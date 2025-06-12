@@ -401,11 +401,8 @@
         if (contentDiv) contentDiv.style.display = "none";
         document.getElementById("messageInfo").textContent = "Erreur lors du chargement du scénario.";
       }
-      return equipes;
-    }
 
     function listenScenario() {
-    function afficherCourseOrientation() {
       const salonCode = localStorage.getItem("salonCode");
       if (!salonCode) return;
       firebase.database().ref('parties/' + salonCode + '/scenario').on('value', function(snapScenario) {
@@ -649,6 +646,5 @@
       </div>
     </div>
   </div>
-  </script>
 </body>
 </html>
