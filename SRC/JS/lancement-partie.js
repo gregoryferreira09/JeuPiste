@@ -13,6 +13,8 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
 // --- Textes fixes de la course d’orientation ---
 const presentationCourseOrientation = "Bienvenue à la grande course d’orientation ! Explorez le terrain, résolvez des énigmes et trouvez tous les points de contrôle avec votre équipe.";
+
+
 const objectifGeneral = "Votre objectif : être la première équipe à valider tous les points de passage ! Communication, réflexion et rapidité seront vos meilleurs atouts.";
 
 // --- Génération des équipes ---
