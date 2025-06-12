@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Choix du personnage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../Public/styles/style.css">
+  <style>
+    .galerie-personnages {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .carte-personnage {
+      background-color: #2c1b1b;
+      border: 2px solid #e9c78c;
+      border-radius: 12px;
+      width: 200px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .carte-personnage img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .carte-personnage:hover {
+      transform: scale(1.05);
+    }
+    .carte-personnage.indisponible {
+      filter: grayscale(0.8) blur(1px);
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .carte-personnage.selectionnee {
+      border: 2px solid #4CAF50 !important;
+    }
+    /* ===== Confirmation retour accueil ===== */
+    #confirmationRetourAccueil {
+      display:none;
+      position:fixed;
+      top:0; left:0; width:100vw; height:100vh;
+      background:rgba(44,27,27,0.72);
+      z-index:99999;
+      justify-content:center;
+      align-items:center;
+    }
+    #confirmationRetourAccueil .modal-content {
+      max-width:340px;
+      margin:auto;
+      text-align:center;
+      border:2.5px solid #e0c185;
+      background:#2c1b1b;
+      border-radius:18px;
+      box-shadow:0 4px 20px #0009;
+      padding:32px 28px;
+    }
+    #confirmationRetourAccueil .modal-content .modal-question {
+      font-weight:bold;
+      margin-bottom:22px;
+      color:#e0c185;
+      font-family:'Cinzel Decorative',serif;
+      font-size:1.1em;
+    }
+    #confirmationRetourAccueil .modal-content .modal-actions {
+      display:flex;
+      flex-direction:row;
+      gap:24px;
+      justify-content:center;
+      margin:0;
+    }
+    #confirmerRetourAccueilBtn {
+      background:#e0c185;
+      color:#181212;
+      border:2px solid #e0c185;
+    }
+    #confirmerRetourAccueilBtn:hover {
+      background:#ffeecb;
+      color:#181212;
+      border:2px solid #e0c185;
+    }
+    #annulerRetourAccueilBtn {
+      background:transparent;
+      color:#ffeecb;
+      border:2px solid #e0c185;
+    }
+    #annulerRetourAccueilBtn:hover {
+      background:#e0c185;
+      color:#181212;
+      border:2px solid #e0c185;
+    }
+    @media (max-width: 700px) {
+      #confirmationRetourAccueil .modal-content {max-width:98vw;}
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 class="site-title">Murder Party</h1>
+  </header>
+
+  <div class="center-wrapper">
+    <main class="main-accueil fadeIn" role="main">
+      <h2 style="font-size:2em; color:#e0c185; margin-bottom:1.3em;">Choisissez votre personnage</h2>
+      <section class="galerie-personnages" id="galeriePersonnages">
+        <!-- Les personnages seront ajoutés dynamiquement ici -->
+      </section>
+      <div class="boutons-actions">
+        <button id="valider-choix" class="main-btn" disabled>Valider mon personnage</button>
+        <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 Murder Party. Tous droits réservés.</p>
+    <a href="mentions-legales.html">Mentions légales</a>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var main = document.querySelector('.fadeIn');
+      if (main) main.classList.add('visible');
+    });
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="../JS/personnages.js"></script>
+  <script>
+    // 1. Config Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Décompte timeout global
+    let decompteTimeoutID = null;
+
+    // Vérifie le code salon
+    const salonCode = localStorage.getItem("salonCode");
+    if (!salonCode) {
+      alert("Code salon manquant. Merci de rejoindre une partie depuis l'accueil.");
+      window.location.href = "join.html";
+    }
+
+    const playerId = localStorage.getItem("uuid") || "anonymous";
+    const pseudo = localStorage.getItem("pseudo") || "Anonyme";
+
+    let personnages = [];
+    let personnageSelectionne = null;
+
+    function afficherPersonnagesEtSync() {
+      db.ref('parties/' + salonCode + '/personnages').on('value', snap => {
+        personnages = [];
+        snap.forEach(p => {
+          const perso = p.val();
+          perso.key = p.key;
+          personnages.push(perso);
+        });
+        afficherGalerie();
+      });
+
+      db.ref('parties/' + salonCode + '/validations').on('value', snap => {
+        const valids = snap.val() || {};
+        updateGalerieIndisponibles(valids);
+        majEtatBouton(valids);
+      });
+    }
+
+    function afficherGalerie() {
+      const galerie = document.getElementById("galeriePersonnages");
+      galerie.innerHTML = personnages.map((perso, i) => `
+        <div class="carte-personnage" data-key="${perso.key}" data-index="${i}">
+          <img src="${perso.image}" alt="${perso.nom}">
+          <p>${perso.nom}</p>
+        </div>
+      `).join("");
+
+      document.querySelectorAll('.carte-personnage').forEach(div => {
+        div.addEventListener('click', function() {
+          if (div.classList.contains('indisponible')) return;
+          document.querySelectorAll('.carte-personnage').forEach(d => d.classList.remove('selectionnee'));
+          div.classList.add('selectionnee');
+          personnageSelectionne = div.getAttribute('data-key');
+          document.getElementById('valider-choix').disabled = false;
+        });
+      });
+    }
+
+    function updateGalerieIndisponibles(valids) {
+      const dejaPrisKeys = Object.values(valids).map(v => v.personnageKey);
+      document.querySelectorAll('.carte-personnage').forEach(div => {
+        const key = div.getAttribute('data-key');
+        if (dejaPrisKeys.includes(key) && (!valids[playerId] || valids[playerId].personnageKey !== key)) {
+          div.classList.add('indisponible');
+        } else {
+          div.classList.remove('indisponible');
+        }
+      });
+      if (valids[playerId]) {
+        const myKey = valids[playerId].personnageKey;
+        document.querySelectorAll('.carte-personnage').forEach(div => {
+          if (div.getAttribute('data-key') === myKey) div.classList.add('selectionnee');
+          else div.classList.remove('selectionnee');
+        });
+        personnageSelectionne = myKey;
+        document.getElementById('valider-choix').disabled = true;
+      }
+    }
+
+    function majEtatBouton(valids) {
+      const btnValider = document.getElementById('valider-choix');
+      const nbValid = Object.keys(valids).length;
+      const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
+      let totalJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
+        ? Number(scenarioData.nombreJoueurs)
+        : Math.max(nbValid, 1); // Fallback sur le nombre de validations (jamais 0)
+      btnValider.textContent =
+        (valids[playerId] ? 'En attente des autres joueurs (' : '') +
+        nbValid + '/' + totalJoueurs +
+        (valids[playerId] ? ')' : ' Valider mon personnage');
+      if (nbValid === totalJoueurs) {
+        lancerDecompteAvantRedirection();
+      }
+      if (valids[playerId] && !document.getElementById('annuler-choix')) {
+        ajouterBoutonAnnuler();
+        btnValider.disabled = true;
+      }
+      if (!valids[playerId] && document.getElementById('annuler-choix')) {
+        document.getElementById('annuler-choix').remove();
+        btnValider.disabled = false;
+      }
+    }
+
+    document.getElementById("valider-choix").onclick = function() {
+      if (!personnageSelectionne || this.disabled) return;
+
+      // Grise la carte sélectionnée immédiatement (localement)
+      document.querySelectorAll('.carte-personnage').forEach(div => {
+        if (div.getAttribute('data-key') === personnageSelectionne) {
+          div.classList.add('indisponible');
+        }
+      });
+
+      db.ref('parties/' + salonCode + '/validations/' + playerId).set({
+        personnageKey: personnageSelectionne,
+        pseudo: pseudo
+      });
+      this.disabled = true;
+    };
+
+    function ajouterBoutonAnnuler() {
+      const btn = document.createElement('button');
+      btn.id = 'annuler-choix';
+      btn.textContent = "Annuler choix personnage";
+      btn.className = "main-btn";
+      btn.onclick = function() {
+        // STOPPER LE DECOMPTE SI LANCÉ
+        if (decompteTimeoutID) {
+          clearTimeout(decompteTimeoutID);
+          decompteTimeoutID = null;
+          const conteneur = document.getElementById('decompte-redirect');
+          if (conteneur) conteneur.remove();
+        }
+        // Dégrise le personnage pour le joueur localement
+        document.querySelectorAll('.carte-personnage').forEach(div => {
+          if (div.classList.contains('selectionnee')) {
+            div.classList.remove('indisponible', 'selectionnee');
+          }
+        });
+        personnageSelectionne = null;
+        document.getElementById('valider-choix').disabled = true;
+        db.ref('parties/' + salonCode + '/validations/' + playerId).remove();
+      };
+      document.querySelector('.boutons-actions').appendChild(btn);
+    }
+
+    window.onload = function() {
+      afficherPersonnagesEtSync();
+    };
+
+    function lancerDecompteAvantRedirection() {
+      // Empêche de lancer deux fois
+      if (document.getElementById('decompte-redirect')) return;
+
+      const conteneur = document.createElement('div');
+      conteneur.id = 'decompte-redirect';
+      conteneur.style.fontSize = '2.2em';
+      conteneur.style.color = '#e0c185';
+      conteneur.style.margin = '24px auto';
+      conteneur.style.textAlign = 'center';
+      conteneur.textContent = 'La partie commence dans 5…';
+      document.querySelector('.main-accueil').appendChild(conteneur);
+
+      let count = 5;
+      function tick() {
+        count--;
+        if (count > 0) {
+          conteneur.textContent = `La partie commence dans ${count}…`;
+          decompteTimeoutID = setTimeout(tick, 1000);
+        } else {
+          conteneur.textContent = "C'est parti !";
+          decompteTimeoutID = setTimeout(() => {
+            window.location.href = "gameplay.html";
+          }, 600);
+        }
+      }
+      decompteTimeoutID = setTimeout(tick, 1000);
+    }
+
+    // === Confirmation retour accueil ===
+    document.addEventListener("DOMContentLoaded", function() {
+      const btnRetourAccueil = document.getElementById("btnRetourAccueil");
+      const confirmationRetourAccueil = document.getElementById("confirmationRetourAccueil");
+      const confirmerRetourAccueilBtn = document.getElementById("confirmerRetourAccueilBtn");
+      const annulerRetourAccueilBtn = document.getElementById("annulerRetourAccueilBtn");
+
+      btnRetourAccueil?.addEventListener("click", function(e) {
+        e.preventDefault();
+        confirmationRetourAccueil.style.display = "flex";
+      });
+
+      confirmerRetourAccueilBtn?.addEventListener("click", function() {
+        confirmationRetourAccueil.style.display = "none";
+        window.location.href = "accueil.html";
+      });
+
+      annulerRetourAccueilBtn?.addEventListener("click", function() {
+        confirmationRetourAccueil.style.display = "none";
+      });
+    });
+  </script>
+
+  <script src="../JS/security-enhance.js"></script>
+  <script src="../JS/ux-enhance.js"></script>
+  <script src="../JS/scalability.js"></script>
+
+  <!-- Fenêtre flottante confirmation retour accueil -->
+  <div id="confirmationRetourAccueil">
+    <div class="modal-content">
+      <div class="modal-question">
+        Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
+      </div>
+      <div class="modal-actions">
+        <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
+        <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
