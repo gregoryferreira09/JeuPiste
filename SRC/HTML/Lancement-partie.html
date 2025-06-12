@@ -6,70 +6,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
-  <style>
-    .presentation-bloc, .objectif-bloc, .detail-bloc {
-      background: #2c1b1b;
-      color: #e0c185;
-      border-radius: 12px;
-      margin: 25px auto;
-      padding: 18px 24px;
-      max-width: 650px;
-      font-family: 'Cormorant Garamond', serif;
-      box-shadow: 0 2px 20px #0004;
-      font-size: 1.25em;
-    }
-    .objectif-bloc {
-      background: #392626;
-      margin-top: 12px;
-      margin-bottom: 24px;
-      border-left: 4px solid #e0c185;
-      font-weight: bold;
-    }
-    .detail-bloc {
-      background: #322222;
-      margin-top: 10px;
-      margin-bottom: 30px;
-      font-size: 1.08em;
-    }
-    .detail-bloc strong {
-      color: #f5d595;
-      font-weight: bold;
-      font-size: 1.13em;
-    }
-    @media (max-width: 700px) {
-      .presentation-bloc, .objectif-bloc, .detail-bloc { max-width: 98vw; }
-    }
-  </style>
 </head>
-<body>
+<body class="accueil">
   <header>
-    <h1 class="site-title">jeu de piste</h1>
+    <h1 class="site-title">Jeu de piste</h1>
   </header>
-
-  <main style="margin-top:30px;">
-    <!-- Bloc Présentation -->
-    <div id="presentation" class="presentation-bloc"></div>
-    <!-- Bloc Objectif général -->
-    <div id="objectifGeneral" class="objectif-bloc"></div>
-    <!-- Bloc détail des équipes -->
-    <div id="detailJeu" class="detail-bloc"></div>
-
-    <div style="text-align: center; margin: 16px 0;">
-      <button onclick="window.location.href='accueil.html'" class="main-btn">Retour à l'accueil</button>
-    </div>
-  </main>
-
+  <div class="center-wrapper">
+    <main class="main-accueil fadeIn" role="main">
+      <h1>Lancement de la partie</h1>
+      <div id="presentation" class="presentation-bloc"></div>
+      <div id="objectifGeneral" class="objectif-bloc"></div>
+      <div id="detailJeu" class="detail-bloc"></div>
+      <div class="boutons-actions">
+        <button onclick="window.location.href='accueil.html'" class="main-btn">Retour à l'accueil</button>
+      </div>
+    </main>
+  </div>
   <footer class="footer">
-    <p>© 2025 Course d’orientation. Tous droits réservés.</p>
+    <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
   <!-- Script de génération des blocs -->
   <script>
+    // Textes fixes de la course d’orientation
     const presentationCourseOrientation = "Bienvenue à la plus rocambolesque des courses d’orientation ! Explorez le parc, résolvez des énigmes et trouvez tous les points de contrôle avec votre équipe.";
     const objectifGeneral = "Votre objectif : être la première équipe à valider tous les points de passage ! Communication, réflexion et rapidité seront vos meilleurs atouts.";
 
@@ -123,7 +85,12 @@
       });
     }
 
-    document.addEventListener("DOMContentLoaded", afficherCourseOrientation);
+    document.addEventListener("DOMContentLoaded", function() {
+      // Animation fadeIn
+      var main = document.querySelector('.fadeIn');
+      if (main) main.classList.add('visible');
+      afficherCourseOrientation();
+    });
   </script>
 </body>
 </html>
