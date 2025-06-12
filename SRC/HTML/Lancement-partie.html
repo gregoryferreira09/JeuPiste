@@ -359,7 +359,7 @@
     });
   </script>
   <script src="../JS/personnages.js"></script>
-  <script src="../JS/Scenario.js"></script>
+  <script src="../JS/lancement-partie.js"></script>
   
   <script>
     function afficherScenario(scenarioObj, scenarioData) {
@@ -559,7 +559,6 @@
           let membres = equipe.join(" & ");
           detailDiv.innerHTML += `<div><strong>Équipe ${idx + 1} :</strong> ${membres}</div>`;
         });
-      };
 
       // Gestion du bouton "Fermer" des messages
       document.body.addEventListener("click", function(e) {
