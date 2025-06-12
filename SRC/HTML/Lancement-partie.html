@@ -544,6 +544,7 @@
             <button id="fermerMsg">Fermer</button>
           </div>`;
           floatConfirm.style.display = "block";
+        });
       firebase.database().ref('parties/' + salonCode + '/joueurs').once('value').then(function(snapshot) {
         let joueurs = [];
         snapshot.forEach(child => {
