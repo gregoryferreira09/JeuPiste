@@ -137,23 +137,6 @@
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
     });
-  </script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script>
-    // Initialisation Firebase (lecture seule)
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (typeof firebase !== "undefined" && !firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
 
     // Affichage du pseudo dans le message de bienvenue
     document.addEventListener("DOMContentLoaded", function() {
