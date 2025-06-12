@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
     body {
       background: #181212;
@@ -42,13 +41,13 @@
       font-size: 1.33em;
       text-align: center;
     }
-    .bandeau-principal .scenario-detail {
+    .scenario-detail {
       margin-bottom: 10px;
       color: #ffeecb;
       font-size: 1.09em;
       text-align: center;
     }
-    .bandeau-principal .scenario-label {
+    .scenario-label {
       color: #e0c185;
       font-weight: 600;
       margin-right: 4px;
@@ -95,7 +94,6 @@
       margin-top: 18px;
       margin-bottom: 4px;
     }
-    /* Blocs en bas */
     .presentation-bloc, .objectif-bloc, .detail-bloc {
       background: #2c1b1b;
       border-radius: 18px;
@@ -128,6 +126,36 @@
       .main-btn { width: 100%; min-width: 0; max-width: 99vw; font-size: 1em;}
       .actions-bandeau { flex-direction: column; gap: 10px;}
     }
+    /* Fenêtre flottante */
+    #confirmationRetourAccueil {
+      display: none;
+      position: fixed;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(24,18,18,0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #confirmationRetourAccueil .modal-content {
+      background: #2c1b1b;
+      border: 2px solid #e0c185;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      color: #f4e4c1;
+      box-shadow: 0 8px 32px #0007;
+      min-width: 280px;
+    }
+    #confirmationRetourAccueil .modal-actions {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+    }
+    #confirmationRetourAccueil .main-btn {
+      min-width: 80px;
+    }
   </style>
 </head>
 <body>
@@ -156,38 +184,16 @@
           <div class="info" id="messageInfo"></div>
         </div>
       </section>
+      <div id="presentation" class="presentation-bloc">Présentation du jeu...</div>
+      <div id="objectifGeneral" class="objectif-bloc">Objectif général ici...</div>
+      <div id="detailJeu" class="detail-bloc">Détails du jeu ici...</div>
     </main>
   </div>
-
-  <main style="margin-top:30px;">
-    <div id="presentation" class="presentation-bloc"></div>
-    <div id="objectifGeneral" class="objectif-bloc"></div>
-    <div id="detailJeu" class="detail-bloc"></div>
-  </main>
-
   <footer class="footer">
     <p>© 2025 Murder Party. Tous droits réservés.</p>
     <p>© 2025 Course d’orientation. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-  <!-- Effet fade-in (optionnel) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      var section = document.querySelector('.fadeIn');
-      if (section) section.classList.add('visible');
-    });
-  </script>
-
-  <script src="../JS/personnages.js"></script>
-  <script src="../JS/lancement-partie.js"></script>
-  <script src="../JS/security-enhance.js"></script>
-  <script src="../JS/ux-enhance.js"></script>
-  <script src="../JS/scalability.js"></script>
 
   <!-- Fenêtre flottante confirmation retour accueil -->
   <div id="confirmationRetourAccueil">
@@ -201,5 +207,45 @@
       </div>
     </div>
   </div>
+
+  <!-- Script unique -->
+  <script>
+    // Effet fade-in
+    document.addEventListener("DOMContentLoaded", function() {
+      var section = document.querySelector('.fadeIn');
+      if (section) section.classList.add('visible');
+    });
+
+    // Activation du bouton "Démarrer" après 30s
+    document.addEventListener("DOMContentLoaded", function() {
+      const demarrerBtn = document.getElementById("demarrerBtn");
+      if (demarrerBtn) {
+        setTimeout(() => {
+          demarrerBtn.style.pointerEvents = "auto";
+          demarrerBtn.style.opacity = "1";
+          demarrerBtn.textContent = "Démarrer la partie";
+        }, 30000);
+      }
+    });
+
+    // Gestion de la modale de retour accueil
+    document.addEventListener("DOMContentLoaded", function() {
+      const btnRetour = document.getElementById("btnRetourAccueil");
+      const confirmation = document.getElementById("confirmationRetourAccueil");
+      const btnConfirmer = document.getElementById("confirmerRetourAccueilBtn");
+      const btnAnnuler = document.getElementById("annulerRetourAccueilBtn");
+      if (btnRetour && confirmation && btnConfirmer && btnAnnuler) {
+        btnRetour.addEventListener("click", () => {
+          confirmation.style.display = "flex";
+        });
+        btnConfirmer.addEventListener("click", () => {
+          window.location.href = "accueil.html";
+        });
+        btnAnnuler.addEventListener("click", () => {
+          confirmation.style.display = "none";
+        });
+      }
+    });
+  </script>
 </body>
 </html>
