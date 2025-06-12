@@ -1,91 +1,83 @@
-// --- Configuration Firebase ---
-const firebaseConfig = {
-  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-  authDomain: "murder-party-ba8d1.firebaseapp.com",
-  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.appspot.com",
-  messagingSenderId: "20295055805",
-  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-  measurementId: "G-KSBMBB7KMJ"
-};
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Lancement de la Partie - Murder Party</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../Public/styles/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
+  <style>
+    /* ... ton CSS existant, inchangé ... */
+    /* Garde tout le bloc <style> tel qu'il était */
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1 class="site-title">Lancement de la partie</h1>
+  </header>
+  <div class="center-wrapper">
+    <main>
+      <section class="page-lancement fadeIn" role="main" aria-live="polite">
+        <div class="scenario-actions">
+          <a class="main-btn" id="demarrerBtn" href="personnage.html" style="pointer-events:none; opacity:0.6;">Disponible dans 30s</a>
+          <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
+        </div>
+        <div class="info" id="messageInfo"></div>
+      </section>
+    </main>
+  </div>
 
-// --- Textes fixes de la course d’orientation ---
-const presentationCourseOrientation =
-  `Bienvenue à la plus rocambolesque des courses d’orientation&nbsp;!<br><br>
-  Explorez le parc, résolvez des énigmes et trouvez tous les points de contrôle avec votre équipe.`;
+  <main style="margin-top:30px;">
+    <!-- Bloc Présentation -->
+    <div id="presentation" class="presentation-bloc"></div>
+    <!-- Bloc Objectif général -->
+    <div id="objectifGeneral" class="objectif-bloc"></div>
+    <!-- Bloc détail des équipes -->
+    <div id="detailJeu" class="detail-bloc"></div>
 
-const objectifGeneral =
-  `<span style="text-decoration: underline; font-weight: bold;">Votre objectif&nbsp;:</span>
-  être la première équipe à valider tous les points de passage&nbsp;!<br>
-  Communication, réflexion et rapidité seront vos meilleurs atouts.`;
+    <div style="text-align: center; margin: 16px 0;">
+      <button onclick="window.location.href='accueil.html'" class="main-btn">Retour à l'accueil</button>
+    </div>
+  </main>
 
-// --- Génération des équipes ---
-function genererEquipes(joueurs) {
-  let equipes = [];
-  let shuffled = joueurs.slice().sort(() => Math.random() - 0.5);
-  while (shuffled.length > 0) {
-    if (shuffled.length === 3 || shuffled.length === 1) {
-      equipes.push(shuffled.splice(0, 3));
-    } else {
-      equipes.push(shuffled.splice(0, 2));
-    }
-  }
-  return equipes;
-}
+  <footer class="footer">
+    <p>© 2025 Murder Party. Tous droits réservés.</p>
+    <p>© 2025 Course d’orientation. Tous droits réservés.</p>
+    <a href="mentions-legales.html">Mentions légales</a>
+  </footer>
 
-// --- Remplissage du HTML ---
-function afficherCourseOrientation() {
-  const salonCode = localStorage.getItem("salonCode");
-  if (!salonCode) {
-    document.getElementById("presentation").innerHTML = "<b>Code salon introuvable.</b>";
-    document.getElementById("objectifGeneral").innerHTML = "";
-    document.getElementById("detailJeu").innerHTML = "";
-    return;
-  }
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-  firebase.database().ref('parties/' + salonCode + '/joueurs').once('value').then(function(snapshot) {
-    let joueurs = [];
-    snapshot.forEach(child => {
-      joueurs.push(child.val().pseudo);
+  <!-- Effet fade-in (optionnel) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var section = document.querySelector('.fadeIn');
+      if (section) section.classList.add('visible');
     });
+  </script>
 
-    // Présentation
-    const presentationDiv = document.getElementById("presentation");
-    presentationDiv.innerHTML = presentationCourseOrientation;
-    presentationDiv.style.marginBottom = "28px";
-    presentationDiv.style.fontSize = "1.13em";
-    presentationDiv.style.lineHeight = "1.5";
+  <!-- Tes scripts métiers et utilitaires -->
+  <script src="../JS/personnages.js"></script>
+  <script src="../JS/lancement-partie.js"></script>
+  <script src="../JS/security-enhance.js"></script>
+  <script src="../JS/ux-enhance.js"></script>
+  <script src="../JS/scalability.js"></script>
 
-    // Objectif général avec soulignage
-    const objectifDiv = document.getElementById("objectifGeneral");
-    objectifDiv.innerHTML = objectifGeneral;
-    objectifDiv.style.marginBottom = "32px";
-    objectifDiv.style.fontSize = "1.18em";
-    objectifDiv.style.lineHeight = "1.6";
-
-    // Détail des équipes (aéré et lisible)
-    const detailDiv = document.getElementById("detailJeu");
-    if (joueurs.length === 0) {
-      detailDiv.innerHTML = "<i>Aucun joueur connecté.</i>";
-      return;
-    }
-    const equipes = genererEquipes(joueurs);
-    detailDiv.innerHTML = `
-      <div style="margin-bottom:18px;font-size:1.13em">${equipes.length} équipe${equipes.length > 1 ? "s" : ""} :</div>
-      <ul style="list-style:none;padding:0;margin:0;">
-        ${equipes.map((equipe, idx) => `
-          <li style="margin-bottom: 18px; padding: 12px 0; border-bottom: 1px solid #e0c18544;">
-            <strong style="color:#e0c185;font-size:1.13em;">Équipe ${idx + 1} :</strong>
-            <span style="color:#f4e4c1;margin-left:12px;">${equipe.join(" &nbsp;&nbsp; ")}</span>
-          </li>
-        `).join('')}
-      </ul>
-    `;
-    detailDiv.style.fontSize = "1.09em";
-    detailDiv.style.lineHeight = "1.7";
-  });
-}
-
-document.addEventListener("DOMContentLoaded", afficherCourseOrientation);
+  <!-- Fenêtre flottante confirmation retour accueil -->
+  <div id="confirmationRetourAccueil">
+    <div class="modal-content">
+      <div class="modal-question">
+        Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
+      </div>
+      <div class="modal-actions">
+        <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
+        <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
