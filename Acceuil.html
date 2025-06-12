@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Accueil – Jeu de piste</title>
+  <title>Accueil – Jeu de Piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
@@ -110,20 +110,20 @@
 <body class="accueil">
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <h1>Jeu de piste</h1>
+      <h1>Murder Party</h1>
       <h2>Enquête collaborative en ligne</h2>
       <div class="bienvenue-message">
         Bienvenue <span id="pseudoAffiche"></span>
       </div>
       <div class="menu-buttons" role="group" aria-label="Actions principales">
-        <button class="gold-btn" type="button" onclick="window.location.href='equipe1.html'">Équipe 1</button>
-        <button class="gold-btn" type="button" onclick="window.location.href='equipe2.html'">Équipe 2</button>
-        <button class="gold-btn" type="button" onclick="window.location.href='equipe3.html'">Équipe 3</button>
-        <button class="gold-btn" type="button" onclick="window.location.href='equipe4.html'">Équipe 4</button>
-        <button class="gold-btn" type="button" onclick="window.location.href='equipe5.html'">Équipe 5</button>
+        <button class="main-btn" type="button" onclick="window.location.href='creer-partie.html'">🎮 Créer une partie</button>
+        <button class="main-btn" type="button" onclick="window.location.href='rejoindre-partie.html'">👥 Rejoindre une partie</button>
+        <button class="main-btn" type="button" onclick="window.location.href='profil-joueur.html'">👤 Profil</button>
+        <button class="main-btn" type="button" onclick="window.location.href='boutique.html'">🛍️ Boutique</button>
+        <button class="main-btn" type="button" onclick="window.location.href='parametres.html'">⚙️ Paramètres</button>
       </div>
       <div class="info">
-        <p><strong>Bienvenue&nbsp;!</strong> Organise un jeu de piste ou rejoins une équipe pour commencer l'aventure.</p>
+        <p><strong>Bienvenue&nbsp;!</strong> Organise un jeu de piste ou rejoins une partie existante grâce à un code partagé.</p>
       </div>
     </main>
   </div>
@@ -137,7 +137,7 @@
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
     });
-
+  
     // Affichage du pseudo dans le message de bienvenue
     document.addEventListener("DOMContentLoaded", function() {
       var pseudo = localStorage.getItem("pseudo");
@@ -151,8 +151,10 @@
     // Nettoyage code salon si existant
     localStorage.removeItem("salonCode");
   </script>
+
   <script src="../JS/security-enhance.js"></script>
   <script src="../JS/ux-enhance.js"></script>
   <script src="../JS/scalability.js"></script>
+  
 </body>
 </html>
