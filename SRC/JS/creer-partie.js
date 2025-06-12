@@ -1,12 +1,13 @@
 // --- Configuration Firebase ---
 const firebaseConfig = {
-  apiKey: "AIzaSyAQ3dmePldp1MYV3lklG51DjTTMpUHnhuY",
-  authDomain: "jeupiste-c97d3.firebaseapp.com",
-  projectId: "jeupiste-c97d3",
-  storageBucket: "jeupiste-c97d3.appspot.com", // <-- CORRIGÉ ici !
-  messagingSenderId: "373850395049",
-  appId: "1:373850395049:web:83c8a17f625b7cda9534b8",
-  measurementId: "G-EX82WFWR7W"
+  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+  authDomain: "murder-party-ba8d1.firebaseapp.com",
+  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "murder-party-ba8d1",
+  storageBucket: "murder-party-ba8d1.firebasestorage.app",
+  messagingSenderId: "20295055805",
+  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+  measurementId: "G-KSBMBB7KMJ"
 };
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
