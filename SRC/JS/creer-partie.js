@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAQ3dmePldp1MYV3lklG51DjTTMpUHnhuY",
   authDomain: "jeupiste-c97d3.firebaseapp.com",
   projectId: "jeupiste-c97d3",
-  storageBucket: "jeupiste-c97d3.firebasestorage.app",
+  storageBucket: "jeupiste-c97d3.appspot.com", // <-- CORRIGÉ ici !
   messagingSenderId: "373850395049",
   appId: "1:373850395049:web:83c8a17f625b7cda9534b8",
   measurementId: "G-EX82WFWR7W"
