@@ -443,3 +443,49 @@ body {
 .fadeIn.visible {
   opacity: 1;
 }
+
+.presentation-jeu {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.8em;
+  margin: 38px 0 24px 0;
+}
+.titre-course {
+  font-family: 'Cinzel Decorative', serif;
+  color: #e0c185;
+  font-size: 1.5em;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.texte-course {
+  font-size: 1.14em;
+  margin-bottom: 0.4em;
+  color: #ffeecb;
+}
+.objectif-course {
+  margin: 1.2em 0 0.7em 0;
+  font-size: 1.18em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.objectif-label {
+  background: #e0c185;
+  color: #181212;
+  font-weight: bold;
+  border-radius: 7px;
+  padding: 0.12em 0.8em;
+  margin-bottom: 0.3em;
+  display: inline-block;
+}
+.objectif-text {
+  color: #ffeecb;
+}
+.regles-course {
+  margin-top: 0.8em;
+  color: #f5e2bf;
+  font-size: 1.09em;
+  line-height: 1.6;
+}
