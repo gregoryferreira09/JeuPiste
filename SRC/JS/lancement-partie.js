@@ -13,10 +13,10 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
 // --- Textes fixes de la course d’orientation ---
 const presentationCourseOrientation =
-  "Bienvenue à la plus rocambolesque des courses d’orientation !<br>Explorez le parc, résolvez des énigmes et trouvez tous les points de contrôle avec votre équipe.";
+  "Bienvenue à la plus rocambolesque des courses d’orientation&nbsp;!<br><br>Explorez le parc, résolvez des énigmes et trouvez tous les points de contrôle avec votre équipe.";
 
-// Pour l’objectif général : on souligne "Votre objectif"
-const objectifGeneral = `<span style="text-decoration: underline; font-weight:bold;">Votre objectif :</span> être la première équipe à valider tous les points de passage !<br>Communication, réflexion et rapidité seront vos meilleurs atouts.`;
+// Objectif général avec "Votre objectif :" souligné et en gras
+const objectifGeneral = `<span style="text-decoration: underline; font-weight:bold;">Votre objectif&nbsp;:</span> être la première équipe à valider tous les points de passage&nbsp;!<br>Communication, réflexion et rapidité seront vos meilleurs atouts.`;
 
 // --- Génération des équipes ---
 function genererEquipes(joueurs) {
@@ -52,27 +52,27 @@ function afficherCourseOrientation() {
     if (presentationDiv) {
       presentationDiv.innerHTML = presentationCourseOrientation;
       presentationDiv.style.marginBottom = "28px";
-      presentationDiv.style.fontSize = "1.12em";
+      presentationDiv.style.fontSize = "1.13em";
     }
 
-    // Objectif général, souligné
+    // Objectif général avec soulignage
     const objectifDiv = document.getElementById("objectifGeneral");
     if (objectifDiv) {
       objectifDiv.innerHTML = objectifGeneral;
       objectifDiv.style.marginBottom = "32px";
-      objectifDiv.style.fontSize = "1.15em";
+      objectifDiv.style.fontSize = "1.18em";
     }
 
-    // Détail des équipes (aéré)
+    // Détail des équipes, espacé, lisible
     const detailDiv = document.getElementById("detailJeu");
     if (detailDiv) {
       detailDiv.innerHTML = `
-        <div style="margin-bottom:18px;font-size:1.13em">${equipes.length} équipe${equipes.length > 1 ? "s" : ""} :</div>
+        <div style="margin-bottom:18px;font-size:1.12em">${equipes.length} équipe${equipes.length > 1 ? "s" : ""} :</div>
         <ul style="list-style:none;padding:0;margin:0;">
           ${equipes.map((equipe, idx) => `
-            <li style="margin-bottom: 18px; padding: 12px 0; border-bottom: 1px solid #e0c18522;">
+            <li style="margin-bottom: 18px; padding: 12px 0; border-bottom: 1px solid #e0c18544;">
               <strong style="color:#e0c185;font-size:1.13em;">Équipe ${idx + 1} :</strong>
-              <span style="color:#f4e4c1;margin-left:8px;">${equipe.join(" & ")}</span>
+              <span style="color:#f4e4c1;margin-left:8px;">${equipe.join(" &nbsp; &nbsp; " )}</span>
             </li>
           `).join('')}
         </ul>
