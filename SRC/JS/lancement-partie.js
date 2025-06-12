@@ -1,4 +1,4 @@
-// --- Firebase config (à adapter selon ton projet si besoin) ---
+// --- Configuration Firebase ---
 const firebaseConfig = {
   apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
   authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -12,10 +12,11 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
 // --- Textes fixes de la course d’orientation ---
-const presentationCourseOrientation = "Bienvenue à la grande course d’orientation ! Explorez le terrain, résolvez des énigmes et trouvez tous les points de contrôle avec votre équipe.";
+const presentationCourseOrientation =
+  "Bienvenue à la plus rocambolesque des courses d’orientation !<br>Explorez le parc, résolvez des énigmes et trouvez tous les points de contrôle avec votre équipe.";
 
-
-const objectifGeneral = "Votre objectif : être la première équipe à valider tous les points de passage ! Communication, réflexion et rapidité seront vos meilleurs atouts.";
+// Pour l’objectif général : on souligne "Votre objectif"
+const objectifGeneral = `<span style="text-decoration: underline; font-weight:bold;">Votre objectif :</span> être la première équipe à valider tous les points de passage !<br>Communication, réflexion et rapidité seront vos meilleurs atouts.`;
 
 // --- Génération des équipes ---
 function genererEquipes(joueurs) {
@@ -38,21 +39,45 @@ function afficherCourseOrientation() {
     document.getElementById("presentation").innerText = "Code salon introuvable.";
     return;
   }
+
   firebase.database().ref('parties/' + salonCode + '/joueurs').once('value').then(function(snapshot) {
     let joueurs = [];
     snapshot.forEach(child => {
       joueurs.push(child.val().pseudo);
     });
     const equipes = genererEquipes(joueurs);
-    document.getElementById("presentation").innerText = presentationCourseOrientation;
-    document.getElementById("objectifGeneral").innerText = objectifGeneral;
+
+    // Présentation
+    const presentationDiv = document.getElementById("presentation");
+    if (presentationDiv) {
+      presentationDiv.innerHTML = presentationCourseOrientation;
+      presentationDiv.style.marginBottom = "28px";
+      presentationDiv.style.fontSize = "1.12em";
+    }
+
+    // Objectif général, souligné
+    const objectifDiv = document.getElementById("objectifGeneral");
+    if (objectifDiv) {
+      objectifDiv.innerHTML = objectifGeneral;
+      objectifDiv.style.marginBottom = "32px";
+      objectifDiv.style.fontSize = "1.15em";
+    }
+
+    // Détail des équipes (aéré)
     const detailDiv = document.getElementById("detailJeu");
-    detailDiv.innerHTML = "";
-    detailDiv.innerHTML += `<div style="margin-bottom:10px;">${equipes.length} équipe${equipes.length > 1 ? "s" : ""} :</div>`;
-    equipes.forEach((equipe, idx) => {
-      let membres = equipe.join(" & ");
-      detailDiv.innerHTML += `<div><strong>Équipe ${idx + 1} :</strong> ${membres}</div>`;
-    });
+    if (detailDiv) {
+      detailDiv.innerHTML = `
+        <div style="margin-bottom:18px;font-size:1.13em">${equipes.length} équipe${equipes.length > 1 ? "s" : ""} :</div>
+        <ul style="list-style:none;padding:0;margin:0;">
+          ${equipes.map((equipe, idx) => `
+            <li style="margin-bottom: 18px; padding: 12px 0; border-bottom: 1px solid #e0c18522;">
+              <strong style="color:#e0c185;font-size:1.13em;">Équipe ${idx + 1} :</strong>
+              <span style="color:#f4e4c1;margin-left:8px;">${equipe.join(" & ")}</span>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
   });
 }
 
