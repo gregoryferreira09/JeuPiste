@@ -188,15 +188,23 @@
       if (section) section.classList.add('visible');
     });
 
-    // Activation du bouton "Démarrer" après 30s
+    // Décompte visible du bouton Démarrer
     document.addEventListener("DOMContentLoaded", function() {
       const demarrerBtn = document.getElementById("demarrerBtn");
+      let timer = 30;
       if (demarrerBtn) {
-        setTimeout(() => {
-          demarrerBtn.style.pointerEvents = "auto";
-          demarrerBtn.style.opacity = "1";
-          demarrerBtn.textContent = "Démarrer la partie";
-        }, 30000);
+        demarrerBtn.textContent = "Disponible dans 30s";
+        const interval = setInterval(() => {
+          timer--;
+          if (timer > 0) {
+            demarrerBtn.textContent = `Disponible dans ${timer}s`;
+          } else {
+            clearInterval(interval);
+            demarrerBtn.style.pointerEvents = "auto";
+            demarrerBtn.style.opacity = "1";
+            demarrerBtn.textContent = "Démarrer la partie";
+          }
+        }, 1000);
       }
     });
 
