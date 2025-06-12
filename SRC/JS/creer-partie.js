@@ -31,15 +31,9 @@ function getRandomElements(arr, n) {
 // Fonction globale accessible depuis l'extérieur
 window.creerPartie = async function(formData) {
   const mode = formData.get("mode");
-  const duree = formData.get("duree");
-  const periode = formData.get("periode");
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
-  const criminels = parseInt(formData.get("criminels"), 10);
-  const criminel_fantome = !!formData.get("criminel_fantome");
-  const avatars_legendaires = !!formData.get("avatars_legendaires");
-  const inactifs = !!formData.get("inactifs");
 
-  if (!mode || !duree || !periode || isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12) {
+  if (!mode || isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12) {
     alert("Veuillez remplir tous les champs correctement.");
     return;
   }
@@ -55,14 +49,8 @@ window.creerPartie = async function(formData) {
 
   const parametresPartie = {
     mode,
-    duree,
-    periode, // On stocke la vraie valeur du select, qui doit correspondre aux clés de univers
     nombreJoueurs,
-    criminels,
-    criminelFantome: criminel_fantome,
-    avatarsLegendaires: avatars_legendaires,
-    inactifs,
-   createur: uuid
+    createur: uuid
   };
 
   // Génère un code salon unique
@@ -71,34 +59,13 @@ window.creerPartie = async function(formData) {
   // Enregistre les paramètres dans Firebase
   await db.ref('parties/' + salonCode + '/parametres').set(parametresPartie);
 
-// Tirage unique des personnages pour la partie
-let persosObj = {};
-
-if (periode === "medieval") {
-  // Génère le scénario et les fiches depuis le générateur spécial
-  const scenario = window.genererScenarioBanquet(window.univers.medieval.banquet);
-  scenario.joueurs.slice(0, nombreJoueurs).forEach((p, i) => {
-    persosObj['perso' + i] = p;
-  });
-
-    // Stocke la trame et les éléments centraux dans Firebase
-  await db.ref('parties/' + salonCode + '/scenario').set({
-    introduction: scenario.introduction,
-    crime: scenario.crime,
-    ambiance: scenario.ambiance,
-    lieu: scenario.lieu,
-    arme: scenario.arme
-    // Ajoute d'autres champs si tu veux (ex : scenario.victime, etc.)
-  });
-  
-} else {
-  // Logique actuelle pour les autres époques
-  let listePersos = getRandomElements(window.personnagesParEpoque[periode], nombreJoueurs);
-  listePersos.forEach((p, i) => {
-    persosObj['perso' + i] = p;
-  });
-}
-await db.ref('parties/' + salonCode + '/personnages').set(persosObj);
+  // GÉNÉRATION À ADAPTER POUR « Parc Saint Nicolas »
+  let persosObj = {};
+  // Exemple simple : crée des personnages vides à personnaliser ensuite
+  for (let i = 0; i < nombreJoueurs; i++) {
+    persosObj['perso' + i] = {};
+  }
+  await db.ref('parties/' + salonCode + '/personnages').set(persosObj);
 
   // Enregistre le créateur comme premier joueur
   await db.ref('parties/' + salonCode + '/joueurs').push({
@@ -106,10 +73,8 @@ await db.ref('parties/' + salonCode + '/personnages').set(persosObj);
     pseudo
   });
 
-  // Stocke les paramètres de la partie dans le localStorage pour les autres pages (AJOUT IMPORTANT)
+  // Stocke les paramètres de la partie dans le localStorage pour les autres pages
   localStorage.setItem("parametresPartie", JSON.stringify(parametresPartie));
-
-  // Stocke uniquement le code salon dans le localStorage (conservé pour compatibilité)
   localStorage.setItem("salonCode", salonCode);
 
   window.location.href = "salon.html";
