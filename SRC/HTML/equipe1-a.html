@@ -63,10 +63,12 @@
       margin: -1px;
     }
 
-    /* Image Gandalf avec bords fondus */
+    /* Image Gandalf avec bords fondus et hauteur réduite */
     .image-fondue {
       width: 100%;
       max-width: 340px;
+      max-height: 180px;
+      object-fit: cover;
       margin: 26px auto 0 auto;
       display: block;
       border-radius: 18px;
@@ -154,6 +156,7 @@
             </svg>
             <span>GPS</span>
           </a>
+          <div style="color:#ffeecb; font-size:0.95em; margin-top:2px;">Boussole</div>
         </div>
         <!-- Appareil photo à droite -->
         <div class="icon-action" style="align-items: flex-end;">
@@ -163,6 +166,7 @@
               <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4-.21h2.83c.16 0 .31.08.4.21L15.95 7H20v13zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
             </svg>
             <span>Photo</span>
+            <div style="color:#ffeecb; font-size:0.95em; margin-top:2px;">preuve à envoyer</div>
             <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
           </label>
         </div>
