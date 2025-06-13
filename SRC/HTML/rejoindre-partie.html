@@ -21,11 +21,9 @@
       .main-join { max-width: 98vw; margin: 10px auto; padding: 12px 2vw; border-radius: 12px; }
     }
   </style>
-  <!-- AJOUT : Charger Firebase AVANT ton script local -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <!-- Ton script local (chemin correct si tu es en serveur local) -->
-  <script src="../JS/rejoindre-partie.js"></script>
 </head>
 <body>
   <header>
@@ -70,11 +68,95 @@
     document.addEventListener("DOMContentLoaded", function() {
       document.querySelector('.main-join').classList.add('visible');
     });
+
+    // --- Configuration Firebase ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // Génère un UUID v4 (même fonction que dans creer-partie.js)
+    function generateUUID() {
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      );
+    }
+
+    document.getElementById("joinForm").addEventListener("submit", async function(e){
+      e.preventDefault();
+      const code = document.getElementById("codeInput").value.trim().toUpperCase();
+      const errorDiv = document.getElementById("errorMessage");
+      errorDiv.textContent = "";
+      if (!code || (code.length !== 4 && code.length !== 6 && code.length !== 8)) {
+        errorDiv.textContent = "Code invalide.";
+        return;
+      }
+
+      // Vérifie l'existence du salon dans Firebase
+      const ref = db.ref('parties/' + code + '/parametres');
+      const snap = await ref.once('value');
+      if (!snap.exists()) {
+        errorDiv.textContent = "Aucune partie trouvée avec ce code.";
+        return;
+      }
+      const parametres = snap.val();
+
+      // Pseudo joueur
+      let pseudo = localStorage.getItem("pseudo") || "";
+      while (!pseudo) {
+        pseudo = prompt("Entrez votre pseudo :");
+        if (pseudo) localStorage.setItem("pseudo", pseudo);
+      }
+      pseudo = pseudo.replace(/[<>\/\\'"`]/g, "").trim().substring(0, 30);
+
+      // UUID local
+      let uuid = localStorage.getItem("uuid");
+      if (!uuid) {
+        uuid = generateUUID();
+        localStorage.setItem("uuid", uuid);
+      }
+
+      // Vérifie s'il n'y a pas déjà trop de joueurs
+      const joueursRef = db.ref('parties/' + code + '/joueurs');
+      const joueursSnap = await joueursRef.once('value');
+      const nbJoueurs = joueursSnap.numChildren();
+      const nbMax = parseInt(parametres.nombreJoueurs) || 1;
+      if (nbJoueurs >= nbMax) {
+        errorDiv.textContent = "La partie est déjà complète.";
+        return;
+      }
+
+      // Empêche l'inscription deux fois avec le même uuid
+      let dejaDansPartie = false;
+      joueursSnap.forEach(child => {
+        const v = child.val();
+        if (v.uuid === uuid) dejaDansPartie = true;
+      });
+      if (!dejaDansPartie) {
+        await joueursRef.push({ uuid, pseudo });
+      }
+
+      // Stocke les infos nécessaires
+      localStorage.setItem("parametresPartie", JSON.stringify(parametres));
+      localStorage.setItem("salonCode", code);
+
+      // Redirige vers le salon
+      window.location.href = "salon.html";
+    });
   </script>
 
   <script src="../JS/security-enhance.js"></script>
-<script src="../JS/ux-enhance.js"></script>
-<script src="../JS/scalability.js"></script>
-  
+  <script src="../JS/ux-enhance.js"></script>
+  <script src="../JS/scalability.js"></script>
 </body>
 </html>
