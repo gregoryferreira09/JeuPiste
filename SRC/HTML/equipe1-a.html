@@ -62,6 +62,39 @@
       padding: 0;
       margin: -1px;
     }
+
+    /* Image Gandalf avec bords fondus */
+    .image-fondue {
+      width: 100%;
+      max-width: 340px;
+      margin: 26px auto 0 auto;
+      display: block;
+      border-radius: 18px;
+      box-shadow: 0 2px 20px 4px rgba(0,0,0,0.18);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    }
+
+    /* Bouton Quête suivante désactivé */
+    #next-quest {
+      background: #aaa;
+      color: #fff;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      margin: 28px auto 0 auto;
+      display: block;
+      opacity: 0.6;
+      cursor: not-allowed;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    #next-quest.enabled {
+      background: #e0c185;
+      opacity: 1;
+      cursor: pointer;
+    }
+
     @media (max-width: 650px) {
       .actions-row {
         flex-direction: column;
@@ -77,6 +110,9 @@
       }
       .icon-action span {
         text-align: left;
+      }
+      .image-fondue {
+        max-width: 98vw;
       }
     }
   </style>
@@ -105,13 +141,16 @@
         </div>
       </div>
 
+      <!-- Image fondue entre les symboles -->
+      <img src="../../Public/images/gandalf.png" alt="Gandalf" class="image-fondue" />
+
       <div class="actions-row">
         <!-- GPS à gauche -->
         <div class="icon-action" style="align-items: flex-start;">
           <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <!-- Icône GPS / localisation -->
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zm0-11.3a2 2 0 1 0 .001 3.999A2 2 0 0 0 12 9z"/>
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zm0-13.3c-1.66 0-3 1.34-3 3 0 1.66 1.34 3 3 3s3-1.34 3-3c0-1.66-1.34-3-3-3zm0 4c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/>
             </svg>
             <span>GPS</span>
           </a>
@@ -121,7 +160,7 @@
           <label for="photo-upload" aria-label="Télécharger une photo">
             <!-- Icône appareil photo -->
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4-.21h2.44c.16 0 .31.08.41.21L15.95 7H20v13zm-8 3a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4-.21h2.83c.16 0 .31.08.4.21L15.95 7H20v13zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
             </svg>
             <span>Photo</span>
             <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -129,6 +168,9 @@
         </div>
       </div>
       <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+
+      <!-- Bouton Quête suivante désactivé par défaut -->
+      <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
 
@@ -137,16 +179,21 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <script>
-    // Affichage du nom de la photo après sélection
+    // Affichage du nom de la photo + activation du bouton
     document.addEventListener('DOMContentLoaded', function() {
       var input = document.getElementById('photo-upload');
       var out = document.getElementById('photo-filename');
+      var btn = document.getElementById('next-quest');
       if(input) {
         input.addEventListener('change', function() {
           if(this.files && this.files[0]) {
             out.textContent = "Photo sélectionnée : " + this.files[0].name;
+            btn.disabled = false;
+            btn.classList.add('enabled');
           } else {
             out.textContent = "";
+            btn.disabled = true;
+            btn.classList.remove('enabled');
           }
         });
       }
