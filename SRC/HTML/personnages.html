@@ -161,9 +161,7 @@
     const pseudo = localStorage.getItem("pseudo") || "Anonyme";
 
     let equipeSelectionnee = null;
-    let nombreEquipes = 0;
 
-    // Initialisation ou récupération du nombre d'équipes
     function calculerNombreEquipes() {
       const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
       let nbJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
@@ -172,43 +170,54 @@
       return Math.ceil(nbJoueurs / 2);
     }
 
-    // Création des équipes si besoin
+    // Toujours créer toutes les équipes attendues (même si la structure existe déjà)
     function initialiserEquipes() {
-      nombreEquipes = calculerNombreEquipes();
+      const nombreEquipes = calculerNombreEquipes();
       db.ref('parties/' + salonCode + '/equipes').once('value', snap => {
-        if (!snap.exists()) {
-          const equipesObj = {};
-          for (let i = 0; i < nombreEquipes; i++) {
+        const equipesObj = snap.val() || {};
+        let changed = false;
+        for (let i = 0; i < nombreEquipes; i++) {
+          if (!equipesObj[i]) {
             equipesObj[i] = { membres: {} };
+            changed = true;
           }
-          db.ref('parties/' + salonCode + '/equipes').set(equipesObj);
         }
+        if (changed) db.ref('parties/' + salonCode + '/equipes').set(equipesObj);
       });
     }
 
-    // Affichage et synchro
     function afficherEquipesEtSync() {
       db.ref('parties/' + salonCode + '/equipes').on('value', snap => {
+        // Toujours préparer la liste complète d'équipes pour l'affichage
+        const nbEquipes = calculerNombreEquipes();
         const equipes = {};
+        for (let i = 0; i < nbEquipes; i++) {
+          equipes[i] = { membres: {} };
+        }
         snap.forEach(e => {
-          equipes[e.key] = e.val();
+          equipes[e.key] = e.val() || { membres: {} };
         });
         afficherGalerieEquipes(equipes);
         majEtatBouton(equipes);
       });
     }
 
-    // Affichage de la galerie d'équipes
     function afficherGalerieEquipes(equipes) {
+      const nbEquipes = calculerNombreEquipes();
+      const equipesList = [];
+      for (let i = 0; i < nbEquipes; i++) {
+        equipesList.push(equipes[i] || { membres: {} });
+      }
+
       const galerie = document.getElementById("galerieEquipes");
-      galerie.innerHTML = Object.entries(equipes).map(([key, equipe], i) => {
+      galerie.innerHTML = equipesList.map((equipe, i) => {
         const membres = equipe.membres || {};
         const pseudos = Object.values(membres).map(m => `<span>${m.pseudo}</span>`).join(' & ');
         const pleine = Object.keys(membres).length >= 2;
         const selectionnee = Object.keys(membres).includes(playerId);
         return `
-          <div class="carte-equipe${pleine ? ' indisponible' : ''}${selectionnee ? ' selectionnee' : ''}" data-key="${key}">
-            <p>Équipe ${parseInt(key) + 1}</p>
+          <div class="carte-equipe${pleine ? ' indisponible' : ''}${selectionnee ? ' selectionnee' : ''}" data-key="${i}">
+            <p>Équipe ${i + 1}</p>
             <div class="pseudos-equipe">${pseudos || 'Disponible'}</div>
           </div>
         `;
@@ -225,7 +234,6 @@
       });
     }
 
-    // Etat du bouton valider et du bouton annuler
     function majEtatBouton(equipes) {
       const btnValider = document.getElementById('valider-choix');
       let nbJoueursValides = 0;
@@ -264,7 +272,6 @@
 
     document.getElementById("valider-choix").onclick = function() {
       if (!equipeSelectionnee || this.disabled) return;
-
       db.ref('parties/' + salonCode + '/equipes/' + equipeSelectionnee + '/membres/' + playerId).set({
         pseudo: pseudo
       });
@@ -296,9 +303,7 @@
     };
 
     function lancerDecompteAvantRedirection() {
-      // Empêche de lancer deux fois
       if (document.getElementById('decompte-redirect')) return;
-
       const conteneur = document.createElement('div');
       conteneur.id = 'decompte-redirect';
       conteneur.style.fontSize = '2.2em';
