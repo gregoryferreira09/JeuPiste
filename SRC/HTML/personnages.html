@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Choix de l'équipe</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../../Public/styles/style.css">
+  <meta charset="UTF-8"> <!-- Définit l'encodage des caractères pour le document -->
+  <title>Choix de l'équipe</title> <!-- Titre de l'onglet -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive design -->
+  <link rel="stylesheet" href="../../Public/styles/style.css"> <!-- Feuille de styles externe -->
   <style>
-    body { background: #181212; color: #f4e4c1; font-family: 'Cormorant Garamond', serif; }
-    .center-wrapper { max-width: 780px; margin: 0 auto; }
-    .galerie-equipes { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin-bottom: 30px; }
+    body { background: #181212; color: #f4e4c1; font-family: 'Cormorant Garamond', serif; } /* Style général */
+    .center-wrapper { max-width: 780px; margin: 0 auto; } /* Centrage contenu */
+    .galerie-equipes { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin-bottom: 30px; } /* Galerie équipes */
     .carte-equipe { background: #2c1b1b; border: 2.5px solid #e0c185; border-radius: 15px; width: 170px; min-height: 140px; display: flex; flex-direction: column; align-items: center; margin: 0 8px 8px 0; padding: 18px 12px; box-shadow: 0 4px 20px #0004; cursor: pointer; transition: box-shadow 0.2s, opacity 0.2s; text-align: center; }
     .carte-equipe.trop-pleine { opacity: 0.58; pointer-events: none; filter: grayscale(0.5);}
     .carte-equipe.selectionnee { border: 2.5px solid #4CAF50 !important; box-shadow: 0 0 10px #4CAF50;}
@@ -23,28 +23,28 @@
 </head>
 <body>
   <header>
-    <h1 class="site-title">Murder Party</h1>
+    <h1 class="site-title">Murder Party</h1> <!-- Titre principal affiché en haut -->
   </header>
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <h2 style="font-size:2em; color:#e0c185; margin-bottom:1.3em;">Choisissez votre équipe</h2>
+      <h2 style="font-size:2em; color:#e0c185; margin-bottom:1.3em;">Choisissez votre équipe</h2> <!-- Sous-titre -->
       <section class="galerie-equipes" id="galerieEquipes">
-        <!-- Les équipes seront générées ici -->
+        <!-- Les équipes seront générées ici dynamiquement en JS -->
       </section>
-      <div id="bandeauResultat"></div>
-      <div id="debugError"></div>
-      <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
+      <div id="bandeauResultat"></div> <!-- Zone pour afficher le bandeau de "tout le monde est prêt" -->
+      <div id="debugError"></div> <!-- Zone pour afficher une erreur si besoin -->
+      <button class="main-btn" id="btnRetourAccueil">Retour accueil</button> <!-- Bouton retour accueil -->
     </main>
   </div>
   <footer class="footer">
     <p>© 2025 Murder Party. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK (pour connecter à la base de données) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
-    // --- Firebase config ---
+    // --- Configuration Firebase (connexion à ton projet) ---
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -56,69 +56,72 @@
       measurementId: "G-KSBMBB7KMJ"
     };
     if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+      firebase.initializeApp(firebaseConfig); // Initialise Firebase si ce n'est pas déjà fait
     }
-    const db = firebase.database();
+    const db = firebase.database(); // Récupère la référence à la base de données
 
-    let equipesInfos = [];
-    let nbJoueursPartie = 2;
-    let pseudo = localStorage.getItem("pseudo") || "";
+    let equipesInfos = []; // Tableau pour stocker les infos sur les équipes (capacités, etc)
+    let nbJoueursPartie = 2; // Valeur par défaut du nombre de joueurs
+    let pseudo = localStorage.getItem("pseudo") || ""; // Récupère le pseudo depuis le stockage local
     while (!pseudo) {
-      pseudo = prompt("Entrez votre pseudo :");
-      if (pseudo) localStorage.setItem("pseudo", pseudo);
+      pseudo = prompt("Entrez votre pseudo :"); // Demande le pseudo si absent
+      if (pseudo) localStorage.setItem("pseudo", pseudo); // Et le stocke
     }
-    let salonCode = localStorage.getItem("salonCode");
+    let salonCode = localStorage.getItem("salonCode"); // Récupère le code de la partie
     if (!salonCode) {
-      alert("Code salon manquant.");
+      alert("Code salon manquant."); // Si absent, alerte et retour à l'accueil
       window.location.href = "accueil.html";
     }
 
-    // Séquence d'initialisation asynchrone
+    // --- Initialisation principale asynchrone ---
     async function initEquipes() {
       try {
-        // 1. Récupère les paramètres
+        // 1. Récupère les paramètres de la partie dans Firebase
         const paramSnap = await db.ref('parties/' + salonCode + '/parametres').once('value');
         const params = paramSnap.val() || {};
         nbJoueursPartie = Number(params.nombreJoueurs) || 2;
         if (!nbJoueursPartie || isNaN(nbJoueursPartie)) throw new Error("Paramètre 'nombreJoueurs' absent ou invalide");
 
-        // 2. Calcule les équipes
+        // 2. Calcule la structure des équipes selon le nombre de joueurs
         let nbEquipes = Math.floor(nbJoueursPartie / 2);
         equipesInfos = [];
-        for (let i = 0; i < nbEquipes; i++) equipesInfos.push({ capacite: 2 });
-        if (nbJoueursPartie % 2 !== 0) equipesInfos.push({ capacite: 3 });
+        for (let i = 0; i < nbEquipes; i++) equipesInfos.push({ capacite: 2 }); // Ajoute des équipes de 2
+        if (nbJoueursPartie % 2 !== 0) equipesInfos.push({ capacite: 3 });      // Dernière équipe de 3 si nombre impair
 
-        // 3. Vérifie/crée /equipes
+        // 3. Vérifie si /equipes existe, sinon le crée vide
         const eqSnap = await db.ref('parties/' + salonCode + '/equipes').once('value');
         if (!eqSnap.exists()) {
           let equipesInit = equipesInfos.map(() => []);
           await db.ref('parties/' + salonCode + '/equipes').set(equipesInit);
         }
-        // 4. Lance le listener SEULEMENT maintenant
+        // 4. Met en place le listener sur /equipes pour affichage en temps réel
         db.ref('parties/' + salonCode + '/equipes').on('value', function(snapshot) {
           const equipes = snapshot.val() || equipesInfos.map(() => []);
           afficherEquipes(equipes);
         });
       } catch (err) {
-        afficherErreur("Erreur d'initialisation : " + err.message);
+        afficherErreur("Erreur d'initialisation : " + err.message); // Affiche l'erreur en cas de souci
       }
     }
 
+    // Affiche une erreur dans la page (zone debugError)
     function afficherErreur(msg) {
       document.getElementById('debugError').innerHTML = '<div class="error-debug">' + msg + '</div>';
     }
 
+    // Affichage dynamique des cartes équipes
     function afficherEquipes(equipes) {
       const galerie = document.getElementById("galerieEquipes");
-      galerie.innerHTML = "";
+      galerie.innerHTML = ""; // Vide la galerie
       let toutLeMondeAUneEquipe = false;
       let monEquipe = null;
       equipesInfos.forEach((info, i) => {
-        const joueurs = equipes[i] || [];
+        const joueurs = equipes[i] || []; // Liste des joueurs dans l'équipe i
         const capacite = info.capacite;
         const estComplete = joueurs.length >= capacite;
         const estMoiDedans = joueurs.includes(pseudo);
         if (estMoiDedans) monEquipe = i;
+        // Crée la carte de l'équipe
         const div = document.createElement("div");
         div.className = "carte-equipe" + (estComplete ? " trop-pleine" : "") + (estMoiDedans ? " selectionnee" : "");
         div.innerHTML = `
@@ -126,17 +129,19 @@
           <div class="etat-equipe">${joueurs.length} / ${capacite}</div>
           <div class="liste-joueurs">${joueurs.map(j => `<div>${j}</div>`).join("")}</div>
         `;
+        // Clique pour rejoindre ou quitter
         if (!estComplete && !estMoiDedans) {
           div.addEventListener("click", () => rejoindreEquipe(i));
         } else if (estMoiDedans) {
           div.addEventListener("click", quitterEquipe);
         }
-        galerie.appendChild(div);
+        galerie.appendChild(div); // Ajoute la carte à la galerie
       });
-      // Affichage du bandeau si tout le monde a une équipe
+      // Calcule si tout le monde a une équipe
       let totalInscrits = equipes.reduce((sum, arr) => sum + arr.length, 0);
       toutLeMondeAUneEquipe = (totalInscrits === nbJoueursPartie);
 
+      // Affiche le bandeau si tous les joueurs sont répartis
       const bandeau = document.getElementById("bandeauResultat");
       if (toutLeMondeAUneEquipe) {
         bandeau.innerHTML = `<div class="bandeau-resultat">Tout le monde est prêt ! <br>La partie va commencer...</div>`;
@@ -145,17 +150,19 @@
       }
     }
 
+    // Fonction pour rejoindre une équipe
     function rejoindreEquipe(idx) {
       db.ref('parties/' + salonCode + '/equipes').transaction(equipes => {
         equipes = equipes || equipesInfos.map(() => []);
-        equipes = equipes.map(arr => arr.filter(j => j !== pseudo));
+        equipes = equipes.map(arr => arr.filter(j => j !== pseudo)); // Se retire des autres équipes
         if (equipes[idx].length < equipesInfos[idx].capacite) {
-          equipes[idx].push(pseudo);
+          equipes[idx].push(pseudo); // Ajoute à la nouvelle équipe
         }
         return equipes;
       });
     }
 
+    // Fonction pour quitter son équipe
     function quitterEquipe() {
       db.ref('parties/' + salonCode + '/equipes').transaction(equipes => {
         equipes = equipes || equipesInfos.map(() => []);
@@ -164,11 +171,12 @@
       });
     }
 
+    // Clique sur "Retour accueil"
     document.getElementById("btnRetourAccueil").onclick = function() {
-      window.location.href = "accueil.html";
+      window.location.href = "accueil.html"; // Redirige vers l'accueil
     };
 
-    // Lance la séquence d'initialisation
+    // Lance l'initialisation quand la page est chargée
     initEquipes();
   </script>
 </body>
