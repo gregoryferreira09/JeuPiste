@@ -2,43 +2,45 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Choix du personnage</title>
+  <title>Choix de l'équipe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    .galerie-personnages {
+    .galerie-equipes {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 20px;
     }
-    .carte-personnage {
+    .carte-equipe {
       background-color: #2c1b1b;
       border: 2px solid #e9c78c;
       border-radius: 12px;
       width: 200px;
-      padding: 10px;
+      padding: 20px 10px 10px 10px;
       text-align: center;
       cursor: pointer;
       transition: transform 0.3s ease;
+      min-height: 100px;
     }
-    .carte-personnage img {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
-    }
-    .carte-personnage:hover {
+    .carte-equipe:hover {
       transform: scale(1.05);
     }
-    .carte-personnage.indisponible {
+    .carte-equipe.indisponible {
       filter: grayscale(0.8) blur(1px);
       pointer-events: none;
       opacity: 0.7;
     }
-    .carte-personnage.selectionnee {
+    .carte-equipe.selectionnee {
       border: 2px solid #4CAF50 !important;
     }
-    /* ===== Confirmation retour accueil ===== */
+    .pseudos-equipe {
+      font-size: 1.1em;
+      color: #e0c185;
+      margin-top: 12px;
+      min-height: 25px;
+    }
+    /* Confirmation retour accueil */
     #confirmationRetourAccueil {
       display:none;
       position:fixed;
@@ -105,12 +107,12 @@
 
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <h2 style="font-size:2em; color:#e0c185; margin-bottom:1.3em;">Choisissez votre personnage</h2>
-      <section class="galerie-personnages" id="galeriePersonnages">
-        <!-- Les personnages seront ajoutés dynamiquement ici -->
+      <h2 style="font-size:2em; color:#e0c185; margin-bottom:1.3em;">Choisissez votre équipe</h2>
+      <section class="galerie-equipes" id="galerieEquipes">
+        <!-- Les équipes seront ajoutées dynamiquement ici -->
       </section>
       <div class="boutons-actions">
-        <button id="valider-choix" class="main-btn" disabled>Valider mon personnage</button>
+        <button id="valider-choix" class="main-btn" disabled>Valider mon équipe</button>
         <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
       </div>
     </main>
@@ -130,7 +132,6 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="../JS/personnages.js"></script>
   <script>
     // 1. Config Firebase
     const firebaseConfig = {
@@ -159,137 +160,139 @@
     const playerId = localStorage.getItem("uuid") || "anonymous";
     const pseudo = localStorage.getItem("pseudo") || "Anonyme";
 
-    let personnages = [];
-    let personnageSelectionne = null;
+    let equipeSelectionnee = null;
+    let nombreEquipes = 0;
 
-    function afficherPersonnagesEtSync() {
-      db.ref('parties/' + salonCode + '/personnages').on('value', snap => {
-        personnages = [];
-        snap.forEach(p => {
-          const perso = p.val();
-          perso.key = p.key;
-          personnages.push(perso);
-        });
-        afficherGalerie();
-      });
+    // Initialisation ou récupération du nombre d'équipes
+    function calculerNombreEquipes() {
+      const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
+      let nbJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
+        ? Number(scenarioData.nombreJoueurs)
+        : 4; // fallback si info manquante
+      return Math.ceil(nbJoueurs / 2);
+    }
 
-      db.ref('parties/' + salonCode + '/validations').on('value', snap => {
-        const valids = snap.val() || {};
-        updateGalerieIndisponibles(valids);
-        majEtatBouton(valids);
+    // Création des équipes si besoin
+    function initialiserEquipes() {
+      nombreEquipes = calculerNombreEquipes();
+      db.ref('parties/' + salonCode + '/equipes').once('value', snap => {
+        if (!snap.exists()) {
+          const equipesObj = {};
+          for (let i = 0; i < nombreEquipes; i++) {
+            equipesObj[i] = { membres: {} };
+          }
+          db.ref('parties/' + salonCode + '/equipes').set(equipesObj);
+        }
       });
     }
 
-    function afficherGalerie() {
-      const galerie = document.getElementById("galeriePersonnages");
-      galerie.innerHTML = personnages.map((perso, i) => `
-        <div class="carte-personnage" data-key="${perso.key}" data-index="${i}">
-          <img src="${perso.image}" alt="${perso.nom}">
-          <p>${perso.nom}</p>
-        </div>
-      `).join("");
+    // Affichage et synchro
+    function afficherEquipesEtSync() {
+      db.ref('parties/' + salonCode + '/equipes').on('value', snap => {
+        const equipes = {};
+        snap.forEach(e => {
+          equipes[e.key] = e.val();
+        });
+        afficherGalerieEquipes(equipes);
+        majEtatBouton(equipes);
+      });
+    }
 
-      document.querySelectorAll('.carte-personnage').forEach(div => {
+    // Affichage de la galerie d'équipes
+    function afficherGalerieEquipes(equipes) {
+      const galerie = document.getElementById("galerieEquipes");
+      galerie.innerHTML = Object.entries(equipes).map(([key, equipe], i) => {
+        const membres = equipe.membres || {};
+        const pseudos = Object.values(membres).map(m => `<span>${m.pseudo}</span>`).join(' & ');
+        const pleine = Object.keys(membres).length >= 2;
+        const selectionnee = Object.keys(membres).includes(playerId);
+        return `
+          <div class="carte-equipe${pleine ? ' indisponible' : ''}${selectionnee ? ' selectionnee' : ''}" data-key="${key}">
+            <p>Équipe ${parseInt(key) + 1}</p>
+            <div class="pseudos-equipe">${pseudos || 'Disponible'}</div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll('.carte-equipe').forEach(div => {
         div.addEventListener('click', function() {
           if (div.classList.contains('indisponible')) return;
-          document.querySelectorAll('.carte-personnage').forEach(d => d.classList.remove('selectionnee'));
+          document.querySelectorAll('.carte-equipe').forEach(d => d.classList.remove('selectionnee'));
           div.classList.add('selectionnee');
-          personnageSelectionne = div.getAttribute('data-key');
+          equipeSelectionnee = div.getAttribute('data-key');
           document.getElementById('valider-choix').disabled = false;
         });
       });
     }
 
-    function updateGalerieIndisponibles(valids) {
-      const dejaPrisKeys = Object.values(valids).map(v => v.personnageKey);
-      document.querySelectorAll('.carte-personnage').forEach(div => {
-        const key = div.getAttribute('data-key');
-        if (dejaPrisKeys.includes(key) && (!valids[playerId] || valids[playerId].personnageKey !== key)) {
-          div.classList.add('indisponible');
-        } else {
-          div.classList.remove('indisponible');
+    // Etat du bouton valider et du bouton annuler
+    function majEtatBouton(equipes) {
+      const btnValider = document.getElementById('valider-choix');
+      let nbJoueursValides = 0;
+      let equipeJoueur = null;
+      Object.entries(equipes).forEach(([key, equipe]) => {
+        nbJoueursValides += Object.keys(equipe.membres || {}).length;
+        if (Object.keys(equipe.membres || {}).includes(playerId)) {
+          equipeJoueur = key;
         }
       });
-      if (valids[playerId]) {
-        const myKey = valids[playerId].personnageKey;
-        document.querySelectorAll('.carte-personnage').forEach(div => {
-          if (div.getAttribute('data-key') === myKey) div.classList.add('selectionnee');
-          else div.classList.remove('selectionnee');
-        });
-        personnageSelectionne = myKey;
-        document.getElementById('valider-choix').disabled = true;
-      }
-    }
 
-    function majEtatBouton(valids) {
-      const btnValider = document.getElementById('valider-choix');
-      const nbValid = Object.keys(valids).length;
       const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
       let totalJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
         ? Number(scenarioData.nombreJoueurs)
-        : Math.max(nbValid, 1); // Fallback sur le nombre de validations (jamais 0)
+        : Math.max(nbJoueursValides, 1);
+
       btnValider.textContent =
-        (valids[playerId] ? 'En attente des autres joueurs (' : '') +
-        nbValid + '/' + totalJoueurs +
-        (valids[playerId] ? ')' : ' Valider mon personnage');
-      if (nbValid === totalJoueurs) {
-        lancerDecompteAvantRedirection();
-      }
-      if (valids[playerId] && !document.getElementById('annuler-choix')) {
-        ajouterBoutonAnnuler();
+        (equipeJoueur ? 'En attente des autres joueurs (' : '') +
+        nbJoueursValides + '/' + totalJoueurs +
+        (equipeJoueur ? ')' : ' Valider mon équipe');
+
+      if (equipeJoueur && !document.getElementById('annuler-choix')) {
+        ajouterBoutonAnnuler(equipeJoueur);
         btnValider.disabled = true;
       }
-      if (!valids[playerId] && document.getElementById('annuler-choix')) {
+      if (!equipeJoueur && document.getElementById('annuler-choix')) {
         document.getElementById('annuler-choix').remove();
         btnValider.disabled = false;
+      }
+
+      // Si toutes les équipes sont pleines (donc nbJoueursValides == totalJoueurs), lancer le décompte
+      if (nbJoueursValides === totalJoueurs) {
+        lancerDecompteAvantRedirection();
       }
     }
 
     document.getElementById("valider-choix").onclick = function() {
-      if (!personnageSelectionne || this.disabled) return;
+      if (!equipeSelectionnee || this.disabled) return;
 
-      // Grise la carte sélectionnée immédiatement (localement)
-      document.querySelectorAll('.carte-personnage').forEach(div => {
-        if (div.getAttribute('data-key') === personnageSelectionne) {
-          div.classList.add('indisponible');
-        }
-      });
-
-      db.ref('parties/' + salonCode + '/validations/' + playerId).set({
-        personnageKey: personnageSelectionne,
+      db.ref('parties/' + salonCode + '/equipes/' + equipeSelectionnee + '/membres/' + playerId).set({
         pseudo: pseudo
       });
       this.disabled = true;
     };
 
-    function ajouterBoutonAnnuler() {
+    function ajouterBoutonAnnuler(equipeJoueur) {
       const btn = document.createElement('button');
       btn.id = 'annuler-choix';
-      btn.textContent = "Annuler choix personnage";
+      btn.textContent = "Annuler choix équipe";
       btn.className = "main-btn";
       btn.onclick = function() {
-        // STOPPER LE DECOMPTE SI LANCÉ
         if (decompteTimeoutID) {
           clearTimeout(decompteTimeoutID);
           decompteTimeoutID = null;
           const conteneur = document.getElementById('decompte-redirect');
           if (conteneur) conteneur.remove();
         }
-        // Dégrise le personnage pour le joueur localement
-        document.querySelectorAll('.carte-personnage').forEach(div => {
-          if (div.classList.contains('selectionnee')) {
-            div.classList.remove('indisponible', 'selectionnee');
-          }
-        });
-        personnageSelectionne = null;
+        equipeSelectionnee = null;
         document.getElementById('valider-choix').disabled = true;
-        db.ref('parties/' + salonCode + '/validations/' + playerId).remove();
+        db.ref('parties/' + salonCode + '/equipes/' + equipeJoueur + '/membres/' + playerId).remove();
       };
       document.querySelector('.boutons-actions').appendChild(btn);
     }
 
     window.onload = function() {
-      afficherPersonnagesEtSync();
+      initialiserEquipes();
+      afficherEquipesEtSync();
     };
 
     function lancerDecompteAvantRedirection() {
