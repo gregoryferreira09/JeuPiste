@@ -76,6 +76,9 @@ async function rejoindreSalon() {
     // Vérifier le nombre max de joueurs
     const paramSnap = await db.ref('parties/' + codeEntre + '/parametres').get();
     const maxJoueurs = paramSnap.exists() ? parseInt(paramSnap.val().nombreJoueurs) : 1;
+    if (paramSnap.exists() && paramSnap.val().nombreJoueurs) {
+  localStorage.setItem("nombreJoueurs", paramSnap.val().nombreJoueurs);
+}
     if (pseudosExistants.length >= maxJoueurs) {
       loader.style.display = "none";
       validerBtn.disabled = false;
