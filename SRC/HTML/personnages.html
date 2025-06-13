@@ -34,6 +34,11 @@
     .carte-equipe.selectionnee {
       border: 2px solid #4CAF50 !important;
     }
+    .nom-equipe {
+      font-size:1em;
+      color:#ffeecb;
+      margin-bottom:7px;
+    }
     .pseudos-equipe {
       font-size: 1.1em;
       color: #e0c185;
@@ -147,82 +152,107 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Décompte timeout global
+    const NOM_EQUIPE_POSSIBLES = [
+      "Les indestructibles", "Les princesses", "Les Looney Tunes",
+      "Les enfants perdus", "Les incompris", "Les Super-Zéro"
+    ];
+    const NB_MAX_EQUIPE = 6;
+
     let decompteTimeoutID = null;
 
-    // Vérifie le code salon
     const salonCode = localStorage.getItem("salonCode");
     if (!salonCode) {
       alert("Code salon manquant. Merci de rejoindre une partie depuis l'accueil.");
       window.location.href = "join.html";
     }
-
     const playerId = localStorage.getItem("uuid") || "anonymous";
     const pseudo = localStorage.getItem("pseudo") || "Anonyme";
-
     let equipeSelectionnee = null;
+
+    function shuffleArray(array) {
+      let arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
 
     function calculerNombreEquipes() {
       const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
       let nbJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
         ? Number(scenarioData.nombreJoueurs)
-        : 4; // fallback si info manquante
-      return Math.ceil(nbJoueurs / 2);
+        : 4; // fallback
+      return Math.min(Math.ceil(nbJoueurs / 2), NB_MAX_EQUIPE);
     }
 
-    // Toujours créer toutes les équipes attendues (même si la structure existe déjà)
+    // Toujours créer toutes les équipes attendues (même si structure existe déjà)
     function initialiserEquipes() {
       const nombreEquipes = calculerNombreEquipes();
       db.ref('parties/' + salonCode + '/equipes').once('value', snap => {
         const equipesObj = snap.val() || {};
-        let changed = false;
-        for (let i = 0; i < nombreEquipes; i++) {
-          if (!equipesObj[i]) {
-            equipesObj[i] = { membres: {} };
-            changed = true;
+        db.ref('parties/' + salonCode + '/nomsEquipes').once('value', snapNames => {
+          let nomsEquipes = snapNames.val();
+          if (!nomsEquipes || Object.keys(nomsEquipes).length !== nombreEquipes) {
+            // Attribuer des noms aléatoires uniques
+            nomsEquipes = {};
+            let nomsMelanges = shuffleArray(NOM_EQUIPE_POSSIBLES).slice(0, nombreEquipes);
+            for (let i = 0; i < nombreEquipes; i++) {
+              nomsEquipes[i] = nomsMelanges[i];
+            }
+            db.ref('parties/' + salonCode + '/nomsEquipes').set(nomsEquipes);
           }
-        }
-        if (changed) db.ref('parties/' + salonCode + '/equipes').set(equipesObj);
+          let changed = false;
+          for (let i = 0; i < nombreEquipes; i++) {
+            if (!equipesObj[i]) {
+              equipesObj[i] = { membres: {} };
+              changed = true;
+            }
+          }
+          if (changed) db.ref('parties/' + salonCode + '/equipes').set(equipesObj);
+        });
       });
     }
 
     function afficherEquipesEtSync() {
-      db.ref('parties/' + salonCode + '/equipes').on('value', snap => {
-        // Toujours préparer la liste complète d'équipes pour l'affichage
-        const nbEquipes = calculerNombreEquipes();
-        const equipes = {};
-        for (let i = 0; i < nbEquipes; i++) {
-          equipes[i] = { membres: {} };
-        }
-        snap.forEach(e => {
-          equipes[e.key] = e.val() || { membres: {} };
+      const nbEquipes = calculerNombreEquipes();
+      db.ref('parties/' + salonCode + '/nomsEquipes').on('value', snapNames => {
+        const nomsEquipes = snapNames.val() || {};
+        db.ref('parties/' + salonCode + '/equipes').on('value', snap => {
+          const equipes = {};
+          for (let i = 0; i < nbEquipes; i++) {
+            equipes[i] = { membres: {} };
+          }
+          snap.forEach(e => {
+            equipes[e.key] = e.val() || { membres: {} };
+          });
+          afficherGalerieEquipes(equipes, nomsEquipes);
+          majEtatBouton(equipes);
         });
-        afficherGalerieEquipes(equipes);
-        majEtatBouton(equipes);
       });
     }
 
-    function afficherGalerieEquipes(equipes) {
+    function afficherGalerieEquipes(equipes, nomsEquipes) {
       const nbEquipes = calculerNombreEquipes();
       const equipesList = [];
       for (let i = 0; i < nbEquipes; i++) {
         equipesList.push(equipes[i] || { membres: {} });
       }
-
       const galerie = document.getElementById("galerieEquipes");
       galerie.innerHTML = equipesList.map((equipe, i) => {
         const membres = equipe.membres || {};
         const pseudos = Object.values(membres).map(m => `<span>${m.pseudo}</span>`).join(' & ');
         const pleine = Object.keys(membres).length >= 2;
         const selectionnee = Object.keys(membres).includes(playerId);
+        const nomEquipe = nomsEquipes && nomsEquipes[i] ? nomsEquipes[i] : "";
         return `
           <div class="carte-equipe${pleine ? ' indisponible' : ''}${selectionnee ? ' selectionnee' : ''}" data-key="${i}">
             <p>Équipe ${i + 1}</p>
+            <div class="nom-equipe">${nomEquipe}</div>
             <div class="pseudos-equipe">${pseudos || 'Disponible'}</div>
           </div>
         `;
       }).join("");
-
       document.querySelectorAll('.carte-equipe').forEach(div => {
         div.addEventListener('click', function() {
           if (div.classList.contains('indisponible')) return;
@@ -244,7 +274,6 @@
           equipeJoueur = key;
         }
       });
-
       const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
       let totalJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
         ? Number(scenarioData.nombreJoueurs)
@@ -263,8 +292,6 @@
         document.getElementById('annuler-choix').remove();
         btnValider.disabled = false;
       }
-
-      // Si toutes les équipes sont pleines (donc nbJoueursValides == totalJoueurs), lancer le décompte
       if (nbJoueursValides === totalJoueurs) {
         lancerDecompteAvantRedirection();
       }
