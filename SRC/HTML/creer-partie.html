@@ -2,112 +2,71 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Créer une Partie - Jeu de piste</title>
+  <title>Choix de l'équipe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
-  <script>
-   // Ne reset le code salon que si on arrive sur cette page sans transition depuis salon.html
-   if (!document.referrer.includes("salon.html")) {
-     localStorage.removeItem("salonCode");
-   }
-  </script>
+  <style>
+    body { background: #181212; color: #f4e4c1; font-family: 'Cormorant Garamond', serif; }
+    .center-wrapper { max-width: 780px; margin: 0 auto; }
+    .galerie-equipes { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin-bottom: 30px; }
+    .carte-equipe {
+      background: #2c1b1b;
+      border: 2.5px solid #e0c185;
+      border-radius: 15px;
+      width: 170px;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 8px 8px 0;
+      padding: 18px 12px;
+      box-shadow: 0 4px 20px #0004;
+      text-align: center;
+      font-size: 1.15em;
+      font-weight: bold;
+      color: #e0c185;
+    }
+    .nom-equipe { color: #e0c185; font-weight: bold; font-size: 1.15em; margin-bottom: 8px; }
+    .bandeau-message {
+      background: #2c1b1b;
+      border: 2.5px solid #e0c185;
+      border-radius: 15px;
+      max-width: 400px;
+      margin: 0 auto 30px auto;
+      padding: 28px 18px;
+      text-align: center;
+      color: #e0c185;
+      font-size: 1.4em;
+      font-weight: bold;
+      box-shadow: 0 4px 20px #0004;
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1 class="site-title">Jeu de piste</h1>
-</header>
-
-<div class="center-wrapper">
-  <main class="main-accueil fadeIn" role="main">
-    <h2 id="creer-partie-heading" style="text-align:center; margin-bottom: 1.3em;">Créer une Partie</h2>
-    <form id="creerPartieForm" class="form-container" autocomplete="off" spellcheck="false">
-      <label for="mode">Choisissez le mode de jeu :</label>
-      <select id="mode" name="mode" required>
-        <option value="parc-saint-nicolas">Parc Saint Nicolas</option>
-      </select>
-
-      <label for="nombreJoueurs">Nombre de joueurs :</label>
-      <select id="nombreJoueurs" name="nombreJoueurs" required>
-        <option value="1">1 joueur</option>
-        <option value="2">2 joueurs</option>
-        <option value="3">3 joueurs</option>
-        <option value="4">4 joueurs</option>
-        <option value="5">5 joueurs</option>
-        <option value="6">6 joueurs</option>
-        <option value="7">7 joueurs</option>
-        <option value="8">8 joueurs</option>
-        <option value="9">9 joueurs</option>
-        <option value="10">10 joueurs</option>
-        <option value="11">11 joueurs</option>
-        <option value="12">12 joueurs</option>
-      </select>
-
-      <div class="boutons-actions">
-        <button class="main-btn" type="submit" id="genererBtn">Créer la partie</button>
-        <a class="main-btn" href="./accueil.html" id="retourAccueilBtn">Retour</a>
-      </div>
-      <div class="message" id="message" role="alert" aria-live="polite"></div>
-    </form>
-  </main>
-</div>
-
-<footer class="footer">
-  <p>© 2025 Murder Party. Tous droits réservés.</p>
-  <a href="mentions-legales.html">Mentions légales</a>
-</footer>
-
-<script>
-  // Effet d'apparition fade-in sur la page principale
-  document.addEventListener("DOMContentLoaded", function() {
-    var main = document.querySelector('.fadeIn');
-    if (main) main.classList.add('visible');
-  });
-</script>
-
-<!-- Charger Firebase AVANT tout JS qui l'utilise -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="../JS/creer-partie.js"></script>
-<script>
-  // Gestion du submit sécurisé
-  const form = document.getElementById('creerPartieForm');
-  const message = document.getElementById('message');
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    message.textContent = "";
-    if (typeof creerPartie === "function") {
-      creerPartie(new FormData(form))
-        .then(() => {
-          message.textContent = "Partie créée avec succès !";
-          message.className = "message succes";
-        })
-        .catch(err => {
-          message.textContent = err && err.message ? err.message : "Erreur lors de la création.";
-          message.className = "message";
-        });
-    } else {
-      message.textContent = "Fonction de création absente.";
-    }
-  });
-
-  // Empêche le retour arrière du navigateur de revenir dans le salon sans reset
-  window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-      localStorage.removeItem("salonCode");
-    }
-  });
-</script>
-<noscript>
-  <div style="color: #e0c185; text-align: center; margin-top: 20px;" role="alert">
-    ⚠️ JavaScript est désactivé. Vous ne pourrez pas créer de partie.
+  <header>
+    <h1 class="site-title">Murder Party</h1>
+  </header>
+  <div class="center-wrapper">
+    <main class="main-accueil fadeIn" role="main">
+      <h2 style="font-size:2em; color:#e0c185; margin-bottom:1.3em;">Choisissez votre équipe</h2>
+      <div class="bandeau-message">Aujourd'hui c'est la fin</div>
+      <section class="galerie-equipes" id="galerieEquipes">
+        <div class="carte-equipe">
+          <div class="nom-equipe">Équipe 1</div>
+        </div>
+        <div class="carte-equipe">
+          <div class="nom-equipe">Équipe 2</div>
+        </div>
+        <div class="carte-equipe">
+          <div class="nom-equipe">Équipe 3</div>
+        </div>
+      </section>
+    </main>
   </div>
-</noscript>
-
-<script src="../JS/security-enhance.js"></script>
-<script src="../JS/ux-enhance.js"></script>
-<script src="../JS/scalability.js"></script>
-  
+  <footer class="footer">
+    <p>© 2025 Murder Party. Tous droits réservés.</p>
+    <a href="mentions-legales.html">Mentions légales</a>
+  </footer>
 </body>
 </html>
