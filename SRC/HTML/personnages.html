@@ -6,100 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    body {
-      background: #181212;
-      color: #f4e4c1;
-      font-family: 'Cormorant Garamond', serif;
-    }
-    .center-wrapper {
-      max-width: 780px;
-      margin: 0 auto;
-    }
-    .galerie-equipes {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 28px;
-      margin-bottom: 30px;
-    }
-    .carte-equipe {
-      background: #2c1b1b;
-      border: 2.5px solid #e0c185;
-      border-radius: 15px;
-      width: 170px;
-      min-height: 140px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0 8px 8px 0;
-      padding: 18px 12px;
-      box-shadow: 0 4px 20px #0004;
-      cursor: pointer;
-      transition: box-shadow 0.2s, opacity 0.2s;
-      text-align: center;
-    }
-    .carte-equipe.trop-pleine {
-      opacity: 0.58;
-      pointer-events: none;
-      filter: grayscale(0.5);
-    }
-    .carte-equipe.selectionnee {
-      border: 2.5px solid #4CAF50 !important;
-      box-shadow: 0 0 10px #4CAF50;
-    }
-    .nom-equipe {
-      color: #e0c185;
-      font-weight: bold;
-      font-size: 1.15em;
-      margin-bottom: 8px;
-    }
-    .etat-equipe {
-      color: #ffeecb;
-      font-size: 1em;
-      margin-bottom: 6px;
-    }
-    .liste-joueurs {
-      font-size: 0.99em;
-      color: #f4e4c1;
-      min-height: 1.5em;
-      margin-bottom: 3px;
-    }
-    .main-btn {
-      background: #181212;
-      color: #e0c185;
-      border: 2px solid #e0c185;
-      border-radius: 12px;
-      margin: 20px auto 0 auto;
-      padding: 14px 22px;
-      font-family: 'Cormorant Garamond', serif;
-      box-shadow: 0 2px 20px #0004;
-      font-size: 1.13em;
-      font-weight: 600;
-      transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.11s;
-      cursor: pointer;
-      outline: none;
-      display: block;
-    }
-    .main-btn:focus, .main-btn:hover {
-      background: #e0c185;
-      color: #181212;
-      box-shadow: 0 0 8px #e0c185a8;
-      outline: 2px solid #e0c185;
-      outline-offset: 3px;
-      transform: scale(1.04);
-    }
-    .bandeau-resultat {
-      margin: 28px auto 0 auto;
-      max-width: 400px;
-      font-size: 1.25em;
-      color: #e0c185;
-      background: #2c1b1b;
-      border: 2px solid #e0c185;
-      border-radius: 10px;
-      padding: 20px 18px;
-      text-align: center;
-      box-shadow: 0 4px 20px #0004;
-    }
+    body { background: #181212; color: #f4e4c1; font-family: 'Cormorant Garamond', serif; }
+    .center-wrapper { max-width: 780px; margin: 0 auto; }
+    .galerie-equipes { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin-bottom: 30px; }
+    .carte-equipe { background: #2c1b1b; border: 2.5px solid #e0c185; border-radius: 15px; width: 170px; min-height: 140px; display: flex; flex-direction: column; align-items: center; margin: 0 8px 8px 0; padding: 18px 12px; box-shadow: 0 4px 20px #0004; cursor: pointer; transition: box-shadow 0.2s, opacity 0.2s; text-align: center; }
+    .carte-equipe.trop-pleine { opacity: 0.58; pointer-events: none; filter: grayscale(0.5);}
+    .carte-equipe.selectionnee { border: 2.5px solid #4CAF50 !important; box-shadow: 0 0 10px #4CAF50;}
+    .nom-equipe { color: #e0c185; font-weight: bold; font-size: 1.15em; margin-bottom: 8px; }
+    .etat-equipe { color: #ffeecb; font-size: 1em; margin-bottom: 6px; }
+    .liste-joueurs { font-size: 0.99em; color: #f4e4c1; min-height: 1.5em; margin-bottom: 3px; }
+    .main-btn { background: #181212; color: #e0c185; border: 2px solid #e0c185; border-radius: 12px; margin: 20px auto 0 auto; padding: 14px 22px; font-family: 'Cormorant Garamond', serif; box-shadow: 0 2px 20px #0004; font-size: 1.13em; font-weight: 600; transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.11s; cursor: pointer; outline: none; display: block; }
+    .main-btn:focus, .main-btn:hover { background: #e0c185; color: #181212; box-shadow: 0 0 8px #e0c185a8; outline: 2px solid #e0c185; outline-offset: 3px; transform: scale(1.04);}
+    .bandeau-resultat { margin: 28px auto 0 auto; max-width: 400px; font-size: 1.25em; color: #e0c185; background: #2c1b1b; border: 2px solid #e0c185; border-radius: 10px; padding: 20px 18px; text-align: center; box-shadow: 0 4px 20px #0004;}
   </style>
 </head>
 <body>
@@ -120,42 +38,67 @@
     <p>© 2025 Murder Party. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
-    // Récupérer pseudo et nombre de joueurs (déjà stocké par la page "Créer partie")
+    // --- Firebase config (doit coller à ta base de jeu) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // --- Récupération des infos locales ---
     let pseudo = localStorage.getItem("pseudo") || "";
     while (!pseudo) {
       pseudo = prompt("Entrez votre pseudo :");
       if (pseudo) localStorage.setItem("pseudo", pseudo);
     }
-
-    let nbJoueurs = Number(localStorage.getItem("nombreJoueurs"));
-    if (!nbJoueurs || nbJoueurs < 2) {
-      alert("Nombre de joueurs inconnu. Merci de (re)passer par la page Créer Partie.");
-      throw new Error("Pas de nombre de joueurs");
+    let salonCode = localStorage.getItem("salonCode");
+    if (!salonCode) {
+      alert("Code salon manquant.");
+      window.location.href = "accueil.html";
     }
 
-    // Générer la structure des équipes
-    let nbEquipes = Math.floor(nbJoueurs / 2);
+    // 1. Récupère le nombre de joueurs depuis les paramètres de la partie (dans Firebase)
+    let nbJoueursPartie = 2;
     let equipesInfos = [];
-    for (let i = 0; i < nbEquipes; i++) equipesInfos.push({ capacite: 2 });
-    if (nbJoueurs % 2 !== 0) equipesInfos.push({ capacite: 3 });
+    db.ref('parties/' + salonCode + '/parametres').once('value').then(function(snap) {
+      const params = snap.val() || {};
+      nbJoueursPartie = Number(params.nombreJoueurs) || 2;
+      // Calcule le nombre d'équipes
+      let nbEquipes = Math.floor(nbJoueursPartie / 2);
+      equipesInfos = [];
+      for (let i = 0; i < nbEquipes; i++) equipesInfos.push({ capacite: 2 });
+      if (nbJoueursPartie % 2 !== 0) equipesInfos.push({ capacite: 3 });
+      // Initialise les équipes dans Firebase si pas déjà fait (par le créateur uniquement)
+      db.ref('parties/' + salonCode + '/equipes').once('value').then(function(eqSnap) {
+        if (!eqSnap.exists()) {
+          let equipesInit = equipesInfos.map(() => []);
+          db.ref('parties/' + salonCode + '/equipes').set(equipesInit);
+        }
+      });
+    });
 
-    // Stockage local des équipes (simulateur mono-appareil ou navigateur partagé)
-    let equipes = JSON.parse(localStorage.getItem("equipesJeuPiste") || "[]");
-    // Initialiser si vide ou structure incorrecte
-    if (!Array.isArray(equipes) || equipes.length !== equipesInfos.length) {
-      equipes = equipesInfos.map(() => []);
-      localStorage.setItem("equipesJeuPiste", JSON.stringify(equipes));
-    }
-
-    function afficherEquipes() {
+    // 2. Affichage dynamique des équipes en temps réel
+    function afficherEquipes(equipes) {
       const galerie = document.getElementById("galerieEquipes");
       galerie.innerHTML = "";
       let toutLeMondeAUneEquipe = false;
       let monEquipe = null;
-
-      equipes.forEach((joueurs, i) => {
-        const capacite = equipesInfos[i].capacite;
+      equipesInfos.forEach((info, i) => {
+        const joueurs = equipes[i] || [];
+        const capacite = info.capacite;
         const estComplete = joueurs.length >= capacite;
         const estMoiDedans = joueurs.includes(pseudo);
         if (estMoiDedans) monEquipe = i;
@@ -175,44 +118,55 @@
       });
       // Vérifier si tous les joueurs sont répartis dans les équipes
       let totalInscrits = equipes.reduce((sum, arr) => sum + arr.length, 0);
-      toutLeMondeAUneEquipe = (totalInscrits === nbJoueurs);
+      toutLeMondeAUneEquipe = (totalInscrits === nbJoueursPartie);
 
       // Afficher le bandeau si tout le monde a une équipe
       const bandeau = document.getElementById("bandeauResultat");
       if (toutLeMondeAUneEquipe) {
         bandeau.innerHTML = `<div class="bandeau-resultat">Tout le monde est prêt ! <br>La partie va commencer...</div>`;
-        // Redirection automatique après 3s (décommente pour rediriger)
+        // Tu peux activer la redirection automatique ici si tu veux :
         // setTimeout(() => { window.location.href = "gameplay.html"; }, 3000);
       } else {
         bandeau.innerHTML = "";
       }
     }
 
+    // 3. Rejoindre une équipe
     function rejoindreEquipe(idx) {
-      // Retirer le joueur d'une autre équipe s'il y était déjà
-      equipes.forEach((joueurs, i) => {
-        const pos = joueurs.indexOf(pseudo);
-        if (pos !== -1) joueurs.splice(pos, 1);
+      db.ref('parties/' + salonCode + '/equipes').transaction(equipes => {
+        equipes = equipes || equipesInfos.map(() => []);
+        // Retirer ce joueur de toutes les équipes
+        equipes = equipes.map(arr => arr.filter(j => j !== pseudo));
+        // Ajouter à la bonne équipe si pas pleine
+        if (equipes[idx].length < equipesInfos[idx].capacite) {
+          equipes[idx].push(pseudo);
+        }
+        return equipes;
       });
-      // Ajouter dans la nouvelle équipe si place
-      if (equipes[idx].length < equipesInfos[idx].capacite) {
-        equipes[idx].push(pseudo);
-      }
-      localStorage.setItem("equipesJeuPiste", JSON.stringify(equipes));
-      afficherEquipes();
     }
 
+    // 4. Quitter son équipe
     function quitterEquipe() {
-      equipes.forEach(joueurs => {
-        const pos = joueurs.indexOf(pseudo);
-        if (pos !== -1) joueurs.splice(pos, 1);
+      db.ref('parties/' + salonCode + '/equipes').transaction(equipes => {
+        equipes = equipes || equipesInfos.map(() => []);
+        equipes = equipes.map(arr => arr.filter(j => j !== pseudo));
+        return equipes;
       });
-      localStorage.setItem("equipesJeuPiste", JSON.stringify(equipes));
-      afficherEquipes();
     }
 
-    // Initialisation affichage
-    afficherEquipes();
+    // 5. Synchroniser l'affichage en temps réel
+    // Il faut attendre que equipesInfos soit initialisé !
+    let firebaseListenerReady = false;
+    function setupFirebaseListener() {
+      if (firebaseListenerReady) return;
+      firebaseListenerReady = true;
+      db.ref('parties/' + salonCode + '/equipes').on('value', function(snapshot) {
+        const equipes = snapshot.val() || equipesInfos.map(() => []);
+        afficherEquipes(equipes);
+      });
+    }
+    // Attendre la récupération des paramètres pour lancer le listener
+    setTimeout(setupFirebaseListener, 900);
 
     // Retour accueil
     document.getElementById("btnRetourAccueil").onclick = function() {
