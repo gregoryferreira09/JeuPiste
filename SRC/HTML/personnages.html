@@ -18,6 +18,7 @@
     .main-btn { background: #181212; color: #e0c185; border: 2px solid #e0c185; border-radius: 12px; margin: 20px auto 0 auto; padding: 14px 22px; font-family: 'Cormorant Garamond', serif; box-shadow: 0 2px 20px #0004; font-size: 1.13em; font-weight: 600; transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.11s; cursor: pointer; outline: none; display: block; }
     .main-btn:focus, .main-btn:hover { background: #e0c185; color: #181212; box-shadow: 0 0 8px #e0c185a8; outline: 2px solid #e0c185; outline-offset: 3px; transform: scale(1.04);}
     .bandeau-resultat { margin: 28px auto 0 auto; max-width: 400px; font-size: 1.25em; color: #e0c185; background: #2c1b1b; border: 2px solid #e0c185; border-radius: 10px; padding: 20px 18px; text-align: center; box-shadow: 0 4px 20px #0004;}
+    .error-debug { background: #c00; color: #fff; font-weight: bold; padding: 10px; border-radius: 8px; margin: 20px auto; max-width: 500px; }
   </style>
 </head>
 <body>
@@ -31,6 +32,7 @@
         <!-- Les équipes seront générées ici -->
       </section>
       <div id="bandeauResultat"></div>
+      <div id="debugError"></div>
       <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
     </main>
   </div>
@@ -42,7 +44,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
-    // --- Firebase config (mets ici la même config que ton projet) ---
+    // --- Firebase config ---
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -58,7 +60,8 @@
     }
     const db = firebase.database();
 
-    // --- Récupération des infos locales ---
+    let equipesInfos = [];
+    let nbJoueursPartie = 2;
     let pseudo = localStorage.getItem("pseudo") || "";
     while (!pseudo) {
       pseudo = prompt("Entrez votre pseudo :");
@@ -70,34 +73,41 @@
       window.location.href = "accueil.html";
     }
 
-    // Variables globales
-    let equipesInfos = [];
-    let nbJoueursPartie = 2;
+    // Séquence d'initialisation asynchrone
+    async function initEquipes() {
+      try {
+        // 1. Récupère les paramètres
+        const paramSnap = await db.ref('parties/' + salonCode + '/parametres').once('value');
+        const params = paramSnap.val() || {};
+        nbJoueursPartie = Number(params.nombreJoueurs) || 2;
+        if (!nbJoueursPartie || isNaN(nbJoueursPartie)) throw new Error("Paramètre 'nombreJoueurs' absent ou invalide");
 
-    // 1. Récupère le nombre de joueurs depuis les paramètres de la partie (dans Firebase) puis initialise tout
-    db.ref('parties/' + salonCode + '/parametres').once('value').then(function(snap) {
-      const params = snap.val() || {};
-      nbJoueursPartie = Number(params.nombreJoueurs) || 2;
-      // Calcule le nombre d'équipes
-      let nbEquipes = Math.floor(nbJoueursPartie / 2);
-      equipesInfos = [];
-      for (let i = 0; i < nbEquipes; i++) equipesInfos.push({ capacite: 2 });
-      if (nbJoueursPartie % 2 !== 0) equipesInfos.push({ capacite: 3 });
-      // Initialise les équipes dans Firebase si pas déjà fait (créateur uniquement)
-      db.ref('parties/' + salonCode + '/equipes').once('value').then(function(eqSnap) {
+        // 2. Calcule les équipes
+        let nbEquipes = Math.floor(nbJoueursPartie / 2);
+        equipesInfos = [];
+        for (let i = 0; i < nbEquipes; i++) equipesInfos.push({ capacite: 2 });
+        if (nbJoueursPartie % 2 !== 0) equipesInfos.push({ capacite: 3 });
+
+        // 3. Vérifie/crée /equipes
+        const eqSnap = await db.ref('parties/' + salonCode + '/equipes').once('value');
         if (!eqSnap.exists()) {
           let equipesInit = equipesInfos.map(() => []);
-          db.ref('parties/' + salonCode + '/equipes').set(equipesInit);
+          await db.ref('parties/' + salonCode + '/equipes').set(equipesInit);
         }
-        // Maintenant que equipesInfos est prêt, on peut démarrer le listener
+        // 4. Lance le listener SEULEMENT maintenant
         db.ref('parties/' + salonCode + '/equipes').on('value', function(snapshot) {
           const equipes = snapshot.val() || equipesInfos.map(() => []);
           afficherEquipes(equipes);
         });
-      });
-    });
+      } catch (err) {
+        afficherErreur("Erreur d'initialisation : " + err.message);
+      }
+    }
 
-    // Affichage dynamique des équipes en temps réel
+    function afficherErreur(msg) {
+      document.getElementById('debugError').innerHTML = '<div class="error-debug">' + msg + '</div>';
+    }
+
     function afficherEquipes(equipes) {
       const galerie = document.getElementById("galerieEquipes");
       galerie.innerHTML = "";
@@ -123,28 +133,22 @@
         }
         galerie.appendChild(div);
       });
-      // Vérifier si tous les joueurs sont répartis dans les équipes
+      // Affichage du bandeau si tout le monde a une équipe
       let totalInscrits = equipes.reduce((sum, arr) => sum + arr.length, 0);
       toutLeMondeAUneEquipe = (totalInscrits === nbJoueursPartie);
 
-      // Afficher le bandeau si tout le monde a une équipe
       const bandeau = document.getElementById("bandeauResultat");
       if (toutLeMondeAUneEquipe) {
         bandeau.innerHTML = `<div class="bandeau-resultat">Tout le monde est prêt ! <br>La partie va commencer...</div>`;
-        // Redirection automatique possible ici :
-        // setTimeout(() => { window.location.href = "gameplay.html"; }, 3000);
       } else {
         bandeau.innerHTML = "";
       }
     }
 
-    // Rejoindre une équipe
     function rejoindreEquipe(idx) {
       db.ref('parties/' + salonCode + '/equipes').transaction(equipes => {
         equipes = equipes || equipesInfos.map(() => []);
-        // Retirer ce joueur de toutes les équipes
         equipes = equipes.map(arr => arr.filter(j => j !== pseudo));
-        // Ajouter à la bonne équipe si pas pleine
         if (equipes[idx].length < equipesInfos[idx].capacite) {
           equipes[idx].push(pseudo);
         }
@@ -152,7 +156,6 @@
       });
     }
 
-    // Quitter son équipe
     function quitterEquipe() {
       db.ref('parties/' + salonCode + '/equipes').transaction(equipes => {
         equipes = equipes || equipesInfos.map(() => []);
@@ -161,10 +164,12 @@
       });
     }
 
-    // Retour accueil
     document.getElementById("btnRetourAccueil").onclick = function() {
       window.location.href = "accueil.html";
     };
+
+    // Lance la séquence d'initialisation
+    initEquipes();
   </script>
 </body>
 </html>
