@@ -113,6 +113,7 @@
         <!-- Les équipes seront générées ici -->
       </section>
       <div id="bandeauResultat"></div>
+      <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
     </main>
   </div>
   <footer class="footer">
@@ -120,7 +121,7 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <script>
-    // --- Récupérer le pseudo et le nombre de joueurs (stocké dans localStorage, sinon demander) ---
+    // Récupérer pseudo et nombre de joueurs (déjà stocké par la page "Créer partie")
     let pseudo = localStorage.getItem("pseudo") || "";
     while (!pseudo) {
       pseudo = prompt("Entrez votre pseudo :");
@@ -129,18 +130,17 @@
 
     let nbJoueurs = Number(localStorage.getItem("nombreJoueurs"));
     if (!nbJoueurs || nbJoueurs < 2) {
-      nbJoueurs = Number(prompt("Combien de joueurs ? (minimum 2)", 4));
-      if (!nbJoueurs || nbJoueurs < 2) nbJoueurs = 4;
-      localStorage.setItem("nombreJoueurs", nbJoueurs);
+      alert("Nombre de joueurs inconnu. Merci de (re)passer par la page Créer Partie.");
+      throw new Error("Pas de nombre de joueurs");
     }
 
-    // --- Générer la structure des équipes ---
+    // Générer la structure des équipes
     let nbEquipes = Math.floor(nbJoueurs / 2);
     let equipesInfos = [];
     for (let i = 0; i < nbEquipes; i++) equipesInfos.push({ capacite: 2 });
     if (nbJoueurs % 2 !== 0) equipesInfos.push({ capacite: 3 });
 
-    // --- Stockage local des équipes ---
+    // Stockage local des équipes (simulateur mono-appareil ou navigateur partagé)
     let equipes = JSON.parse(localStorage.getItem("equipesJeuPiste") || "[]");
     // Initialiser si vide ou structure incorrecte
     if (!Array.isArray(equipes) || equipes.length !== equipesInfos.length) {
@@ -151,7 +151,7 @@
     function afficherEquipes() {
       const galerie = document.getElementById("galerieEquipes");
       galerie.innerHTML = "";
-      let toutLeMondeAUneEquipe = true;
+      let toutLeMondeAUneEquipe = false;
       let monEquipe = null;
 
       equipes.forEach((joueurs, i) => {
@@ -181,10 +181,8 @@
       const bandeau = document.getElementById("bandeauResultat");
       if (toutLeMondeAUneEquipe) {
         bandeau.innerHTML = `<div class="bandeau-resultat">Tout le monde est prêt ! <br>La partie va commencer...</div>`;
-        // Redirection automatique après 3s (adapter la page cible si besoin)
-        setTimeout(() => {
-          // window.location.href = "gameplay.html";
-        }, 3000);
+        // Redirection automatique après 3s (décommente pour rediriger)
+        // setTimeout(() => { window.location.href = "gameplay.html"; }, 3000);
       } else {
         bandeau.innerHTML = "";
       }
@@ -215,6 +213,11 @@
 
     // Initialisation affichage
     afficherEquipes();
+
+    // Retour accueil
+    document.getElementById("btnRetourAccueil").onclick = function() {
+      window.location.href = "accueil.html";
+    };
   </script>
 </body>
 </html>
