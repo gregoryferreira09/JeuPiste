@@ -65,17 +65,18 @@
 
     /* Image Gandalf avec bords fondus et hauteur réduite */
     .image-fondue {
-      width: 100%;
-      max-width: 340px;
-      max-height: 180px;
-      object-fit: cover;
-      margin: 26px auto 0 auto;
-      display: block;
-      border-radius: 18px;
-      box-shadow: 0 2px 20px 4px rgba(0,0,0,0.18);
-      mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-    }
+  width: 100%;
+  max-width: 340px;
+  max-height: 140px;      /* Ajuste la hauteur ici selon ton besoin */
+  object-fit: contain;    /* On voit toute l'image, non rognée */
+  background: #1b1a17;    /* Couleur de fond pour combler l'espace vide */
+  margin: 26px auto 0 auto;
+  display: block;
+  border-radius: 18px;
+  box-shadow: 0 2px 20px 4px rgba(0,0,0,0.18);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+}
 
     /* Bouton Quête suivante désactivé */
     #next-quest {
