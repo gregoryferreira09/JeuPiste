@@ -42,7 +42,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script>
-    // --- Firebase config (doit coller à ta base de jeu) ---
+    // --- Firebase config (mets ici la même config que ton projet) ---
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -70,9 +70,11 @@
       window.location.href = "accueil.html";
     }
 
-    // 1. Récupère le nombre de joueurs depuis les paramètres de la partie (dans Firebase)
-    let nbJoueursPartie = 2;
+    // Variables globales
     let equipesInfos = [];
+    let nbJoueursPartie = 2;
+
+    // 1. Récupère le nombre de joueurs depuis les paramètres de la partie (dans Firebase) puis initialise tout
     db.ref('parties/' + salonCode + '/parametres').once('value').then(function(snap) {
       const params = snap.val() || {};
       nbJoueursPartie = Number(params.nombreJoueurs) || 2;
@@ -81,16 +83,21 @@
       equipesInfos = [];
       for (let i = 0; i < nbEquipes; i++) equipesInfos.push({ capacite: 2 });
       if (nbJoueursPartie % 2 !== 0) equipesInfos.push({ capacite: 3 });
-      // Initialise les équipes dans Firebase si pas déjà fait (par le créateur uniquement)
+      // Initialise les équipes dans Firebase si pas déjà fait (créateur uniquement)
       db.ref('parties/' + salonCode + '/equipes').once('value').then(function(eqSnap) {
         if (!eqSnap.exists()) {
           let equipesInit = equipesInfos.map(() => []);
           db.ref('parties/' + salonCode + '/equipes').set(equipesInit);
         }
+        // Maintenant que equipesInfos est prêt, on peut démarrer le listener
+        db.ref('parties/' + salonCode + '/equipes').on('value', function(snapshot) {
+          const equipes = snapshot.val() || equipesInfos.map(() => []);
+          afficherEquipes(equipes);
+        });
       });
     });
 
-    // 2. Affichage dynamique des équipes en temps réel
+    // Affichage dynamique des équipes en temps réel
     function afficherEquipes(equipes) {
       const galerie = document.getElementById("galerieEquipes");
       galerie.innerHTML = "";
@@ -124,14 +131,14 @@
       const bandeau = document.getElementById("bandeauResultat");
       if (toutLeMondeAUneEquipe) {
         bandeau.innerHTML = `<div class="bandeau-resultat">Tout le monde est prêt ! <br>La partie va commencer...</div>`;
-        // Tu peux activer la redirection automatique ici si tu veux :
+        // Redirection automatique possible ici :
         // setTimeout(() => { window.location.href = "gameplay.html"; }, 3000);
       } else {
         bandeau.innerHTML = "";
       }
     }
 
-    // 3. Rejoindre une équipe
+    // Rejoindre une équipe
     function rejoindreEquipe(idx) {
       db.ref('parties/' + salonCode + '/equipes').transaction(equipes => {
         equipes = equipes || equipesInfos.map(() => []);
@@ -145,7 +152,7 @@
       });
     }
 
-    // 4. Quitter son équipe
+    // Quitter son équipe
     function quitterEquipe() {
       db.ref('parties/' + salonCode + '/equipes').transaction(equipes => {
         equipes = equipes || equipesInfos.map(() => []);
@@ -153,20 +160,6 @@
         return equipes;
       });
     }
-
-    // 5. Synchroniser l'affichage en temps réel
-    // Il faut attendre que equipesInfos soit initialisé !
-    let firebaseListenerReady = false;
-    function setupFirebaseListener() {
-      if (firebaseListenerReady) return;
-      firebaseListenerReady = true;
-      db.ref('parties/' + salonCode + '/equipes').on('value', function(snapshot) {
-        const equipes = snapshot.val() || equipesInfos.map(() => []);
-        afficherEquipes(equipes);
-      });
-    }
-    // Attendre la récupération des paramètres pour lancer le listener
-    setTimeout(setupFirebaseListener, 900);
 
     // Retour accueil
     document.getElementById("btnRetourAccueil").onclick = function() {
