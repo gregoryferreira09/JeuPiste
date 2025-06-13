@@ -8,10 +8,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    .actions-row {
+    .actions-row-horizontal {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: center;
       margin-top: 38px;
       margin-bottom: 10px;
       gap: 24px;
@@ -65,17 +65,17 @@
 
     /* Image Gandalf avec bords fondus et hauteur réduite */
     .image-fondue {
-  width: 100%;
-  max-width: 540px;
-  max-height: 340px;      /* Ajuste la hauteur ici selon ton besoin */
-  object-fit: contain;    /* On voit toute l'image, non rognée */
-  margin: 26px auto 0 auto;
-  display: block;
-  border-radius: 18px;
-  box-shadow: 0 2px 20px 4px rgba(0,0,0,0.18);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-}
+      width: 100%;
+      max-width: 540px;
+      max-height: 340px;
+      object-fit: contain;
+      margin: 26px auto 0 auto;
+      display: block;
+      border-radius: 18px;
+      box-shadow: 0 2px 20px 4px rgba(0,0,0,0.18);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    }
 
     /* Bouton Quête suivante désactivé */
     #next-quest {
@@ -98,7 +98,7 @@
     }
 
     @media (max-width: 650px) {
-      .actions-row {
+      .actions-row-horizontal {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
@@ -143,37 +143,35 @@
         </div>
       </div>
 
-      <!-- Image fondue entre les symboles -->
-      <img src="../../Public/images/gandalf.png" alt="Gandalf" class="image-fondue" />
+      <!-- Actions et image entre les deux boutons -->
+      <div class="actions-row-horizontal">
+        <!-- GPS à gauche -->
+        <div class="icon-action side-icon">
+          <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0[...]"/>
+            </svg>
+            <span>GPS</span>
+          </a>
+          <div class="icon-label">Boussole</div>
+        </div>
 
-     <div class="actions-row-horizontal">
-  <!-- GPS à gauche -->
-  <div class="icon-action side-icon">
-    <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zm0-13.3c-1.66 0-3 1.34-3 3 0 1.66 1.34 3 3 3s3-1.34 3-3c0-1.66-1.34-3-3-3zm0 4c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/>
-      </svg>
-      <span>GPS</span>
-    </a>
-    <div class="icon-label">Boussole</div>
-  </div>
+        <!-- Image au centre -->
+        <img src="../../Public/images/gandalf.png" alt="Gandalf" class="image-fondue" />
 
-  <!-- Image au centre -->
-  <img src="../../Public/images/gandalf.png" alt="Gandalf" class="image-fondue" />
-
-  <!-- Appareil photo à droite -->
-  <div class="icon-action side-icon">
-    <label for="photo-upload" aria-label="Télécharger une photo">
-      <svg viewBox="0 0 24 24">
-        <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4-.21h2.83c.16 0 .31.08.4.21L15.95 7H20v13zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
-      </svg>
-      <span>Photo</span>
-      <div class="icon-label">preuve à envoyer</div>
-      <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
-    </label>
-  </div>
-</div>
-<div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+        <!-- Appareil photo à droite -->
+        <div class="icon-action side-icon">
+          <label for="photo-upload" aria-label="Télécharger une photo">
+            <svg viewBox="0 0 24 24">
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4[...]"/>
+            </svg>
+            <span>Photo</span>
+            <div class="icon-label">preuve à envoyer</div>
+            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
+          </label>
+        </div>
+      </div>
+      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
 
       <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
