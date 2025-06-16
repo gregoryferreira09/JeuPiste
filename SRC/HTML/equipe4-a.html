@@ -332,6 +332,19 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 <script>
+  // Déblocage uniquement quand A = F
+  document.getElementById('select-a').addEventListener('change', function() {
+    document.getElementById('show-indice').disabled = (this.value !== "F");
+  });
+
+  // Gestion du modal indice harmonisé
+  document.getElementById('show-indice').addEventListener('click', function() {
+    document.getElementById('indice-modal').classList.add('active');
+  });
+  document.getElementById('close-indice').addEventListener('click', function() {
+    document.getElementById('indice-modal').classList.remove('active');
+  });
+
   // Mot de passe attendu pour la validation finale
   const PASSWORD = "j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?"
     .trim().toLowerCase()
@@ -350,31 +363,6 @@
       btn.disabled = true;
       btn.classList.remove('enabled');
     }
-  });
-
-  // Mot de passe attendu pour l'indice (à personnaliser si besoin)
-  const INDICE_PASSWORD = "motdepasseindice"; // change ce mot de passe si besoin
-
-  function checkIndiceUnlock() {
-    const pwd = document.getElementById('indice-password').value.trim().toLowerCase();
-    const sel = document.getElementById('select-a').value;
-    const btn = document.getElementById('show-indice');
-    if (pwd === INDICE_PASSWORD && sel === "F") {
-      btn.disabled = false;
-    } else {
-      btn.disabled = true;
-    }
-  }
-
-  document.getElementById('indice-password').addEventListener('input', checkIndiceUnlock);
-  document.getElementById('select-a').addEventListener('change', checkIndiceUnlock);
-
-  // Gestion du modal indice harmonisé
-  document.getElementById('show-indice').addEventListener('click', function() {
-    document.getElementById('indice-modal').classList.add('active');
-  });
-  document.getElementById('close-indice').addEventListener('click', function() {
-    document.getElementById('indice-modal').classList.remove('active');
   });
 
   // Redirection page suivante
