@@ -254,8 +254,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
   const db = firebase.database();
-  const dureeEpreuve = 7 * 60; // 7 minutes en secondes (mets 7*60 pour 7min)
+  const dureeEpreuve = 7 * 60; // 7 minutes en secondes
   const epreuveId = 5; // à adapter si besoin
+
+  // Sécurité accès
+  if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
+    window.location.href = "accueil.html";
+    return;
+  }
 
   let timer = document.getElementById('timer');
   let chronoMsg = document.getElementById('chrono-message');
@@ -264,7 +270,10 @@ document.addEventListener('DOMContentLoaded', function() {
   let blocker = document.getElementById('blocker');
   let blockerBtn = document.getElementById('blocker-btn');
 
-  // Navigation synchronisée (redirige automatiquement si "currentStep" change)
+  // Amélioration UX : autofocus réponse
+  if(answerField) answerField.setAttribute('autofocus', 'autofocus');
+
+  // Navigation synchronisée (redirige si currentStep change)
   db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
     const step = snap.val() || 0;
     const parcours = window.parcoursEquipes[equipeNum];
@@ -281,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(snap => {
       let startTime = snap.val();
       if (!startTime) {
-        // Premier joueur qui arrive : enregistre le startTime pour tout le binôme
+        // Premier arrivé : enregistre le startTime pour tout le binôme
         startTime = Date.now();
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + `/epreuves/${epreuveId}/startTime`).set(startTime);
       }
@@ -313,14 +322,21 @@ document.addEventListener('DOMContentLoaded', function() {
     nextBtn.disabled = false;
     nextBtn.classList.add('enabled');
     window.name = "blocker-determination";
+    // Petit bonus UX : vibration si dispo
+    if ("vibrate" in navigator) navigator.vibrate(200);
   }
 
-  // Vérification réponse
+  // Vérification réponse (insensible à la casse, accent, espaces multiples)
   answerField.addEventListener('input', function() {
-    let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
-    if ((value === "rien" || value === "détermination") && !this.disabled) {
+    let value = this.value.trim().toLowerCase()
+      .replace(/’/g, "'")
+      .replace(/\s+/g, ' ')
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // enlève accents
+    if ((value === "rien" || value === "determination") && !this.disabled) {
       nextBtn.disabled = false;
       nextBtn.classList.add('enabled');
+      // Bonus UX : vibration légère si dispo
+      if ("vibrate" in navigator) navigator.vibrate(70);
     } else {
       nextBtn.disabled = true;
       nextBtn.classList.remove('enabled');
