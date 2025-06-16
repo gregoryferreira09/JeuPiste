@@ -15,6 +15,18 @@
       margin-top: 38px;
       margin-bottom: 10px;
       gap: 24px;
+      flex-wrap: wrap;
+    }
+    .left-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .right-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
     }
     .icon-action {
       display: flex;
@@ -93,24 +105,26 @@
       opacity: 1;
       cursor: pointer;
     }
-    @media (max-width: 650px) {
+    @media (max-width: 900px) {
       .actions-row-horizontal {
         flex-direction: column;
         align-items: stretch;
+        gap: 14px;
+      }
+      .right-actions {
         gap: 10px;
+        justify-content: space-between;
+        flex-wrap: wrap;
       }
       .icon-action {
         width: 100%;
         flex-direction: row;
         justify-content: flex-start;
-        gap: 10px;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+        gap: 8px;
       }
       .icon-action span {
         text-align: left;
-      }
-      .image-fondue {
-        max-width: 98vw;
       }
     }
   </style>
@@ -124,7 +138,6 @@
     <main class="main-accueil" role="main">
       <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">La quête du bout du monde</h2>
       <div class="presentation-jeu" style="margin-top: 24px;">
-        </div>
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
@@ -139,55 +152,55 @@
         </div>
       </div>
 
-      <!-- Bouton boussole -->
-      <div style="display:flex; justify-content:center; margin:32px 0 18px 0;">
-        <div class="icon-action side-icon">
-          <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 6c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 7.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            <span>Boussole</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Quatre boutons photo -->
+      <!-- Actions: Boussole + 4 photos dans le bandeau -->
       <div class="actions-row-horizontal">
-        <div class="icon-action side-icon">
-          <label id="label-photo1" for="photo-upload-1">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
-            </svg>
-            <span>Photo avec un paysan</span>
-            <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
+        <div class="left-actions">
+          <div class="icon-action side-icon">
+            <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 6c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 7.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <span>Boussole</span>
+            </a>
+          </div>
         </div>
-        <div class="icon-action side-icon">
-          <label id="label-photo2" for="photo-upload-2">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
-            </svg>
-            <span>Photo avec un gueux</span>
-            <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
-        </div>
-        <div class="icon-action side-icon">
-          <label id="label-photo3" for="photo-upload-3">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
-            </svg>
-            <span>Photo avec un troubadour</span>
-            <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
-        </div>
-        <div class="icon-action side-icon">
-          <label id="label-photo4" for="photo-upload-4">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
-            </svg>
-            <span>Photo avec un fils d'unijambiste</span>
-            <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
+        <div class="right-actions">
+          <div class="icon-action side-icon">
+            <label id="label-photo1" for="photo-upload-1">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+              </svg>
+              <span>Photo avec un paysan</span>
+              <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            </label>
+          </div>
+          <div class="icon-action side-icon">
+            <label id="label-photo2" for="photo-upload-2">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+              </svg>
+              <span>Photo avec un gueux</span>
+              <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            </label>
+          </div>
+          <div class="icon-action side-icon">
+            <label id="label-photo3" for="photo-upload-3">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+              </svg>
+              <span>Photo avec un troubadour</span>
+              <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            </label>
+          </div>
+          <div class="icon-action side-icon">
+            <label id="label-photo4" for="photo-upload-4">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+              </svg>
+              <span>Photo avec un fils d'unijambiste</span>
+              <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            </label>
+          </div>
         </div>
       </div>
       <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
