@@ -2,11 +2,108 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Toile d’Araignée - Jeu de piste</title>
+  <title>Quête du coeur vaillant - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
+  <style>
+    .actions-row-horizontal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 38px;
+      margin-bottom: 10px;
+      gap: 24px;
+    }
+    .icon-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90px;
+    }
+    .icon-action a, .icon-action label {
+      cursor: pointer;
+      color: #e0c185;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .icon-action a:hover, .icon-action label:hover {
+      color: #ffeecb;
+    }
+    .icon-action svg {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 6px;
+      fill: #e0c185;
+      transition: fill 0.2s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .icon-action a:hover svg,
+    .icon-action label:hover svg {
+      fill: #ffeecb;
+    }
+    .icon-action span {
+      font-size: 0.98em;
+      color: #e0c185;
+      margin-top: 2px;
+      text-align: center;
+    }
+    /* Pour masquer l'input file natif */
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap;
+      border: 0;
+      padding: 0;
+      margin: -1px;
+    }
+
+     /* Bouton Quête suivante désactivé */
+    #next-quest {
+      background: #aaa;
+      color: #fff;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      margin: 28px auto 0 auto;
+      display: block;
+      opacity: 0.6;
+      cursor: not-allowed;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    #next-quest.enabled {
+      background: #e0c185;
+      opacity: 1;
+      cursor: pointer;
+    }
+
+    @media (max-width: 650px) {
+      .actions-row-horizontal {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .icon-action {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .icon-action span {
+        text-align: left;
+      }
+      .image-fondue {
+        max-width: 98vw;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -15,7 +112,7 @@
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Toile d’Araignée</h2>
+      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête du coeur vaillant</h2>
       <div class="presentation-jeu" style="margin-top: 24px;">
         <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 14px;">
           <em>
@@ -25,12 +122,43 @@
         </div>
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
-          <div class="objectif-text">
-            Survie à la toile d’araignée et atteint son sommet.<br>
-            Une photo des deux héros doit être envoyée afin de prouver l’exploit.
-          </div>
+          <div class="objectif-text" style="margin-top: 18px;">
+  Pour espérer atteindre le Graal, il vous faudra d’abord affronter la grande Toile du Destin.<br><br>
+
+  <strong><br>
+  Cette structure suspendue entre ciel et terre mettra à l’épreuve votre bravoure et votre agilité.<br>
+  Grimpez ensemble jusqu’à son sommet, là où le monde vacille sous vos pieds.<br><br>
+
+  <em><br>
+  Capturez cet instant de courage en duo, sur une photo prise tout en haut, auréolés de peur… et de fierté.<br><br>
+            
+      <!-- Actions et image entre les deux boutons -->
+      <div class="actions-row-horizontal">
+        <!-- GPS à gauche -->
+        <div class="icon-action side-icon">
+          <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0[...]"/>
+            </svg>
+            <span>Boussole</span>
+          </a>
+        </div>
+
+        <!-- Appareil photo à droite -->
+        <div class="icon-action side-icon">
+          <label for="photo-upload" aria-label="Télécharger une photo">
+            <svg viewBox="0 0 24 24">
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4[...]"/>
+            </svg>
+            <span>Photo à envoyer</span>
+            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
+          </label>
         </div>
       </div>
+      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+
+      <!-- Bouton Quête suivante désactivé par défaut -->
+      <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
 
@@ -38,5 +166,26 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <script>
+    // Affichage du nom de la photo + activation du bouton
+    document.addEventListener('DOMContentLoaded', function() {
+      var input = document.getElementById('photo-upload');
+      var out = document.getElementById('photo-filename');
+      var btn = document.getElementById('next-quest');
+      if(input) {
+        input.addEventListener('change', function() {
+          if(this.files && this.files[0]) {
+            out.textContent = "Photo sélectionnée : " + this.files[0].name;
+            btn.disabled = false;
+            btn.classList.add('enabled');
+          } else {
+            out.textContent = "";
+            btn.disabled = true;
+            btn.classList.remove('enabled');
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
