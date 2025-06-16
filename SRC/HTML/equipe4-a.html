@@ -60,6 +60,66 @@
       padding: 0;
       margin: -1px;
     }
+    /* ---- Bouton Indice harmonisé ---- */
+    #show-indice {
+      background: #e0c185;
+      color: #473714;
+      font-size: 0.98em;
+      border: none;
+      border-radius: 7px;
+      padding: 5px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+      margin: 0 8px;
+    }
+    #show-indice:hover {
+      background: #ffeecb;
+    }
+    #indice-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(20,16,8,0.85);
+      justify-content: center;
+      align-items: center;
+    }
+    #indice-modal.active {
+      display: flex;
+    }
+    .modal-img-wrapper {
+      position: relative;
+      background: #fffbe0;
+      padding: 24px 24px 12px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      max-width: 92vw;
+    }
+    .modal-img-wrapper img {
+      display: block;
+      max-width: 70vw;
+      max-height: 60vh;
+      margin: 0 auto;
+      border-radius: 7px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .close-modal {
+      position: absolute;
+      top: 4px;
+      right: 12px;
+      font-size: 2.2em;
+      color: #a8832b;
+      cursor: pointer;
+      font-weight: bold;
+      background: transparent;
+      border: none;
+      z-index: 10;
+      transition: color 0.2s;
+    }
+    .close-modal:hover {
+      color: #e0c185;
+    }
     #next-quest {
       background: #aaa;
       color: #fff;
@@ -109,53 +169,6 @@
     .input-password-field:focus {
       border: 1.5px solid #ffeecb;
     }
-
-    /* CSS du modal indice */
-    #indice-modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0; top: 0; right: 0; bottom: 0;
-      background: rgba(20,16,8,0.85);
-      justify-content: center;
-      align-items: center;
-    }
-    #indice-modal.active {
-      display: flex;
-    }
-    .modal-img-wrapper {
-      position: relative;
-      background: #fffbe0;
-      padding: 24px 24px 12px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-      max-width: 92vw;
-    }
-    .modal-img-wrapper img {
-      display: block;
-      max-width: 70vw;
-      max-height: 60vh;
-      margin: 0 auto;
-      border-radius: 7px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    .close-modal {
-      position: absolute;
-      top: 4px;
-      right: 12px;
-      font-size: 2.2em;
-      color: #a8832b;
-      cursor: pointer;
-      font-weight: bold;
-      background: transparent;
-      border: none;
-      z-index: 10;
-      transition: color 0.2s;
-    }
-    .close-modal:hover {
-      color: #e0c185;
-    }
-
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -210,7 +223,7 @@
         </div>
       </div>
 
-      <!-- Bouton indice -->
+      <!-- Bouton indice harmonisé -->
       <div style="display:flex; justify-content:center; margin:38px 0 10px 0;">
         <button id="show-indice" type="button">
           Voir l’indice
@@ -275,12 +288,19 @@
     }
   });
 
-  // Gestion du modal indice
+  // Gestion du modal indice harmonisé
   document.getElementById('show-indice').addEventListener('click', function() {
     document.getElementById('indice-modal').classList.add('active');
   });
   document.getElementById('close-indice').addEventListener('click', function() {
     document.getElementById('indice-modal').classList.remove('active');
+  });
+
+  // Redirection page suivante
+  document.getElementById('next-quest').addEventListener('click', function() {
+    if (!this.disabled) {
+      window.location.href = "equipe4-b.html";
+    }
   });
 </script>
 </body>
