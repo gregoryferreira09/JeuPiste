@@ -209,20 +209,5 @@
       btn.classList.remove('enabled');
     }
   });
-</script>
-
-    // Gestion du champ mot de passe pour activer le bouton
-    document.getElementById('password-field').addEventListener('input', function() {
-      const userValue = this.value.trim().toLowerCase();
-      const btn = document.getElementById('next-quest');
-      if (userValue === PASSWORD) {
-        btn.disabled = false;
-        btn.classList.add('enabled');
-      } else {
-        btn.disabled = true;
-        btn.classList.remove('enabled');
-      }
-    });
-  </script>
 </body>
 </html>
