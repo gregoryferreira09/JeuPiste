@@ -246,69 +246,103 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <script>
-    // Chrono 7min
-    let total = 1 * 60;
-    let chrono = total;
-    let timer = document.getElementById('timer');
-    let chronoMsg = document.getElementById('chrono-message');
-    let answerField = document.getElementById('answer-field');
-    let nextBtn = document.getElementById('next-quest');
-    let blocker = document.getElementById('blocker');
-    let blockerBtn = document.getElementById('blocker-btn');
-    
-    function showBlockerPage() {
-      blocker.style.display = "flex";
-      answerField.value = "détermination";
-      answerField.disabled = true;
-      nextBtn.disabled = false;
-      nextBtn.classList.add('enabled');
-      window.name = "blocker-determination";
-    }
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../JS/gameflow.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = Number(localStorage.getItem("equipeNum"));
+  const db = firebase.database();
+  const dureeEpreuve = 7 * 60; // 7 minutes en secondes (mets 7*60 pour 7min)
+  const epreuveId = 5; // à adapter si besoin
 
-    let interval = setInterval(function() {
-      let min = Math.floor(chrono / 60);
-      let sec = chrono % 60;
-      timer.textContent = (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
-      if (chrono <= 0) {
-        clearInterval(interval);
+  let timer = document.getElementById('timer');
+  let chronoMsg = document.getElementById('chrono-message');
+  let answerField = document.getElementById('answer-field');
+  let nextBtn = document.getElementById('next-quest');
+  let blocker = document.getElementById('blocker');
+  let blockerBtn = document.getElementById('blocker-btn');
+
+  // Navigation synchronisée (redirige automatiquement si "currentStep" change)
+  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
+    const step = snap.val() || 0;
+    const parcours = window.parcoursEquipes[equipeNum];
+    const epreuveNum = parcours[step];
+    const expectedPage = `equipe${epreuveNum}-a.html`;
+    if (!window.location.pathname.endsWith(expectedPage)) {
+      window.location.href = expectedPage;
+    }
+  });
+
+  // Chrono SYNCHRO Firebase
+  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + `/epreuves/${epreuveId}/startTime`)
+    .once('value')
+    .then(snap => {
+      let startTime = snap.val();
+      if (!startTime) {
+        // Premier joueur qui arrive : enregistre le startTime pour tout le binôme
+        startTime = Date.now();
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + `/epreuves/${epreuveId}/startTime`).set(startTime);
+      }
+      lancerChrono(startTime);
+    });
+
+  function lancerChrono(startTime) {
+    function tick() {
+      const now = Date.now();
+      let secRestantes = Math.max(0, Math.round((startTime + dureeEpreuve * 1000 - now) / 1000));
+      let min = Math.floor(secRestantes / 60);
+      let sec = secRestantes % 60;
+      timer.textContent = (min < 10 ? "0":"") + min + ":" + (sec < 10 ? "0":"") + sec;
+      if (secRestantes > 0) {
+        setTimeout(tick, 1000);
+      } else {
         timer.classList.add('overtime');
         chronoMsg.classList.add('overtime');
         showBlockerPage();
       }
-      chrono--;
-    }, 1000);
+    }
+    tick();
+  }
 
-    // Vérification réponse
-    answerField.addEventListener('input', function() {
-      let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
-      if ((value === "rien" || value === "détermination") && !this.disabled) {
-        nextBtn.disabled = false;
-        nextBtn.classList.add('enabled');
-      } else {
-        nextBtn.disabled = true;
-        nextBtn.classList.remove('enabled');
-      }
-    });
+  function showBlockerPage() {
+    blocker.style.display = "flex";
+    answerField.value = "détermination";
+    answerField.disabled = true;
+    nextBtn.disabled = false;
+    nextBtn.classList.add('enabled');
+    window.name = "blocker-determination";
+  }
 
-    // Navigation vers la page suivante (à adapter si besoin)
+  // Vérification réponse
+  answerField.addEventListener('input', function() {
+    let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
+    if ((value === "rien" || value === "détermination") && !this.disabled) {
+      nextBtn.disabled = false;
+      nextBtn.classList.add('enabled');
+    } else {
+      nextBtn.disabled = true;
+      nextBtn.classList.remove('enabled');
+    }
+  });
+
+  // Passage à la quête suivante (synchro binôme)
+  if (nextBtn) {
     nextBtn.addEventListener('click', function() {
-      if(!this.disabled) {
-        window.name = ""; // reset
-        window.location.href = "equipe5-b.html";
-      }
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
     });
+  }
 
-    // Gestion fermeture/réouverture après blocage
-    document.addEventListener('DOMContentLoaded', function() {
-      if (window.name === "blocker-determination") {
-        showBlockerPage();
-      }
-    });
+  // Gestion fermeture/réouverture après blocage
+  if (window.name === "blocker-determination") {
+    showBlockerPage();
+  }
 
-    blockerBtn.addEventListener('click', function() {
-      blocker.style.display = "none";
-    });
-  </script>
+  blockerBtn.addEventListener('click', function() {
+    blocker.style.display = "none";
+  });
+});
+</script>
 </body>
 </html>
