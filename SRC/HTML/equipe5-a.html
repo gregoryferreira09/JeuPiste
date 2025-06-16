@@ -4,29 +4,33 @@
   <meta charset="UTF-8">
   <title>Quête émotionnelle - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    .chrono-row {
+    .chrono-block {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 18px;
-      margin-top: 18px;
-      margin-bottom: 8px;
-      font-size: 1.12em;
+      gap: 22px;
+      background: #231d1d;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px #0005;
+      padding: 18px 22px;
+      margin: 24px auto 22px auto;
+      max-width: 850px;
     }
     .chrono-timer {
-      font-size: 1.18em;
+      font-size: 1.38em;
       font-weight: bold;
       color: #e0c185;
-      background: #231d1d;
-      border-radius: 8px;
-      padding: 5px 16px;
+      background: #181212;
+      border-radius: 9px;
+      padding: 10px 26px;
       letter-spacing: 2px;
-      min-width: 95px;
+      min-width: 110px;
       text-align: center;
+      margin-right: 6px;
+      box-shadow: 0 1px 4px #0002;
       transition: color .25s;
     }
     .chrono-timer.overtime {
@@ -34,13 +38,13 @@
       background: #2b1313;
       animation: blink 1s steps(2, start) infinite;
     }
-    @keyframes blink {
-      to { color: #fff; }
-    }
+    @keyframes blink { to { color: #fff; } }
     .chrono-message {
       color: #e0c185;
-      font-size: 1.04em;
+      font-size: 1.08em;
+      line-height: 1.6;
       transition: color .25s;
+      max-width: 600px;
     }
     .chrono-message.overtime {
       color: #ff2f2f;
@@ -99,9 +103,55 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
-    @media (max-width: 650px) {
-      .chrono-row { flex-direction: column; gap: 6px; }
-      .input-answer-field { width: 98vw; font-size: 1em; padding: 10px 7px; }
+    /* Blocage plein écran */
+    #blocker {
+      display: none;
+      position: fixed;
+      z-index: 5000;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(24,18,18,0.92);
+      color: #e0c185;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-size: 1.35em;
+      text-align: center;
+      transition: background 0.5s;
+      padding: 0 10px;
+    }
+    #blocker-content {
+      background: #241919;
+      border-radius: 18px;
+      padding: 38px 18px 28px 18px;
+      box-shadow: 0 6px 32px #000a;
+      max-width: 440px;
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+    }
+    #blocker-content strong {
+      color: #ffeecb;
+    }
+    #blocker-btn {
+      margin-top: 24px;
+      padding: 12px 32px;
+      background: #e0c185;
+      color: #473714;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-family: inherit;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 2px 10px #0004;
+      transition: background 0.18s;
+    }
+    #blocker-btn:hover { background: #ffeecb; }
+    @media (max-width: 700px) {
+      .chrono-block { flex-direction: column; padding: 12px 6vw; gap: 8px; max-width: 99vw; }
+      .chrono-timer { margin: 0 0 8px 0; font-size: 1.1em; padding: 8px 15px; min-width: 80px; }
+      .chrono-message { font-size: 1em; text-align: center; max-width: 95vw; }
+      #blocker-content { padding: 22px 4vw 16px 4vw; }
     }
   </style>
 </head>
@@ -110,16 +160,26 @@
     <h1 class="site-title">Jeu de piste</h1>
   </header>
 
+  <div id="blocker">
+    <div id="blocker-content">
+      <div>
+        Votre lutte acharnée durant ces longues minutes vous auront sûrement permis de découvrir une qualité certaine :<br><br>
+        <strong>la détermination.</strong>
+      </div>
+      <button id="blocker-btn" type="button">Continuer</button>
+    </div>
+  </div>
+
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
       <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête émotionnelle</h2>
-      <!-- Chrono et message -->
+      <!-- Chrono et message harmonisés -->
       <div class="chrono-block">
-  <span class="chrono-timer" id="timer">07:00</span>
-  <span class="chrono-message" id="chrono-message">
-    Chevaliers, en selle sans tarder ! Vous n'avez que sept minutes pour atteindre ce lieu mystérieux et découvrir ce qui s'y cache, avant que le temps ne vous soit impitoyablement retiré. Hâtez-vous, car sans cet élément précieux, votre destin au combat à venir pourrait bien être scellé.
-  </span>
-</div>
+        <span class="chrono-timer" id="timer">07:00</span>
+        <span class="chrono-message" id="chrono-message">
+          Chevaliers, en selle sans tarder ! Vous n'avez que sept minutes pour atteindre ce lieu mystérieux et découvrir ce qui s'y cache, avant que le temps ne vous soit impitoyablement retiré. Hâtez-vous, car sans cet élément précieux, votre destin au combat à venir pourrait bien être scellé.
+        </span>
+      </div>
       <div class="presentation-jeu" style="margin-top: 24px;">
         <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 14px;">
           <em>
@@ -127,6 +187,7 @@
             Sous le voile des feuillages, là où l’ombre danse avec la lumière, creusez, fouillez et scrutez le sol sacré.<br>
             <br>
             À vingt pas de ce lieu, l’indice vous attend, tapi dans le silence des racines et des feuilles.<br>
+          </em>
         </div>
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
@@ -153,92 +214,70 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-<script>
-  // Chrono 5min (300s)
-  let total = 1 * 60;
-  let chrono = total;
-  let timer = document.getElementById('timer');
-  let chronoMsg = document.getElementById('chrono-message');
-  let answerField = document.getElementById('answer-field');
-  let nextBtn = document.getElementById('next-quest');
-  let messageTimeout = null;
-
-  function showOvertimeMessage() {
-    // Efface le champ et désactive-le
-    answerField.value = "détermination";
-    answerField.disabled = true;
-    nextBtn.disabled = false;
-    nextBtn.classList.add('enabled');
-    // Ajoute le message spécial
-    let div = document.createElement("div");
-    div.id = "overtime-msg";
-    div.style.margin = "20px auto";
-    div.style.maxWidth = "420px";
-    div.style.background = "#241919";
-    div.style.color = "#e0c185";
-    div.style.borderRadius = "9px";
-    div.style.padding = "18px 18px 14px 18px";
-    div.style.fontSize = "1.07em";
-    div.style.textAlign = "center";
-    div.style.boxShadow = "0 2px 10px #0006";
-    div.innerHTML = "Votre lutte acharnée durant ces longues minutes vous aura sûrement permis de découvrir une qualité certaine : <b>la détermination</b>.";
-    // Ajoute le message juste en dessous du chrono
-    let chronoRow = document.querySelector('.chrono-row');
-    if(document.getElementById('overtime-msg')) return; // évite doublons
-    chronoRow.parentNode.insertBefore(div, chronoRow.nextSibling);
-  }
-
-  let interval = setInterval(function() {
-    let min = Math.floor(chrono / 60);
-    let sec = chrono % 60;
-    timer.textContent = (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
-    if (chrono <= 0) {
-      clearInterval(interval);
-      timer.classList.add('overtime');
-      chronoMsg.classList.add('overtime');
-      answerField.disabled = true;
-      showOvertimeMessage();
-    }
-    chrono--;
-  }, 1000);
-
-  // Vérification réponse
-  answerField.addEventListener('input', function() {
-    let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
-    if ((value === "rien" || value === "détermination") && !this.disabled) {
-      nextBtn.disabled = false;
-      nextBtn.classList.add('enabled');
-    } else {
-      nextBtn.disabled = true;
-      nextBtn.classList.remove('enabled');
-    }
-  });
-
-  // Navigation vers la page suivante (à adapter si besoin)
-  nextBtn.addEventListener('click', function() {
-    if(!this.disabled) {
-      window.location.href = "equipe5-b.html";
-    }
-  });
-
-  // Lorsque la page est rechargée (après retour), pré-remplir si besoin
-  document.addEventListener('DOMContentLoaded', function() {
-    if (window.name === "overtime-determination") {
+  <script>
+    // Chrono 7min
+    let total = 7 * 60;
+    let chrono = total;
+    let timer = document.getElementById('timer');
+    let chronoMsg = document.getElementById('chrono-message');
+    let answerField = document.getElementById('answer-field');
+    let nextBtn = document.getElementById('next-quest');
+    let blocker = document.getElementById('blocker');
+    let blockerBtn = document.getElementById('blocker-btn');
+    
+    function showBlockerPage() {
+      blocker.style.display = "flex";
       answerField.value = "détermination";
       answerField.disabled = true;
       nextBtn.disabled = false;
       nextBtn.classList.add('enabled');
-      showOvertimeMessage();
-      window.name = ""; // reset pour la suite
+      // Flag pour rechargement/réouverture
+      window.name = "blocker-determination";
     }
-  });
 
-  // Si l'utilisateur ferme la page après overtime, marque le flag pour la prochaine ouverture
-  window.addEventListener("beforeunload", function(e) {
-    if (answerField.value.trim().toLowerCase() === "détermination" && answerField.disabled) {
-      window.name = "overtime-determination";
-    }
-  });
-</script>
+    let interval = setInterval(function() {
+      let min = Math.floor(chrono / 60);
+      let sec = chrono % 60;
+      timer.textContent = (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
+      if (chrono <= 0) {
+        clearInterval(interval);
+        timer.classList.add('overtime');
+        chronoMsg.classList.add('overtime');
+        showBlockerPage();
+      }
+      chrono--;
+    }, 1000);
+
+    // Vérification réponse
+    answerField.addEventListener('input', function() {
+      let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
+      if ((value === "rien" || value === "détermination") && !this.disabled) {
+        nextBtn.disabled = false;
+        nextBtn.classList.add('enabled');
+      } else {
+        nextBtn.disabled = true;
+        nextBtn.classList.remove('enabled');
+      }
+    });
+
+    // Navigation vers la page suivante (à adapter si besoin)
+    nextBtn.addEventListener('click', function() {
+      if(!this.disabled) {
+        window.name = ""; // reset
+        window.location.href = "equipe5-b.html";
+      }
+    });
+
+    // Gestion fermeture/réouverture après blocage
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.name === "blocker-determination") {
+        showBlockerPage();
+      }
+    });
+
+    blockerBtn.addEventListener('click', function() {
+      blocker.style.display = "none";
+    });
+  </script>
 </body>
 </html>
