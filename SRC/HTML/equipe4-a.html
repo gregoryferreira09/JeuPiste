@@ -4,226 +4,66 @@
   <meta charset="UTF-8">
   <title>Quête de la lumière de l’esprit - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    .actions-row-horizontal {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 38px;
-      margin-bottom: 10px;
-      gap: 24px;
-    }
-    .icon-action {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 90px;
-    }
-    .icon-action a {
-      cursor: pointer;
-      color: #e0c185;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .icon-action a:hover {
-      color: #ffeecb;
-    }
-    .icon-action svg {
-      width: 38px;
-      height: 38px;
-      margin-bottom: 6px;
-      fill: #e0c185;
-      transition: fill 0.2s;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .icon-action a:hover svg {
-      fill: #ffeecb;
-    }
-    .icon-action span {
-      font-size: 0.98em;
-      color: #e0c185;
-      margin-top: 2px;
-      text-align: center;
-    }
-    .visually-hidden {
-      position: absolute !important;
-      height: 1px; width: 1px;
-      overflow: hidden;
-      clip: rect(1px, 1px, 1px, 1px);
-      white-space: nowrap;
-      border: 0;
-      padding: 0;
-      margin: -1px;
-    }
-    /* ---- Bouton Indice harmonisé ---- */
-    #show-indice {
-      background: #e0c185;
-      color: #473714;
-      font-size: 0.98em;
-      border: none;
-      border-radius: 7px;
-      padding: 5px 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-      margin: 0 8px;
-    }
-    #show-indice:disabled {
-      opacity: 0.6;
-      background: #b7a170;
-      cursor: not-allowed;
-    }
-    #show-indice:hover:enabled {
-      background: #ffeecb;
-    }
-    #indice-modal {
+    /* ... (le reste de tes styles inchangé) ... */
+    .actions-row-horizontal { display: flex; justify-content: space-between; align-items: center; margin-top: 38px; margin-bottom: 10px; gap: 24px; }
+    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
+    .icon-action a { cursor: pointer; color: #e0c185; text-decoration: none; transition: color 0.2s; }
+    .icon-action a:hover { color: #ffeecb; }
+    .icon-action svg { width: 38px; height: 38px; margin-bottom: 6px; fill: #e0c185; transition: fill 0.2s; display: block; margin-left: auto; margin-right: auto; }
+    .icon-action a:hover svg { fill: #ffeecb; }
+    .icon-action span { font-size: 0.98em; color: #e0c185; margin-top: 2px; text-align: center; }
+    .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.07); margin: 0 8px; }
+    #show-indice:disabled { opacity: 0.6; background: #b7a170; cursor: not-allowed; }
+    #show-indice:hover:enabled { background: #ffeecb; }
+    #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
+    #indice-modal.active { display: flex; }
+    .modal-img-wrapper { position: relative; background: #fffbe0; padding: 24px 24px 12px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); max-width: 92vw; }
+    .modal-img-wrapper img { display: block; max-width: 70vw; max-height: 60vh; margin: 0 auto; border-radius: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.2s; }
+    .close-modal:hover { color: #e0c185; }
+    #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; transition: background 0.2s, opacity 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    #next-quest.enabled { background: #e0c185; opacity: 1; cursor: pointer; }
+    .input-password-wrapper { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
+    .input-password-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
+    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 90vw; text-align: center; box-sizing: border-box; transition: border 0.2s; }
+    .input-password-field:focus { border: 1.5px solid #ffeecb; }
+    .indice-unlock-block { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
+    .indice-unlock-row { margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .indice-unlock-row select { font-size: 1em; padding: 3px 8px; border-radius: 6px; background: #2b2323; color: #e0c185; border: 1px solid #e0c185; }
+    /* Blocage écran rouge */
+    #blocker {
       display: none;
       position: fixed;
-      z-index: 1000;
+      z-index: 2000;
       left: 0; top: 0; right: 0; bottom: 0;
-      background: rgba(20,16,8,0.85);
+      background: #b80f0a;
+      color: #fff;
       justify-content: center;
       align-items: center;
-    }
-    #indice-modal.active {
-      display: flex;
-    }
-    .modal-img-wrapper {
-      position: relative;
-      background: #fffbe0;
-      padding: 24px 24px 12px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-      max-width: 92vw;
-    }
-    .modal-img-wrapper img {
-      display: block;
-      max-width: 70vw;
-      max-height: 60vh;
-      margin: 0 auto;
-      border-radius: 7px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    .close-modal {
-      position: absolute;
-      top: 4px;
-      right: 12px;
-      font-size: 2.2em;
-      color: #a8832b;
-      cursor: pointer;
-      font-weight: bold;
-      background: transparent;
-      border: none;
-      z-index: 10;
-      transition: color 0.2s;
-    }
-    .close-modal:hover {
-      color: #e0c185;
-    }
-    #next-quest {
-      background: #aaa;
-      color: #fff;
-      font-size: 1.08em;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 30px;
-      margin: 28px auto 0 auto;
-      display: block;
-      opacity: 0.6;
-      cursor: not-allowed;
-      transition: background 0.2s, opacity 0.2s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    #next-quest.enabled {
-      background: #e0c185;
-      opacity: 1;
-      cursor: pointer;
-    }
-    .input-password-wrapper {
-      display: flex;
       flex-direction: column;
-      align-items: center;
-      margin: 38px 0 10px 0;
-    }
-    .input-password-label {
-      color: #e0c185;
-      font-size: 1.06em;
-      margin-bottom: 8px;
+      font-size: 1.5em;
       text-align: center;
     }
-    .input-password-field {
-      padding: 10px 16px;
-      font-size: 1.11em;
-      border-radius: 7px;
-      border: 1px solid #e0c185;
-      outline: none;
-      margin-bottom: 0;
-      background: #2b2323;
-      color: #ffeecb;
-      width: 320px;
-      max-width: 90vw;
-      text-align: center;
-      box-sizing: border-box;
-      transition: border 0.2s;
+    #blocker-message {
+      margin-bottom: 24px;
+      font-size: 1.2em;
+      font-weight: bold;
     }
-    .input-password-field:focus {
-      border: 1.5px solid #ffeecb;
+    #blocker-countdown {
+      font-size: 2.2em;
+      font-weight: bold;
     }
     @media (max-width: 650px) {
-      .actions-row-horizontal {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .icon-action {
-        width: 100%;
-        flex-direction: row;
-        justify-content: flex-start;
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-      .icon-action span {
-        text-align: left;
-      }
-      .input-password-field {
-        width: 98vw;
-        font-size: 1em;
-        padding: 10px 7px;
-      }
-      .modal-img-wrapper img {
-        max-width: 95vw;
-        max-height: 50vh;
-      }
-    }
-    /* Pour bon alignement du bloc de l'indice */
-    .indice-unlock-block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 38px 0 10px 0;
-    }
-    .indice-unlock-block label {
-      color: #e0c185;
-      font-size: 1em;
-    }
-    .indice-unlock-row {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .indice-unlock-row select {
-      font-size: 1em;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: #2b2323;
-      color: #e0c185;
-      border: 1px solid #e0c185;
+      /* ... (tes media queries inchangés) ... */
+      .actions-row-horizontal { flex-direction: column; align-items: stretch; gap: 10px; }
+      .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
+      .icon-action span { text-align: left; }
+      .input-password-field { width: 98vw; font-size: 1em; padding: 10px 7px; }
+      .modal-img-wrapper img { max-width: 95vw; max-height: 50vh; }
     }
   </style>
 </head>
@@ -231,6 +71,11 @@
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
+
+  <div id="blocker">
+    <div id="blocker-message">Il faut vous rendre à la pierre de Rosette et inscrire ce que vous y trouverez.<br><br>Déblocage dans :</div>
+    <div id="blocker-countdown">30</div>
+  </div>
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
@@ -246,7 +91,7 @@
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
             Un message ancien, scellé par les sages, vous attend sur la pierre de Rosette.<br><br>
-            </strong><br>
+            <strong>Défi&nbsp;:</strong><br>
             Parlez ami et entrez... Déchiffrez le texte, percez ses secrets et inscrivez-le ci-dessous<br><br>
             Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.<br><br>
             <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
@@ -257,42 +102,41 @@
         </div>
       </div>
 
-
-<div class="indice-unlock-block">
-  <div class="indice-unlock-row">
-    <label for="select-a">A = ?</label>
-    <select id="select-a">
-      <option value="">Choisir…</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-      <option value="D">D</option>
-      <option value="E">E</option>
-      <option value="F">F</option>
-      <option value="G">G</option>
-      <option value="H">H</option>
-      <option value="I">I</option>
-      <option value="J">J</option>
-      <option value="K">K</option>
-      <option value="L">L</option>
-      <option value="M">M</option>
-      <option value="N">N</option>
-      <option value="O">O</option>
-      <option value="P">P</option>
-      <option value="Q">Q</option>
-      <option value="R">R</option>
-      <option value="S">S</option>
-      <option value="T">T</option>
-      <option value="U">U</option>
-      <option value="V">V</option>
-      <option value="W">W</option>
-      <option value="X">X</option>
-      <option value="Y">Y</option>
-      <option value="Z">Z</option>
-    </select>
-  </div>
-  <button id="show-indice" type="button" disabled>Voir l’indice</button>
-</div>
+      <div class="indice-unlock-block">
+        <div class="indice-unlock-row">
+          <label for="select-a">A = ?</label>
+          <select id="select-a">
+            <option value="">Choisir…</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+            <option value="K">K</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="N">N</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="Q">Q</option>
+            <option value="R">R</option>
+            <option value="S">S</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+          </select>
+        </div>
+        <button id="show-indice" type="button" disabled>Voir l’indice</button>
+      </div>
 
       <!-- Modal d'indice -->
       <div id="indice-modal">
@@ -332,10 +176,36 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 <script>
-  // Déblocage uniquement quand A = F
+  // Blocage écran rouge si la mauvaise lettre est choisie
+  let blockTimeout = null;
   document.getElementById('select-a').addEventListener('change', function() {
-    document.getElementById('show-indice').disabled = (this.value !== "F");
+    const btnIndice = document.getElementById('show-indice');
+    if (this.value === "F") {
+      btnIndice.disabled = false;
+    } else if (this.value !== "") {
+      btnIndice.disabled = true;
+      showBlocker();
+    } else {
+      btnIndice.disabled = true;
+    }
   });
+
+  function showBlocker() {
+    const blocker = document.getElementById('blocker');
+    blocker.style.display = 'flex';
+    let count = 30;
+    document.getElementById('blocker-countdown').textContent = count;
+    blockTimeout && clearInterval(blockTimeout);
+    blockTimeout = setInterval(() => {
+      count--;
+      document.getElementById('blocker-countdown').textContent = count;
+      if (count <= 0) {
+        clearInterval(blockTimeout);
+        blocker.style.display = 'none';
+        document.getElementById('select-a').value = '';
+      }
+    }, 1000);
+  }
 
   // Gestion du modal indice harmonisé
   document.getElementById('show-indice').addEventListener('click', function() {
