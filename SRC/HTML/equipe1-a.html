@@ -166,15 +166,15 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-<!-- ... tout ton HTML ... -->
+
+    
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script src="../JS/gameflow.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = Number(localStorage.getItem("equipeNum")); // 0 à 4
-  const playerId = localStorage.getItem("uuid");
+  const equipeNum = Number(localStorage.getItem("equipeNum"));
   const db = firebase.database();
 
   if (salonCode === null || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
 
-  // Synchronisation du parcours : si le currentStep change, les DEUX joueurs sont redirigés
+  // Navigation synchronisée : redirection automatique pour le binôme
   db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
     const step = snap.val() || 0;
     const parcours = window.parcoursEquipes[equipeNum];
@@ -193,21 +193,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Gestion du bouton "quête suivante" et upload photo
+  // Gestion du bouton photo + synchro binôme
   var input = document.getElementById('photo-upload');
   var out = document.getElementById('photo-filename');
   var btn = document.getElementById('next-quest');
 
-  // 1. Synchro photo (optionnelle mais top UX)
   if(input && btn && out) {
-    // Quand la photo est prise
+    // Quand la photo est prise, on enregistre dans Firebase
     input.addEventListener('change', function() {
       if(this.files && this.files[0]) {
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').set(true);
       }
     });
 
-    // Synchro sur les deux téléphones
+    // Synchro sur les deux téléphones : désactive l’input et active le bouton
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').on('value', snap => {
       if (snap.val()) {
         input.disabled = true;
@@ -223,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // 2. Passage à la quête suivante (pour le binôme)
+  // Passage à la quête suivante (synchro binôme)
   if (btn) {
     btn.addEventListener('click', function() {
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
