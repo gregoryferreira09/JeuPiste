@@ -297,13 +297,17 @@
       }
     }
 
+    // ----------- MODIFICATION ICI -------------
     document.getElementById("valider-choix").onclick = function() {
       if (!equipeSelectionnee || this.disabled) return;
       db.ref('parties/' + salonCode + '/equipes/' + equipeSelectionnee + '/membres/' + playerId).set({
         pseudo: pseudo
       });
+      // ENREGISTRE LE NUMÉRO D'ÉQUIPE POUR GAMEFLOW
+      localStorage.setItem("equipeNum", equipeSelectionnee);
       this.disabled = true;
     };
+    // ----------- FIN MODIF -------------
 
     function ajouterBoutonAnnuler(equipeJoueur) {
       const btn = document.createElement('button');
@@ -320,6 +324,8 @@
         equipeSelectionnee = null;
         document.getElementById('valider-choix').disabled = true;
         db.ref('parties/' + salonCode + '/equipes/' + equipeJoueur + '/membres/' + playerId).remove();
+        // ENLÈVE ÉQUIPE SI ANNULÉ
+        localStorage.removeItem("equipeNum");
       };
       document.querySelector('.boutons-actions').appendChild(btn);
     }
