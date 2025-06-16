@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quête des bêtes mystiques - Jeu de piste</title>
+  <title>Quête de la lumière de l’esprit - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
@@ -22,20 +22,14 @@
       align-items: center;
       width: 90px;
     }
-    .icon-action label {
+    .icon-action a {
       cursor: pointer;
       color: #e0c185;
       text-decoration: none;
       transition: color 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
-    .icon-action label:active,
-    .icon-action label[aria-disabled="true"] {
-      color: #9d8c62;
-      cursor: not-allowed;
-      opacity: 0.6;
+    .icon-action a:hover {
+      color: #ffeecb;
     }
     .icon-action svg {
       width: 38px;
@@ -47,21 +41,14 @@
       margin-left: auto;
       margin-right: auto;
     }
-    .icon-action label:hover svg {
+    .icon-action a:hover svg {
       fill: #ffeecb;
-    }
-    .icon-action label[aria-disabled="true"] svg {
-      filter: grayscale(1);
-      fill: #9d8c62;
     }
     .icon-action span {
       font-size: 0.98em;
       color: #e0c185;
       margin-top: 2px;
       text-align: center;
-    }
-    .icon-action label[aria-disabled="true"] span {
-      color: #9d8c62;
     }
     .visually-hidden {
       position: absolute !important;
@@ -72,66 +59,6 @@
       border: 0;
       padding: 0;
       margin: -1px;
-    }
-    #indice-modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0; top: 0; right: 0; bottom: 0;
-      background: rgba(20,16,8,0.85);
-      justify-content: center;
-      align-items: center;
-    }
-    #indice-modal.active {
-      display: flex;
-    }
-    .modal-img-wrapper {
-      position: relative;
-      background: #fffbe0;
-      padding: 24px 24px 12px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-      max-width: 92vw;
-    }
-    .modal-img-wrapper img {
-      display: block;
-      max-width: 70vw;
-      max-height: 60vh;
-      margin: 0 auto;
-      border-radius: 7px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    .close-modal {
-      position: absolute;
-      top: 4px;
-      right: 12px;
-      font-size: 2.2em;
-      color: #a8832b;
-      cursor: pointer;
-      font-weight: bold;
-      background: transparent;
-      border: none;
-      z-index: 10;
-      transition: color 0.2s;
-    }
-    .close-modal:hover {
-      color: #e0c185;
-    }
-    /* ---- Harmo boutons ---- */
-    #show-indice {
-      background: #e0c185;
-      color: #473714;
-      font-size: 0.98em;
-      border: none;
-      border-radius: 7px;
-      padding: 5px 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-      margin: 0 8px;
-    }
-    #show-indice:hover {
-      background: #ffeecb;
     }
     #next-quest {
       background: #aaa;
@@ -152,6 +79,37 @@
       opacity: 1;
       cursor: pointer;
     }
+    .input-password-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 38px 0 10px 0;
+    }
+    .input-password-label {
+      color: #e0c185;
+      font-size: 1.06em;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .input-password-field {
+      padding: 10px 16px;
+      font-size: 1.11em;
+      border-radius: 7px;
+      border: 1px solid #e0c185;
+      outline: none;
+      margin-bottom: 0;
+      background: #2b2323;
+      color: #ffeecb;
+      width: 320px;
+      max-width: 90vw;
+      text-align: center;
+      box-sizing: border-box;
+      transition: border 0.2s;
+    }
+    .input-password-field:focus {
+      border: 1.5px solid #ffeecb;
+    }
+
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -168,12 +126,10 @@
       .icon-action span {
         text-align: left;
       }
-      .image-fondue {
-        max-width: 98vw;
-      }
-      .modal-img-wrapper img {
-        max-width: 95vw;
-        max-height: 50vh;
+      .input-password-field {
+        width: 98vw;
+        font-size: 1em;
+        padding: 10px 7px;
       }
     }
   </style>
@@ -185,71 +141,44 @@
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête des bêtes mystiques</h2>
+      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête de la lumière de l’esprit</h2>
       <div class="presentation-jeu" style="margin-top: 24px;">
         <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7;">
-  <em>
-    Il est des chemins que ni l’épée ni la course ne sauraient franchir.<br>
-    Seule la lumière de l’esprit éclaire ce que les yeux ne voient pas.
-  </em>
-</div>
-<div class="objectif-course" style="margin-top: 24px;">
-  <div class="objectif-label">Objectif</div>
-  <div class="objectif-text" style="margin-top:18px;">
-    Un message ancien, scellé par les sages, vous attend.<br><br>
-    <strong>Défi&nbsp;:</strong><br>
-    Déchiffrez ses symboles, percez ses secrets…<br><br>
-    Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.
-  </div>
-</div>
-      </div>
-
-      <!-- Bouton indice -->
-      <div style="display:flex; justify-content:center; margin:38px 0 10px 0;">
-        <button id="show-indice" type="button">
-          Voir l’indice
-        </button>
-      </div>
-
-      <!-- Modal d'indice -->
-      <div id="indice-modal">
-        <div class="modal-img-wrapper">
-          <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
-          <img src="../../Public/images/Plan parc photo.png" alt="Indice visuel du plan du parc">
+          <em>
+            Il est des chemins que ni l’épée ni la course ne sauraient franchir.<br>
+            Seule la lumière de l’esprit éclaire ce que les yeux ne voient pas.
+          </em>
+        </div>
+        <div class="objectif-course" style="margin-top: 24px;">
+          <div class="objectif-label">Objectif</div>
+          <div class="objectif-text" style="margin-top:18px;">
+            Un message ancien, scellé par les sages, vous attend.<br><br>
+            <strong>Défi&nbsp;:</strong><br>
+            Déchiffrez ses symboles, percez ses secrets…<br><br>
+            Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.
+          </div>
         </div>
       </div>
 
-      <!-- Trois boutons photo -->
+      <!-- Bouton boussole -->
       <div class="actions-row-horizontal">
         <div class="icon-action side-icon">
-          <label id="label-photo1" for="photo-upload-1">
+          <a href="https://maps.google.com/?q=47.47722211138926,-0.5798594274786282" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
             </svg>
-            <span>Photo de tortue à envoyer</span>
-            <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
-        </div>
-        <div class="icon-action side-icon">
-          <label id="label-photo2" for="photo-upload-2">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
-            </svg>
-            <span>Photo de chevreau à envoyer</span>
-            <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
-        </div>
-        <div class="icon-action side-icon">
-          <label id="label-photo3" for="photo-upload-3">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
-            </svg>
-            <span>Photo d'alpaga à envoyer</span>
-            <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
+            <span>Boussole</span>
+          </a>
         </div>
       </div>
-      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+
+      <!-- Zone de saisie mot de passe -->
+      <div class="input-password-wrapper">
+        <label for="password-field" class="input-password-label">
+          Entrez le mot de passe pour valider votre progression :
+        </label>
+        <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
+      </div>
 
       <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
@@ -261,44 +190,21 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <script>
-    // Modal indice
-    document.getElementById('show-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.add('active');
-    });
-    document.getElementById('close-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.remove('active');
-    });
+    // Mot de passe attendu (sans casse, sans espace superflu)
+    const PASSWORD = 'gregory ferreira est un chevalier';
 
-    // Gestion des uploads photo et désactivation des boutons
-    function handlePhotoUpload(inputId, labelId) {
-      var input = document.getElementById(inputId);
-      var label = document.getElementById(labelId);
-      input.addEventListener('change', function() {
-        if(this.files && this.files[0]) {
-          label.setAttribute('aria-disabled', 'true');
-          input.disabled = true;
-          // Affichage du nom du fichier
-          var out = document.getElementById('photo-filename');
-          var allFiles = [];
-          for (var i = 1; i <= 3; i++) {
-            var inp = document.getElementById('photo-upload-' + i);
-            if (inp && inp.files && inp.files[0]) {
-              allFiles.push(inp.files[0].name);
-            }
-          }
-          out.textContent = "Photos sélectionnées : " + allFiles.join(", ");
-          // Activation du bouton "Quête suivante" si 3 photos
-          if(allFiles.length === 3) {
-            var btn = document.getElementById('next-quest');
-            btn.disabled = false;
-            btn.classList.add('enabled');
-          }
-        }
-      });
-    }
-    handlePhotoUpload('photo-upload-1','label-photo1');
-    handlePhotoUpload('photo-upload-2','label-photo2');
-    handlePhotoUpload('photo-upload-3','label-photo3');
+    // Gestion du champ mot de passe pour activer le bouton
+    document.getElementById('password-field').addEventListener('input', function() {
+      const userValue = this.value.trim().toLowerCase();
+      const btn = document.getElementById('next-quest');
+      if (userValue === PASSWORD) {
+        btn.disabled = false;
+        btn.classList.add('enabled');
+      } else {
+        btn.disabled = true;
+        btn.classList.remove('enabled');
+      }
+    });
   </script>
 </body>
 </html>
