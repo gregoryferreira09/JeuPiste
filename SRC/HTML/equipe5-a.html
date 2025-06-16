@@ -153,45 +153,92 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <script>
-    // Chrono 5min
-    let total = 7 * 60;
-    let chrono = total;
-    let timer = document.getElementById('timer');
-    let chronoMsg = document.getElementById('chrono-message');
-    let interval = setInterval(function() {
-      let min = Math.floor(chrono / 60);
-      let sec = chrono % 60;
-      timer.textContent = (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
-      if (chrono <= 0) {
-        clearInterval(interval);
-        timer.classList.add('overtime');
-        chronoMsg.classList.add('overtime');
-        document.getElementById('answer-field').disabled = true;
-        document.getElementById('next-quest').disabled = true;
-      }
-      chrono--;
-    }, 1000);
+<script>
+  // Chrono 5min (300s)
+  let total = 1 * 60;
+  let chrono = total;
+  let timer = document.getElementById('timer');
+  let chronoMsg = document.getElementById('chrono-message');
+  let answerField = document.getElementById('answer-field');
+  let nextBtn = document.getElementById('next-quest');
+  let messageTimeout = null;
 
-    // Vérification réponse
-    document.getElementById('answer-field').addEventListener('input', function() {
-      let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
-      const btn = document.getElementById('next-quest');
-      if(value === "détermination" && !this.disabled) {
-        btn.disabled = false;
-        btn.classList.add('enabled');
-      } else {
-        btn.disabled = true;
-        btn.classList.remove('enabled');
-      }
-    });
+  function showOvertimeMessage() {
+    // Efface le champ et désactive-le
+    answerField.value = "détermination";
+    answerField.disabled = true;
+    nextBtn.disabled = false;
+    nextBtn.classList.add('enabled');
+    // Ajoute le message spécial
+    let div = document.createElement("div");
+    div.id = "overtime-msg";
+    div.style.margin = "20px auto";
+    div.style.maxWidth = "420px";
+    div.style.background = "#241919";
+    div.style.color = "#e0c185";
+    div.style.borderRadius = "9px";
+    div.style.padding = "18px 18px 14px 18px";
+    div.style.fontSize = "1.07em";
+    div.style.textAlign = "center";
+    div.style.boxShadow = "0 2px 10px #0006";
+    div.innerHTML = "Votre lutte acharnée durant ces longues minutes vous aura sûrement permis de découvrir une qualité certaine : <b>la détermination</b>.";
+    // Ajoute le message juste en dessous du chrono
+    let chronoRow = document.querySelector('.chrono-row');
+    if(document.getElementById('overtime-msg')) return; // évite doublons
+    chronoRow.parentNode.insertBefore(div, chronoRow.nextSibling);
+  }
 
-    // Navigation vers la page suivante (à adapter si besoin)
-    document.getElementById('next-quest').addEventListener('click', function() {
-      if(!this.disabled) {
-        window.location.href = "equipe5-b.html";
-      }
-    });
-  </script>
+  let interval = setInterval(function() {
+    let min = Math.floor(chrono / 60);
+    let sec = chrono % 60;
+    timer.textContent = (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
+    if (chrono <= 0) {
+      clearInterval(interval);
+      timer.classList.add('overtime');
+      chronoMsg.classList.add('overtime');
+      answerField.disabled = true;
+      showOvertimeMessage();
+    }
+    chrono--;
+  }, 1000);
+
+  // Vérification réponse
+  answerField.addEventListener('input', function() {
+    let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
+    if ((value === "rien" || value === "détermination") && !this.disabled) {
+      nextBtn.disabled = false;
+      nextBtn.classList.add('enabled');
+    } else {
+      nextBtn.disabled = true;
+      nextBtn.classList.remove('enabled');
+    }
+  });
+
+  // Navigation vers la page suivante (à adapter si besoin)
+  nextBtn.addEventListener('click', function() {
+    if(!this.disabled) {
+      window.location.href = "equipe5-b.html";
+    }
+  });
+
+  // Lorsque la page est rechargée (après retour), pré-remplir si besoin
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.name === "overtime-determination") {
+      answerField.value = "détermination";
+      answerField.disabled = true;
+      nextBtn.disabled = false;
+      nextBtn.classList.add('enabled');
+      showOvertimeMessage();
+      window.name = ""; // reset pour la suite
+    }
+  });
+
+  // Si l'utilisateur ferme la page après overtime, marque le flag pour la prochaine ouverture
+  window.addEventListener("beforeunload", function(e) {
+    if (answerField.value.trim().toLowerCase() === "détermination" && answerField.disabled) {
+      window.name = "overtime-determination";
+    }
+  });
+</script>
 </body>
 </html>
