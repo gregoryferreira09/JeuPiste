@@ -143,16 +143,31 @@
           </a>
         </div>
 
-        <!-- Appareil photo à droite -->
-        <div class="icon-action side-icon">
-          <label for="photo-upload" aria-label="Télécharger une photo">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4[...]"/>
-            </svg>
-            <span>Photo à envoyer</span>
-            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
-        </div>
+        <!-- Vidéo 1 -->
+<div class="icon-action side-icon">
+  <label id="label-video1" for="video-upload-1" aria-label="Télécharger la vidéo 1">
+    <svg id="icon-video1" viewBox="0 0 24 24"><!-- icône caméra --></svg>
+    <span>Vidéo 1 à envoyer</span>
+    <input id="video-upload-1" class="visually-hidden" type="file" accept="video/*">
+    <div id="progress-container-1" style="display:none;">
+      <progress id="progress-1" value="0" max="100"></progress>
+      <span id="percent-1">0%</span>
+    </div>
+  </label>
+</div>
+
+<!-- Vidéo 2 -->
+<div class="icon-action side-icon">
+  <label id="label-video2" for="video-upload-2" aria-label="Télécharger la vidéo 2">
+    <svg id="icon-video2" viewBox="0 0 24 24"><!-- icône caméra --></svg>
+    <span>Vidéo 2 à envoyer</span>
+    <input id="video-upload-2" class="visually-hidden" type="file" accept="video/*">
+    <div id="progress-container-2" style="display:none;">
+      <progress id="progress-2" value="0" max="100"></progress>
+      <span id="percent-2">0%</span>
+    </div>
+  </label>
+</div>
       </div>
       <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
 
