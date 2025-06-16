@@ -171,6 +171,7 @@
         text-align: left;
       }
     }
+    #blocker { display: none; }
   </style>
 </head>
 <body>
@@ -196,7 +197,7 @@
       <div class="chrono-block">
         <span class="chrono-timer" id="timer">07:00</span>
         <span class="chrono-message" id="chrono-message">
-          Chevaliers, en selle sans tarder ! Vous n'avez que sept minutes pour atteindre ce lieu mystérieux et découvrir ce qui s'y cache, avant que le temps ne vous soit impitoyablement retiré. Hâtez-vous !
+          Chevaliers, en selle sans tarder ! Vous n'avez que sept minutes pour atteindre ce lieu mystérieux et découvrir ce qui s'y cache, avant que le temps ne vous soit impitoyablement retiré.
         </span>
       </div>
       <div class="presentation-jeu" style="margin-top: 24px;">
@@ -221,7 +222,7 @@
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.477556,-0.578583" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
             </svg>
             <span>Boussole</span>
           </a>
@@ -246,36 +247,42 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="../JS/gameflow.js"></script>
-<script>
+  <!-- Firebase scripts et initialisation -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    // Remplace par ta vraie config Firebase !
+    const firebaseConfig = {
+      apiKey: "TA_CLE",
+      authDomain: "TON_DOMAINE.firebaseapp.com",
+      databaseURL: "https://TON_DOMAINE.firebaseio.com",
+      projectId: "TON_DOMAINE",
+      storageBucket: "TON_DOMAINE.appspot.com",
+      messagingSenderId: "XXXXXXX",
+      appId: "1:XXXXXXX:web:XXXXXXX"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+  <script src="../JS/gameflow.js"></script>
+  <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Sécurité accès
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
   const db = firebase.database();
-  const dureeEpreuve = 7 * 60; // 7 minutes en secondes
-  const epreuveId = 5; // à adapter selon la page
+  const dureeEpreuve = 7 * 60;
+  const epreuveId = 5;
 
   if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
     window.location.href = "accueil.html";
     return;
   }
 
-  // Sélection des éléments
   const timer = document.getElementById('timer');
   const chronoMsg = document.getElementById('chrono-message');
   const answerField = document.getElementById('answer-field');
   const nextBtn = document.getElementById('next-quest');
   const blocker = document.getElementById('blocker');
   const blockerBtn = document.getElementById('blocker-btn');
-
-  // Masquer la fenêtre flottante au chargement
-  blocker.style.display = "none";
-
-  // Autofocus UX
-  answerField.setAttribute('autofocus', 'autofocus');
 
   // NAVIGATION SYNCHRO
   db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
@@ -288,20 +295,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Lancement chrono SYNC
+  // CHRONO SYNCHRO FIABLE AVEC .on('value')
+  let chronoInterval = null;
   db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${epreuveId}/startTime`)
-    .once('value')
-    .then(snap => {
+    .on('value', snap => {
       let startTime = snap.val();
       if (!startTime) {
+        // Premier arrivé : écrit startTime UNE FOIS
         startTime = Date.now();
         db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${epreuveId}/startTime`).set(startTime);
+        return;
       }
       lancerChrono(startTime);
     });
 
-  // Fonction chrono
   function lancerChrono(startTime) {
+    if (chronoInterval) clearTimeout(chronoInterval);
     function tick() {
       const now = Date.now();
       let secRestantes = Math.max(0, Math.round((startTime + dureeEpreuve * 1000 - now) / 1000));
@@ -309,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
       let sec = secRestantes % 60;
       timer.textContent = (min < 10 ? "0":"") + min + ":" + (sec < 10 ? "0":"") + sec;
       if (secRestantes > 0) {
-        setTimeout(tick, 1000);
+        chronoInterval = setTimeout(tick, 1000);
       } else {
         timer.classList.add('overtime');
         chronoMsg.classList.add('overtime');
@@ -339,12 +348,11 @@ document.addEventListener('DOMContentLoaded', function() {
     nextBtn.classList.add('enabled');
   }
 
-  // Gestion du bouton continuer sur le blocker
   blockerBtn.addEventListener('click', function() {
     blocker.style.display = "none";
   });
 
-  // Validation réponse
+  // Validation réponse (accent/casse/espaces gérés)
   answerField.addEventListener('input', function() {
     let value = this.value.trim().toLowerCase()
       .replace(/’/g, "'")
@@ -360,11 +368,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Passage à la quête suivante (synchro binôme)
   nextBtn.addEventListener('click', function() {
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
   });
 });
-</script>
+  </script>
 </body>
 </html>
