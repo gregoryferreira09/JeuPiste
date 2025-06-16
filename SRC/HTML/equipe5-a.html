@@ -2,68 +2,80 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quête du coeur vaillant - Jeu de piste</title>
+  <title>Quête du Saint-Graal - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    .actions-row-horizontal {
+    .chrono-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-top: 38px;
-      margin-bottom: 10px;
-      gap: 24px;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-size: 1.12em;
     }
-    .icon-action {
+    .chrono-timer {
+      font-size: 1.18em;
+      font-weight: bold;
+      color: #e0c185;
+      background: #231d1d;
+      border-radius: 8px;
+      padding: 5px 16px;
+      letter-spacing: 2px;
+      min-width: 95px;
+      text-align: center;
+      transition: color .25s;
+    }
+    .chrono-timer.overtime {
+      color: #ff2f2f;
+      background: #2b1313;
+      animation: blink 1s steps(2, start) infinite;
+    }
+    @keyframes blink {
+      to { color: #fff; }
+    }
+    .chrono-message {
+      color: #e0c185;
+      font-size: 1.04em;
+      transition: color .25s;
+    }
+    .chrono-message.overtime {
+      color: #ff2f2f;
+      font-weight: bold;
+    }
+    .input-answer-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 90px;
+      margin: 32px 0 10px 0;
     }
-    .icon-action a, .icon-action label {
-      cursor: pointer;
+    .input-answer-label {
       color: #e0c185;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .icon-action a:hover, .icon-action label:hover {
-      color: #ffeecb;
-    }
-    .icon-action svg {
-      width: 38px;
-      height: 38px;
-      margin-bottom: 6px;
-      fill: #e0c185;
-      transition: fill 0.2s;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .icon-action a:hover svg,
-    .icon-action label:hover svg {
-      fill: #ffeecb;
-    }
-    .icon-action span {
-      font-size: 0.98em;
-      color: #e0c185;
-      margin-top: 2px;
+      font-size: 1.06em;
+      margin-bottom: 8px;
       text-align: center;
     }
-    /* Pour masquer l'input file natif */
-    .visually-hidden {
-      position: absolute !important;
-      height: 1px; width: 1px;
-      overflow: hidden;
-      clip: rect(1px, 1px, 1px, 1px);
-      white-space: nowrap;
-      border: 0;
-      padding: 0;
-      margin: -1px;
+    .input-answer-field {
+      padding: 10px 16px;
+      font-size: 1.11em;
+      border-radius: 7px;
+      border: 1px solid #e0c185;
+      outline: none;
+      background: #2b2323;
+      color: #ffeecb;
+      width: 320px;
+      max-width: 90vw;
+      text-align: center;
+      box-sizing: border-box;
+      transition: border 0.2s;
+      margin-bottom: 0;
     }
-
-     /* Bouton Quête suivante désactivé */
+    .input-answer-field:focus {
+      border: 1.5px solid #ffeecb;
+    }
     #next-quest {
       background: #aaa;
       color: #fff;
@@ -82,26 +94,14 @@
       opacity: 1;
       cursor: pointer;
     }
-
+    #next-quest:disabled {
+      background: #aaa;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
     @media (max-width: 650px) {
-      .actions-row-horizontal {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .icon-action {
-        width: 100%;
-        flex-direction: row;
-        justify-content: flex-start;
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-      .icon-action span {
-        text-align: left;
-      }
-      .image-fondue {
-        max-width: 98vw;
-      }
+      .chrono-row { flex-direction: column; gap: 6px; }
+      .input-answer-field { width: 98vw; font-size: 1em; padding: 10px 7px; }
     }
   </style>
 </head>
@@ -112,56 +112,43 @@
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête du coeur vaillant</h2>
+      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête du Saint-Graal</h2>
+      <!-- Chrono et message -->
+      <div class="chrono-row">
+        <span class="chrono-timer" id="timer">05:00</span>
+        <span class="chrono-message" id="chrono-message">
+          Vous avez 5 minutes pour vous rendre sur le lieu et trouver ce qui se cache. Délai dépassé, il faudra avancer ailleurs.
+        </span>
+      </div>
       <div class="presentation-jeu" style="margin-top: 24px;">
         <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 14px;">
           <em>
-            Vilain petit moucheron pourquoi est-tu grognon ?<br>
-            Dans la toile emprisonnée bientôt tu seras… mangé.
+            La quête du Saint-Graal ne s’accomplit pas sans peine ni patience.<br>
+            Sous le voile des feuillages, là où l’ombre danse avec la lumière, creusez, fouillez et scrutez le sol sacré.<br>
+            <br>
+            À vingt pas de ce lieu, l’indice vous attend, tapi dans le silence des racines et des feuilles.<br>
+            <br>
+            Lorsque vous l’aurez déterré, ne laissez ni le doute ni l’hésitation freiner votre élan : <span style="color:#e0c185;font-weight:bold;">assemblez-le avec soin</span>,<br>
+            puis <span style="color:#e0c185;font-weight:bold;">transmettez son image à Merlin</span>, gardien des secrets.<br>
+            <br>
+            <span style="color:#ffeecb;">Seul lui pourra percer le mystère et vous ouvrir la voie au-delà.</span>
           </em>
         </div>
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
-  <em>
-    La quête du Saint-Graal ne s’accomplit pas sans douleur, peine ni patience.<br>
-    Sous le voile des feuillages, là où l’ombre danse avec la lumière,<br>
-    creusez, fouillez et scrutez l'environnement sacré.<br>
-    <br>
-    À vingt pas de ce lieu, l’indice vous attend, tapi dans le silence verdoyant.<br>
-    <br>
-    Lorsque vous l’aurez trouvé, ne laissez ni le doute ni l’hésitation freiner votre élan :<br>
-    <span style="color:#e0c185;"><b>assemblez-le avec soin</b></span>,<br>
-    puis <span style="color:#e0c185;"><b>transmettez son image à Merlin</b></span>, gardien des secrets.<br>
-    <br>
-    <span style="color:#ffeecb;">Seul lui pourra percer le mystère et vous ouvrir la voie au-delà.</span>
-  </em>
-</div>
-            
-      <!-- Actions et image entre les deux boutons -->
-      <div class="actions-row-horizontal">
-        <!-- GPS à gauche -->
-        <div class="icon-action side-icon">
-          <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0[...]"/>
-            </svg>
-            <span>Boussole</span>
-          </a>
-        </div>
-
-        <!-- Appareil photo à droite -->
-        <div class="icon-action side-icon">
-          <label for="photo-upload" aria-label="Télécharger une photo">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4[...]"/>
-            </svg>
-            <span>Photo à envoyer</span>
-            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
+            Rendez-vous sur le lieu, cherchez l’indice, et inscrivez ci-dessous ce que vous avez trouvé pour poursuivre la quête.
+          </div>
         </div>
       </div>
-      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+
+      <!-- Saisie de la réponse -->
+      <div class="input-answer-wrapper">
+        <label for="answer-field" class="input-answer-label">
+          Inscrivez ici ce que vous avez trouvé :
+        </label>
+        <input type="text" id="answer-field" class="input-answer-field" autocomplete="off" placeholder="Tapez votre réponse…">
+      </div>
 
       <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
@@ -173,23 +160,42 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <script>
-    // Affichage du nom de la photo + activation du bouton
-    document.addEventListener('DOMContentLoaded', function() {
-      var input = document.getElementById('photo-upload');
-      var out = document.getElementById('photo-filename');
-      var btn = document.getElementById('next-quest');
-      if(input) {
-        input.addEventListener('change', function() {
-          if(this.files && this.files[0]) {
-            out.textContent = "Photo sélectionnée : " + this.files[0].name;
-            btn.disabled = false;
-            btn.classList.add('enabled');
-          } else {
-            out.textContent = "";
-            btn.disabled = true;
-            btn.classList.remove('enabled');
-          }
-        });
+    // Chrono 5min
+    let total = 5 * 60;
+    let chrono = total;
+    let timer = document.getElementById('timer');
+    let chronoMsg = document.getElementById('chrono-message');
+    let interval = setInterval(function() {
+      let min = Math.floor(chrono / 60);
+      let sec = chrono % 60;
+      timer.textContent = (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
+      if (chrono <= 0) {
+        clearInterval(interval);
+        timer.classList.add('overtime');
+        chronoMsg.classList.add('overtime');
+        document.getElementById('answer-field').disabled = true;
+        document.getElementById('next-quest').disabled = true;
+      }
+      chrono--;
+    }, 1000);
+
+    // Vérification réponse
+    document.getElementById('answer-field').addEventListener('input', function() {
+      let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
+      const btn = document.getElementById('next-quest');
+      if(value === "rien" && !this.disabled) {
+        btn.disabled = false;
+        btn.classList.add('enabled');
+      } else {
+        btn.disabled = true;
+        btn.classList.remove('enabled');
+      }
+    });
+
+    // Navigation vers la page suivante (à adapter si besoin)
+    document.getElementById('next-quest').addEventListener('click', function() {
+      if(!this.disabled) {
+        window.location.href = "equipe5-b.html";
       }
     });
   </script>
