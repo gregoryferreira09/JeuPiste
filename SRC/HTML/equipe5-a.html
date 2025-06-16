@@ -251,29 +251,33 @@
 <script src="../JS/gameflow.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Sécurité accès
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
   const db = firebase.database();
   const dureeEpreuve = 7 * 60; // 7 minutes en secondes
-  const epreuveId = 5; // à adapter si besoin
+  const epreuveId = 5; // à adapter selon la page
 
-  // Sécurité accès
   if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
     window.location.href = "accueil.html";
     return;
   }
 
-  let timer = document.getElementById('timer');
-  let chronoMsg = document.getElementById('chrono-message');
-  let answerField = document.getElementById('answer-field');
-  let nextBtn = document.getElementById('next-quest');
-  let blocker = document.getElementById('blocker');
-  let blockerBtn = document.getElementById('blocker-btn');
+  // Sélection des éléments
+  const timer = document.getElementById('timer');
+  const chronoMsg = document.getElementById('chrono-message');
+  const answerField = document.getElementById('answer-field');
+  const nextBtn = document.getElementById('next-quest');
+  const blocker = document.getElementById('blocker');
+  const blockerBtn = document.getElementById('blocker-btn');
 
-  // Amélioration UX : autofocus réponse
-  if(answerField) answerField.setAttribute('autofocus', 'autofocus');
+  // Masquer la fenêtre flottante au chargement
+  blocker.style.display = "none";
 
-  // Navigation synchronisée (redirige si currentStep change)
+  // Autofocus UX
+  answerField.setAttribute('autofocus', 'autofocus');
+
+  // NAVIGATION SYNCHRO
   db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
     const step = snap.val() || 0;
     const parcours = window.parcoursEquipes[equipeNum];
@@ -284,19 +288,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Chrono SYNCHRO Firebase
-  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + `/epreuves/${epreuveId}/startTime`)
+  // Lancement chrono SYNC
+  db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${epreuveId}/startTime`)
     .once('value')
     .then(snap => {
       let startTime = snap.val();
       if (!startTime) {
-        // Premier arrivé : enregistre le startTime pour tout le binôme
         startTime = Date.now();
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + `/epreuves/${epreuveId}/startTime`).set(startTime);
+        db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${epreuveId}/startTime`).set(startTime);
       }
       lancerChrono(startTime);
     });
 
+  // Fonction chrono
   function lancerChrono(startTime) {
     function tick() {
       const now = Date.now();
@@ -315,6 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
     tick();
   }
 
+  // Affichage du blocker uniquement à la fin du chrono
   function showBlockerPage() {
     blocker.style.display = "flex";
     answerField.value = "détermination";
@@ -322,20 +327,32 @@ document.addEventListener('DOMContentLoaded', function() {
     nextBtn.disabled = false;
     nextBtn.classList.add('enabled');
     window.name = "blocker-determination";
-    // Petit bonus UX : vibration si dispo
     if ("vibrate" in navigator) navigator.vibrate(200);
   }
 
-  // Vérification réponse (insensible à la casse, accent, espaces multiples)
+  // Réactivation du blocker en cas de rechargement APRÈS la fin du chrono
+  if (window.name === "blocker-determination") {
+    blocker.style.display = "flex";
+    answerField.value = "détermination";
+    answerField.disabled = true;
+    nextBtn.disabled = false;
+    nextBtn.classList.add('enabled');
+  }
+
+  // Gestion du bouton continuer sur le blocker
+  blockerBtn.addEventListener('click', function() {
+    blocker.style.display = "none";
+  });
+
+  // Validation réponse
   answerField.addEventListener('input', function() {
     let value = this.value.trim().toLowerCase()
       .replace(/’/g, "'")
       .replace(/\s+/g, ' ')
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // enlève accents
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     if ((value === "rien" || value === "determination") && !this.disabled) {
       nextBtn.disabled = false;
       nextBtn.classList.add('enabled');
-      // Bonus UX : vibration légère si dispo
       if ("vibrate" in navigator) navigator.vibrate(70);
     } else {
       nextBtn.disabled = true;
@@ -344,19 +361,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Passage à la quête suivante (synchro binôme)
-  if (nextBtn) {
-    nextBtn.addEventListener('click', function() {
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
-    });
-  }
-
-  // Gestion fermeture/réouverture après blocage
-  if (window.name === "blocker-determination") {
-    showBlockerPage();
-  }
-
-  blockerBtn.addEventListener('click', function() {
-    blocker.style.display = "none";
+  nextBtn.addEventListener('click', function() {
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
   });
 });
 </script>
