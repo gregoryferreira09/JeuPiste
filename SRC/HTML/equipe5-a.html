@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
   const db = firebase.database();
-  const dureeEpreuve = 1 * 60;
+  const dureeEpreuve = 7 * 60; // 7 minutes chrono
   const epreuveId = 5;
 
   if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // CHRONO SYNCHRO FIABLE AVEC .on('value')
+  // CHRONO SYNCHRO FIABLE
   let chronoInterval = null;
   db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${epreuveId}/startTime`)
     .on('value', snap => {
@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
     tick();
   }
 
-  // Affichage du blocker uniquement à la fin du chrono
+  // Affichage du blocker à la fin du chrono
   function showBlockerPage() {
     blocker.style.display = "flex";
     answerField.value = "détermination";
@@ -340,20 +340,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if ("vibrate" in navigator) navigator.vibrate(200);
   }
 
-  // Réactivation du blocker en cas de rechargement APRÈS la fin du chrono
+  // Affiche le blocker si on recharge après la fin du chrono
   if (window.name === "blocker-determination") {
     blocker.style.display = "flex";
     answerField.value = "détermination";
     answerField.disabled = true;
     nextBtn.disabled = false;
     nextBtn.classList.add('enabled');
+  } else {
+    blocker.style.display = "none";
+    answerField.disabled = false;
   }
 
+  // Gestion bouton "Continuer" du blocker (on peut refermer la fenêtre)
   blockerBtn.addEventListener('click', function() {
     blocker.style.display = "none";
   });
 
-  // Validation réponse (accent/casse/espaces gérés)
+  // Validation réponse (avant la fin du chrono)
   answerField.addEventListener('input', function() {
     let value = this.value.trim().toLowerCase()
       .replace(/’/g, "'")
@@ -369,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // Passage à la quête suivante (synchro binôme)
   nextBtn.addEventListener('click', function() {
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
   });
