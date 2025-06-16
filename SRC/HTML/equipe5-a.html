@@ -103,37 +103,43 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
-    /* Blocage plein écran */
+    /* Blocage plein écran harmonisé */
     #blocker {
       display: none;
       position: fixed;
       z-index: 5000;
       left: 0; top: 0; right: 0; bottom: 0;
-      background: rgba(24,18,18,0.92);
-      color: #e0c185;
+      background: rgba(24,18,18,0.85);
+      color: #fff;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      font-size: 1.35em;
+      font-size: 1.38em;
       text-align: center;
-      transition: background 0.5s;
       padding: 0 10px;
     }
-    #blocker-content {
+    #blocker-inner {
       background: #241919;
       border-radius: 18px;
-      padding: 38px 18px 28px 18px;
-      box-shadow: 0 6px 32px #000a;
+      box-shadow: 0 4px 32px #000b;
+      padding: 38px 24px 28px 24px;
       max-width: 440px;
       width: 100%;
       margin: 0 auto;
-      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    #blocker-content strong {
+    #blocker-msg {
+      font-size: 1.07em;
+      font-weight: normal;
       color: #ffeecb;
+      margin-bottom: 28px;
+      line-height: 1.5;
     }
     #blocker-btn {
-      margin-top: 24px;
+      display: inline-block;
+      margin-top: 0;
       padding: 12px 32px;
       background: #e0c185;
       color: #473714;
@@ -151,7 +157,7 @@
       .chrono-block { flex-direction: column; padding: 12px 6vw; gap: 8px; max-width: 99vw; }
       .chrono-timer { margin: 0 0 8px 0; font-size: 1.1em; padding: 8px 15px; min-width: 80px; }
       .chrono-message { font-size: 1em; text-align: center; max-width: 95vw; }
-      #blocker-content { padding: 22px 4vw 16px 4vw; }
+      #blocker-inner { padding: 22px 4vw 16px 4vw; }
     }
   </style>
 </head>
@@ -160,9 +166,10 @@
     <h1 class="site-title">Jeu de piste</h1>
   </header>
 
+  <!-- Fenêtre flottante harmonisée, cachée par défaut -->
   <div id="blocker">
-    <div id="blocker-content">
-      <div>
+    <div id="blocker-inner">
+      <div id="blocker-msg">
         Votre lutte acharnée durant ces longues minutes vous auront sûrement permis de découvrir une qualité certaine :<br><br>
         <strong>la détermination.</strong>
       </div>
@@ -216,7 +223,7 @@
   </footer>
   <script>
     // Chrono 7min
-    let total = 1 * 60;
+    let total = 7 * 60;
     let chrono = total;
     let timer = document.getElementById('timer');
     let chronoMsg = document.getElementById('chrono-message');
@@ -231,7 +238,6 @@
       answerField.disabled = true;
       nextBtn.disabled = false;
       nextBtn.classList.add('enabled');
-      // Flag pour rechargement/réouverture
       window.name = "blocker-determination";
     }
 
