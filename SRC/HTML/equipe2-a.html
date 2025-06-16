@@ -180,26 +180,58 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <script>
-    // Affichage du nom de la photo + activation du bouton
-    document.addEventListener('DOMContentLoaded', function() {
-      var input = document.getElementById('photo-upload');
-      var out = document.getElementById('photo-filename');
-      var btn = document.getElementById('next-quest');
-      if(input) {
-        input.addEventListener('change', function() {
-          if(this.files && this.files[0]) {
-            out.textContent = "Photo sélectionnée : " + this.files[0].name;
-            btn.disabled = false;
-            btn.classList.add('enabled');
-          } else {
-            out.textContent = "";
-            btn.disabled = true;
-            btn.classList.remove('enabled');
-          }
-        });
-      }
-    });
-  </script>
+ <script>
+function handleVideoUpload(inputId, progressContainerId, progressId, percentId, labelId, iconId, state) {
+  var input = document.getElementById(inputId);
+  var progressContainer = document.getElementById(progressContainerId);
+  var progress = document.getElementById(progressId);
+  var percent = document.getElementById(percentId);
+  var label = document.getElementById(labelId);
+  var icon = document.getElementById(iconId);
+
+  input.addEventListener('change', function() {
+    if(this.files && this.files[0]) {
+      progressContainer.style.display = 'block';
+      progress.value = 0;
+      percent.textContent = '0%';
+
+      // Simule un upload (remplace par ton vrai upload AJAX/XHR si besoin !)
+      var uploaded = 0;
+      var interval = setInterval(function() {
+        if(uploaded >= 100) {
+          clearInterval(interval);
+          progress.value = 100;
+          percent.textContent = '100%';
+          input.disabled = true;
+          label.style.opacity = 0.5;
+          icon.style.filter = "grayscale(1)";
+          state.done = true;
+          checkAllUploads();
+        } else {
+          uploaded += 10;
+          progress.value = uploaded;
+          percent.textContent = uploaded + '%';
+        }
+      }, 200);
+    }
+  });
+}
+
+// Vérifie si les deux vidéos sont uploadées
+function checkAllUploads() {
+  if(window.uploadState1.done && window.uploadState2.done) {
+    var btn = document.getElementById('next-quest');
+    btn.disabled = false;
+    btn.classList.add('enabled');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.uploadState1 = { done: false };
+  window.uploadState2 = { done: false };
+  handleVideoUpload('video-upload-1', 'progress-container-1', 'progress-1', 'percent-1', 'label-video1', 'icon-video1', window.uploadState1);
+  handleVideoUpload('video-upload-2', 'progress-container-2', 'progress-2', 'percent-2', 'label-video2', 'icon-video2', window.uploadState2);
+});
+</script>
 </body>
 </html>
