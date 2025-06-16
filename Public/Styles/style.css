@@ -489,3 +489,22 @@ body {
   font-size: 1.09em;
   line-height: 1.6;
 }
+
+.bandeau {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0; right: 0;
+  background: #e0c185;
+  color: #2a1810;
+  text-align: center;
+  padding: 14px 0;
+  font-size: 1.1em;
+  z-index: 9999;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  font-family: 'Cinzel Decorative', serif;
+  letter-spacing: 1px;
+}
+.bandeau.show {
+  display: block;
+}
