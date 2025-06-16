@@ -153,13 +153,28 @@
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
             Un message ancien, scellé par les sages, vous attend sur la pierre de Rosette.<br><br>
-            <strong>Défi&nbsp;:</strong><br>
+            <strong><br>
             Déchiffrez le texte et percez ses secrets…<br><br>
             Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.
           </div>
         </div>
       </div>
 
+      <!-- Bouton indice -->
+<div style="display:flex; justify-content:center; margin:38px 0 10px 0;">
+  <button id="show-indice" type="button">
+    Voir l’indice
+  </button>
+</div>
+
+<!-- Modal d'indice -->
+<div id="indice-modal">
+  <div class="modal-img-wrapper">
+    <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
+    <img src="../../Public/images/Plan parc photo.png" alt="Indice visuel du plan du parc">
+  </div>
+</div>
+      
       <!-- Bouton boussole -->
       <div class="actions-row-horizontal">
         <div class="icon-action side-icon">
@@ -171,7 +186,7 @@
           </a>
         </div>
       </div>
-
+      
       <!-- Zone de saisie mot de passe -->
       <div class="input-password-wrapper">
         <label for="password-field" class="input-password-label">
