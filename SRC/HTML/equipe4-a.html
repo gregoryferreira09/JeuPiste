@@ -193,6 +193,22 @@
     // Mot de passe attendu (sans casse, sans espace superflu)
     const PASSWORD = 'j'ai visiblement trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?';
 
+    const PASSWORD = "j'ai visiblement trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?";
+
+document.getElementById('password-field').addEventListener('input', function() {
+  let userValue = this.value.trim().toLowerCase()
+    .replace(/’/g, "'")       // apostrophe courbe => simple
+    .replace(/\s+/g, ' ');    // espaces multiples => un seul espace
+  const btn = document.getElementById('next-quest');
+  if (userValue === PASSWORD) {
+    btn.disabled = false;
+    btn.classList.add('enabled');
+  } else {
+    btn.disabled = true;
+    btn.classList.remove('enabled');
+  }
+});
+
     // Gestion du champ mot de passe pour activer le bouton
     document.getElementById('password-field').addEventListener('input', function() {
       const userValue = this.value.trim().toLowerCase();
