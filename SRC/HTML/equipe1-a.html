@@ -166,57 +166,70 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+<!-- ... tout ton HTML ... -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script src="../JS/gameflow.js"></script>
 <script>
-const salonCode = localStorage.getItem("salonCode");
-const equipeNum = Number(localStorage.getItem("equipeNum")); // 0 à 4
-const playerId = localStorage.getItem("uuid");
-const db = firebase.database();
+document.addEventListener('DOMContentLoaded', function() {
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = Number(localStorage.getItem("equipeNum")); // 0 à 4
+  const playerId = localStorage.getItem("uuid");
+  const db = firebase.database();
 
-// Sécurité : si une info manque, retour accueil
-if (salonCode === null || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
-  window.location.href = "accueil.html";
-}
-
-// 1. Synchronisation du parcours : si le currentStep change, les DEUX joueurs sont redirigés
-db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
-  const step = snap.val() || 0;
-  const parcours = window.parcoursEquipes[equipeNum];
-  const epreuveNum = parcours[step];
-  const expectedPage = `equipe${epreuveNum}-a.html`;
-  if (!window.location.pathname.endsWith(expectedPage)) {
-    window.location.href = expectedPage;
+  if (salonCode === null || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
+    window.location.href = "accueil.html";
+    return;
   }
-});
 
-// 2. Quand le bouton “quête suivante” est cliqué, on passe à l’épreuve suivante pour le binôme
-const btn = document.getElementById('next-quest');
-if (btn) {
-  btn.addEventListener('click', function() {
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
+  // Synchronisation du parcours : si le currentStep change, les DEUX joueurs sont redirigés
+  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
+    const step = snap.val() || 0;
+    const parcours = window.parcoursEquipes[equipeNum];
+    const epreuveNum = parcours[step];
+    const expectedPage = `equipe${epreuveNum}-a.html`;
+    if (!window.location.pathname.endsWith(expectedPage)) {
+      window.location.href = expectedPage;
+    }
   });
-}
-    // Affichage du nom de la photo + activation du bouton
-    document.addEventListener('DOMContentLoaded', function() {
-      var input = document.getElementById('photo-upload');
-      var out = document.getElementById('photo-filename');
-      var btn = document.getElementById('next-quest');
-      if(input) {
-        input.addEventListener('change', function() {
-          if(this.files && this.files[0]) {
-            out.textContent = "Photo sélectionnée : " + this.files[0].name;
-            btn.disabled = false;
-            btn.classList.add('enabled');
-          } else {
-            out.textContent = "";
-            btn.disabled = true;
-            btn.classList.remove('enabled');
-          }
-        });
+
+  // Gestion du bouton "quête suivante" et upload photo
+  var input = document.getElementById('photo-upload');
+  var out = document.getElementById('photo-filename');
+  var btn = document.getElementById('next-quest');
+
+  // 1. Synchro photo (optionnelle mais top UX)
+  if(input && btn && out) {
+    // Quand la photo est prise
+    input.addEventListener('change', function() {
+      if(this.files && this.files[0]) {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').set(true);
       }
     });
-  </script>
+
+    // Synchro sur les deux téléphones
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').on('value', snap => {
+      if (snap.val()) {
+        input.disabled = true;
+        btn.disabled = false;
+        btn.classList.add('enabled');
+        out.textContent = "Photo validée !";
+      } else {
+        input.disabled = false;
+        btn.disabled = true;
+        btn.classList.remove('enabled');
+        out.textContent = "";
+      }
+    });
+  }
+
+  // 2. Passage à la quête suivante (pour le binôme)
+  if (btn) {
+    btn.addEventListener('click', function() {
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
+    });
+  }
+});
+</script>
 </body>
 </html>
