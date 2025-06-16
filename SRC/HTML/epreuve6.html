@@ -198,15 +198,17 @@
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
-            <div class="objectif-text" style="margin-top:18px;">
-  Au sommet de la butte, le vent murmure les secrets du royaume de l’Ogre. D’ici, le regard embrasse les terres du noble roi Arthur.<br><br>
-  Mais l’heure n’est plus à la contemplation.<br>
-  Descendez dans les plaines, preux aventuriers, et mêlez-vous au peuple errant.<br><br>
-  Pour localiser l’antre du Dragon, il vous faudra sonder les salutations et questionner les âmes croisées.<br><br>
-  📸 <strong>Votre quête : prendre la pose avec quatre inconnus du royaume.</strong><br>
-  Ces portraits seront la clé d’un savoir ancien.<br><br>
-  Envoyez vos preuves à Merlin : peut-être alors dévoilera-t-il le chemin du combat final.
-</div>
+            Au sommet de la butte, le vent murmure les secrets du royaume de l’Ogre. D’ici, le regard embrasse les terres du noble roi Arthur.<br><br>
+            Mais l’heure n’est plus à la contemplation.<br>
+            Descendez dans les plaines, preux aventuriers, et mêlez-vous au peuple errant.<br><br>
+            Pour localiser l’antre du Dragon, il vous faudra sonder les salutations et questionner les âmes croisées.<br><br>
+            📸 <strong>Votre quête : prendre la pose avec quatre inconnus du royaume.</strong><br>
+            Ces portraits seront la clé d’un savoir ancien.<br><br>
+            Envoyez vos preuves à Merlin : peut-être alors dévoilera-t-il le chemin du combat final.
+          </div>
+        </div>
+      </div>
+
       <!-- Bouton indice -->
       <div style="display:flex; justify-content:center; margin:38px 0 10px 0;">
         <button id="show-indice" type="button">
@@ -222,33 +224,42 @@
         </div>
       </div>
 
-      <!-- Trois boutons photo -->
+      <!-- Quatre boutons photo -->
       <div class="actions-row-horizontal">
         <div class="icon-action side-icon">
           <label id="label-photo1" for="photo-upload-1">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
             </svg>
-            <span>Photo de tortue à envoyer</span>
+            <span>Photo avec un paysan</span>
             <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
           </label>
         </div>
         <div class="icon-action side-icon">
           <label id="label-photo2" for="photo-upload-2">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
             </svg>
-            <span>Photo de chevreau à envoyer</span>
+            <span>Photo avec un gueux</span>
             <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
           </label>
         </div>
         <div class="icon-action side-icon">
           <label id="label-photo3" for="photo-upload-3">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
             </svg>
-            <span>Photo d'alpaga à envoyer</span>
+            <span>Photo avec un troubadour</span>
             <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
+          </label>
+        </div>
+        <div class="icon-action side-icon">
+          <label id="label-photo4" for="photo-upload-4">
+            <svg viewBox="0 0 24 24">
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+            </svg>
+            <span>Photo avec un fils d'unijambiste</span>
+            <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
           </label>
         </div>
       </div>
@@ -272,7 +283,7 @@
       document.getElementById('indice-modal').classList.remove('active');
     });
 
-    // Gestion des uploads photo et désactivation des boutons
+    // Gestion des uploads photo (4 boutons)
     function handlePhotoUpload(inputId, labelId) {
       var input = document.getElementById(inputId);
       var label = document.getElementById(labelId);
@@ -283,15 +294,15 @@
           // Affichage du nom du fichier
           var out = document.getElementById('photo-filename');
           var allFiles = [];
-          for (var i = 1; i <= 3; i++) {
+          for (var i = 1; i <= 4; i++) {
             var inp = document.getElementById('photo-upload-' + i);
             if (inp && inp.files && inp.files[0]) {
               allFiles.push(inp.files[0].name);
             }
           }
           out.textContent = "Photos sélectionnées : " + allFiles.join(", ");
-          // Activation du bouton "Quête suivante" si 3 photos
-          if(allFiles.length === 3) {
+          // Activation du bouton "Quête suivante" si 4 photos
+          if(allFiles.length === 4) {
             var btn = document.getElementById('next-quest');
             btn.disabled = false;
             btn.classList.add('enabled');
@@ -302,6 +313,7 @@
     handlePhotoUpload('photo-upload-1','label-photo1');
     handlePhotoUpload('photo-upload-2','label-photo2');
     handlePhotoUpload('photo-upload-3','label-photo3');
+    handlePhotoUpload('photo-upload-4','label-photo4');
   </script>
 </body>
 </html>
