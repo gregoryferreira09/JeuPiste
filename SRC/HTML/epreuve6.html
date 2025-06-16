@@ -10,22 +10,23 @@
   <style>
     .actions-row-horizontal {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       margin-top: 38px;
       margin-bottom: 10px;
-      gap: 24px;
+      gap: 38px;
       flex-wrap: wrap;
     }
-    .left-actions {
+    .boussole-action {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
     }
-    .right-actions {
+    .photo-actions {
       display: flex;
-      gap: 16px;
+      gap: 38px;
+      justify-content: center;
+      align-items: center;
       flex-wrap: wrap;
     }
     .icon-action {
@@ -106,15 +107,13 @@
       cursor: pointer;
     }
     @media (max-width: 900px) {
-      .actions-row-horizontal {
+      .actions-row-horizontal, .photo-actions {
         flex-direction: column;
-        align-items: stretch;
-        gap: 14px;
+        gap: 18px;
+        align-items: center;
       }
-      .right-actions {
-        gap: 10px;
-        justify-content: space-between;
-        flex-wrap: wrap;
+      .photo-actions {
+        gap: 18px;
       }
       .icon-action {
         width: 100%;
@@ -154,17 +153,15 @@
 
       <!-- Actions: Boussole + 4 photos dans le bandeau -->
       <div class="actions-row-horizontal">
-        <div class="left-actions">
-          <div class="icon-action side-icon">
-            <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 6c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 7.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-              </svg>
-              <span>Boussole</span>
-            </a>
-          </div>
+        <div class="icon-action boussole-action">
+          <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 6c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 7.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            <span>Boussole</span>
+          </a>
         </div>
-        <div class="right-actions">
+        <div class="photo-actions">
           <div class="icon-action side-icon">
             <label id="label-photo1" for="photo-upload-1">
               <svg viewBox="0 0 24 24">
