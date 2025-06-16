@@ -73,7 +73,12 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.07);
       margin: 0 8px;
     }
-    #show-indice:hover {
+    #show-indice:disabled {
+      opacity: 0.6;
+      background: #b7a170;
+      cursor: not-allowed;
+    }
+    #show-indice:hover:enabled {
       background: #ffeecb;
     }
     #indice-modal {
@@ -195,6 +200,31 @@
         max-height: 50vh;
       }
     }
+    /* Pour bon alignement du bloc de l'indice */
+    .indice-unlock-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 38px 0 10px 0;
+    }
+    .indice-unlock-block label {
+      color: #e0c185;
+      font-size: 1em;
+    }
+    .indice-unlock-row {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .indice-unlock-row select {
+      font-size: 1em;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #2b2323;
+      color: #e0c185;
+      border: 1px solid #e0c185;
+    }
   </style>
 </head>
 <body>
@@ -215,23 +245,57 @@
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
-  Un message ancien, scellé par les sages, vous attend sur la pierre de Rosette.<br><br>
-  <strong>Défi&nbsp;:</strong><br>
-  Parlez ami et entrez.. Déchiffrez le texte, percez ses secrets et inscrivez le ci-dessous<br><br>
-  Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.<br><br>
-  <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
-  <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
-    O'FN YWTU IJ YJRU XQNGWJ, ATZX S'FWNJE UFX ZSJ FRNJ HJQNGFYFNWJ F RJ UWJXJSYJW ?
-  </span>
-</div>
+            Un message ancien, scellé par les sages, vous attend sur la pierre de Rosette.<br><br>
+            <strong>Défi&nbsp;:</strong><br>
+            Parlez ami et entrez... Déchiffrez le texte, percez ses secrets et inscrivez-le ci-dessous<br><br>
+            Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.<br><br>
+            <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
+            <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
+              O'FN YWTU IJ YJRU XQNGWJ, ATZX S'FWNJE UFX ZSJ FRNJ HJQNGFYFNWJ F RJ UWJXJSYJW ?
+            </span>
+          </div>
         </div>
       </div>
 
-      <!-- Bouton indice harmonisé -->
-      <div style="display:flex; justify-content:center; margin:38px 0 10px 0;">
-        <button id="show-indice" type="button">
-          Voir l’indice
-        </button>
+      <!-- Bloc pour débloquer l'indice -->
+      <div class="indice-unlock-block">
+        <div class="indice-unlock-row">
+          <label for="indice-password">Mot de passe indice :</label>
+          <input type="text" id="indice-password" class="input-password-field" placeholder="Entrez le mot de passe…" autocomplete="off" style="width:180px;">
+        </div>
+        <div class="indice-unlock-row">
+          <label for="select-a">A = ?</label>
+          <select id="select-a">
+            <option value="">Choisir…</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+            <option value="K">K</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="N">N</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="Q">Q</option>
+            <option value="R">R</option>
+            <option value="S">S</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+          </select>
+        </div>
+        <button id="show-indice" type="button" disabled>Voir l’indice</button>
       </div>
 
       <!-- Modal d'indice -->
@@ -272,7 +336,7 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 <script>
-  // Mot de passe attendu (apostrophe simple, espaces multiples réduits)
+  // Mot de passe attendu pour la validation finale
   const PASSWORD = "j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?"
     .trim().toLowerCase()
     .replace(/’/g, "'")
@@ -291,6 +355,23 @@
       btn.classList.remove('enabled');
     }
   });
+
+  // Mot de passe attendu pour l'indice (à personnaliser si besoin)
+  const INDICE_PASSWORD = "motdepasseindice"; // change ce mot de passe si besoin
+
+  function checkIndiceUnlock() {
+    const pwd = document.getElementById('indice-password').value.trim().toLowerCase();
+    const sel = document.getElementById('select-a').value;
+    const btn = document.getElementById('show-indice');
+    if (pwd === INDICE_PASSWORD && sel === "F") {
+      btn.disabled = false;
+    } else {
+      btn.disabled = true;
+    }
+  }
+
+  document.getElementById('indice-password').addEventListener('input', checkIndiceUnlock);
+  document.getElementById('select-a').addEventListener('change', checkIndiceUnlock);
 
   // Gestion du modal indice harmonisé
   document.getElementById('show-indice').addEventListener('click', function() {
