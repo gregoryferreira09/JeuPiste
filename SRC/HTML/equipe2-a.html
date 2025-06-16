@@ -4,108 +4,14 @@
   <meta charset="UTF-8">
   <title>Quête de la force - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
-  <style>
-    .actions-row-horizontal {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 38px;
-      margin-bottom: 10px;
-      gap: 24px;
-    }
-    .icon-action {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 90px;
-    }
-    .icon-action a, .icon-action label {
-      cursor: pointer;
-      color: #e0c185;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .icon-action a:hover, .icon-action label:hover {
-      color: #ffeecb;
-    }
-    .icon-action svg {
-      width: 38px;
-      height: 38px;
-      margin-bottom: 6px;
-      fill: #e0c185;
-      transition: fill 0.2s;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .icon-action a:hover svg,
-    .icon-action label:hover svg {
-      fill: #ffeecb;
-    }
-    .icon-action span {
-      font-size: 0.98em;
-      color: #e0c185;
-      margin-top: 2px;
-      text-align: center;
-    }
-    /* Pour masquer l'input file natif */
-    .visually-hidden {
-      position: absolute !important;
-      height: 1px; width: 1px;
-      overflow: hidden;
-      clip: rect(1px, 1px, 1px, 1px);
-      white-space: nowrap;
-      border: 0;
-      padding: 0;
-      margin: -1px;
-    }
-
-     /* Bouton Quête suivante désactivé */
-    #next-quest {
-      background: #aaa;
-      color: #fff;
-      font-size: 1.08em;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 30px;
-      margin: 28px auto 0 auto;
-      display: block;
-      opacity: 0.6;
-      cursor: not-allowed;
-      transition: background 0.2s, opacity 0.2s;
-    }
-    #next-quest.enabled {
-      background: #e0c185;
-      opacity: 1;
-      cursor: pointer;
-    }
-
-    @media (max-width: 650px) {
-      .actions-row-horizontal {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .icon-action {
-        width: 100%;
-        flex-direction: row;
-        justify-content: flex-start;
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-      .icon-action span {
-        text-align: left;
-      }
-      .image-fondue {
-        max-width: 98vw;
-      }
-    }
-  </style>
 </head>
 <body>
+  <!-- Bandeaux vidéos -->
+  <div id="bandeau-video1" class="bandeau">Préparation de l'envoi de la vidéo 1…</div>
+  <div id="bandeau-video2" class="bandeau">Préparation de l'envoi de la vidéo 2…</div>
+
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
@@ -126,52 +32,55 @@
             Prouvez votre puissance en dominant trois tractions pour les chevaliers (F) et cinq tractions pour les chevaliers (H), gage de votre force et détermination.<br>
             Un seul moyen de prouver votre exploit : une vidéo de chacun lors de votre défi.<br>
             (Parce que Merlin n'est pas un gros bâtard, si l'un n'y arrive pas, son binome peut faire 7 tractions pour valider l'ensemble)
-            
           </div>
         </div>
       </div>
 
-      <!-- Actions et image entre les deux boutons -->
       <div class="actions-row-horizontal">
         <!-- GPS à gauche -->
         <div class="icon-action side-icon">
-          <a href="https://maps.google.com/?q=47.473976, -0.576762" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0[...]"/>
+          <a href="https://maps.google.com/?q=47.473976,-0.576762" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <svg viewBox="0 0 24 24" width="38" height="38" style="display:block;margin:auto;margin-bottom:6px;fill:#e0c185;">
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3z"/>
+              <circle cx="12" cy="11" r="2.5"/>
             </svg>
             <span>Boussole</span>
           </a>
         </div>
 
         <!-- Vidéo 1 -->
-<div class="icon-action side-icon">
-  <label id="label-video1" for="video-upload-1" aria-label="Télécharger la vidéo 1">
-    <svg id="icon-video1" viewBox="0 0 24 24"><!-- icône caméra --></svg>
-    <span>Vidéo 1 à envoyer</span>
-    <input id="video-upload-1" class="visually-hidden" type="file" accept="video/*">
-    <div id="progress-container-1" style="display:none;">
-      <progress id="progress-1" value="0" max="100"></progress>
-      <span id="percent-1">0%</span>
-    </div>
-  </label>
-</div>
+        <div class="icon-action side-icon">
+          <label id="label-video1" for="video-upload-1" aria-label="Télécharger la vidéo 1">
+            <!-- SVG appareil photo -->
+            <svg id="icon-video1" viewBox="0 0 24 24" width="38" height="38" style="display:block;margin:auto;margin-bottom:6px;fill:#e0c185;">
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+            </svg>
+            <span>Vidéo 1 à envoyer</span>
+            <input id="video-upload-1" class="visually-hidden" type="file" accept="video/*">
+            <div id="progress-container-1" style="display:none;">
+              <progress id="progress-1" value="0" max="100"></progress>
+              <span id="percent-1">0%</span>
+            </div>
+          </label>
+        </div>
 
-<!-- Vidéo 2 -->
-<div class="icon-action side-icon">
-  <label id="label-video2" for="video-upload-2" aria-label="Télécharger la vidéo 2">
-    <svg id="icon-video2" viewBox="0 0 24 24"><!-- icône caméra --></svg>
-    <span>Vidéo 2 à envoyer</span>
-    <input id="video-upload-2" class="visually-hidden" type="file" accept="video/*">
-    <div id="progress-container-2" style="display:none;">
-      <progress id="progress-2" value="0" max="100"></progress>
-      <span id="percent-2">0%</span>
-    </div>
-  </label>
-</div>
+        <!-- Vidéo 2 -->
+        <div class="icon-action side-icon">
+          <label id="label-video2" for="video-upload-2" aria-label="Télécharger la vidéo 2">
+            <!-- SVG appareil photo -->
+            <svg id="icon-video2" viewBox="0 0 24 24" width="38" height="38" style="display:block;margin:auto;margin-bottom:6px;fill:#e0c185;">
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+            </svg>
+            <span>Vidéo 2 à envoyer</span>
+            <input id="video-upload-2" class="visually-hidden" type="file" accept="video/*">
+            <div id="progress-container-2" style="display:none;">
+              <progress id="progress-2" value="0" max="100"></progress>
+              <span id="percent-2">0%</span>
+            </div>
+          </label>
+        </div>
       </div>
-      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
 
-      <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -180,58 +89,77 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
- <script>
-function handleVideoUpload(inputId, progressContainerId, progressId, percentId, labelId, iconId, state) {
-  var input = document.getElementById(inputId);
-  var progressContainer = document.getElementById(progressContainerId);
-  var progress = document.getElementById(progressId);
-  var percent = document.getElementById(percentId);
-  var label = document.getElementById(labelId);
-  var icon = document.getElementById(iconId);
 
-  input.addEventListener('change', function() {
-    if(this.files && this.files[0]) {
-      progressContainer.style.display = 'block';
-      progress.value = 0;
-      percent.textContent = '0%';
-
-      // Simule un upload (remplace par ton vrai upload AJAX/XHR si besoin !)
-      var uploaded = 0;
-      var interval = setInterval(function() {
-        if(uploaded >= 100) {
-          clearInterval(interval);
-          progress.value = 100;
-          percent.textContent = '100%';
-          input.disabled = true;
-          label.style.opacity = 0.5;
-          icon.style.filter = "grayscale(1)";
-          state.done = true;
-          checkAllUploads();
-        } else {
-          uploaded += 10;
-          progress.value = uploaded;
-          percent.textContent = uploaded + '%';
-        }
-      }, 200);
+  <script>
+    function showBandeau(id) {
+      var el = document.getElementById(id);
+      el.classList.add("show");
+      setTimeout(function() {
+        el.classList.remove("show");
+      }, 1800);
     }
-  });
-}
 
-// Vérifie si les deux vidéos sont uploadées
-function checkAllUploads() {
-  if(window.uploadState1.done && window.uploadState2.done) {
-    var btn = document.getElementById('next-quest');
-    btn.disabled = false;
-    btn.classList.add('enabled');
-  }
-}
+    function handleVideoUpload(inputId, progressContainerId, progressId, percentId, labelId, iconId, state, bandeauId) {
+      var input = document.getElementById(inputId);
+      var progressContainer = document.getElementById(progressContainerId);
+      var progress = document.getElementById(progressId);
+      var percent = document.getElementById(percentId);
+      var label = document.getElementById(labelId);
+      var icon = document.getElementById(iconId);
 
-document.addEventListener('DOMContentLoaded', function() {
-  window.uploadState1 = { done: false };
-  window.uploadState2 = { done: false };
-  handleVideoUpload('video-upload-1', 'progress-container-1', 'progress-1', 'percent-1', 'label-video1', 'icon-video1', window.uploadState1);
-  handleVideoUpload('video-upload-2', 'progress-container-2', 'progress-2', 'percent-2', 'label-video2', 'icon-video2', window.uploadState2);
-});
-</script>
+      // Afficher le bandeau lors du clic sur le label
+      label.addEventListener('click', function() {
+        if (!input.disabled) showBandeau(bandeauId);
+      });
+
+      input.addEventListener('change', function() {
+        if(this.files && this.files[0]) {
+          progressContainer.style.display = 'block';
+          progress.value = 0;
+          percent.textContent = '0%';
+
+          // Simulation upload (remplace par upload réel si besoin)
+          var uploaded = 0;
+          var interval = setInterval(function() {
+            if(uploaded >= 100) {
+              clearInterval(interval);
+              progress.value = 100;
+              percent.textContent = '100%';
+              input.disabled = true;
+              label.style.opacity = 0.5;
+              icon.style.filter = "grayscale(1)";
+              state.done = true;
+              checkAllUploads();
+            } else {
+              uploaded += 10;
+              progress.value = uploaded;
+              percent.textContent = uploaded + '%';
+            }
+          }, 200);
+        }
+      });
+    }
+
+    function checkAllUploads() {
+      if(window.uploadState1.done && window.uploadState2.done) {
+        var btn = document.getElementById('next-quest');
+        btn.disabled = false;
+        btn.classList.add('enabled');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      window.uploadState1 = { done: false };
+      window.uploadState2 = { done: false };
+      handleVideoUpload(
+        'video-upload-1', 'progress-container-1', 'progress-1', 'percent-1',
+        'label-video1', 'icon-video1', window.uploadState1, "bandeau-video1"
+      );
+      handleVideoUpload(
+        'video-upload-2', 'progress-container-2', 'progress-2', 'percent-2',
+        'label-video2', 'icon-video2', window.uploadState2, "bandeau-video2"
+      );
+    });
+  </script>
 </body>
 </html>
