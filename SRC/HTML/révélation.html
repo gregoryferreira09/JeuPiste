@@ -53,6 +53,26 @@
       margin-top: 2px;
       text-align: center;
     }
+    /* Nouveau pour le bouton */
+    #next-quest {
+      background: #e0c185;
+      color: #473714;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      margin: 38px auto 0 auto;
+      display: block;
+      opacity: 1;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    #next-quest:disabled {
+      background: #aaa;
+      color: #fff;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -90,20 +110,17 @@
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top: 18px;">
-  <strong>⚔️ L’Ultime Épreuve — L’Affrontement du Dragon</strong><br><br>
-  L’aventure touche à sa fin…<br>
-  Les voiles du mystère se sont levés et les villageois ont parlé :<br>
-  <em>Le Dragon n’était autre que Merlin lui-même.</em><br><br>
-
-  Gardien du Graal depuis des siècles, le vieux mage s’est dissimulé sous le masque du guide.<br>
-  Mais l’heure n’est plus aux énigmes : il vous faut l’affronter pour mériter le Saint Graal.<br><br>
-
-  🛡️ <strong>Armez-vous de courage et d’acier.</strong><br>
-  👣 Suivez les derniers pas jusqu’à son antre, car le sort du royaume repose sur votre victoire.<br><br>
-
-  Le combat final vous attend, preux chevaliers.<br>
-  <strong>Que la légende s’écrive aujourd’hui… ou ne soit jamais contée.</strong>
-</div>
+            <strong>⚔️ L’Ultime Épreuve — L’Affrontement du Dragon</strong><br><br>
+            L’aventure touche à sa fin…<br>
+            Les voiles du mystère se sont levés et les villageois ont parlé :<br>
+            <em>Le Dragon n’était autre que Merlin lui-même.</em><br><br>
+            Gardien du Graal depuis des siècles, le vieux mage s’est dissimulé sous le masque du guide.<br>
+            Mais l’heure n’est plus aux énigmes : il vous faut l’affronter pour mériter le Saint Graal.<br><br>
+            🛡️ <strong>Armez-vous de courage et d’acier.</strong><br>
+            👣 Suivez les derniers pas jusqu’à son antre, car le sort du royaume repose sur votre victoire.<br><br>
+            Le combat final vous attend, preux chevaliers.<br>
+            <strong>Que la légende s’écrive aujourd’hui… ou ne soit jamais contée.</strong>
+          </div>
         </div>
       </div>
 
@@ -112,13 +129,15 @@
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.469417,-0.574556" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 6c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 7.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13[...]
             </svg>
             <span>Boussole</span>
           </a>
         </div>
       </div>
 
+      <!-- BOUTON QUETE SUIVANTE (visible, mais inutilisé si fin) -->
+      <button id="next-quest">Quête suivante</button>
     </main>
   </div>
 
@@ -126,5 +145,51 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- === Ajouts pour navigation gameflow === -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="../JS/gameflow.js"></script>
+  <script>
+    // Initialisation Firebase (AVANT tout usage)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    // NAVIGATION GAMEFLOW
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('next-quest').addEventListener('click', function() {
+        const salonCode = localStorage.getItem("salonCode");
+        const equipeNum = Number(localStorage.getItem("equipeNum"));
+        const db = firebase.database();
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+            if (!error && committed) {
+              const parcours = window.parcoursEquipes[equipeNum];
+              const step = snapshot.val();
+              if (step < parcours.length) {
+                const epreuveNum = parcours[step];
+                if (epreuveNum === 6) {
+                  window.location.href = "epreuve6.html";
+                } else if (epreuveNum === 7) {
+                  window.location.href = "révélation.html";
+                } else {
+                  window.location.href = `equipe${epreuveNum}-a.html`;
+                }
+              } else {
+                alert('Bravo, vous avez terminé !');
+              }
+            }
+          });
+      });
+    });
+  </script>
 </body>
 </html>
