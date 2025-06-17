@@ -286,17 +286,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const blocker = document.getElementById('blocker');
   const blockerBtn = document.getElementById('blocker-btn');
 
-  // NAVIGATION SYNCHRO
-  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
-    const step = snap.val() || 0;
-    const parcours = window.parcoursEquipes[equipeNum];
-    const epreuveNum = parcours[step];
-    const expectedPage = `equipe${epreuveNum}-a.html`;
-    if (!window.location.pathname.endsWith(expectedPage)) {
-      window.location.href = expectedPage;
-    }
-  });
-
   // CHRONO SYNCHRO
   let chronoInterval = null;
   db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${epreuveId}/startTime`)
