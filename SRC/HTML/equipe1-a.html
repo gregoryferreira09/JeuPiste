@@ -119,12 +119,13 @@
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top: 18px;">
-  Pour espérer atteindre le Graal, il vous faudra d’abord affronter la grande Toile du Destin.<br><br>
-  <strong><br>
-  Cette structure suspendue entre ciel et terre mettra à l’épreuve votre bravoure et votre agilité.<br>
-  Grimpez ensemble jusqu’à son sommet, là où le monde vacille sous vos pieds.<br><br>
-  <em><br>
-  Capturez cet instant de courage en duo, sur une photo prise tout en haut, auréolés de peur… et de fierté.<br><br>
+            Pour espérer atteindre le Graal, il vous faudra d’abord affronter la grande Toile du Destin.<br><br>
+            <strong><br>
+            Cette structure suspendue entre ciel et terre mettra à l’épreuve votre bravoure et votre agilité.<br>
+            Grimpez ensemble jusqu’à son sommet, là où le monde vacille sous vos pieds.<br><br>
+            <em><br>
+            Capturez cet instant de courage en duo, sur une photo prise tout en haut, auréolés de peur… et de fierté.<br><br>
+          </div>
         </div>
       </div>
       <!-- Actions et image entre les deux boutons -->
@@ -179,26 +180,23 @@
           }
         });
       }
-    });
-  </script>
-  <!-- === GAMEFLOW DYNAMIQUE : navigation par chemin équipe === -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.appspot.com",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('next-quest').addEventListener('click', function() {
+      // === GAMEFLOW DYNAMIQUE ===
+      btn.addEventListener('click', function() {
+        // Navigation dynamique par équipe
+        // (Reprend la logique des autres pages, utilise gameflow.js ou inline)
+        const firebaseConfig = {
+          apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+          authDomain: "murder-party-ba8d1.firebaseapp.com",
+          databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "murder-party-ba8d1",
+          storageBucket: "murder-party-ba8d1.appspot.com",
+          messagingSenderId: "20295055805",
+          appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+          measurementId: "G-KSBMBB7KMJ"
+        };
+        if (!window.firebase?.apps?.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
         const salonCode = localStorage.getItem("salonCode");
         const equipeNum = Number(localStorage.getItem("equipeNum"));
         firebase.database().ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
@@ -237,5 +235,7 @@
       });
     });
   </script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </body>
 </html>
