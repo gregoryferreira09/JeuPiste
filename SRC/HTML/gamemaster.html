@@ -8,54 +8,47 @@
   <style>
     body { background: #1a1414; color: #ffeecb; font-family: 'Cormorant Garamond', serif; }
     h1 { color: #e0c185; text-align: center; margin: 28px 0 22px 0; }
-    .gm-wrapper { max-width: 1100px; margin: 22px auto; padding: 16px 18px; background: #2b2323; border-radius: 14px; box-shadow: 0 2px 14px #0005;}
-    .gm-metrics { display: flex; gap: 40px; justify-content: center; margin-bottom: 30px;}
-    .gm-metric { font-size: 1.18em; background: #191313; border-radius: 10px; padding: 14px 26px; color: #e0c185;}
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { padding: 9px 10px; text-align: center; border-bottom: 1px solid #3a2c1d;}
-    th { color: #ffeecb; background: #231916; }
-    td { color: #e0c185;}
-    .files-list { display: flex; flex-direction: column; gap: 7px; align-items: center;}
-    .download-link, .download-btn { color: #e0c185; text-decoration: underline; cursor: pointer; background: none; border: none; font-size: 1em;}
-    .download-link:hover, .download-btn:hover { color: #ffeecb;}
-    .file-miniature { max-width: 75px; max-height: 55px; margin-right: 8px; vertical-align: middle; border-radius: 7px; border:1px solid #3a2c1d; background: #181212;}
-    .team-members { font-size:0.93em; color:#ffeecb; margin-bottom:3px;}
-    .video-thumb { max-width: 75px; max-height: 55px; border-radius: 7px; border:1px solid #3a2c1d; background: #181212; }
+    .gm-wrapper { max-width: 800px; margin: 22px auto; padding: 16px 18px; background: #2b2323; border-radius: 14px; box-shadow: 0 2px 14px #0005;}
+    .nav-btn { font-size:2.2em; cursor:pointer; color: #e0c185; background:none; border:none; transition:color 0.2s;}
+    .nav-btn:hover { color: #ffeecb; }
+    .carousel { display: flex; align-items: center; justify-content: center; gap: 16px;}
+    .carte-equipe { flex:1; background: #181212; border-radius: 12px; padding: 28px 24px; min-height:320px; }
+    .team-title { font-size:1.3em; color:#ffeecb; margin-bottom:7px;}
+    .team-members { font-size:1em; color:#d8d8a6; margin-bottom:16px;}
+    .etape-encours { margin: 16px 0; font-weight:bold; }
+    .timer { font-size:1.1em; margin-bottom:6px; }
+    .timer.late { color:#ff5757; font-weight:bold; }
+    .parcours-list { margin-top:12px; }
+    .parcours-list > .epreuve { margin-bottom: 17px; }
+    .epreuve-titre { font-weight:bold; color:#e0c185; }
+    .fichiers-epreuve { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+    .miniature, .miniature-video { max-width:90px; max-height:70px; border-radius:7px; border:1px solid #3a2c1d; background:#181212; }
+    .fichier-bloc { display:flex; align-items:center; gap:4px; margin-bottom:4px;}
+    .download-btn { color: #e0c185; text-decoration: underline; cursor: pointer; background: none; border: none; font-size: 1em;}
+    .download-btn:hover { color: #ffeecb;}
     @media (max-width: 700px) {
       .gm-wrapper { padding: 7px; }
-      .gm-metrics { gap: 15px; flex-direction: column; }
-      th, td { font-size: 0.96em; padding: 4px; }
-      .file-miniature, .video-thumb { max-width: 45px; max-height: 30px;}
+      .carte-equipe { padding: 12px 6px;}
+      .miniature, .miniature-video { max-width: 60px; max-height: 40px;}
     }
   </style>
 </head>
 <body>
   <h1>Gamemaster — Suivi des équipes</h1>
   <div class="gm-wrapper">
-    <div class="gm-metrics">
-      <div class="gm-metric"><span id="nb-equipes">0</span> équipes en jeu</div>
-      <div class="gm-metric"><span id="nb-total-progres">0</span> étapes franchies</div>
+    <div class="carousel">
+      <button class="nav-btn" id="prev-team">&#8592;</button>
+      <div class="carte-equipe" id="carte-equipe">
+        <div style="text-align:center;">Chargement…</div>
+      </div>
+      <button class="nav-btn" id="next-team">&#8594;</button>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Équipe</th>
-          <th>Nom</th>
-          <th>Membres</th>
-          <th>Étape atteinte</th>
-          <th>Photos/Vidéos</th>
-        </tr>
-      </thead>
-      <tbody id="teams-table">
-        <tr><td colspan="5">Chargement…</td></tr>
-      </tbody>
-    </table>
   </div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script>
-    // Initialisation Firebase
+    // --- CONFIG & INIT ---
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -70,80 +63,133 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // Récupère le code du salon (adapte si plusieurs parties en parallèle)
+    // --- DONNÉES ---
     const salonCode = localStorage.getItem("salonCode") || prompt("Code salon à superviser ?");
+    let equipes = [];
+    let nomsEquipes = {};
+    let currentIndex = 0;
+    let etapes = [
+      // Exemple de structure, à adapter selon ta logique de jeu :
+      { titre: "Épreuve 1", fichiersAttendus: ["Photo 1"] },
+      { titre: "Épreuve 2", fichiersAttendus: ["Vidéo"] },
+      { titre: "Épreuve 3", fichiersAttendus: ["Photo 2"] },
+      // Ajoute ici la suite des épreuves et fichiers attendus…
+    ];
 
-    // Affichage des équipes et progression
+    // --- NAVIGATION ---
+    document.getElementById('prev-team').onclick = function() {
+      if (equipes.length) {
+        currentIndex = (currentIndex - 1 + equipes.length) % equipes.length;
+        afficherEquipe();
+      }
+    };
+    document.getElementById('next-team').onclick = function() {
+      if (equipes.length) {
+        currentIndex = (currentIndex + 1) % equipes.length;
+        afficherEquipe();
+      }
+    };
+
+    // --- CHARGEMENT & AFFICHAGE ---
     function chargerEquipes() {
-      db.ref(`parties/${salonCode}/equipes`).on('value', snap => {
-        const equipes = snap.val() || {};
+      db.ref(`parties/${salonCode}/equipes`).once('value', snap => {
+        const data = snap.val() || {};
+        equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
         db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
-          const nomsEquipes = snapNoms.val() || {};
-          const table = document.getElementById('teams-table');
-          let html = '';
-          let totalEquipe = 0, totalEtapes = 0;
-          Object.entries(equipes).forEach(([num, equipe]) => {
-            totalEquipe++;
-            const nom = nomsEquipes[num] || `Équipe ${parseInt(num)+1}`;
-            const currentStep = equipe.currentStep ?? 0;
-            totalEtapes += currentStep;
-            // Affichage membres
-            let membres = '';
-            if(equipe.membres) {
-              membres = Object.values(equipe.membres).map(m=>m.pseudo).join(', ');
-            }
-            html += `<tr>
-              <td>${parseInt(num)+1}</td>
-              <td>${nom}</td>
-              <td class="team-members">${membres || '—'}</td>
-              <td>${currentStep}</td>
-              <td><div class="files-list" id="files-list-${num}">Chargement…</div></td>
-            </tr>`;
-          });
-          table.innerHTML = html || '<tr><td colspan="5">Aucune équipe détectée</td></tr>';
-          document.getElementById('nb-equipes').textContent = totalEquipe;
-          document.getElementById('nb-total-progres').textContent = totalEtapes;
-          Object.keys(equipes).forEach(num => {
-            listerFichiersEquipe(num);
-          });
+          nomsEquipes = snapNoms.val() || {};
+          if (equipes.length === 0) {
+            document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée</div>";
+          } else {
+            if (currentIndex >= equipes.length) currentIndex = 0;
+            afficherEquipe();
+          }
         });
       });
     }
 
-    // Affiche les fichiers par équipe, avec miniatures et téléchargement
-    function listerFichiersEquipe(num) {
-      const path = `parties/${salonCode}/equipe${num}/`;
-      const filesDiv = document.getElementById('files-list-' + num);
-      storage.ref(path).listAll().then(res => {
-        if (res.items.length === 0) {
-          filesDiv.textContent = "—";
-        } else {
-          filesDiv.innerHTML = '';
-          res.items.forEach(item => {
-            item.getDownloadURL().then(url => {
-              const fileName = item.name;
-              const ext = fileName.split('.').pop().toLowerCase();
-              let thumb = '';
-              // Miniature image
-              if(['jpg','jpeg','png','gif'].includes(ext)) {
-                thumb = `<img src="${url}" class="file-miniature" alt="Photo">`;
-              }
-              // Miniature vidéo (première frame, pas supportée partout mais <video> suffit pour un aperçu)
-              else if(['mp4','webm','ogg'].includes(ext)) {
-                thumb = `<video src="${url}" class="video-thumb" muted preload="metadata"></video>`;
-              }
-              // Bouton téléchargement 100% compatible
-              const btn = `<button class="download-btn" onclick="downloadFile('${url}','${fileName}')">Télécharger</button>`;
-              filesDiv.innerHTML += `<div>${thumb}<span>${fileName}</span> ${btn}</div>`;
-            });
-          });
-        }
-      }).catch(() => {
-        filesDiv.textContent = "Erreur ou aucun fichier";
-      });
+    function afficherEquipe() {
+      const carte = document.getElementById('carte-equipe');
+      const equipe = equipes[currentIndex];
+      const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
+      const membres = equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—';
+      const step = equipe.currentStep ?? 0;
+      let html = `
+        <div class='team-title'>${nom}</div>
+        <div class='team-members'>${membres}</div>
+        <div class='etape-encours'>Étape actuelle : <span>${etapes[step]?.titre || 'Terminé'}</span></div>
+        <div id="timer" class="timer">Temps sur cette étape : …</div>
+        <div class='parcours-list'>
+      `;
+      // Affiche toutes les étapes (parcours)
+      for (let i=0; i<etapes.length; i++) {
+        html += `<div class='epreuve'>
+            <div class='epreuve-titre'>${etapes[i].titre}${i==step ? " <span style='color:#ffe07e;'>(en cours)</span>": (i<step ? " <span style='color:#a8ffb9;'>(réalisée)</span>":"")}</div>
+            <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
+          </div>`;
+      }
+      html += '</div>';
+      carte.innerHTML = html;
+      // Timer
+      afficherTimer(equipe, step);
+      // Fichiers pour chaque étape
+      for (let i=0; i<etapes.length; i++) {
+        listerFichiersEquipeEtape(equipe.num, i, etapes[i].fichiersAttendus);
+      }
     }
 
-    // Téléchargement forcé côté client via fetch + blob (pour tous types de fichiers)
+    // --- TIMER ---
+    let timerInterval = null;
+    function afficherTimer(equipe, step) {
+      if (timerInterval) clearInterval(timerInterval);
+      const timerDiv = document.getElementById('timer');
+      function maj() {
+        // timestamp début étape stocké dans equipe.etapes
+        let start = equipe.etapes && equipe.etapes[step] && equipe.etapes[step].debut ? equipe.etapes[step].debut : null;
+        if (!start) { timerDiv.textContent = "Temps sur cette étape : —"; return; }
+        const elapsed = Math.floor((Date.now() - start) / 1000);
+        const min = Math.floor(elapsed/60), sec = elapsed%60;
+        timerDiv.textContent = `Temps sur cette étape : ${min}:${sec.toString().padStart(2,'0')}`;
+        if (elapsed >= 600) { timerDiv.classList.add('late'); timerDiv.textContent += " ⏰"; }
+        else timerDiv.classList.remove('late');
+      }
+      maj();
+      timerInterval = setInterval(maj, 1000);
+    }
+
+    // --- AFFICHAGE FICHIERS PAR ÉQUIPE & ÉPREUVE ---
+    function listerFichiersEquipeEtape(num, etapeIdx, fichiersAttendus) {
+      const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
+      if (!div) return;
+      const basePath = `parties/${salonCode}/equipe${num}/etape${etapeIdx}/`;
+      storage.ref(basePath).listAll().then(res => {
+        if (res.items.length === 0) {
+          div.innerHTML = fichiersAttendus.map(nom=> `<div class="fichier-bloc"><span>${nom} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`).join('');
+        } else {
+          div.innerHTML = '';
+          fichiersAttendus.forEach(nomAttendu => {
+            // Cherche le fichier correspondant (par nom)
+            const fichier = res.items.find(item => item.name.toLowerCase().includes(nomAttendu.toLowerCase().replace(/\s/g,'') ));
+            if (!fichier) {
+              div.innerHTML += `<div class="fichier-bloc"><span>${nomAttendu} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`;
+            } else {
+              fichier.getDownloadURL().then(url => {
+                const ext = fichier.name.split('.').pop().toLowerCase();
+                let mini = '';
+                if(['jpg','jpeg','png','gif'].includes(ext)) {
+                  mini = `<img src="${url}" class="miniature" alt="Photo">`;
+                } else if(['mp4','webm','ogg'].includes(ext)) {
+                  mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
+                }
+                div.innerHTML += `<div class="fichier-bloc">${mini}<span>${fichier.name}</span>
+                  <button class="download-btn" onclick="downloadFile('${url}','${fichier.name}')">Télécharger</button></div>`;
+              });
+            }
+          });
+        }
+      }).catch(()=>{div.innerHTML = "<span style='color:#b8b8b8;'>Erreur</span>";});
+    }
+
+    // --- Download helper ---
     window.downloadFile = function(url, fileName) {
       fetch(url)
         .then(resp => resp.blob())
@@ -160,8 +206,13 @@
         });
     };
 
-    // Rafraîchissement auto (événement live déjà en place)
-    chargerEquipes();
+    // --- RAFRAICHISSEMENT AUTO ---
+    function refreshLoop() {
+      chargerEquipes();
+      setTimeout(refreshLoop, 5000);
+    }
+    refreshLoop();
+
   </script>
 </body>
 </html>
