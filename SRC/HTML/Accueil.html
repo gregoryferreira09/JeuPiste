@@ -48,7 +48,7 @@
       margin: 24px 0 0 0;
       align-items: center;
     }
-    .gold-btn {
+    .gold-btn, .main-btn {
       background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
       color: #3d2b1f;
       border: 2px solid #e0c185;
@@ -67,7 +67,9 @@
       box-sizing: border-box;
     }
     .gold-btn:hover,
-    .gold-btn:focus {
+    .main-btn:hover,
+    .gold-btn:focus,
+    .main-btn:focus {
       background: #e0c185;
       color: #1a1a1a;
       box-shadow: 0 0 8px #e0c18588;
@@ -83,6 +85,111 @@
       outline: 2px solid #e0c185;
       outline-offset: 3px;
     }
+    /* -- MODALE GAMEMASTER -- */
+    .modal-bg {
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      background: rgba(44,27,27,0.86);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-gamemaster {
+      background: #2c1b1b;
+      border: 2.5px solid #e0c185;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px #0008;
+      padding: 38px 32px 30px 32px;
+      min-width: 285px;
+      max-width: 94vw;
+      color: #f4e4c1;
+      font-family: 'Cormorant Garamond', serif;
+      text-align: center;
+      position: relative;
+      animation: modalpop .33s cubic-bezier(.33,1.44,.73,1.02);
+    }
+    @keyframes modalpop {
+      0% { transform: scale(.82) translateY(60px); opacity:0; }
+      100% { transform: scale(1) translateY(0); opacity:1; }
+    }
+    .modal-gamemaster h2 {
+      font-family: 'Cinzel Decorative', serif;
+      color: #e0c185;
+      font-size: 1.25em;
+      margin-bottom: 12px;
+      margin-top: 0;
+      letter-spacing: 1px;
+    }
+    .modal-gamemaster label {
+      font-size: 1.08em;
+      margin-bottom: 8px;
+      display: block;
+      color: #ffeecb;
+    }
+    .modal-gamemaster input[type="password"] {
+      margin-top: 8px;
+      padding: 11px 14px;
+      border-radius: 7px;
+      border: 1.5px solid #e0c185;
+      background: #1d1611;
+      color: #ffeecb;
+      font-size: 1.09em;
+      font-family: inherit;
+      margin-bottom: 18px;
+      outline: none;
+      width: 94%;
+      box-sizing: border-box;
+      transition: border .2s;
+    }
+    .modal-gamemaster input[type="password"]:focus {
+      border: 2.5px solid #ffe07e;
+    }
+    .modal-gamemaster .modal-btns {
+      margin-top: 8px;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    .modal-gamemaster .modal-btn {
+      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
+      color: #3d2b1f;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-size: 1.08em;
+      font-family: 'Cinzel Decorative', cursive;
+      cursor: pointer;
+      transition: box-shadow .2s, background .2s, color .2s;
+      min-width: 90px;
+    }
+    .modal-gamemaster .modal-btn:hover,
+    .modal-gamemaster .modal-btn:focus {
+      background: #e0c185;
+      color: #1a1a1a;
+      box-shadow: 0 0 8px #e0c18555;
+      outline: none;
+    }
+    .modal-gamemaster .modal-err {
+      color: #ff615b;
+      font-size: 1em;
+      margin-top: 8px;
+      min-height: 22px;
+      font-family: 'Roboto Mono', monospace;
+    }
+    .modal-gamemaster .modal-close {
+      position: absolute;
+      top: 8px;
+      right: 16px;
+      font-size: 1.3em;
+      color: #e0c185;
+      background: none;
+      border: none;
+      cursor: pointer;
+      opacity: .7;
+      transition: opacity .15s;
+    }
+    .modal-gamemaster .modal-close:hover { opacity: 1; color: #ffe07e;}
     @media (max-width: 650px) {
       html { font-size: 16px; }
       body { overflow-x: hidden; }
@@ -96,7 +203,7 @@
       .main-accueil h2 { font-size: 1.1em; }
       .bienvenue-message { font-size: 1.05em; margin-bottom: 10px; }
       .menu-buttons { gap: 10px; }
-      .gold-btn, button {
+      .gold-btn, .main-btn, .modal-gamemaster .modal-btn {
         width: 100%;
         max-width: 99vw;
         min-width: 0;
@@ -104,6 +211,7 @@
         font-size: 1em;
       }
       .info { margin: 12px 0 0 0; }
+      .modal-gamemaster { padding: 20px 6vw;}
     }
   </style>
 </head>
@@ -119,12 +227,28 @@
         <button class="main-btn" type="button" onclick="window.location.href='creer-partie.html'">🎮 Créer une partie</button>
         <button class="main-btn" type="button" onclick="window.location.href='rejoindre-partie.html'">👥 Rejoindre une partie</button>
         <button class="main-btn" type="button" onclick="window.location.href='profil-joueur.html'">👤 Profil</button>
-        <button class="main-btn" type="button" onclick="window.location.href='parametres.html'">⚙️ Paramètres</button>
+        <button class="main-btn" type="button" id="gamemaster-btn">🧩 Gamemaster</button>
       </div>
       <div class="info">
         <p><strong>Bienvenue&nbsp;!</strong> Organise un jeu de piste ou rejoins une partie existante grâce à un code partagé.</p>
       </div>
     </main>
+  </div>
+  <!-- MODALE GAMEMASTER -->
+  <div id="modal-bg" class="modal-bg" style="display:none;">
+    <div class="modal-gamemaster" role="dialog" aria-modal="true" aria-labelledby="gm-modal-title">
+      <button class="modal-close" title="Fermer" onclick="closeGmModal()">&times;</button>
+      <h2 id="gm-modal-title">Accès Gamemaster</h2>
+      <form id="gm-modal-form" autocomplete="off" onsubmit="return checkGmPass();">
+        <label for="gm-mp">Mot de passe&nbsp;:</label>
+        <input type="password" id="gm-mp" name="gm-mp" required autofocus autocomplete="current-password">
+        <div class="modal-err" id="modal-err"></div>
+        <div class="modal-btns">
+          <button type="submit" class="modal-btn">Valider</button>
+          <button type="button" class="modal-btn" onclick="closeGmModal()">Annuler</button>
+        </div>
+      </form>
+    </div>
   </div>
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
@@ -136,7 +260,6 @@
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
     });
-  
     // Affichage du pseudo dans le message de bienvenue
     document.addEventListener("DOMContentLoaded", function() {
       var pseudo = localStorage.getItem("pseudo");
@@ -146,14 +269,50 @@
         document.getElementById("pseudoAffiche").textContent = "invité";
       }
     });
-
     // Nettoyage code salon si existant
     localStorage.removeItem("salonCode");
+    // --- MODALE GAMEMASTER ---
+    function openGmModal() {
+      document.getElementById('gm-mp').value = '';
+      document.getElementById('modal-err').textContent = '';
+      document.getElementById('modal-bg').style.display = 'flex';
+      setTimeout(function() {
+        document.getElementById('gm-mp').focus();
+      }, 100);
+    }
+    function closeGmModal() {
+      document.getElementById('modal-bg').style.display = 'none';
+      document.getElementById('gm-mp').value = '';
+      document.getElementById('modal-err').textContent = '';
+    }
+    function checkGmPass() {
+      var val = document.getElementById('gm-mp').value.trim();
+      if (val === 'gamemaster') {
+        // Ouvre la page gamemaster.html
+        window.location.href = "gamemaster.html";
+        return false;
+      } else {
+        document.getElementById('modal-err').textContent = "Mot de passe incorrect.";
+        document.getElementById('gm-mp').value = '';
+        document.getElementById('gm-mp').focus();
+        return false;
+      }
+    }
+    document.getElementById('gamemaster-btn').onclick = openGmModal;
+    // Fermer la modale si on clique sur le fond (hors modale)
+    document.getElementById('modal-bg').addEventListener('click', function(e) {
+      if (e.target === this) closeGmModal();
+    });
+    // Entrée clavier sur le bouton
+    document.getElementById('gm-mp').addEventListener('keydown', function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        checkGmPass();
+      }
+    });
   </script>
-
   <script src="../JS/security-enhance.js"></script>
   <script src="../JS/ux-enhance.js"></script>
   <script src="../JS/scalability.js"></script>
-  
 </body>
 </html>
