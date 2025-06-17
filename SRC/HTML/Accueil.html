@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
-    body { background: #1a1414; color: #ffeecb; font-family: 'Cormorant Garamond', serif; }
     .main-accueil {
       max-width: 520px;
       margin: 40px auto;
@@ -49,31 +48,30 @@
       margin: 24px 0 0 0;
       align-items: center;
     }
-    .main-btn {
-      background: #36231b;
-      color: #ffeecb;
-      border: 1.5px solid #333;
+    .gold-btn {
+      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
+      color: #3d2b1f;
+      border: 2px solid #e0c185;
       border-radius: 8px;
       padding: 14px 30px;
       font-size: 1.15em;
       font-family: 'Cinzel Decorative', cursive;
       cursor: pointer;
       margin: 0 4px;
-      transition: background .2s, color .2s, box-shadow .2s;
+      transition: box-shadow .2s, background .2s, color .2s;
       text-decoration: none;
       display: inline-block;
       min-width: 120px;
       width: 90%;
       max-width: 350px;
       box-sizing: border-box;
-      box-shadow: 0 1px 4px #0004;
     }
-    .main-btn:hover,
-    .main-btn:focus {
-      background: #442e22;
-      color: #ffe07e;
+    .gold-btn:hover,
+    .gold-btn:focus {
+      background: #e0c185;
+      color: #1a1a1a;
+      box-shadow: 0 0 8px #e0c18588;
       outline: none;
-      box-shadow: 0 2px 12px #e0c18544;
     }
     .info {
       margin: 20px 0 0 0;
@@ -98,7 +96,7 @@
       .main-accueil h2 { font-size: 1.1em; }
       .bienvenue-message { font-size: 1.05em; margin-bottom: 10px; }
       .menu-buttons { gap: 10px; }
-      .main-btn {
+      .gold-btn, button {
         width: 100%;
         max-width: 99vw;
         min-width: 0;
@@ -121,7 +119,7 @@
         <button class="main-btn" type="button" onclick="window.location.href='creer-partie.html'">🎮 Créer une partie</button>
         <button class="main-btn" type="button" onclick="window.location.href='rejoindre-partie.html'">👥 Rejoindre une partie</button>
         <button class="main-btn" type="button" onclick="window.location.href='profil-joueur.html'">👤 Profil</button>
-        <button class="main-btn" type="button" onclick="window.location.href='gamemaster.html'">🧩 Gamemaster</button>
+        <button class="main-btn" type="button" onclick="window.location.href='Gamemaster.html'">🧩 Gamemaster </button>
       </div>
       <div class="info">
         <p><strong>Bienvenue&nbsp;!</strong> Organise un jeu de piste ou rejoins une partie existante grâce à un code partagé.</p>
@@ -138,7 +136,7 @@
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
     });
-
+  
     // Affichage du pseudo dans le message de bienvenue
     document.addEventListener("DOMContentLoaded", function() {
       var pseudo = localStorage.getItem("pseudo");
@@ -156,5 +154,6 @@
   <script src="../JS/security-enhance.js"></script>
   <script src="../JS/ux-enhance.js"></script>
   <script src="../JS/scalability.js"></script>
+  
 </body>
 </html>
