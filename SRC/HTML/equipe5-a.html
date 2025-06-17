@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
+    /* ... tout ton CSS inchangé ... */
     .chrono-block {
       display: flex;
       align-items: center;
@@ -257,7 +258,7 @@
   authDomain: "murder-party-ba8d1.firebaseapp.com",
   databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.firebasestorage.app",
+  storageBucket: "murder-party-ba8d1.appspot.com",
   messagingSenderId: "20295055805",
   appId: "1:20295055805:web:0963719c3f23ab7752fad4",
   measurementId: "G-KSBMBB7KMJ"
@@ -270,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
   const db = firebase.database();
-  const dureeEpreuve = 1 * 60; // 7 minutes chrono
+  const dureeEpreuve = 7 * 60; // 7 minutes chrono (corrigé)
   const epreuveId = 5;
 
   if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
@@ -373,9 +374,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Passage à la quête suivante (synchro binôme)
+  // Passage à la quête suivante (synchro binôme) et redirection dynamique
   nextBtn.addEventListener('click', function() {
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
+    // On incrémente le currentStep du binôme
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+      if (!error && committed) {
+        // Redirection dynamique vers la prochaine épreuve du parcours de l'équipe
+        const parcours = window.parcoursEquipes[equipeNum];
+        const step = snapshot.val();
+        if (step < parcours.length) {
+          const epreuveNum = parcours[step];
+          window.location.href = `equipe${epreuveNum}-a.html`;
+        } else {
+          // Dernière étape, fin de parcours
+          alert('Bravo, vous avez terminé !');
+          // window.location.href = "fin.html";
+        }
+      }
+    });
     window.name = ""; // reset pour ne pas réouvrir la fenêtre à la prochaine page
   });
 });
