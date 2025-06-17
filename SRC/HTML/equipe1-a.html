@@ -51,7 +51,6 @@
       margin-top: 2px;
       text-align: center;
     }
-    /* Pour masquer l'input file natif */
     .visually-hidden {
       position: absolute !important;
       height: 1px; width: 1px;
@@ -62,9 +61,7 @@
       padding: 0;
       margin: -1px;
     }
-
-     /* Bouton Quête suivante désactivé */
-    #next-quest {
+     #next-quest {
       background: #aaa;
       color: #fff;
       font-size: 1.08em;
@@ -82,7 +79,6 @@
       opacity: 1;
       cursor: pointer;
     }
-
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -124,31 +120,29 @@
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top: 18px;">
   Pour espérer atteindre le Graal, il vous faudra d’abord affronter la grande Toile du Destin.<br><br>
-
   <strong><br>
   Cette structure suspendue entre ciel et terre mettra à l’épreuve votre bravoure et votre agilité.<br>
   Grimpez ensemble jusqu’à son sommet, là où le monde vacille sous vos pieds.<br><br>
-
   <em><br>
   Capturez cet instant de courage en duo, sur une photo prise tout en haut, auréolés de peur… et de fierté.<br><br>
-            
+        </div>
+      </div>
       <!-- Actions et image entre les deux boutons -->
       <div class="actions-row-horizontal">
         <!-- GPS à gauche -->
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0[...]"/>
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3z"/>
             </svg>
             <span>Boussole</span>
           </a>
         </div>
-
         <!-- Appareil photo à droite -->
         <div class="icon-action side-icon">
           <label for="photo-upload" aria-label="Télécharger une photo">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4[...]"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
             </svg>
             <span>Photo à envoyer</span>
             <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -185,6 +179,62 @@
           }
         });
       }
+    });
+  </script>
+  <!-- === GAMEFLOW DYNAMIQUE : navigation par chemin équipe === -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('next-quest').addEventListener('click', function() {
+        const salonCode = localStorage.getItem("salonCode");
+        const equipeNum = Number(localStorage.getItem("equipeNum"));
+        firebase.database().ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
+          const mapping = snap.val() || {};
+          const parcoursIdx = mapping[equipeNum];
+          const parcoursEquipes = [
+            [1, 2, 5, 3, 4],
+            [2, 4, 3, 5, 1],
+            [3, 1, 4, 2, 5],
+            [4, 5, 2, 1, 3],
+            [5, 3, 1, 4, 2]
+          ];
+          const parcours = parcoursEquipes[parcoursIdx];
+          if (!parcours || !Array.isArray(parcours)) {
+            alert("Erreur de parcours : configuration absente ou corrompue. Contactez l'orga.");
+            return;
+          }
+          const match = window.location.pathname.match(/equipe(\d+)-([a-z]).html$/);
+          if (!match) return alert("Erreur navigation !");
+          const currentNum = parseInt(match[1], 10);
+          let etapeIdx = -1;
+          for (let i = 0; i < parcours.length; i++) {
+            if (parcours[i] === currentNum) {
+              etapeIdx = i;
+              break;
+            }
+          }
+          if (etapeIdx < parcours.length - 1) {
+            const nextNum = parcours[etapeIdx + 1];
+            window.location.href = `equipe${nextNum}-a.html`;
+          } else {
+            alert("Bravo, vous avez terminé !");
+            // window.location.href = "fin.html";
+          }
+        });
+      });
     });
   </script>
 </body>
