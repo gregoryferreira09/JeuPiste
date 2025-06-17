@@ -333,14 +333,19 @@
           .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
             if (!error && committed) {
               const parcours = window.parcoursEquipes[equipeNum];
-              const step = snapshot.val();
-              if (step < parcours.length) {
-                const epreuveNum = parcours[step];
-                window.location.href = `equipe${epreuveNum}-a.html`;
-              } else {
-                alert('Bravo, vous avez terminé !');
-                // window.location.href = "fin.html";
-              }
+const step = snapshot.val();
+if (step < parcours.length) {
+  const epreuveNum = parcours[step];
+  if (epreuveNum === 6) {
+    window.location.href = "epreuve6.html";
+  } else if (epreuveNum === 7) {
+    window.location.href = "révélation.html";
+  } else {
+    window.location.href = `equipe${epreuveNum}-a.html`;
+  }
+} else {
+  alert('Bravo, vous avez terminé !');
+}
             }
           });
       });
