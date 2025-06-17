@@ -6,10 +6,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
-  <!-- ... styles identiques ... -->
+  <style>
+    .actions-row-horizontal { display: flex; justify-content: space-between; align-items: center; margin-top: 38px; margin-bottom: 10px; gap: 24px; }
+    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
+    .icon-action a { cursor: pointer; color: #e0c185; text-decoration: none; transition: color 0.2s; }
+    .icon-action a:hover { color: #ffeecb; }
+    .icon-action svg { width: 38px; height: 38px; margin-bottom: 6px; fill: #e0c185; transition: fill 0.2s; display: block; margin-left: auto; margin-right: auto; }
+    .icon-action a:hover svg { fill: #ffeecb; }
+    .icon-action span { font-size: 0.98em; color: #e0c185; margin-top: 2px; text-align: center; }
+    .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.07); margin: 0 8px; }
+    #show-indice:disabled { opacity: 0.6; background: #b7a170; cursor: not-allowed; }
+    #show-indice:hover:enabled { background: #ffeecb; }
+    #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
+    #indice-modal.active { display: flex; }
+    .modal-img-wrapper { position: relative; background: #fffbe0; padding: 24px 24px 12px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); max-width: 92vw; }
+    .modal-img-wrapper img { display: block; max-width: 70vw; max-height: 60vh; margin: 0 auto; border-radius: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.2s; }
+    .close-modal:hover { color: #e0c185; }
+    #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; transition: background 0.2s, opacity 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    #next-quest.enabled { background: #e0c185; opacity: 1; cursor: pointer; }
+    .input-password-wrapper { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
+    .input-password-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
+    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 90vw; text-align: center; box-sizing: border-box; transition: border 0.2s; }
+    .input-password-field:focus { border: 1.5px solid #ffeecb; }
+    .indice-unlock-block { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
+    .indice-unlock-row { margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .indice-unlock-row select { font-size: 1em; padding: 3px 8px; border-radius: 6px; background: #2b2323; color: #e0c185; border: 1px solid #e0c185; }
+    /* Blocage écran fondu */
+    #blocker {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(24,18,18,0.7);
+      color: #fff;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-size: 1.5em;
+      text-align: center;
+      transition: background 0.5s;
+    }
+    #blocker-message {
+      margin-bottom: 24px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    #blocker-countdown {
+      font-size: 2.2em;
+      font-weight: bold;
+    }
+    @media (max-width: 650px) {
+      .actions-row-horizontal { flex-direction: column; align-items: stretch; gap: 10px; }
+      .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
+      .icon-action span { text-align: left; }
+      .input-password-field { width: 98vw; font-size: 1em; padding: 10px 7px; }
+      .modal-img-wrapper img { max-width: 95vw; max-height: 50vh; }
+    }
+  </style>
 </head>
 <body>
-  <header> <h1 class="site-title">Jeu de piste</h1> </header>
+  <header>
+    <h1 class="site-title">Jeu de piste</h1>
+  </header>
 
   <div id="blocker">
     <div id="blocker-message">Il faut vous rendre à la pierre de Rosette et inscrire ce que vous y trouverez. (Bande de feignassou !)<br><br>Déblocage dans :</div>
@@ -18,7 +78,94 @@
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <!-- ... contenu d'origine ... -->
+      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête de l’esprit</h2>
+      <div class="presentation-jeu" style="margin-top: 24px;">
+        <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7;">
+          <em>
+            Il est des chemins que ni l’épée ni la course ne sauraient franchir.<br>
+            Seule la lumière de l’esprit éclaire ce que les yeux ne voient pas.
+          </em>
+        </div>
+        <div class="objectif-course" style="margin-top: 24px;">
+          <div class="objectif-label">Objectif</div>
+          <div class="objectif-text" style="margin-top:18px;">
+            Un indice qui permet de lire un message ancien, scellé par les sages, vous attend sur la pierre de Rosette.<br><br>
+            </strong><br>
+            Parlez ami et entrez... Déchiffrez le texte, percez ses secrets et inscrivez-le ci-dessous<br><br>
+            Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.<br><br>
+            <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
+            <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
+              O'FN YWTU IJ YJRU XQNGWJ, ATZX S'FWNJE UFX ZSJ FRNJ HJQNGFYFNWJ F RJ UWJXJSYJW ?
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="indice-unlock-block">
+        <div class="indice-unlock-row">
+          <label for="select-a">A = ?</label>
+          <select id="select-a">
+            <option value="">Choisir…</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="G">G</option>
+            <option value="H">H</option>
+            <option value="I">I</option>
+            <option value="J">J</option>
+            <option value="K">K</option>
+            <option value="L">L</option>
+            <option value="M">M</option>
+            <option value="N">N</option>
+            <option value="O">O</option>
+            <option value="P">P</option>
+            <option value="Q">Q</option>
+            <option value="R">R</option>
+            <option value="S">S</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+            <option value="X">X</option>
+            <option value="Y">Y</option>
+            <option value="Z">Z</option>
+          </select>
+        </div>
+        <button id="show-indice" type="button" disabled>Voir l’indice</button>
+      </div>
+
+      <!-- Modal d'indice -->
+      <div id="indice-modal">
+        <div class="modal-img-wrapper">
+          <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
+          <img src="../../Public/images/enigme.png" alt="Indice visuel alphabet">
+        </div>
+      </div>
+      
+      <!-- Bouton boussole -->
+      <div class="actions-row-horizontal">
+        <div class="icon-action side-icon">
+          <a href="https://maps.google.com/?q=47.47722211138926,-0.5798594274786282" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+            </svg>
+            <span>Boussole</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Zone de saisie mot de passe -->
+      <div class="input-password-wrapper">
+        <label for="password-field" class="input-password-label">
+          Entrez le mot de passe pour valider votre progression :
+        </label>
+        <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
+      </div>
+
+      <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -27,132 +174,72 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.appspot.com",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  </script>
-
-  <script>
-    // --- ton JS d'origine (blocage, indices, mot de passe, etc.) ---
-    let blockTimeout = null;
-    document.getElementById('select-a').addEventListener('change', function() {
-      const btnIndice = document.getElementById('show-indice');
-      if (this.value === "F") {
-        btnIndice.disabled = false;
-      } else if (this.value !== "") {
-        btnIndice.disabled = true;
-        showBlocker();
-      } else {
-        btnIndice.disabled = true;
-      }
-    });
-
-    function showBlocker() {
-      const blocker = document.getElementById('blocker');
-      blocker.style.display = 'flex';
-      let count = 30;
-      document.getElementById('blocker-countdown').textContent = count;
-      blockTimeout && clearInterval(blockTimeout);
-      blockTimeout = setInterval(() => {
-        count--;
-        document.getElementById('blocker-countdown').textContent = count;
-        if (count <= 0) {
-          clearInterval(blockTimeout);
-          blocker.style.display = 'none';
-          document.getElementById('select-a').value = '';
-        }
-      }, 1000);
+<script>
+  // Blocage écran fondu si la mauvaise lettre est choisie
+  let blockTimeout = null;
+  document.getElementById('select-a').addEventListener('change', function() {
+    const btnIndice = document.getElementById('show-indice');
+    if (this.value === "F") {
+      btnIndice.disabled = false;
+    } else if (this.value !== "") {
+      btnIndice.disabled = true;
+      showBlocker();
+    } else {
+      btnIndice.disabled = true;
     }
+  });
 
-    document.getElementById('show-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.add('active');
-    });
-    document.getElementById('close-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.remove('active');
-    });
+  function showBlocker() {
+    const blocker = document.getElementById('blocker');
+    blocker.style.display = 'flex';
+    let count = 30;
+    document.getElementById('blocker-countdown').textContent = count;
+    blockTimeout && clearInterval(blockTimeout);
+    blockTimeout = setInterval(() => {
+      count--;
+      document.getElementById('blocker-countdown').textContent = count;
+      if (count <= 0) {
+        clearInterval(blockTimeout);
+        blocker.style.display = 'none';
+        document.getElementById('select-a').value = '';
+      }
+    }, 1000);
+  }
 
-    const PASSWORD = "j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?"
-      .trim().toLowerCase()
+  // Gestion du modal indice harmonisé
+  document.getElementById('show-indice').addEventListener('click', function() {
+    document.getElementById('indice-modal').classList.add('active');
+  });
+  document.getElementById('close-indice').addEventListener('click', function() {
+    document.getElementById('indice-modal').classList.remove('active');
+  });
+
+  // Mot de passe attendu pour la validation finale
+  const PASSWORD = "j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?"
+    .trim().toLowerCase()
+    .replace(/’/g, "'")
+    .replace(/\s+/g, ' ');
+
+  document.getElementById('password-field').addEventListener('input', function() {
+    let userValue = this.value.trim().toLowerCase()
       .replace(/’/g, "'")
       .replace(/\s+/g, ' ');
+    const btn = document.getElementById('next-quest');
+    if (userValue === PASSWORD) {
+      btn.disabled = false;
+      btn.classList.add('enabled');
+    } else {
+      btn.disabled = true;
+      btn.classList.remove('enabled');
+    }
+  });
 
-    document.getElementById('password-field').addEventListener('input', function() {
-      let userValue = this.value.trim().toLowerCase()
-        .replace(/’/g, "'")
-        .replace(/\s+/g, ' ');
-      const btn = document.getElementById('next-quest');
-      if (userValue === PASSWORD) {
-        btn.disabled = false;
-        btn.classList.add('enabled');
-      } else {
-        btn.disabled = true;
-        btn.classList.remove('enabled');
-      }
-    });
-
-    // --- Redirection dynamique basée sur le mapping gameflow ---
-    document.getElementById('next-quest').addEventListener('click', function() {
-      if (!this.disabled) {
-        const salonCode = localStorage.getItem("salonCode");
-        const equipeNum = localStorage.getItem("equipeNum");
-        firebase.database().ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
-          const mapping = snap.val() || {};
-          const parcoursIdx = mapping[equipeNum];
-          // Copié-collé du mapping du gameflow.js
-          const parcoursEquipes = [
-            [5, 2, 5, 3, 4],
-            [2, 4, 3, 5, 1],
-            [3, 1, 4, 2, 5],
-            [4, 5, 2, 1, 3],
-            [5, 3, 1, 4, 2]
-          ];
-          const parcours = parcoursEquipes[parcoursIdx];
-
-          // On trouve dans le parcours la position de la page actuelle
-          const match = window.location.pathname.match(/equipe(\d+)-([a-z]).html$/);
-          if (!match) return alert("Erreur navigation !");
-          const currentNum = parseInt(match[1], 10);
-          const currentSuffix = match[2];
-          // Cherche l'index de cette étape dans le parcours (numéro + suffixe)
-          let etapeIdx = -1;
-          for (let i = 0; i < parcours.length; i++) {
-            const num = parcours[i];
-            const suffix = String.fromCharCode(97 + i); // "a", "b", ...
-            if (num === currentNum && suffix === currentSuffix) {
-              etapeIdx = i;
-              break;
-            }
-          }
-          if (etapeIdx === -1) {
-            // fallback : index du suffixe
-            etapeIdx = currentSuffix.charCodeAt(0) - 97;
-          }
-
-          // Redirection vers l'étape suivante du parcours
-          if (etapeIdx < parcours.length - 1) {
-            const nextNum = parcours[etapeIdx + 1];
-            const nextSuffix = String.fromCharCode(97 + etapeIdx + 1); // "b", "c", ...
-            window.location.href = `equipe${nextNum}-${nextSuffix}.html`;
-          } else {
-            alert("Bravo, vous avez terminé !");
-            // window.location.href = "fin.html";
-          }
-        });
-      }
-    });
-  </script>
+  // Redirection page suivante
+  document.getElementById('next-quest').addEventListener('click', function() {
+    if (!this.disabled) {
+      window.location.href = "equipe4-b.html";
+    }
+  });
+</script>
 </body>
 </html>
