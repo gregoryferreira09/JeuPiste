@@ -289,7 +289,7 @@
     function checkGmPass() {
       var val = document.getElementById('gm-mp').value.trim();
       if (val === 'gamemaster') {
-        // Ouvre la page gamemaster.html
+        localStorage.setItem("gm_ok", "1");
         window.location.href = "gamemaster.html";
         return false;
       } else {
