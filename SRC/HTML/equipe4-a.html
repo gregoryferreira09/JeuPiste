@@ -252,21 +252,20 @@
         const currentSuffix = match[2];
         let etapeIdx = -1;
         for (let i = 0; i < parcours.length; i++) {
-          const num = parcours[i];
-          const suffix = String.fromCharCode(97 + i); // "a", "b", ...
-          if (num === currentNum && suffix === currentSuffix) {
-            etapeIdx = i;
-            break;
-          }
-        }
-        if (etapeIdx === -1) etapeIdx = currentSuffix.charCodeAt(0) - 97;
-        if (etapeIdx < parcours.length - 1) {
-        const nextNum = parcours[etapeIdx + 1];
-        window.location.href = `equipe${nextNum}-a.html`;
-        } else {
-          alert("Bravo, vous avez terminé !");
-          // window.location.href = "fin.html";
-        }
+          const parcours = window.parcoursEquipes[equipeNum];
+const step = snapshot.val();
+if (step < parcours.length) {
+  const epreuveNum = parcours[step];
+  if (epreuveNum === 6) {
+    window.location.href = "epreuve6.html";
+  } else if (epreuveNum === 7) {
+    window.location.href = "révélation.html";
+  } else {
+    window.location.href = `equipe${epreuveNum}-a.html`;
+  }
+} else {
+  alert('Bravo, vous avez terminé !');
+}
       });
     }
   });
