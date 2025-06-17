@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    /* ... ton style existant ... */
     .actions-row-horizontal {
       display: flex;
       justify-content: center;
@@ -261,32 +260,30 @@
     handlePhotoUpload('photo-upload-3','label-photo3');
     handlePhotoUpload('photo-upload-4','label-photo4');
 
-    // === NAVIGATION GAMEFLOW ===
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('next-quest').addEventListener('click', function() {
-        const salonCode = localStorage.getItem("salonCode");
-        const equipeNum = Number(localStorage.getItem("equipeNum"));
-        const db = firebase.database();
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-            if (!error && committed) {
-              const parcours = window.parcoursEquipes[equipeNum];
-              const step = snapshot.val();
-              if (step < parcours.length) {
-                const epreuveNum = parcours[step];
-                if (epreuveNum === 6) {
-                  window.location.href = "epreuve6.html";
-                } else if (epreuveNum === 7) {
-                  window.location.href = "révélation.html";
-                } else {
-                  window.location.href = `equipe${epreuveNum}-a.html`;
-                }
+    // === NAVIGATION GAMEFLOW UNIQUEMENT ===
+    document.getElementById('next-quest').addEventListener('click', function() {
+      const salonCode = localStorage.getItem("salonCode");
+      const equipeNum = Number(localStorage.getItem("equipeNum"));
+      const db = firebase.database();
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+        .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+          if (!error && committed) {
+            const parcours = window.parcoursEquipes[equipeNum];
+            const step = snapshot.val();
+            if (step < parcours.length) {
+              const epreuveNum = parcours[step];
+              if (epreuveNum === 6) {
+                window.location.href = "epreuve6.html";
+              } else if (epreuveNum === 7) {
+                window.location.href = "révélation.html";
               } else {
-                alert('Bravo, vous avez terminé !');
+                window.location.href = `equipe${epreuveNum}-a.html`;
               }
+            } else {
+              alert('Bravo, vous avez terminé !');
             }
-          });
-      });
+          }
+        });
     });
   </script>
 </body>
