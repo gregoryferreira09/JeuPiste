@@ -1,10 +1,10 @@
-// Les parcours possibles (à ne pas modifier)
+// Les parcours possibles (mise à jour)
 window.parcoursEquipes = [
-  [1, 2, 5, 3, 4], // Parcours 0
-  [2, 4, 3, 5, 1], // Parcours 1
-  [3, 1, 4, 2, 5], // Parcours 2
-  [4, 5, 2, 1, 3], // Parcours 3
-  [5, 3, 1, 4, 2]  // Parcours 4
+  [1, 2, 5, 3, 4, 6, 7], // 6 = epreuve6, 7 = révélation
+  [2, 4, 3, 5, 1, 6, 7],
+  [3, 1, 4, 2, 5, 6, 7],
+  [4, 5, 2, 1, 3, 6, 7],
+  [5, 3, 1, 4, 2, 6, 7]
 ];
 
 // Fonction utilitaire pour mélanger un tableau
