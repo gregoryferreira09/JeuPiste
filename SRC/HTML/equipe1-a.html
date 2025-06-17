@@ -61,7 +61,7 @@
       padding: 0;
       margin: -1px;
     }
-     #next-quest {
+    #next-quest {
       background: #aaa;
       color: #fff;
       font-size: 1.08em;
@@ -161,6 +161,7 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- Firebase et gameflow.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
@@ -185,16 +186,14 @@
         });
       }
 
-      // === NAVIGATION GAMEFLOW COMME EQUIPE 5 ===
+      // === NAVIGATION GAMEFLOW COMME EQUIPE5 ===
       btn.addEventListener('click', function() {
         const salonCode = localStorage.getItem("salonCode");
         const equipeNum = Number(localStorage.getItem("equipeNum"));
         const db = firebase.database();
-
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
           .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
             if (!error && committed) {
-              // Navigation dynamique comme equipe5
               const parcours = window.parcoursEquipes[equipeNum];
               const step = snapshot.val();
               if (step < parcours.length) {
