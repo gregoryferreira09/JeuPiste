@@ -45,7 +45,6 @@
       margin-top: 12px;
       min-height: 25px;
     }
-    /* Confirmation retour accueil */
     #confirmationRetourAccueil {
       display:none;
       position:fixed;
@@ -138,13 +137,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script>
-    // 1. Config Firebase
+    // ========== CONFIGURATION ==========
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "murder-party-ba8d1.appspot.com",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
@@ -152,6 +151,37 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // ========== PARCOURS POSSIBLES ==========
+    window.parcoursEquipes = [
+      [5, 2, 5, 3, 4],
+      [2, 4, 3, 5, 1],
+      [3, 1, 4, 2, 5],
+      [4, 5, 2, 1, 3],
+      [5, 3, 1, 4, 2]
+    ];
+
+    // Mélange un tableau (Fisher–Yates)
+    function shuffleArray(array) {
+      let arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Génère et sauvegarde le mapping parcours/équipe (chemin unique)
+    function initialiserMappingParcours(salonCode, nombreEquipes) {
+      let indices = [...Array(window.parcoursEquipes.length).keys()];
+      let tirage = shuffleArray(indices).slice(0, nombreEquipes);
+      let cheminsParEquipe = {};
+      for (let i = 0; i < nombreEquipes; i++) {
+        cheminsParEquipe[i] = tirage[i];
+      }
+      db.ref('parties/' + salonCode + '/cheminsParEquipe').set(cheminsParEquipe);
+    }
+
+    // ========== LOGIQUE EQUIPES ==========
     const NOM_EQUIPE_POSSIBLES = [
       "Les indestructibles", "Les princesses", "Les Looney Tunes",
       "Les enfants perdus", "Les incompris", "Les Super-Zéro"
@@ -169,15 +199,6 @@
     const pseudo = localStorage.getItem("pseudo") || "Anonyme";
     let equipeSelectionnee = null;
 
-    function shuffleArray(array) {
-      let arr = array.slice();
-      for (let i = arr.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
     function calculerNombreEquipes() {
       const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
       let nbJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
@@ -186,7 +207,6 @@
       return Math.min(Math.ceil(nbJoueurs / 2), NB_MAX_EQUIPE);
     }
 
-    // Toujours créer toutes les équipes attendues (même si structure existe déjà)
     function initialiserEquipes() {
       const nombreEquipes = calculerNombreEquipes();
       db.ref('parties/' + salonCode + '/equipes').once('value', snap => {
@@ -264,6 +284,7 @@
       });
     }
 
+    // Gère l'état du bouton et le décompte de début de partie
     function majEtatBouton(equipes) {
       const btnValider = document.getElementById('valider-choix');
       let nbJoueursValides = 0;
@@ -292,12 +313,13 @@
         document.getElementById('annuler-choix').remove();
         btnValider.disabled = false;
       }
+      // Si toutes les équipes sont pleines (prêtes), on lance le décompte
       if (nbJoueursValides === totalJoueurs) {
         lancerDecompteAvantRedirection();
       }
     }
 
-    // ----------- MODIFICATION ICI -------------
+    // Validation choix équipe
     document.getElementById("valider-choix").onclick = function() {
       if (!equipeSelectionnee || this.disabled) return;
       db.ref('parties/' + salonCode + '/equipes/' + equipeSelectionnee + '/membres/' + playerId).set({
@@ -307,7 +329,6 @@
       localStorage.setItem("equipeNum", equipeSelectionnee);
       this.disabled = true;
     };
-    // ----------- FIN MODIF -------------
 
     function ajouterBoutonAnnuler(equipeJoueur) {
       const btn = document.createElement('button');
@@ -324,7 +345,6 @@
         equipeSelectionnee = null;
         document.getElementById('valider-choix').disabled = true;
         db.ref('parties/' + salonCode + '/equipes/' + equipeJoueur + '/membres/' + playerId).remove();
-        // ENLÈVE ÉQUIPE SI ANNULÉ
         localStorage.removeItem("equipeNum");
       };
       document.querySelector('.boutons-actions').appendChild(btn);
@@ -335,6 +355,7 @@
       afficherEquipesEtSync();
     };
 
+    // Lance le décompte et génère le mapping parcours/équipe une seule fois
     function lancerDecompteAvantRedirection() {
       if (document.getElementById('decompte-redirect')) return;
       const conteneur = document.createElement('div');
@@ -345,6 +366,13 @@
       conteneur.style.textAlign = 'center';
       conteneur.textContent = 'La partie commence dans 5…';
       document.querySelector('.main-accueil').appendChild(conteneur);
+
+      // --- Appel la génération du mapping UNE SEULE FOIS (côté "maître") ---
+      // Ici, on ne peut pas garantir qui est "maître", mais ce n'est pas grave si la génération est appelée plusieurs fois
+      // car le tirage sera le même pour tous si fait à ce moment précis.
+      const nombreEquipes = calculerNombreEquipes();
+      initialiserMappingParcours(salonCode, nombreEquipes);
+      // ---------------------------------------------------------
 
       let count = 5;
       function tick() {
