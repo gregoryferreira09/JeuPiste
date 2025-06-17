@@ -8,20 +8,24 @@
   <style>
     body { background: #1a1414; color: #ffeecb; font-family: 'Cormorant Garamond', serif; }
     h1 { color: #e0c185; text-align: center; margin: 28px 0 22px 0; }
-    .gm-wrapper { max-width: 900px; margin: 22px auto; padding: 16px 18px; background: #2b2323; border-radius: 14px; box-shadow: 0 2px 14px #0005;}
+    .gm-wrapper { max-width: 1100px; margin: 22px auto; padding: 16px 18px; background: #2b2323; border-radius: 14px; box-shadow: 0 2px 14px #0005;}
     .gm-metrics { display: flex; gap: 40px; justify-content: center; margin-bottom: 30px;}
     .gm-metric { font-size: 1.18em; background: #191313; border-radius: 10px; padding: 14px 26px; color: #e0c185;}
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
     th, td { padding: 9px 10px; text-align: center; border-bottom: 1px solid #3a2c1d;}
     th { color: #ffeecb; background: #231916; }
     td { color: #e0c185;}
-    .files-list { display: flex; flex-direction: column; gap: 7px; }
-    .download-link { color: #e0c185; text-decoration: underline; cursor: pointer;}
-    .download-link:hover { color: #ffeecb;}
+    .files-list { display: flex; flex-direction: column; gap: 7px; align-items: center;}
+    .download-link, .download-btn { color: #e0c185; text-decoration: underline; cursor: pointer; background: none; border: none; font-size: 1em;}
+    .download-link:hover, .download-btn:hover { color: #ffeecb;}
+    .file-miniature { max-width: 75px; max-height: 55px; margin-right: 8px; vertical-align: middle; border-radius: 7px; border:1px solid #3a2c1d; background: #181212;}
+    .team-members { font-size:0.93em; color:#ffeecb; margin-bottom:3px;}
+    .video-thumb { max-width: 75px; max-height: 55px; border-radius: 7px; border:1px solid #3a2c1d; background: #181212; }
     @media (max-width: 700px) {
       .gm-wrapper { padding: 7px; }
       .gm-metrics { gap: 15px; flex-direction: column; }
       th, td { font-size: 0.96em; padding: 4px; }
+      .file-miniature, .video-thumb { max-width: 45px; max-height: 30px;}
     }
   </style>
 </head>
@@ -37,12 +41,13 @@
         <tr>
           <th>Équipe</th>
           <th>Nom</th>
+          <th>Membres</th>
           <th>Étape atteinte</th>
           <th>Photos/Vidéos</th>
         </tr>
       </thead>
       <tbody id="teams-table">
-        <tr><td colspan="4">Chargement…</td></tr>
+        <tr><td colspan="5">Chargement…</td></tr>
       </tbody>
     </table>
   </div>
@@ -68,7 +73,7 @@
     // Récupère le code du salon (adapte si plusieurs parties en parallèle)
     const salonCode = localStorage.getItem("salonCode") || prompt("Code salon à superviser ?");
 
-    // Récupère les équipes et leur progression
+    // Affichage des équipes et progression
     function chargerEquipes() {
       db.ref(`parties/${salonCode}/equipes`).on('value', snap => {
         const equipes = snap.val() || {};
@@ -82,18 +87,22 @@
             const nom = nomsEquipes[num] || `Équipe ${parseInt(num)+1}`;
             const currentStep = equipe.currentStep ?? 0;
             totalEtapes += currentStep;
+            // Affichage membres
+            let membres = '';
+            if(equipe.membres) {
+              membres = Object.values(equipe.membres).map(m=>m.pseudo).join(', ');
+            }
             html += `<tr>
               <td>${parseInt(num)+1}</td>
               <td>${nom}</td>
+              <td class="team-members">${membres || '—'}</td>
               <td>${currentStep}</td>
               <td><div class="files-list" id="files-list-${num}">Chargement…</div></td>
             </tr>`;
           });
-          table.innerHTML = html || '<tr><td colspan="4">Aucune équipe détectée</td></tr>';
+          table.innerHTML = html || '<tr><td colspan="5">Aucune équipe détectée</td></tr>';
           document.getElementById('nb-equipes').textContent = totalEquipe;
           document.getElementById('nb-total-progres').textContent = totalEtapes;
-
-          // Pour chaque équipe, charge les fichiers du storage associés
           Object.keys(equipes).forEach(num => {
             listerFichiersEquipe(num);
           });
@@ -101,21 +110,31 @@
       });
     }
 
-    // Lister les fichiers dans le storage pour chaque équipe
+    // Affiche les fichiers par équipe, avec miniatures et téléchargement
     function listerFichiersEquipe(num) {
-      // Par convention, suppose que les fichiers sont stockés sous: parties/<salonCode>/equipe<num>/
       const path = `parties/${salonCode}/equipe${num}/`;
       const filesDiv = document.getElementById('files-list-' + num);
       storage.ref(path).listAll().then(res => {
         if (res.items.length === 0) {
           filesDiv.textContent = "—";
         } else {
-          let filesHtml = '';
+          filesDiv.innerHTML = '';
           res.items.forEach(item => {
             item.getDownloadURL().then(url => {
               const fileName = item.name;
-              filesHtml += `<a class="download-link" href="${url}" download target="_blank">${fileName}</a><br>`;
-              filesDiv.innerHTML = filesHtml;
+              const ext = fileName.split('.').pop().toLowerCase();
+              let thumb = '';
+              // Miniature image
+              if(['jpg','jpeg','png','gif'].includes(ext)) {
+                thumb = `<img src="${url}" class="file-miniature" alt="Photo">`;
+              }
+              // Miniature vidéo (première frame, pas supportée partout mais <video> suffit pour un aperçu)
+              else if(['mp4','webm','ogg'].includes(ext)) {
+                thumb = `<video src="${url}" class="video-thumb" muted preload="metadata"></video>`;
+              }
+              // Bouton téléchargement 100% compatible
+              const btn = `<button class="download-btn" onclick="downloadFile('${url}','${fileName}')">Télécharger</button>`;
+              filesDiv.innerHTML += `<div>${thumb}<span>${fileName}</span> ${btn}</div>`;
             });
           });
         }
@@ -124,9 +143,25 @@
       });
     }
 
-    // Rafraîchissement auto
+    // Téléchargement forcé côté client via fetch + blob (pour tous types de fichiers)
+    window.downloadFile = function(url, fileName) {
+      fetch(url)
+        .then(resp => resp.blob())
+        .then(blob => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+          }, 100);
+        });
+    };
+
+    // Rafraîchissement auto (événement live déjà en place)
     chargerEquipes();
-    setInterval(chargerEquipes, 7000); // toutes les 7s
   </script>
 </body>
 </html>
