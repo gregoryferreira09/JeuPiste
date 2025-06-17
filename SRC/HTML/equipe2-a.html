@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
+    /* ... ton style inchangé ... */
     .actions-row-horizontal {
       display: flex;
       justify-content: space-between;
@@ -51,7 +52,6 @@
       margin-top: 2px;
       text-align: center;
     }
-    /* Pour masquer l'input file natif */
     .visually-hidden {
       position: absolute !important;
       height: 1px; width: 1px;
@@ -62,8 +62,6 @@
       padding: 0;
       margin: -1px;
     }
-
-     /* Bouton Quête suivante désactivé */
     #next-quest {
       background: #aaa;
       color: #fff;
@@ -82,7 +80,6 @@
       opacity: 1;
       cursor: pointer;
     }
-
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -145,7 +142,7 @@
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.473976,-0.576762" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3z"/>
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13[...]
               <circle cx="12" cy="11" r="2.5"/>
             </svg>
             <span>Boussole</span>
@@ -157,7 +154,7 @@
           <label id="label-video1" for="video-upload-1" aria-label="Télécharger la vidéo 1">
             <!-- SVG appareil photo ajouté -->
             <svg id="icon-video1" viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24[...]
             </svg>
             <span>Vidéo 1 à envoyer</span>
             <input id="video-upload-1" class="visually-hidden" type="file" accept="video/*">
@@ -173,7 +170,7 @@
           <label id="label-video2" for="video-upload-2" aria-label="Télécharger la vidéo 2">
             <!-- SVG appareil photo ajouté -->
             <svg id="icon-video2" viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24[...]
             </svg>
             <span>Vidéo 2 à envoyer</span>
             <input id="video-upload-2" class="visually-hidden" type="file" accept="video/*">
@@ -195,6 +192,23 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- Firebase scripts pour navigation dynamique -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    // Remplace par ta vraie config Firebase !
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  </script>
   <script>
     function handleVideoUpload(inputId, progressContainerId, progressId, percentId, labelId, iconId, state) {
       var input = document.getElementById(inputId);
@@ -246,6 +260,44 @@
       window.uploadState2 = { done: false };
       handleVideoUpload('video-upload-1', 'progress-container-1', 'progress-1', 'percent-1', 'label-video1', 'icon-video1', window.uploadState1);
       handleVideoUpload('video-upload-2', 'progress-container-2', 'progress-2', 'percent-2', 'label-video2', 'icon-video2', window.uploadState2);
+
+      // ----- AJOUT GAMEFLOW DYNAMIQUE -----
+      document.getElementById('next-quest').addEventListener('click', function() {
+        const salonCode = localStorage.getItem("salonCode");
+        const equipeNum = Number(localStorage.getItem("equipeNum"));
+        firebase.database().ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
+          const mapping = snap.val() || {};
+          const parcoursIdx = mapping[equipeNum];
+          const parcoursEquipes = [
+            [1, 2, 5, 3, 4],
+            [2, 4, 3, 5, 1],
+            [3, 1, 4, 2, 5],
+            [4, 5, 2, 1, 3],
+            [5, 3, 1, 4, 2]
+          ];
+          const parcours = parcoursEquipes[parcoursIdx];
+          // Trouver l'index de la page actuelle (ici 2)
+          const match = window.location.pathname.match(/equipe(\d+)-([a-z]).html$/);
+          if (!match) return alert("Erreur navigation !");
+          const currentNum = parseInt(match[1], 10);
+          // Cherche la position actuelle dans le parcours
+          let etapeIdx = -1;
+          for (let i = 0; i < parcours.length; i++) {
+            if (parcours[i] === currentNum) {
+              etapeIdx = i;
+              break;
+            }
+          }
+          if (etapeIdx < parcours.length - 1) {
+            const nextNum = parcours[etapeIdx + 1];
+            window.location.href = `equipe${nextNum}-a.html`;
+          } else {
+            alert("Bravo, vous avez terminé !");
+            // window.location.href = "fin.html";
+          }
+        });
+      });
+      // ----- FIN AJOUT -----
     });
   </script>
 </body>
