@@ -261,9 +261,8 @@
         }
         if (etapeIdx === -1) etapeIdx = currentSuffix.charCodeAt(0) - 97;
         if (etapeIdx < parcours.length - 1) {
-          const nextNum = parcours[etapeIdx + 1];
-          const nextSuffix = String.fromCharCode(97 + etapeIdx + 1); // "b", "c", ...
-          window.location.href = `equipe${nextNum}-${nextSuffix}.html`;
+        const nextNum = parcours[etapeIdx + 1];
+        window.location.href = `equipe${nextNum}-a.html`;
         } else {
           alert("Bravo, vous avez terminé !");
           // window.location.href = "fin.html";
