@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gamemaster - Suivi des équipes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../Public/styles/style.css">
+  <style>
+    body { background: #1a1414; color: #ffeecb; font-family: 'Cormorant Garamond', serif; }
+    h1 { color: #e0c185; text-align: center; margin: 28px 0 22px 0; }
+    .gm-wrapper { max-width: 900px; margin: 22px auto; padding: 16px 18px; background: #2b2323; border-radius: 14px; box-shadow: 0 2px 14px #0005;}
+    .gm-metrics { display: flex; gap: 40px; justify-content: center; margin-bottom: 30px;}
+    .gm-metric { font-size: 1.18em; background: #191313; border-radius: 10px; padding: 14px 26px; color: #e0c185;}
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 9px 10px; text-align: center; border-bottom: 1px solid #3a2c1d;}
+    th { color: #ffeecb; background: #231916; }
+    td { color: #e0c185;}
+    .files-list { display: flex; flex-direction: column; gap: 7px; }
+    .download-link { color: #e0c185; text-decoration: underline; cursor: pointer;}
+    .download-link:hover { color: #ffeecb;}
+    @media (max-width: 700px) {
+      .gm-wrapper { padding: 7px; }
+      .gm-metrics { gap: 15px; flex-direction: column; }
+      th, td { font-size: 0.96em; padding: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Gamemaster — Suivi des équipes</h1>
+  <div class="gm-wrapper">
+    <div class="gm-metrics">
+      <div class="gm-metric"><span id="nb-equipes">0</span> équipes en jeu</div>
+      <div class="gm-metric"><span id="nb-total-progres">0</span> étapes franchies</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Équipe</th>
+          <th>Nom</th>
+          <th>Étape atteinte</th>
+          <th>Photos/Vidéos</th>
+        </tr>
+      </thead>
+      <tbody id="teams-table">
+        <tr><td colspan="4">Chargement…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script>
+    // Initialisation Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const storage = firebase.storage();
+
+    // Récupère le code du salon (adapte si plusieurs parties en parallèle)
+    const salonCode = localStorage.getItem("salonCode") || prompt("Code salon à superviser ?");
+
+    // Récupère les équipes et leur progression
+    function chargerEquipes() {
+      db.ref(`parties/${salonCode}/equipes`).on('value', snap => {
+        const equipes = snap.val() || {};
+        db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
+          const nomsEquipes = snapNoms.val() || {};
+          const table = document.getElementById('teams-table');
+          let html = '';
+          let totalEquipe = 0, totalEtapes = 0;
+          Object.entries(equipes).forEach(([num, equipe]) => {
+            totalEquipe++;
+            const nom = nomsEquipes[num] || `Équipe ${parseInt(num)+1}`;
+            const currentStep = equipe.currentStep ?? 0;
+            totalEtapes += currentStep;
+            html += `<tr>
+              <td>${parseInt(num)+1}</td>
+              <td>${nom}</td>
+              <td>${currentStep}</td>
+              <td><div class="files-list" id="files-list-${num}">Chargement…</div></td>
+            </tr>`;
+          });
+          table.innerHTML = html || '<tr><td colspan="4">Aucune équipe détectée</td></tr>';
+          document.getElementById('nb-equipes').textContent = totalEquipe;
+          document.getElementById('nb-total-progres').textContent = totalEtapes;
+
+          // Pour chaque équipe, charge les fichiers du storage associés
+          Object.keys(equipes).forEach(num => {
+            listerFichiersEquipe(num);
+          });
+        });
+      });
+    }
+
+    // Lister les fichiers dans le storage pour chaque équipe
+    function listerFichiersEquipe(num) {
+      // Par convention, suppose que les fichiers sont stockés sous: parties/<salonCode>/equipe<num>/
+      const path = `parties/${salonCode}/equipe${num}/`;
+      const filesDiv = document.getElementById('files-list-' + num);
+      storage.ref(path).listAll().then(res => {
+        if (res.items.length === 0) {
+          filesDiv.textContent = "—";
+        } else {
+          let filesHtml = '';
+          res.items.forEach(item => {
+            item.getDownloadURL().then(url => {
+              const fileName = item.name;
+              filesHtml += `<a class="download-link" href="${url}" download target="_blank">${fileName}</a><br>`;
+              filesDiv.innerHTML = filesHtml;
+            });
+          });
+        }
+      }).catch(() => {
+        filesDiv.textContent = "Erreur ou aucun fichier";
+      });
+    }
+
+    // Rafraîchissement auto
+    chargerEquipes();
+    setInterval(chargerEquipes, 7000); // toutes les 7s
+  </script>
+</body>
+</html>
