@@ -231,7 +231,7 @@
         <div class="icon-action side-icon">
           <label id="label-photo1" for="photo-upload-1">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
             </svg>
             <span>Photo de tortue à envoyer</span>
             <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -240,7 +240,7 @@
         <div class="icon-action side-icon">
           <label id="label-photo2" for="photo-upload-2">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
             </svg>
             <span>Photo de chevreau à envoyer</span>
             <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -249,7 +249,7 @@
         <div class="icon-action side-icon">
           <label id="label-photo3" for="photo-upload-3">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.16 0 .3.08.39.21L15.95 7H20v13zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
             </svg>
             <span>Photo d'alpaga à envoyer</span>
             <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -306,6 +306,62 @@
     handlePhotoUpload('photo-upload-1','label-photo1');
     handlePhotoUpload('photo-upload-2','label-photo2');
     handlePhotoUpload('photo-upload-3','label-photo3');
+  </script>
+  <!-- === GAMEFLOW DYNAMIQUE : navigation par chemin équipe === -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('next-quest').addEventListener('click', function() {
+        const salonCode = localStorage.getItem("salonCode");
+        const equipeNum = Number(localStorage.getItem("equipeNum"));
+        firebase.database().ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
+          const mapping = snap.val() || {};
+          const parcoursIdx = mapping[equipeNum];
+          const parcoursEquipes = [
+            [1, 2, 5, 3, 4],
+            [2, 4, 3, 5, 1],
+            [3, 1, 4, 2, 5],
+            [4, 5, 2, 1, 3],
+            [5, 3, 1, 4, 2]
+          ];
+          const parcours = parcoursEquipes[parcoursIdx];
+          if (!parcours || !Array.isArray(parcours)) {
+            alert("Erreur de parcours : configuration absente ou corrompue. Contactez l'orga.");
+            return;
+          }
+          const match = window.location.pathname.match(/equipe(\d+)-([a-z]).html$/);
+          if (!match) return alert("Erreur navigation !");
+          const currentNum = parseInt(match[1], 10);
+          let etapeIdx = -1;
+          for (let i = 0; i < parcours.length; i++) {
+            if (parcours[i] === currentNum) {
+              etapeIdx = i;
+              break;
+            }
+          }
+          if (etapeIdx < parcours.length - 1) {
+            const nextNum = parcours[etapeIdx + 1];
+            window.location.href = `equipe${nextNum}-a.html`;
+          } else {
+            alert("Bravo, vous avez terminé !");
+            // window.location.href = "fin.html";
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>
