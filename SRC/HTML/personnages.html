@@ -367,12 +367,8 @@
       conteneur.textContent = 'La partie commence dans 5…';
       document.querySelector('.main-accueil').appendChild(conteneur);
 
-      // --- Appel la génération du mapping UNE SEULE FOIS (côté "maître") ---
-      // Ici, on ne peut pas garantir qui est "maître", mais ce n'est pas grave si la génération est appelée plusieurs fois
-      // car le tirage sera le même pour tous si fait à ce moment précis.
       const nombreEquipes = calculerNombreEquipes();
       initialiserMappingParcours(salonCode, nombreEquipes);
-      // ---------------------------------------------------------
 
       let count = 5;
       function tick() {
@@ -383,7 +379,15 @@
         } else {
           conteneur.textContent = "C'est parti !";
           decompteTimeoutID = setTimeout(() => {
-            window.location.href = "gameplay.html";
+            // REDIRECTION VERS LA 1ère ÉNIGME DU BON PARCOURS
+            const equipeNum = localStorage.getItem("equipeNum");
+            db.ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
+              const mapping = snap.val() || {};
+              const parcoursIdx = mapping[equipeNum];
+              const parcours = window.parcoursEquipes[parcoursIdx];
+              const premiereEpreuve = parcours[0];
+              window.location.href = `equipe${premiereEpreuve}-a.html`;
+            });
           }, 600);
         }
       }
