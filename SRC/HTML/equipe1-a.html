@@ -161,12 +161,16 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="../JS/gameflow.js"></script>
   <script>
-    // Affichage du nom de la photo + activation du bouton
     document.addEventListener('DOMContentLoaded', function() {
       var input = document.getElementById('photo-upload');
       var out = document.getElementById('photo-filename');
       var btn = document.getElementById('next-quest');
+
+      // Affichage du nom de la photo + activation du bouton
       if(input) {
         input.addEventListener('change', function() {
           if(this.files && this.files[0]) {
@@ -180,62 +184,30 @@
           }
         });
       }
-      // === GAMEFLOW DYNAMIQUE ===
+
+      // === NAVIGATION GAMEFLOW COMME EQUIPE 5 ===
       btn.addEventListener('click', function() {
-        // Navigation dynamique par équipe
-        // (Reprend la logique des autres pages, utilise gameflow.js ou inline)
-        const firebaseConfig = {
-          apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-          authDomain: "murder-party-ba8d1.firebaseapp.com",
-          databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-          projectId: "murder-party-ba8d1",
-          storageBucket: "murder-party-ba8d1.appspot.com",
-          messagingSenderId: "20295055805",
-          appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-          measurementId: "G-KSBMBB7KMJ"
-        };
-        if (!window.firebase?.apps?.length) {
-          firebase.initializeApp(firebaseConfig);
-        }
         const salonCode = localStorage.getItem("salonCode");
         const equipeNum = Number(localStorage.getItem("equipeNum"));
-        firebase.database().ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
-          const mapping = snap.val() || {};
-          const parcoursIdx = mapping[equipeNum];
-          const parcoursEquipes = [
-            [1, 2, 5, 3, 4],
-            [2, 4, 3, 5, 1],
-            [3, 1, 4, 2, 5],
-            [4, 5, 2, 1, 3],
-            [5, 3, 1, 4, 2]
-          ];
-          const parcours = parcoursEquipes[parcoursIdx];
-          if (!parcours || !Array.isArray(parcours)) {
-            alert("Erreur de parcours : configuration absente ou corrompue. Contactez l'orga.");
-            return;
-          }
-          const match = window.location.pathname.match(/equipe(\d+)-([a-z]).html$/);
-          if (!match) return alert("Erreur navigation !");
-          const currentNum = parseInt(match[1], 10);
-          let etapeIdx = -1;
-          for (let i = 0; i < parcours.length; i++) {
-            if (parcours[i] === currentNum) {
-              etapeIdx = i;
-              break;
+        const db = firebase.database();
+
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+            if (!error && committed) {
+              // Navigation dynamique comme equipe5
+              const parcours = window.parcoursEquipes[equipeNum];
+              const step = snapshot.val();
+              if (step < parcours.length) {
+                const epreuveNum = parcours[step];
+                window.location.href = `equipe${epreuveNum}-a.html`;
+              } else {
+                alert('Bravo, vous avez terminé !');
+                // window.location.href = "fin.html";
+              }
             }
-          }
-          if (etapeIdx < parcours.length - 1) {
-            const nextNum = parcours[etapeIdx + 1];
-            window.location.href = `equipe${nextNum}-a.html`;
-          } else {
-            alert("Bravo, vous avez terminé !");
-            // window.location.href = "fin.html";
-          }
-        });
+          });
       });
     });
   </script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </body>
 </html>
