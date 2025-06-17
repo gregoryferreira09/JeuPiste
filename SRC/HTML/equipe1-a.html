@@ -2,64 +2,83 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quête du coeur vaillant - Jeu de piste</title>
+  <title>Quête émotionnelle - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    .actions-row-horizontal {
+    .chrono-block {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-top: 38px;
-      margin-bottom: 10px;
-      gap: 24px;
+      justify-content: center;
+      gap: 22px;
+      background: #231d1d;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px #0005;
+      padding: 18px 22px;
+      margin: 24px auto 22px auto;
+      max-width: 850px;
     }
-    .icon-action {
+    .chrono-timer {
+      font-size: 1.38em;
+      font-weight: bold;
+      color: #e0c185;
+      background: #181212;
+      border-radius: 9px;
+      padding: 10px 26px;
+      letter-spacing: 2px;
+      min-width: 110px;
+      text-align: center;
+      margin-right: 6px;
+      box-shadow: 0 1px 4px #0002;
+      transition: color .25s;
+    }
+    .chrono-timer.overtime {
+      color: #ff2f2f;
+      background: #2b1313;
+      animation: blink 1s steps(2, start) infinite;
+    }
+    @keyframes blink { to { color: #fff; } }
+    .chrono-message {
+      color: #e0c185;
+      font-size: 1.08em;
+      line-height: 1.6;
+      transition: color .25s;
+      max-width: 600px;
+    }
+    .chrono-message.overtime {
+      color: #ff2f2f;
+      font-weight: bold;
+    }
+    .input-answer-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 90px;
+      margin: 32px 0 10px 0;
     }
-    .icon-action a, .icon-action label {
-      cursor: pointer;
+    .input-answer-label {
       color: #e0c185;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .icon-action a:hover, .icon-action label:hover {
-      color: #ffeecb;
-    }
-    .icon-action svg {
-      width: 38px;
-      height: 38px;
-      margin-bottom: 6px;
-      fill: #e0c185;
-      transition: fill 0.2s;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .icon-action a:hover svg,
-    .icon-action label:hover svg {
-      fill: #ffeecb;
-    }
-    .icon-action span {
-      font-size: 0.98em;
-      color: #e0c185;
-      margin-top: 2px;
+      font-size: 1.06em;
+      margin-bottom: 8px;
       text-align: center;
     }
-    .visually-hidden {
-      position: absolute !important;
-      height: 1px; width: 1px;
-      overflow: hidden;
-      clip: rect(1px, 1px, 1px, 1px);
-      white-space: nowrap;
-      border: 0;
-      padding: 0;
-      margin: -1px;
+    .input-answer-field {
+      padding: 10px 16px;
+      font-size: 1.11em;
+      border-radius: 7px;
+      border: 1px solid #e0c185;
+      outline: none;
+      background: #2b2323;
+      color: #ffeecb;
+      width: 320px;
+      max-width: 90vw;
+      text-align: center;
+      box-sizing: border-box;
+      transition: border 0.2s;
+      margin-bottom: 0;
+    }
+    .input-answer-field:focus {
+      border: 1.5px solid #ffeecb;
     }
     #next-quest {
       background: #aaa;
@@ -79,12 +98,61 @@
       opacity: 1;
       cursor: pointer;
     }
-    #photo-preview,
-    #video-preview {
-      display: none;
-      max-width: 200px;
-      margin: 10px auto;
-      background: #222;
+    #next-quest:disabled {
+      background: #aaa;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .actions-row-horizontal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 38px;
+      margin-bottom: 10px;
+      gap: 24px;
+    }
+    .icon-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90px;
+    }
+    .icon-action a {
+      cursor: pointer;
+      color: #e0c185;
+      text-decoration: none;
+      transition: color 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .icon-action a:hover {
+      color: #ffeecb;
+    }
+    .icon-action svg {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 6px;
+      fill: #e0c185;
+      transition: fill 0.2s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .icon-action a:hover svg {
+      fill: #ffeecb;
+    }
+    .icon-action span {
+      font-size: 0.98em;
+      color: #e0c185;
+      margin-top: 2px;
+      text-align: center;
+    }
+    @media (max-width: 700px) {
+      .chrono-block { flex-direction: column; padding: 12px 6vw; gap: 8px; max-width: 99vw; }
+      .chrono-timer { margin: 0 0 8px 0; font-size: 1.1em; padding: 8px 15px; min-width: 80px; }
+      .chrono-message { font-size: 1em; text-align: center; max-width: 95vw; }
+      #blocker-inner { padding: 22px 4vw 16px 4vw; }
     }
     @media (max-width: 650px) {
       .actions-row-horizontal {
@@ -102,9 +170,6 @@
       .icon-action span {
         text-align: left;
       }
-      .image-fondue {
-        max-width: 98vw;
-      }
     }
   </style>
 </head>
@@ -113,55 +178,64 @@
     <h1 class="site-title">Jeu de piste</h1>
   </header>
 
+  <!-- Fenêtre flottante harmonisée, cachée par défaut -->
+  <div id="blocker">
+    <div id="blocker-inner">
+      <div id="blocker-msg">
+        Votre lutte acharnée durant ces longues minutes vous auront sûrement permis de découvrir une qualité certaine :<br><br>
+        <strong>la détermination.</strong>
+      </div>
+      <button id="blocker-btn" type="button">Continuer</button>
+    </div>
+  </div>
+
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête du coeur vaillant</h2>
+      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête émotionnelle</h2>
+      <!-- Chrono et message harmonisés -->
+      <div class="chrono-block">
+        <span class="chrono-timer" id="timer">07:00</span>
+        <span class="chrono-message" id="chrono-message">
+          Chevaliers, en selle sans tarder ! Vous n'avez que sept minutes pour atteindre ce lieu mystérieux et découvrir ce qui s'y cache, avant que le temps ne vous soit impitoyablement retiré. Hâtez-vous !
+        </span>
+      </div>
       <div class="presentation-jeu" style="margin-top: 24px;">
         <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 14px;">
           <em>
-            Vilain petit moucheron pourquoi est-tu grognon ?<br>
-            Dans la toile emprisonnée bientôt tu seras… mangé.
+            La quête du Saint-Graal ne s’accomplit pas sans peine ni patience.<br>
+            Sous le voile des feuillages, là où l’ombre danse avec la lumière, creusez, fouillez et scrutez le sol sacré.<br>
+            <br>
+            À vingt pas de ce lieu, l’indice vous attend, tapi dans le silence des racines et des feuilles.<br>
           </em>
         </div>
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
-          <div class="objectif-text" style="margin-top: 18px;">
-            Pour espérer atteindre le Graal, il vous faudra d’abord affronter la grande Toile du Destin.<br><br>
-            <strong><br>
-            Cette structure suspendue entre ciel et terre mettra à l’épreuve votre bravoure et votre agilité.<br>
-            Grimpez ensemble jusqu’à son sommet, là où le monde vacille sous vos pieds.<br><br>
-            <em><br>
-            Capturez cet instant de courage en duo, sur une photo prise tout en haut, auréolés de peur… et de fierté.<br><br>
+          <div class="objectif-text" style="margin-top:18px;">
+            Rendez-vous sur le lieu, cherchez l’indice, et inscrivez ci-dessous ce que vous avez trouvé pour poursuivre la quête.
           </div>
         </div>
       </div>
 
+      <!-- Bloc boussole harmonisé -->
       <div class="actions-row-horizontal">
-        <!-- GPS à gauche -->
         <div class="icon-action side-icon">
-          <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+          <a href="https://maps.google.com/?q=47.477556,-0.578583" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
               <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM12 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
             </svg>
             <span>Boussole</span>
           </a>
         </div>
-        <!-- Appareil photo/vidéo à droite -->
-        <div class="icon-action side-icon">
-          <label for="photo-upload" aria-label="Télécharger une photo ou vidéo">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.42-.21h2.83c.17 0 .33.08.42.21L15.95 7H20v13zM12 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
-            </svg>
-            <span>Photo ou vidéo à envoyer</span>
-            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*,video/*" capture="environment">
-          </label>
-        </div>
       </div>
-      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-      <!-- Aperçu photo -->
-      <img id="photo-preview" style="display:none;max-width:200px;margin:10px auto;display:block;">
-      <!-- Aperçu vidéo -->
-      <video id="video-preview" style="display:none;max-width:200px;margin:10px auto;display:block;" controls></video>
+      <!-- Fin bloc boussole -->
+
+      <!-- Saisie de la réponse -->
+      <div class="input-answer-wrapper">
+        <label for="answer-field" class="input-answer-label">
+          Inscrivez ici ce que vous avez trouvé :
+        </label>
+        <input type="text" id="answer-field" class="input-answer-field" autocomplete="off" placeholder="Tapez votre réponse…">
+      </div>
 
       <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
@@ -172,152 +246,69 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-
-<!-- ⚠️ REMPLACE la config ci-dessous par celle de TON projet Firebase ! -->
-<script>
-  const firebaseConfig = {
-  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-  authDomain: "murder-party-ba8d1.firebaseapp.com",
-  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.appspot.com",
-  messagingSenderId: "20295055805",
-  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-  measurementId: "G-KSBMBB7KMJ"
-};
-  firebase.initializeApp(firebaseConfig);
-</script>
-
-<!-- JS parcours équipe (doit définir window.parcoursEquipes) -->
-<script src="../JS/gameflow.js"></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = Number(localStorage.getItem("equipeNum"));
-  const db = firebase.database();
-  const storage = firebase.storage();
-
-  if (salonCode === null || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
-    window.location.href = "accueil.html";
-    return;
-  }
-
-  // Navigation synchronisée avec sécurisation
-  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
-    const step = snap.val() || 0;
-    const parcoursEquipes = window.parcoursEquipes;
-    if (!parcoursEquipes || !Array.isArray(parcoursEquipes) || !parcoursEquipes[equipeNum]) {
-      console.warn('Parcours équipe introuvable', equipeNum, parcoursEquipes);
-      return;
+  <script>
+    // Chrono 7min
+    let total = 1 * 60;
+    let chrono = total;
+    let timer = document.getElementById('timer');
+    let chronoMsg = document.getElementById('chrono-message');
+    let answerField = document.getElementById('answer-field');
+    let nextBtn = document.getElementById('next-quest');
+    let blocker = document.getElementById('blocker');
+    let blockerBtn = document.getElementById('blocker-btn');
+    
+    function showBlockerPage() {
+      blocker.style.display = "flex";
+      answerField.value = "détermination";
+      answerField.disabled = true;
+      nextBtn.disabled = false;
+      nextBtn.classList.add('enabled');
+      window.name = "blocker-determination";
     }
-    const parcours = parcoursEquipes[equipeNum];
-    if (!Array.isArray(parcours) || step < 0 || step >= parcours.length) {
-      console.warn('Step hors limites', step, parcours);
-      return;
-    }
-    const epreuveNum = parcours[step];
-    const expectedPage = `equipe${epreuveNum}-a.html`;
-    if (!window.location.pathname.endsWith(expectedPage)) {
-      window.location.href = expectedPage;
-    }
-  });
 
-  // Upload photo ou vidéo + synchro binôme
-  var input = document.getElementById('photo-upload');
-  var out = document.getElementById('photo-filename');
-  var btn = document.getElementById('next-quest');
-  var preview = document.getElementById('photo-preview');
-  var videoPreview = document.getElementById('video-preview');
-
-  if(input && btn && out && preview && videoPreview) {
-    input.addEventListener('change', function() {
-      if(this.files && this.files[0]) {
-        var file = this.files[0];
-        var ext = file.type.startsWith("video/") ? ".mp4" : ".jpg";
-        var fileName = 'equipe' + equipeNum + '-' + Date.now() + ext;
-        var storageRef = storage.ref('media/' + salonCode + '/' + fileName);
-        out.textContent = "Téléchargement...";
-
-        // Prévisualisation rapide
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          if(file.type.startsWith("video/")) {
-            preview.style.display = "none";
-            videoPreview.src = e.target.result;
-            videoPreview.style.display = "block";
-          } else {
-            videoPreview.style.display = "none";
-            preview.src = e.target.result;
-            preview.style.display = "block";
-          }
-        };
-        reader.readAsDataURL(file);
-
-        var uploadTask = storageRef.put(file);
-
-        uploadTask.on('state_changed',
-          function(snapshot) {
-            var percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-            out.textContent = "Téléchargement " + percent + "%";
-          },
-          function(error) {
-            out.textContent = "Erreur upload";
-            preview.style.display = "none";
-            videoPreview.style.display = "none";
-          },
-          function() {
-            uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-              db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').set(downloadURL);
-              out.textContent = "Fichier envoyé !";
-              input.disabled = true;
-              btn.disabled = false;
-              btn.classList.add('enabled');
-            });
-          }
-        );
+    let interval = setInterval(function() {
+      let min = Math.floor(chrono / 60);
+      let sec = chrono % 60;
+      timer.textContent = (min < 10 ? "0" : "") + min + ":" + (sec < 10 ? "0" : "") + sec;
+      if (chrono <= 0) {
+        clearInterval(interval);
+        timer.classList.add('overtime');
+        chronoMsg.classList.add('overtime');
+        showBlockerPage();
       }
-    });
+      chrono--;
+    }, 1000);
 
-    // Synchro sur les deux téléphones : désactive l'input et active le bouton si fichier présent
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').on('value', snap => {
-      var val = snap.val();
-      if (val && typeof val === 'string' && val.startsWith('http')) {
-        input.disabled = true;
-        btn.disabled = false;
-        btn.classList.add('enabled');
-        out.textContent = "Fichier envoyé !";
-        if (val.endsWith('.mp4')) {
-          preview.style.display = "none";
-          videoPreview.src = val;
-          videoPreview.style.display = "block";
-        } else {
-          videoPreview.style.display = "none";
-          preview.src = val;
-          preview.style.display = "block";
-        }
+    // Vérification réponse
+    answerField.addEventListener('input', function() {
+      let value = this.value.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
+      if ((value === "rien" || value === "détermination") && !this.disabled) {
+        nextBtn.disabled = false;
+        nextBtn.classList.add('enabled');
       } else {
-        input.disabled = false;
-        btn.disabled = true;
-        btn.classList.remove('enabled');
-        out.textContent = "";
-        preview.style.display = "none";
-        videoPreview.style.display = "none";
+        nextBtn.disabled = true;
+        nextBtn.classList.remove('enabled');
       }
     });
-  }
 
-  // Passage à la quête suivante (synchro binôme)
-  if (btn) {
-    btn.addEventListener('click', function() {
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1);
+    // Navigation vers la page suivante (à adapter si besoin)
+    nextBtn.addEventListener('click', function() {
+      if(!this.disabled) {
+        window.name = ""; // reset
+        window.location.href = "equipe5-b.html";
+      }
     });
-  }
-});
-</script>
+
+    // Gestion fermeture/réouverture après blocage
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.name === "blocker-determination") {
+        showBlockerPage();
+      }
+    });
+
+    blockerBtn.addEventListener('click', function() {
+      blocker.style.display = "none";
+    });
+  </script>
 </body>
 </html>
