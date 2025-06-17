@@ -368,17 +368,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // On incrémente le currentStep du binôme
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
       if (!error && committed) {
-        // Redirection dynamique vers la prochaine épreuve du parcours de l'équipe
         const parcours = window.parcoursEquipes[equipeNum];
-        const step = snapshot.val();
-        if (step < parcours.length) {
-          const epreuveNum = parcours[step];
-          window.location.href = `equipe${epreuveNum}-a.html`;
-        } else {
-          // Dernière étape, fin de parcours
-          alert('Bravo, vous avez terminé !');
-          // window.location.href = "fin.html";
-        }
+const step = snapshot.val();
+if (step < parcours.length) {
+  const epreuveNum = parcours[step];
+  if (epreuveNum === 6) {
+    window.location.href = "epreuve6.html";
+  } else if (epreuveNum === 7) {
+    window.location.href = "révélation.html";
+  } else {
+    window.location.href = `equipe${epreuveNum}-a.html`;
+  }
+} else {
+  alert('Bravo, vous avez terminé !');
+}
       }
     });
     window.name = ""; // reset pour ne pas réouvrir la fenêtre à la prochaine page
