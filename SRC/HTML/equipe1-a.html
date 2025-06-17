@@ -84,7 +84,6 @@
       display: none;
       max-width: 200px;
       margin: 10px auto;
-      display: block;
       background: #222;
     }
     @media (max-width: 650px) {
@@ -175,10 +174,30 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
+<!-- Librairies Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+<!-- Configuration Firebase : À REMPLACER PAR TES PROPRES INFOS ! -->
+<script>
+  // Récupère ta config sur https://console.firebase.google.com > Projet > Paramètres > Vos applications
+  const firebaseConfig = {
+  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+  authDomain: "murder-party-ba8d1.firebaseapp.com",
+  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "murder-party-ba8d1",
+  storageBucket: "murder-party-ba8d1.firebasestorage.app",
+  messagingSenderId: "20295055805",
+  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+  measurementId: "G-KSBMBB7KMJ"
+};
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<!-- JS parcours équipe (doit contenir window.parcoursEquipes) -->
 <script src="../JS/gameflow.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const salonCode = localStorage.getItem("salonCode");
@@ -235,16 +254,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var uploadTask = storageRef.put(file);
 
-        uploadTask.on('state_changed', 
+        uploadTask.on('state_changed',
           function(snapshot) {
             var percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
             out.textContent = "Téléchargement " + percent + "%";
-          }, 
+          },
           function(error) {
             out.textContent = "Erreur upload";
             preview.style.display = "none";
             videoPreview.style.display = "none";
-          }, 
+          },
           function() {
             uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
               db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').set(downloadURL);
@@ -252,7 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
               input.disabled = true;
               btn.disabled = false;
               btn.classList.add('enabled');
-              // Affichage de l'aperçu cloud (optionnel, ici on garde le local)
             });
           }
         );
