@@ -51,7 +51,6 @@
       margin-top: 2px;
       text-align: center;
     }
-    /* Pour masquer l'input file natif */
     .visually-hidden {
       position: absolute !important;
       height: 1px; width: 1px;
@@ -79,6 +78,14 @@
       background: #e0c185;
       opacity: 1;
       cursor: pointer;
+    }
+    #photo-preview,
+    #video-preview {
+      display: none;
+      max-width: 200px;
+      margin: 10px auto;
+      display: block;
+      background: #222;
     }
     @media (max-width: 650px) {
       .actions-row-horizontal {
@@ -141,20 +148,22 @@
             <span>Boussole</span>
           </a>
         </div>
-        <!-- Appareil photo à droite -->
+        <!-- Appareil photo/vidéo à droite -->
         <div class="icon-action side-icon">
-          <label for="photo-upload" aria-label="Télécharger une photo">
+          <label for="photo-upload" aria-label="Télécharger une photo ou vidéo">
             <svg viewBox="0 0 24 24">
               <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.42-.21h2.83c.17 0 .33.08.42.21L15.95 7H20v13zM12 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
             </svg>
-            <span>Photo à envoyer</span>
-            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            <span>Photo ou vidéo à envoyer</span>
+            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*,video/*" capture="environment">
           </label>
         </div>
       </div>
       <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
       <!-- Aperçu de la photo prise -->
       <img id="photo-preview" style="display:none;max-width:200px;margin:10px auto;display:block;">
+      <!-- Aperçu de la vidéo prise -->
+      <video id="video-preview" style="display:none;max-width:200px;margin:10px auto;display:block;" controls></video>
 
       <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
@@ -193,59 +202,87 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Upload photo + synchro binôme
+  // Upload photo ou vidéo + synchro binôme
   var input = document.getElementById('photo-upload');
   var out = document.getElementById('photo-filename');
   var btn = document.getElementById('next-quest');
   var preview = document.getElementById('photo-preview');
+  var videoPreview = document.getElementById('video-preview');
 
-  if(input && btn && out && preview) {
+  if(input && btn && out && preview && videoPreview) {
     input.addEventListener('change', function() {
       if(this.files && this.files[0]) {
         var file = this.files[0];
-        var fileName = 'equipe' + equipeNum + '-' + Date.now() + '.jpg';
-        var storageRef = storage.ref('photos/' + salonCode + '/' + fileName);
+        var ext = file.type.startsWith("video/") ? ".mp4" : ".jpg";
+        var fileName = 'equipe' + equipeNum + '-' + Date.now() + ext;
+        var storageRef = storage.ref('media/' + salonCode + '/' + fileName);
         out.textContent = "Téléchargement...";
+
+        // Prévisualisation rapide
         var reader = new FileReader();
         reader.onload = function(e) {
-          preview.src = e.target.result;
-          preview.style.display = "block";
+          if(file.type.startsWith("video/")) {
+            preview.style.display = "none";
+            videoPreview.src = e.target.result;
+            videoPreview.style.display = "block";
+          } else {
+            videoPreview.style.display = "none";
+            preview.src = e.target.result;
+            preview.style.display = "block";
+          }
         };
         reader.readAsDataURL(file);
 
         var uploadTask = storageRef.put(file);
 
         uploadTask.on('state_changed', 
-          function(snapshot) {}, 
+          function(snapshot) {
+            var percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            out.textContent = "Téléchargement " + percent + "%";
+          }, 
           function(error) {
             out.textContent = "Erreur upload";
+            preview.style.display = "none";
+            videoPreview.style.display = "none";
           }, 
           function() {
             uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
               db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').set(downloadURL);
-              out.textContent = "Photo envoyée !";
+              out.textContent = "Fichier envoyé !";
               input.disabled = true;
               btn.disabled = false;
               btn.classList.add('enabled');
+              // Affichage de l'aperçu cloud (optionnel, ici on garde le local)
             });
           }
         );
       }
     });
 
-    // Synchro sur les deux téléphones : désactive l'input et active le bouton si photo présente
+    // Synchro sur les deux téléphones : désactive l'input et active le bouton si fichier présent
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/actions/photo1').on('value', snap => {
-      if (snap.val()) {
+      var val = snap.val();
+      if (val && typeof val === 'string' && val.startsWith('http')) {
         input.disabled = true;
         btn.disabled = false;
         btn.classList.add('enabled');
-        out.textContent = "Photo envoyée !";
+        out.textContent = "Fichier envoyé !";
+        if (val.endsWith('.mp4')) {
+          preview.style.display = "none";
+          videoPreview.src = val;
+          videoPreview.style.display = "block";
+        } else {
+          videoPreview.style.display = "none";
+          preview.src = val;
+          preview.style.display = "block";
+        }
       } else {
         input.disabled = false;
         btn.disabled = true;
         btn.classList.remove('enabled');
         out.textContent = "";
         preview.style.display = "none";
+        videoPreview.style.display = "none";
       }
     });
   }
