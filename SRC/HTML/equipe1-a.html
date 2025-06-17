@@ -136,7 +136,6 @@
         </div>
       </div>
 
-      <!-- Actions et image entre les deux boutons -->
       <div class="actions-row-horizontal">
         <!-- GPS à gauche -->
         <div class="icon-action side-icon">
@@ -159,9 +158,9 @@
         </div>
       </div>
       <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-      <!-- Aperçu de la photo prise -->
+      <!-- Aperçu photo -->
       <img id="photo-preview" style="display:none;max-width:200px;margin:10px auto;display:block;">
-      <!-- Aperçu de la vidéo prise -->
+      <!-- Aperçu vidéo -->
       <video id="video-preview" style="display:none;max-width:200px;margin:10px auto;display:block;" controls></video>
 
       <!-- Bouton Quête suivante désactivé par défaut -->
@@ -174,28 +173,25 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
-<!-- Librairies Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
-<!-- Configuration Firebase : À REMPLACER PAR TES PROPRES INFOS ! -->
+<!-- ⚠️ REMPLACE la config ci-dessous par celle de TON projet Firebase ! -->
 <script>
-  // Récupère ta config sur https://console.firebase.google.com > Projet > Paramètres > Vos applications
   const firebaseConfig = {
-  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-  authDomain: "murder-party-ba8d1.firebaseapp.com",
-  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.firebasestorage.app",
-  messagingSenderId: "20295055805",
-  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-  measurementId: "G-KSBMBB7KMJ"
-};
+    apiKey: "XXX",
+    authDomain: "XXX.firebaseapp.com",
+    databaseURL: "https://XXX.firebaseio.com",
+    projectId: "XXX",
+    storageBucket: "XXX.appspot.com",
+    messagingSenderId: "XXX",
+    appId: "XXX"
+  };
   firebase.initializeApp(firebaseConfig);
 </script>
 
-<!-- JS parcours équipe (doit contenir window.parcoursEquipes) -->
+<!-- JS parcours équipe (doit définir window.parcoursEquipes) -->
 <script src="../JS/gameflow.js"></script>
 
 <script>
@@ -210,10 +206,19 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
 
-  // Navigation synchronisée
+  // Navigation synchronisée avec sécurisation
   db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', snap => {
     const step = snap.val() || 0;
-    const parcours = window.parcoursEquipes[equipeNum];
+    const parcoursEquipes = window.parcoursEquipes;
+    if (!parcoursEquipes || !Array.isArray(parcoursEquipes) || !parcoursEquipes[equipeNum]) {
+      console.warn('Parcours équipe introuvable', equipeNum, parcoursEquipes);
+      return;
+    }
+    const parcours = parcoursEquipes[equipeNum];
+    if (!Array.isArray(parcours) || step < 0 || step >= parcours.length) {
+      console.warn('Step hors limites', step, parcours);
+      return;
+    }
     const epreuveNum = parcours[step];
     const expectedPage = `equipe${epreuveNum}-a.html`;
     if (!window.location.pathname.endsWith(expectedPage)) {
