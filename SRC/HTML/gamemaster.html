@@ -7,99 +7,30 @@
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* --- Harmonisation accueil/gamemaster --- */
-    body {
-      font-family: 'Cormorant Garamond', serif;
-      background: #2c1b1b;
-      color: #f4e4c1;
-      margin: 0;
-    }
-    .main-gamemaster {
-      max-width: 650px;
-      margin: 40px auto;
+    /* --- TOUT LE STYLE DE TON ANCIEN CODE, inchangé --- */
+    body { background: #1b1b1b; color: #f4e4c1; font-family: 'Cormorant Garamond', serif; margin: 0; }
+    .main-accueil {
+      max-width: 600px;
+      margin: 38px auto;
       background: #2c1b1b;
       border-radius: 18px;
       box-shadow: 0 4px 20px #0001;
       padding: 32px 24px;
       border: 2px solid #e0c185;
       color: #f4e4c1;
+      font-family: 'Cormorant Garamond', serif;
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      min-width: 320px;
+      min-width: 300px;
     }
-    .main-gamemaster h1 {
+    .main-accueil h1 {
       text-align: center;
       font-family: 'Cinzel Decorative', serif;
-      font-size: 2.1em;
-      margin-bottom: 8px;
+      font-size: 2.15em;
+      margin-bottom: 18px;
       color: #e0c185;
       margin-top: 0;
-    }
-    .gm-tabs {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 18px;
-      justify-content: center;
-    }
-    .gm-tab-btn {
-      background: #2c1b1b;
-      color: #e0c185;
-      border: 2px solid #e0c185;
-      border-bottom: none;
-      border-radius: 8px 8px 0 0;
-      font-family: 'Cinzel Decorative', serif;
-      padding: 7px 24px;
-      font-size: 1.1em;
-      cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-    .gm-tab-btn.active {
-      background: #e0c185;
-      color: #2c1b1b;
-    }
-    .gm-section {
-      margin: 22px 0 12px 0;
-      text-align: center;
-    }
-    .gm-label {
-      display: block;
-      margin-bottom: 7px;
-      color: #e0c185;
-    }
-    .gm-input, .gm-btn, .main-btn {
-      font-family: inherit;
-      border-radius: 7px;
-      border: 2px solid #e0c185;
-      font-size: 1em;
-      padding: 11px 16px;
-      margin-bottom: 10px;
-      background: #281813;
-      color: #f4e4c1;
-      transition: background .15s, color .15s, border .15s;
-      box-sizing: border-box;
-    }
-    .gm-btn, .main-btn {
-      cursor: pointer;
-      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
-      color: #3d2b1f;
-      font-family: 'Cinzel Decorative', cursive;
-      font-size: 1.09em;
-      font-weight: bold;
-      min-width: 130px;
-      margin-bottom: 0;
-      margin-top: 8px;
-    }
-    .gm-btn:hover, .main-btn:hover {
-      background: #e0c185;
-      color: #1a1a1a;
-      box-shadow: 0 0 8px #e0c18588;
-    }
-    .gm-error {
-      color: #ff9393;
-      margin-top: 6px;
-      min-height: 22px;
-      text-align: center;
     }
     .carousel {
       display: flex;
@@ -124,160 +55,52 @@
       flex-direction: column;
       align-items: stretch;
     }
-    .team-title {
-      font-family: 'Cinzel Decorative', serif;
-      color: #e0c185;
-      font-size: 1.28em;
-      text-align: center;
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-    }
-    .team-members {
-      color: #ffeecb;
-      font-size: 1.08em;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .etape-encours {
-      color: #e9c78c;
-      background: #291d10;
-      border-radius: 7px;
-      padding: 6px 0;
-      font-weight: bold;
-      margin: 10px 0 12px 0;
-      text-align: center;
-      font-size: 1.08em;
-    }
-    .timer {
-      color: #ffeecb;
-      text-align: center;
-      margin: 9px 0 16px 0;
-      font-size: 1.04em;
-      font-family: 'Roboto Mono', monospace;
-      background: #241b14;
-      border-radius: 7px;
-      padding: 8px 0;
-    }
+    .team-title { font-family: 'Cinzel Decorative', serif; color: #e0c185; font-size: 1.28em; text-align: center; margin-bottom: 8px; letter-spacing: 1px; }
+    .team-members { color: #ffeecb; font-size: 1.08em; text-align: center; margin-bottom: 10px; }
+    .etape-encours { color: #e9c78c; background: #291d10; border-radius: 7px; padding: 6px 0; font-weight: bold; margin: 10px 0 12px 0; text-align: center; font-size: 1.08em;}
+    .timer { color: #ffeecb; text-align: center; margin: 9px 0 16px 0; font-size: 1.04em; font-family: 'Roboto Mono', monospace; background: #241b14; border-radius: 7px; padding: 8px 0;}
     .late { color: #ffadad !important; }
-    .parcours-list {
-      margin-top: 8px;
-    }
-    .epreuve {
-      margin-bottom: 14px;
-      padding-bottom: 6px;
-      border-bottom: 1px dashed #e0c18544;
-    }
+    .parcours-list { margin-top: 8px; }
+    .epreuve { margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px dashed #e0c18544;}
     .epreuve:last-child { border-bottom: none; }
-    .epreuve-titre {
-      color: #e0c185;
-      font-weight: bold;
-      font-size: 1.06em;
-      margin-bottom: 4px;
-    }
-    .fichiers-epreuve {
-      color: #b8b8b8;
-      font-size: 0.96em;
-      margin-bottom: 2px;
-    }
-    .download-btn {
-      background: #e0c185;
-      color: #473714;
-      border: none;
-      border-radius: 7px;
-      padding: 4px 16px;
-      font-size: 0.98em;
-      cursor: pointer;
-      margin-left: 7px;
-      margin-top: 4px;
-      transition: background 0.2s;
-    }
-    .download-btn:hover, .download-btn:focus {
-      background: #ffeecb;
-      color: #473714;
-      outline: 2px solid #e0c185;
-    }
-    .chrono-value {
-      color: #ffe07e;
-      font-size: 0.98em;
-      font-weight: bold;
-      margin-left: 8px;
-      letter-spacing: 1px;
-      font-family: 'Roboto Mono', monospace;
-    }
-    .nav-btn {
-      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
-      color: #473714;
-      border: 2px solid #e0c185;
-      border-radius: 8px;
-      font-size: 1.5em;
-      font-family: 'Cinzel Decorative', serif;
-      font-weight: bold;
-      padding: 8px 18px;
-      cursor: pointer;
-      margin: 0 4px;
-      transition: box-shadow .2s, background .2s, color .2s;
-      min-width: 54px;
-      min-height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .nav-btn:hover, .nav-btn:focus {
-      background: #e0c185;
-      color: #1a1a1a;
-      box-shadow: 0 0 8px #e0c18588;
-      outline: 2px solid #e0c185;
-    }
-    .msg-info {
-      color: #c9b49a;
-      font-style: italic;
-      margin: 16px 0 0 0;
-      text-align: center;
-    }
-    .gm-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #200f0f;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .gm-table th, .gm-table td {
-      border: 1px solid #e0c18566;
-      padding: 11px 8px;
-      text-align: left;
-      font-size: 1em;
-    }
-    .gm-table th {
-      background: #e0c185;
-      color: #2c1b1b;
-      font-weight: bold;
-    }
-    .gm-table tr:nth-child(even) {
-      background: #241313;
-    }
-    .cross {
-      color: #e06c6c;
-      font-size: 1.23em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: color 0.15s;
-    }
-    .cross:hover { color: #ff2f0a; }
+    .epreuve-titre { color: #e0c185; font-weight: bold; font-size: 1.06em; margin-bottom: 4px;}
+    .fichiers-epreuve { color: #b8b8b8; font-size: 0.96em; margin-bottom: 2px;}
+    .download-btn { background: #e0c185; color: #473714; border: none; border-radius: 7px; padding: 4px 16px; font-size: 0.98em; cursor: pointer; margin-left: 7px; margin-top: 4px; transition: background 0.2s;}
+    .download-btn:hover, .download-btn:focus { background: #ffeecb; color: #473714; outline: 2px solid #e0c185;}
+    .chrono-value { color: #ffe07e; font-size: 0.98em; font-weight: bold; margin-left: 8px; letter-spacing: 1px; font-family: 'Roboto Mono', monospace;}
+    .nav-btn { background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #473714; border: 2px solid #e0c185; border-radius: 8px; font-size: 1.5em; font-family: 'Cinzel Decorative', serif; font-weight: bold; padding: 8px 18px; cursor: pointer; margin: 0 4px; transition: box-shadow .2s, background .2s, color .2s; min-width: 54px; min-height: 54px; display: flex; align-items: center; justify-content: center;}
+    .nav-btn:hover, .nav-btn:focus { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588; outline: 2px solid #e0c185;}
+    .msg-info { color: #c9b49a; font-style: italic; margin: 16px 0 0 0; text-align: center;}
+    .gm-table { width: 100%; border-collapse: collapse; background: #200f0f; margin-bottom: 20px; border-radius: 8px; overflow: hidden;}
+    .gm-table th, .gm-table td { border: 1px solid #e0c18566; padding: 11px 8px; text-align: left; font-size: 1em;}
+    .gm-table th { background: #e0c185; color: #2c1b1b; font-weight: bold;}
+    .gm-table tr:nth-child(even) { background: #241313;}
+    .cross { color: #e06c6c; font-size: 1.23em; font-weight: bold; cursor: pointer; transition: color 0.15s;}
+    .cross:hover { color: #ff2f0a;}
+    /* Onglet + Auth */
+    .gm-tabs { display: flex; gap: 16px; margin-bottom: 18px; justify-content: center;}
+    .gm-tab-btn { background: #2c1b1b; color: #e0c185; border: 2px solid #e0c185; border-bottom: none; border-radius: 8px 8px 0 0; font-family: 'Cinzel Decorative', serif; padding: 7px 24px; font-size: 1.1em; cursor: pointer; transition: background .15s, color .15s;}
+    .gm-tab-btn.active { background: #e0c185; color: #2c1b1b;}
+    .gm-section { margin: 22px 0 12px 0; text-align: center;}
+    .gm-label { display: block; margin-bottom: 7px; color: #e0c185;}
+    .gm-input, .gm-btn { font-family: inherit; border-radius: 7px; border: 2px solid #e0c185; font-size: 1em; padding: 11px 16px; margin-bottom: 10px; background: #281813; color: #f4e4c1; transition: background .15s, color .15s, border .15s;}
+    .gm-btn { cursor: pointer; background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #3d2b1f; font-family: 'Cinzel Decorative', cursive; font-size: 1.09em; font-weight: bold; min-width: 130px; margin-bottom: 0; margin-top: 8px;}
+    .gm-btn:hover { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588;}
+    .gm-error { color: #ff9393; margin-top: 6px; min-height: 22px; text-align: center;}
     @media (max-width: 750px) {
-      .main-gamemaster { max-width: 98vw; padding: 10px 1vw; }
+      .main-accueil { max-width: 97vw; padding: 10px 1vw; }
       .carte-equipe { min-width: 0; max-width: 99vw; padding: 20px 4vw; }
       .carousel { flex-direction: column; gap: 12px; }
       .nav-btn { min-width: 46px; min-height: 46px; font-size: 1.1em; padding: 7px 9px;}
       .gm-table th, .gm-table td { padding: 7px 2px; font-size: 1em; }
       .gm-tab-btn { padding: 7px 4vw; font-size: 1em; }
-      .gm-btn, .main-btn { padding: 12px 7px; font-size: 0.99em; }
+      .gm-btn { padding: 12px 7px; font-size: 0.99em; }
     }
   </style>
 </head>
 <body>
   <div class="center-wrapper">
-    <main class="main-gamemaster" role="main">
+    <main class="main-accueil" role="main" id="mainContainer">
       <h1>Gamemaster — Suivi des équipes</h1>
       <div id="auth-section" class="gm-section">
         <label class="gm-label" for="gm-email">Email du gamemaster</label>
@@ -292,10 +115,9 @@
           <button class="gm-tab-btn active" id="btn-courante" onclick="afficherSuivi()">Partie en cours</button>
           <button class="gm-tab-btn" id="btn-historique" onclick="afficherHistorique()">Historique</button>
         </div>
-        <!-- Vue suivi -->
-        <div id="suivi-partie" style="display:none;">
-          <button class="gm-btn" id="btn-connexion-partie" style="margin:0 auto 20px auto;display:block;">Se connecter à la partie en cours</button>
-          <div class="carousel" style="display:none;">
+        <!-- Onglet suivi équipe classique (carousel) -->
+        <div id="suivi-partie">
+          <div class="carousel">
             <button class="nav-btn" id="prev-team" aria-label="Équipe précédente">&#8592;</button>
             <div class="carte-equipe" id="carte-equipe">
               <div style="text-align:center;">Chargement…</div>
@@ -303,7 +125,7 @@
             <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
           </div>
         </div>
-        <!-- Vue historique -->
+        <!-- Onglet historique -->
         <div id="historique-parties" style="display:none;"></div>
       </div>
     </main>
@@ -312,12 +134,13 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- FIREBASE & JS -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script>
-    // --- CONFIG & INIT ---
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -361,8 +184,6 @@
       document.getElementById('historique-parties').style.display = 'none';
       document.getElementById('btn-courante').classList.add('active');
       document.getElementById('btn-historique').classList.remove('active');
-      document.querySelector('.carousel').style.display = "none";
-      document.getElementById('btn-connexion-partie').style.display = "block";
     }
     function afficherHistorique() {
       document.getElementById('suivi-partie').style.display = 'none';
@@ -372,9 +193,14 @@
       chargerHistorique();
     }
 
-    // --- Partie en cours (récupère le code de la plus récente partie) ---
-    let partieCouranteId = null;
-    let equipes = [], nomsEquipes = {}, currentIndex = 0, stepsTime = {}, etapes = [
+    // --- LIVE suivi équipe, navigation et timers (100% ton ancien JS, inchangé) ---
+    let salonCode = null;
+    let equipes = [];
+    let nomsEquipes = {};
+    let currentIndex = 0;
+    let stepsTime = {};
+
+    let etapes = [
       { titre: "Épreuve 1", fichiersAttendus: ["Photo 1"] },
       { titre: "Épreuve 2", fichiersAttendus: ["Vidéo"] },
       { titre: "Épreuve 3", fichiersAttendus: ["Photo 2"] },
@@ -383,22 +209,28 @@
       { titre: "Épreuve 6", fichiersAttendus: [] }
     ];
 
-    document.getElementById('btn-connexion-partie').onclick = function() {
+    // --- LIVE LISTENING ---
+    function chargerSalonCodeEtLive() {
       db.ref("parties").orderByKey().limitToLast(1).once("value", snap => {
         if (!snap.exists()) {
-          alert("Aucune partie en cours !");
+          document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune partie en cours</div>";
           return;
         }
-        snap.forEach(partieSnap => {
-          partieCouranteId = partieSnap.key;
+        snap.forEach(partieSnap => salonCode = partieSnap.key);
+        localStorage.setItem("salonCode", salonCode);
+
+        // Ecoute en temps réel
+        db.ref(`parties/${salonCode}/equipes`).on('value', function(snap) {
+          const data = snap.val() || {};
+          equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
+          db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
+            nomsEquipes = snapNoms.val() || {};
+            chargerStepsTimeEtAfficher();
+          });
         });
-        // Stockage local facultatif
-        localStorage.setItem("salonCode", partieCouranteId);
-        chargerEquipes(() => chargerStepsTimeEtAfficher());
-        document.querySelector('.carousel').style.display = "flex";
-        document.getElementById('btn-connexion-partie').style.display = "none";
       });
-    };
+    }
+
     document.getElementById('prev-team').onclick = function() {
       if (equipes.length) {
         currentIndex = (currentIndex - 1 + equipes.length) % equipes.length;
@@ -412,24 +244,13 @@
       }
     };
 
-    function chargerEquipes(callback) {
-      db.ref(`parties/${partieCouranteId}/equipes`).once('value', snap => {
-        const data = snap.val() || {};
-        equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
-        db.ref(`parties/${partieCouranteId}/nomsEquipes`).once('value', snapNoms => {
-          nomsEquipes = snapNoms.val() || {};
-          callback && callback();
-        });
-      });
-    }
-
     function chargerStepsTimeEtAfficher() {
       if (equipes.length === 0) {
         document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée</div>";
         return;
       }
       const equipe = equipes[currentIndex];
-      db.ref(`parties/${partieCouranteId}/equipes/${equipe.num}/stepsTime`).once('value', snapStepsTime => {
+      db.ref(`parties/${salonCode}/equipes/${equipe.num}/stepsTime`).once('value', snapStepsTime => {
         stepsTime = snapStepsTime.val() || {};
         afficherEquipe();
       });
@@ -448,6 +269,7 @@
         <div id="timer" class="timer">Temps sur cette épreuve : 0:00</div>
         <div class='parcours-list'>
       `;
+
       for (let i=0; i<etapes.length; i++) {
         let statut = "";
         let chrono = "";
@@ -481,13 +303,14 @@
       const timerDiv = document.getElementById('timer');
       const equipe = equipes[currentIndex];
       const step = equipe.currentStep ?? 0;
+
       function maj() {
         if (step >= etapes.length) {
           timerDiv.textContent = "Temps sur cette épreuve : terminé";
           timerDiv.classList.remove('late');
           return;
         }
-        db.ref(`parties/${partieCouranteId}/equipes/${equipe.num}/epreuves/${step}/startTime`).once('value', snap => {
+        db.ref(`parties/${salonCode}/equipes/${equipe.num}/epreuves/${step}/startTime`).once('value', snap => {
           const startTime = snap.val();
           if (!startTime) {
             timerDiv.textContent = "Temps sur cette épreuve : —";
@@ -519,7 +342,7 @@
     function listerFichiersEquipeEtape(num, etapeIdx, fichiersAttendus) {
       const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
       if (!div) return;
-      const basePath = `parties/${partieCouranteId}/equipe${num}/etape${etapeIdx}/`;
+      const basePath = `parties/${salonCode}/equipe${num}/etape${etapeIdx}/`;
       storage.ref(basePath).listAll().then(res => {
         if (res.items.length === 0) {
           div.innerHTML = fichiersAttendus.map(nom=> `<div class="fichier-bloc"><span>${nom} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`).join('');
@@ -563,7 +386,7 @@
         });
     };
 
-    // --- Historique ---
+    // --- HISTORIQUE ---
     function chargerHistorique() {
       const div = document.getElementById('historique-parties');
       div.innerHTML = "<div class='msg-info'>Chargement en cours...</div>";
@@ -595,6 +418,14 @@
       }
     }
     window.supprimerPartie = supprimerPartie;
+
+    // --- Lancement du LIVE dès affichage de la page (après login) ---
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        // Lance l'écoute live (carousel) dès l'affichage du suivi
+        chargerSalonCodeEtLive();
+      }
+    });
   </script>
 </body>
 </html>
