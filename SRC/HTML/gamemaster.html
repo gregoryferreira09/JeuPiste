@@ -307,6 +307,7 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
+    // --- DONNÉES ---
     const salonCode = localStorage.getItem("salonCode") || prompt("Code salon à superviser ?");
     let equipes = [];
     let nomsEquipes = {};
@@ -315,6 +316,7 @@
       { titre: "Épreuve 1", fichiersAttendus: ["Photo 1"] },
       { titre: "Épreuve 2", fichiersAttendus: ["Vidéo"] },
       { titre: "Épreuve 3", fichiersAttendus: ["Photo 2"] },
+      // Ajoute ici la suite des épreuves et fichiers attendus…
     ];
 
     document.getElementById('prev-team').onclick = function() {
@@ -346,71 +348,53 @@
       });
     }
 
-    function formatDuree(sec) {
-      let min = Math.floor(sec / 60);
-      let s = sec % 60;
-      return `${min}:${s.toString().padStart(2, '0')}`;
-    }
-
-    let timerLiveInterval = null;
-
     function afficherEquipe() {
-      if (timerLiveInterval) clearInterval(timerLiveInterval);
-
       const carte = document.getElementById('carte-equipe');
       const equipe = equipes[currentIndex];
       const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
       const membres = equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—';
       const step = equipe.currentStep ?? 0;
-      const etapesEquipe = equipe.etapes || [];
-
       let html = `
         <div class='team-title'>${nom}</div>
         <div class='team-members'>${membres}</div>
         <div class='etape-encours'>Étape actuelle : <span>${etapes[step]?.titre || 'Terminé'}</span></div>
-        <div id="timer" class="timer">Temps sur cette épreuve : <span id="timer-live">—</span></div>
+        <div id="timer" class="timer">Temps sur cette épreuve : 0:00</div>
         <div class='parcours-list'>
       `;
-
-      let timersLive = [];
       for (let i=0; i<etapes.length; i++) {
-        let tempsEpreuve = '';
-        if (etapesEquipe[i] && etapesEquipe[i].debut) {
-          if (etapesEquipe[i].fin) {
-            let elapsed = Math.floor((etapesEquipe[i].fin - etapesEquipe[i].debut) / 1000);
-            tempsEpreuve = ` <span style='color:#a8ffb9;'>(réalisée - ${formatDuree(elapsed)})</span>`;
-          } else if (i === step) {
-            tempsEpreuve = ` <span style='color:#ffe07e;'>(en cours - <span id="timer-epreuve${i}">—</span>)</span>`;
-            timersLive.push({i, debut: etapesEquipe[i].debut});
-          }
-        }
         html += `<div class='epreuve'>
-          <div class='epreuve-titre'>${etapes[i].titre}${tempsEpreuve}</div>
-          <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
-        </div>`;
+            <div class='epreuve-titre'>${etapes[i].titre}${i==step ? " <span style='color:#ffe07e;'>(en cours)</span>": (i<step ? " <span style='color:#a8ffb9;'>(réalisée)</span>":"")}</div>
+            <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
+          </div>`;
       }
       html += '</div>';
       carte.innerHTML = html;
-
-      // Chrono principal sur étape courante et chrono à côté de l'étape en cours
-      if (timersLive.length > 0 && timersLive[0].debut) {
-        function maj() {
-          let elapsed = Math.floor((Date.now() - timersLive[0].debut) / 1000);
-          let timerLive = document.getElementById('timer-live');
-          if (timerLive) timerLive.textContent = formatDuree(elapsed);
-          let timerStep = document.getElementById('timer-epreuve'+timersLive[0].i);
-          if (timerStep) timerStep.textContent = formatDuree(elapsed);
-        }
-        maj();
-        timerLiveInterval = setInterval(maj, 1000);
-      } else {
-        let timerLive = document.getElementById('timer-live');
-        if (timerLive) timerLive.textContent = '—';
-      }
-
+      afficherTimer(); // Chrono local à chaque affichage d'équipe
       for (let i=0; i<etapes.length; i++) {
         listerFichiersEquipeEtape(equipe.num, i, etapes[i].fichiersAttendus);
       }
+    }
+
+    // --- TIMER : Chrono de présence sur la page équipe ---
+    let timerInterval = null;
+    let chronoStart = null;
+    function afficherTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      chronoStart = Date.now();
+      const timerDiv = document.getElementById('timer');
+      function maj() {
+        const elapsed = Math.floor((Date.now() - chronoStart) / 1000);
+        const min = Math.floor(elapsed/60), sec = elapsed%60;
+        timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
+        if (elapsed >= 600) {
+          timerDiv.classList.add('late');
+          timerDiv.textContent += " ⏰";
+        } else {
+          timerDiv.classList.remove('late');
+        }
+      }
+      maj();
+      timerInterval = setInterval(maj, 1000);
     }
 
     function listerFichiersEquipeEtape(num, etapeIdx, fichiersAttendus) {
