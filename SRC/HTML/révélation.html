@@ -102,8 +102,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Bandeau avec uniquement la boussole -->
       <div class="actions-row-horizontal">
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.469417,-0.574556" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
@@ -114,7 +112,7 @@
           </a>
         </div>
       </div>
-      <!-- PAS DE BOUTON ICI -->
+      <!-- PAS DE BOUTON -->
     </main>
   </div>
 
@@ -122,12 +120,11 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <!-- Firebase + Gameflow navigation -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
-    // Initialisation Firebase (AVANT tout usage)
+    // Initialisation Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -140,13 +137,15 @@
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
-    // NAVIGATION GAMEFLOW SYNCHRO (si jamais on revient en arrière)
+    // Synchronisation navigation, arrêt total si la partie est finie
+    let listenerRef = null;
     function goToStep(stepIndex) {
       const salonCode = localStorage.getItem("salonCode");
       const equipeNum = Number(localStorage.getItem("equipeNum"));
       getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
         if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-          // FIN DE PARCOURS : ne rien faire du tout
+          // FIN DE PARCOURS : détacher l'écouteur et ne plus rien faire
+          if (listenerRef) listenerRef.off();
           return;
         }
         const epreuveNum = parcours[stepIndex];
@@ -163,18 +162,17 @@
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
     const db = firebase.database();
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-      .on('value', function(snapshot) {
-        const step = snapshot.val() || 0;
-        goToStep(step);
-      });
+    listenerRef = db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep');
+    listenerRef.on('value', function(snapshot) {
+      const step = snapshot.val() || 0;
+      goToStep(step);
+    });
     window.addEventListener("pageshow", function(evt) {
       if (evt.persisted) {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .once('value', function(snapshot) {
-            const step = snapshot.val() || 0;
-            goToStep(step);
-          });
+        listenerRef.once('value', function(snapshot) {
+          const step = snapshot.val() || 0;
+          goToStep(step);
+        });
       }
     });
   </script>
