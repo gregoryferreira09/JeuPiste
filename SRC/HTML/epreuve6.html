@@ -126,6 +126,27 @@
       display: block;
       animation: fadein 0.3s;
     }
+    #gps-block {
+      text-align: center;
+      margin: 32px 0;
+      padding: 16px 0 28px 0;
+    }
+    #gps-feedback {
+      color: #ffeecb;
+      margin-top: 18px;
+      font-size: 1.05em;
+      min-height: 1.4em;
+    }
+    #check-gps {
+      padding: 12px 26px;
+      border-radius: 8px;
+      background: #e0c185;
+      color: #473714;
+      font-size: 1.08em;
+      border: none;
+      cursor: pointer;
+      margin-top: 12px;
+    }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
     @media (max-width: 900px) {
       .actions-row-horizontal, .photo-actions {
@@ -154,7 +175,20 @@
     <h1 class="site-title">Jeu de piste</h1>
   </header>
 
-  <div class="center-wrapper">
+  <div id="gps-block">
+    <h3 style="color:#e0c185;">Étape de localisation</h3>
+    <p>
+      Pour poursuivre la quête, rends-toi à cet endroit précis :<br>
+      <strong>47.469222, -0.577722</strong>
+    </p>
+    <div style="margin:16px 0;">
+      <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" style="color:#e0c185;">Ouvrir dans Google Maps</a>
+    </div>
+    <button id="check-gps">Je suis arrivé !</button>
+    <div id="gps-feedback"></div>
+  </div>
+
+  <div class="center-wrapper" id="main-content" style="display:none;">
     <main class="main-accueil" role="main">
       <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">La quête du bout du monde</h2>
       <div class="presentation-jeu" style="margin-top: 24px;">
@@ -172,12 +206,11 @@
         </div>
       </div>
 
-      <!-- Actions: Boussole + 4 photos dans le bandeau -->
       <div class="actions-row-horizontal">
         <div class="icon-action boussole-action">
           <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13[...]
             </svg>
             <span>Boussole</span>
           </a>
@@ -186,7 +219,7 @@
           <div class="icon-action side-icon">
             <label id="label-photo1" for="photo-upload-1">
               <svg viewBox="0 0 24 24">
-                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4-.21h2.44c.16 0 .31.08.4.21L15.95 7H20v13z"></path>
+                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
                 <circle cx="12" cy="14" r="3"></circle>
               </svg>
               <span>Photo avec un paysan</span>
@@ -196,7 +229,7 @@
           <div class="icon-action side-icon">
             <label id="label-photo2" for="photo-upload-2">
               <svg viewBox="0 0 24 24">
-                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4-.21h2.44c.16 0 .31.08.4.21L15.95 7H20v13z"></path>
+                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
                 <circle cx="12" cy="14" r="3"></circle>
               </svg>
               <span>Photo avec un gueux</span>
@@ -206,7 +239,7 @@
           <div class="icon-action side-icon">
             <label id="label-photo3" for="photo-upload-3">
               <svg viewBox="0 0 24 24">
-                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4-.21h2.44c.16 0 .31.08.4.21L15.95 7H20v13z"></path>
+                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
                 <circle cx="12" cy="14" r="3"></circle>
               </svg>
               <span>Photo avec un troubadour</span>
@@ -216,7 +249,7 @@
           <div class="icon-action side-icon">
             <label id="label-photo4" for="photo-upload-4">
               <svg viewBox="0 0 24 24">
-                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.4-.21h2.44c.16 0 .31.08.4.21L15.95 7H20v13z"></path>
+                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
                 <circle cx="12" cy="14" r="3"></circle>
               </svg>
               <span>Photo avec un fils d'unijambiste</span>
@@ -226,8 +259,6 @@
         </div>
       </div>
       <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-
-      <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -241,6 +272,47 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
+    // --- Bloc GPS obligatoire ---
+    const DEST_LAT = 47.469222;
+    const DEST_LON = -0.577722;
+    const TOLERANCE_METERS = 40;
+
+    function getDistanceMeters(lat1, lon1, lat2, lon2) {
+      const R = 6378137;
+      const dLat = (lat2-lat1)*Math.PI/180;
+      const dLon = (lon2-lon1)*Math.PI/180;
+      const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+                Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) *
+                Math.sin(dLon/2)*Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    document.getElementById("check-gps").addEventListener("click", function() {
+      const feedback = document.getElementById("gps-feedback");
+      feedback.textContent = "Recherche de votre position...";
+      if (!navigator.geolocation) {
+        feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const dist = getDistanceMeters(lat, lon, DEST_LAT, DEST_LON);
+        if (dist < TOLERANCE_METERS) {
+          document.getElementById("gps-block").style.display = "none";
+          document.getElementById("main-content").style.display = "";
+        } else {
+          feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
+        }
+      }, function(err) {
+        feedback.textContent = "Position non trouvée (" + err.message + ")";
+      });
+    });
+
+    // --- FIN BLOC GPS ---
+
+    // Le reste de ton JS (Firebase, photos, navigation, etc.) est inchangé :
     // Sécurité session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
@@ -261,7 +333,6 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Toast feedback harmonisé
     function showToast(msg) {
       const toast = document.getElementById('toast-message');
       if (toast) {
@@ -271,7 +342,6 @@
       }
     }
 
-    // Gestion multi-photo synchronisée
     const nbPhotos = 4;
     let uploadedPhotos = [null, null, null, null];
 
@@ -322,7 +392,6 @@
         });
     }
 
-    // Navigation gameflow harmonisée
     document.getElementById('next-quest').addEventListener('click', function() {
       if (this.disabled) return;
       this.disabled = true;
@@ -341,7 +410,6 @@
         });
     });
 
-    // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
     function goToStep(stepIndex) {
       getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
         if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
