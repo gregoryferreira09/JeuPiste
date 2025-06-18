@@ -2,88 +2,39 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Gamemaster – Jeu de Piste</title>
+  <title>Gamemaster – Suivi des équipes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../Public/styles/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    /* --- Harmonisation accueil/gamemaster --- */
     body {
       font-family: 'Cormorant Garamond', serif;
       background: #2c1b1b;
-      margin: 0;
       color: #f4e4c1;
+      margin: 0;
     }
     .main-gamemaster {
-      max-width: 560px;
+      max-width: 650px;
       margin: 40px auto;
       background: #2c1b1b;
       border-radius: 18px;
       box-shadow: 0 4px 20px #0001;
-      padding: 32px 28px;
+      padding: 32px 24px;
       border: 2px solid #e0c185;
       color: #f4e4c1;
-      font-family: 'Cormorant Garamond', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      min-width: 320px;
     }
     .main-gamemaster h1 {
       text-align: center;
       font-family: 'Cinzel Decorative', serif;
       font-size: 2.1em;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       color: #e0c185;
-    }
-    .main-gamemaster h2 {
-      text-align: center;
-      font-size: 1.18em;
-      font-weight: 400;
-      color: #f4e4c1;
       margin-top: 0;
-      margin-bottom: 16px;
-    }
-    .gm-section {
-      margin: 22px 0;
-    }
-    .gm-label {
-      display: block;
-      margin-bottom: 7px;
-      color: #e0c185;
-    }
-    .gm-input, .gm-btn, .main-btn {
-      font-family: inherit;
-      border-radius: 7px;
-      border: 2px solid #e0c185;
-      font-size: 1em;
-      padding: 11px 16px;
-      margin-bottom: 10px;
-      background: #281813;
-      color: #f4e4c1;
-      transition: background .15s, color .15s, border .15s;
-      box-sizing: border-box;
-    }
-    .gm-input:focus, .gm-btn:focus, .main-btn:focus {
-      outline: 2px solid #e0c185;
-    }
-    .gm-btn, .main-btn {
-      cursor: pointer;
-      margin-top: 10px;
-      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
-      color: #3d2b1f;
-      border: 2px solid #e0c185;
-      font-family: 'Cinzel Decorative', cursive;
-      font-size: 1.07em;
-      font-weight: bold;
-      min-width: 130px;
-      margin-bottom: 0;
-    }
-    .gm-btn:hover, .main-btn:hover {
-      background: #e0c185;
-      color: #1a1a1a;
-      box-shadow: 0 0 8px #e0c18588;
-    }
-    .gm-error {
-      color: #ff9393;
-      margin-top: 6px;
-      min-height: 22px;
-      text-align: center;
     }
     .gm-tabs {
       display: flex;
@@ -106,6 +57,182 @@
     .gm-tab-btn.active {
       background: #e0c185;
       color: #2c1b1b;
+    }
+    .gm-section {
+      margin: 22px 0 12px 0;
+      text-align: center;
+    }
+    .gm-label {
+      display: block;
+      margin-bottom: 7px;
+      color: #e0c185;
+    }
+    .gm-input, .gm-btn, .main-btn {
+      font-family: inherit;
+      border-radius: 7px;
+      border: 2px solid #e0c185;
+      font-size: 1em;
+      padding: 11px 16px;
+      margin-bottom: 10px;
+      background: #281813;
+      color: #f4e4c1;
+      transition: background .15s, color .15s, border .15s;
+      box-sizing: border-box;
+    }
+    .gm-btn, .main-btn {
+      cursor: pointer;
+      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
+      color: #3d2b1f;
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.09em;
+      font-weight: bold;
+      min-width: 130px;
+      margin-bottom: 0;
+      margin-top: 8px;
+    }
+    .gm-btn:hover, .main-btn:hover {
+      background: #e0c185;
+      color: #1a1a1a;
+      box-shadow: 0 0 8px #e0c18588;
+    }
+    .gm-error {
+      color: #ff9393;
+      margin-top: 6px;
+      min-height: 22px;
+      text-align: center;
+    }
+    .carousel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin: 0 auto;
+    }
+    .carte-equipe {
+      background: #231d1d;
+      border: 2px solid #e0c185;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px #0002;
+      padding: 30px 18px 24px 18px;
+      min-width: 260px;
+      max-width: 410px;
+      flex: 1 1 0;
+      margin: 0 8px;
+      color: #ffeecb;
+      font-size: 1.05em;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .team-title {
+      font-family: 'Cinzel Decorative', serif;
+      color: #e0c185;
+      font-size: 1.28em;
+      text-align: center;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .team-members {
+      color: #ffeecb;
+      font-size: 1.08em;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .etape-encours {
+      color: #e9c78c;
+      background: #291d10;
+      border-radius: 7px;
+      padding: 6px 0;
+      font-weight: bold;
+      margin: 10px 0 12px 0;
+      text-align: center;
+      font-size: 1.08em;
+    }
+    .timer {
+      color: #ffeecb;
+      text-align: center;
+      margin: 9px 0 16px 0;
+      font-size: 1.04em;
+      font-family: 'Roboto Mono', monospace;
+      background: #241b14;
+      border-radius: 7px;
+      padding: 8px 0;
+    }
+    .late { color: #ffadad !important; }
+    .parcours-list {
+      margin-top: 8px;
+    }
+    .epreuve {
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #e0c18544;
+    }
+    .epreuve:last-child { border-bottom: none; }
+    .epreuve-titre {
+      color: #e0c185;
+      font-weight: bold;
+      font-size: 1.06em;
+      margin-bottom: 4px;
+    }
+    .fichiers-epreuve {
+      color: #b8b8b8;
+      font-size: 0.96em;
+      margin-bottom: 2px;
+    }
+    .download-btn {
+      background: #e0c185;
+      color: #473714;
+      border: none;
+      border-radius: 7px;
+      padding: 4px 16px;
+      font-size: 0.98em;
+      cursor: pointer;
+      margin-left: 7px;
+      margin-top: 4px;
+      transition: background 0.2s;
+    }
+    .download-btn:hover, .download-btn:focus {
+      background: #ffeecb;
+      color: #473714;
+      outline: 2px solid #e0c185;
+    }
+    .chrono-value {
+      color: #ffe07e;
+      font-size: 0.98em;
+      font-weight: bold;
+      margin-left: 8px;
+      letter-spacing: 1px;
+      font-family: 'Roboto Mono', monospace;
+    }
+    .nav-btn {
+      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
+      color: #473714;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      font-size: 1.5em;
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: bold;
+      padding: 8px 18px;
+      cursor: pointer;
+      margin: 0 4px;
+      transition: box-shadow .2s, background .2s, color .2s;
+      min-width: 54px;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-btn:hover, .nav-btn:focus {
+      background: #e0c185;
+      color: #1a1a1a;
+      box-shadow: 0 0 8px #e0c18588;
+      outline: 2px solid #e0c185;
+    }
+    .msg-info {
+      color: #c9b49a;
+      font-style: italic;
+      margin: 16px 0 0 0;
+      text-align: center;
     }
     .gm-table {
       width: 100%;
@@ -137,19 +264,11 @@
       transition: color 0.15s;
     }
     .cross:hover { color: #ff2f0a; }
-    .msg-info {
-      color: #c9b49a;
-      font-style: italic;
-      margin: 16px 0 0 0;
-      text-align: center;
-    }
-    @media (max-width: 650px) {
-      .main-gamemaster {
-        max-width: 98vw;
-        margin: 10px auto;
-        padding: 12px 2vw;
-        border-radius: 12px;
-      }
+    @media (max-width: 750px) {
+      .main-gamemaster { max-width: 98vw; padding: 10px 1vw; }
+      .carte-equipe { min-width: 0; max-width: 99vw; padding: 20px 4vw; }
+      .carousel { flex-direction: column; gap: 12px; }
+      .nav-btn { min-width: 46px; min-height: 46px; font-size: 1.1em; padding: 7px 9px;}
       .gm-table th, .gm-table td { padding: 7px 2px; font-size: 1em; }
       .gm-tab-btn { padding: 7px 4vw; font-size: 1em; }
       .gm-btn, .main-btn { padding: 12px 7px; font-size: 0.99em; }
@@ -159,10 +278,7 @@
 <body>
   <div class="center-wrapper">
     <main class="main-gamemaster" role="main">
-      <h1>Gamemaster</h1>
-      <h2>Suivi et gestion en temps réel</h2>
-
-      <!-- Section Connexion -->
+      <h1>Gamemaster — Suivi des équipes</h1>
       <div id="auth-section" class="gm-section">
         <label class="gm-label" for="gm-email">Email du gamemaster</label>
         <input type="email" id="gm-email" class="gm-input" autocomplete="username" required>
@@ -171,15 +287,24 @@
         <button id="gm-login" class="gm-btn">Connexion Gamemaster</button>
         <div id="gm-auth-error" class="gm-error"></div>
       </div>
-
-      <!-- Section Gestion Gamemaster -->
       <div id="gm-content" style="display:none;">
         <div class="gm-tabs">
           <button class="gm-tab-btn active" id="btn-courante" onclick="afficherSuivi()">Partie en cours</button>
           <button class="gm-tab-btn" id="btn-historique" onclick="afficherHistorique()">Historique</button>
         </div>
-        <div id="suivi-partie"></div>
-        <div id="historique-parties" style="display:none"></div>
+        <!-- Vue suivi -->
+        <div id="suivi-partie" style="display:none;">
+          <button class="gm-btn" id="btn-connexion-partie" style="margin:0 auto 20px auto;display:block;">Se connecter à la partie en cours</button>
+          <div class="carousel" style="display:none;">
+            <button class="nav-btn" id="prev-team" aria-label="Équipe précédente">&#8592;</button>
+            <div class="carte-equipe" id="carte-equipe">
+              <div style="text-align:center;">Chargement…</div>
+            </div>
+            <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
+          </div>
+        </div>
+        <!-- Vue historique -->
+        <div id="historique-parties" style="display:none;"></div>
       </div>
     </main>
   </div>
@@ -187,14 +312,13 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
-  <!-- Firebase & Logic -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script>
-    // --- CONFIGURATION FIREBASE ---
-    var firebaseConfig = {
+    // --- CONFIG & INIT ---
+    const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
@@ -204,9 +328,11 @@
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
     };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const storage = firebase.storage();
 
-    // --- AUTHENTIFICATION GAMEMASTER ---
+    // --- AUTH ---
     document.getElementById('gm-login').onclick = function() {
       const email = document.getElementById('gm-email').value;
       const pass = document.getElementById('gm-password').value;
@@ -218,7 +344,6 @@
           document.getElementById('gm-auth-error').textContent = "Connexion échouée : " + e.message;
         });
     };
-
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         document.getElementById('auth-section').style.display = "none";
@@ -230,13 +355,14 @@
       }
     });
 
-    // Gestion des onglets
+    // --- Onglets ---
     function afficherSuivi() {
       document.getElementById('suivi-partie').style.display = 'block';
       document.getElementById('historique-parties').style.display = 'none';
       document.getElementById('btn-courante').classList.add('active');
       document.getElementById('btn-historique').classList.remove('active');
-      chargerPartieEnCours();
+      document.querySelector('.carousel').style.display = "none";
+      document.getElementById('btn-connexion-partie').style.display = "block";
     }
     function afficherHistorique() {
       document.getElementById('suivi-partie').style.display = 'none';
@@ -246,64 +372,202 @@
       chargerHistorique();
     }
 
-    // --- Partie en cours (la plus récente) ---
+    // --- Partie en cours (récupère le code de la plus récente partie) ---
     let partieCouranteId = null;
+    let equipes = [], nomsEquipes = {}, currentIndex = 0, stepsTime = {}, etapes = [
+      { titre: "Épreuve 1", fichiersAttendus: ["Photo 1"] },
+      { titre: "Épreuve 2", fichiersAttendus: ["Vidéo"] },
+      { titre: "Épreuve 3", fichiersAttendus: ["Photo 2"] },
+      { titre: "Épreuve 4", fichiersAttendus: [] },
+      { titre: "Épreuve 5", fichiersAttendus: [] },
+      { titre: "Épreuve 6", fichiersAttendus: [] }
+    ];
 
-    function chargerPartieEnCours() {
-      const div = document.getElementById('suivi-partie');
-      div.innerHTML = "<div class='msg-info'>Chargement en cours...</div>";
-      firebase.database().ref("parties").orderByKey().limitToLast(1).once("value").then(snap => {
+    document.getElementById('btn-connexion-partie').onclick = function() {
+      db.ref("parties").orderByKey().limitToLast(1).once("value", snap => {
         if (!snap.exists()) {
-          div.innerHTML = "<div class='msg-info'>Aucune partie en cours !</div>";
+          alert("Aucune partie en cours !");
           return;
         }
         snap.forEach(partieSnap => {
           partieCouranteId = partieSnap.key;
-          let data = partieSnap.val();
-          let html = `<table class="gm-table">
-            <tr>
-              <th colspan="3" style="background:#e0c185;color:#2c1b1b;font-size:1.03em;">
-                Partie en cours&nbsp;: <span style="font-family:monospace;">${partieCouranteId}</span>
-                <button class="gm-btn" style="float:right;margin-top:-5px;" onclick="connecterPartie()">Se connecter</button>
-              </th>
-            </tr>`;
-          if (data.equipes && Object.keys(data.equipes).length > 0) {
-            html += `<tr><th>Équipe</th><th>Avancement</th><th></th></tr>`;
-            Object.entries(data.equipes).forEach(([eqId, eqData]) => {
-              if (eqId !== "0" && eqData) {
-                html += `<tr>
-                  <td><b>${eqId}</b></td>
-                  <td>${eqData.etapeActuelle || 0}</td>
-                  <td></td>
-                </tr>`;
-              }
-            });
-          } else {
-            html += `<tr><td colspan="3"><div class='msg-info'>Aucune équipe enregistrée pour cette partie.</div></td></tr>`;
-          }
-          html += "</table>";
-          div.innerHTML = html;
         });
-      }).catch(e => {
-        div.innerHTML = "<span style='color:#ff9393'>Erreur lors du chargement : " + e.message + "</span>";
+        // Stockage local facultatif
+        localStorage.setItem("salonCode", partieCouranteId);
+        chargerEquipes(() => chargerStepsTimeEtAfficher());
+        document.querySelector('.carousel').style.display = "flex";
+        document.getElementById('btn-connexion-partie').style.display = "none";
+      });
+    };
+    document.getElementById('prev-team').onclick = function() {
+      if (equipes.length) {
+        currentIndex = (currentIndex - 1 + equipes.length) % equipes.length;
+        chargerStepsTimeEtAfficher();
+      }
+    };
+    document.getElementById('next-team').onclick = function() {
+      if (equipes.length) {
+        currentIndex = (currentIndex + 1) % equipes.length;
+        chargerStepsTimeEtAfficher();
+      }
+    };
+
+    function chargerEquipes(callback) {
+      db.ref(`parties/${partieCouranteId}/equipes`).once('value', snap => {
+        const data = snap.val() || {};
+        equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
+        db.ref(`parties/${partieCouranteId}/nomsEquipes`).once('value', snapNoms => {
+          nomsEquipes = snapNoms.val() || {};
+          callback && callback();
+        });
       });
     }
 
-    // --- Connexion à la partie en cours ---
-    function connecterPartie() {
-      if (!partieCouranteId) {
-        alert("Aucune partie en cours !");
+    function chargerStepsTimeEtAfficher() {
+      if (equipes.length === 0) {
+        document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée</div>";
         return;
       }
-      // Ici tu peux rediriger vers une page de suivi live, ou afficher un panneau de gestion détaillé, etc.
-      alert("Connecté à la partie " + partieCouranteId + " ! (code à personnaliser selon ton besoin)");
+      const equipe = equipes[currentIndex];
+      db.ref(`parties/${partieCouranteId}/equipes/${equipe.num}/stepsTime`).once('value', snapStepsTime => {
+        stepsTime = snapStepsTime.val() || {};
+        afficherEquipe();
+      });
     }
+
+    function afficherEquipe() {
+      const carte = document.getElementById('carte-equipe');
+      const equipe = equipes[currentIndex];
+      const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
+      const membres = equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—';
+      const step = equipe.currentStep ?? 0;
+      let html = `
+        <div class='team-title'>${nom}</div>
+        <div class='team-members'>${membres}</div>
+        <div class='etape-encours'>Étape actuelle : <span>${etapes[step]?.titre || 'Terminé'}</span></div>
+        <div id="timer" class="timer">Temps sur cette épreuve : 0:00</div>
+        <div class='parcours-list'>
+      `;
+      for (let i=0; i<etapes.length; i++) {
+        let statut = "";
+        let chrono = "";
+        if (i == step) {
+          statut = " <span style='color:#ffe07e;'>(en cours)</span>";
+        } else if (i < step) {
+          let t = stepsTime && (stepsTime[i] !== undefined && stepsTime[i] !== null) ? stepsTime[i] : null;
+          if (t !== null) {
+            let min = Math.floor(t/60), sec = t%60;
+            chrono = `<span class="chrono-value">(${min}:${sec.toString().padStart(2, '0')})</span>`;
+          }
+          statut = ` <span style='color:#a8ffb9;'>(réalisée)</span> ${chrono}`;
+        }
+        html += `<div class='epreuve'>
+          <div class='epreuve-titre'>${etapes[i].titre}${statut}</div>
+          <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
+        </div>`;
+      }
+      html += '</div>';
+      carte.innerHTML = html;
+      afficherTimer();
+      for (let i=0; i<etapes.length; i++) {
+        listerFichiersEquipeEtape(equipe.num, i, etapes[i].fichiersAttendus);
+      }
+    }
+
+    // --- TIMER : Chrono en temps réel basé sur le startTime Firebase de l'étape courante ---
+    let timerInterval = null;
+    function afficherTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      const timerDiv = document.getElementById('timer');
+      const equipe = equipes[currentIndex];
+      const step = equipe.currentStep ?? 0;
+      function maj() {
+        if (step >= etapes.length) {
+          timerDiv.textContent = "Temps sur cette épreuve : terminé";
+          timerDiv.classList.remove('late');
+          return;
+        }
+        db.ref(`parties/${partieCouranteId}/equipes/${equipe.num}/epreuves/${step}/startTime`).once('value', snap => {
+          const startTime = snap.val();
+          if (!startTime) {
+            timerDiv.textContent = "Temps sur cette épreuve : —";
+            timerDiv.classList.remove('late');
+            return;
+          }
+          const chronoVal = stepsTime && (stepsTime[step] !== undefined && stepsTime[step] !== null) ? stepsTime[step] : null;
+          if (chronoVal !== null) {
+            let min = Math.floor(chronoVal/60), sec = chronoVal%60;
+            timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
+            timerDiv.classList.remove('late');
+            return;
+          }
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          const min = Math.floor(elapsed/60), sec = elapsed%60;
+          timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
+          if (elapsed >= 600) {
+            timerDiv.classList.add('late');
+            timerDiv.textContent += " ⏰";
+          } else {
+            timerDiv.classList.remove('late');
+          }
+        });
+      }
+      maj();
+      timerInterval = setInterval(maj, 1000);
+    }
+
+    function listerFichiersEquipeEtape(num, etapeIdx, fichiersAttendus) {
+      const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
+      if (!div) return;
+      const basePath = `parties/${partieCouranteId}/equipe${num}/etape${etapeIdx}/`;
+      storage.ref(basePath).listAll().then(res => {
+        if (res.items.length === 0) {
+          div.innerHTML = fichiersAttendus.map(nom=> `<div class="fichier-bloc"><span>${nom} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`).join('');
+        } else {
+          div.innerHTML = '';
+          fichiersAttendus.forEach(nomAttendu => {
+            const fichier = res.items.find(item => item.name.toLowerCase().includes(nomAttendu.toLowerCase().replace(/\s/g,'')));
+            if (!fichier) {
+              div.innerHTML += `<div class="fichier-bloc"><span>${nomAttendu} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`;
+            } else {
+              fichier.getDownloadURL().then(url => {
+                const ext = fichier.name.split('.').pop().toLowerCase();
+                let mini = '';
+                if(['jpg','jpeg','png','gif'].includes(ext)) {
+                  mini = `<img src="${url}" class="miniature" alt="Photo">`;
+                } else if(['mp4','webm','ogg'].includes(ext)) {
+                  mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
+                }
+                div.innerHTML += `<div class="fichier-bloc">${mini}<span>${fichier.name}</span>
+                  <button class="download-btn" onclick="downloadFile('${url}','${fichier.name}')">Télécharger</button></div>`;
+              });
+            }
+          });
+        }
+      }).catch(()=>{div.innerHTML = "<span style='color:#b8b8b8;'>Erreur</span>";});
+    }
+
+    window.downloadFile = function(url, fileName) {
+      fetch(url)
+        .then(resp => resp.blob())
+        .then(blob => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+          }, 100);
+        });
+    };
 
     // --- Historique ---
     function chargerHistorique() {
       const div = document.getElementById('historique-parties');
       div.innerHTML = "<div class='msg-info'>Chargement en cours...</div>";
-      firebase.database().ref("parties").once("value").then(snap => {
+      db.ref("parties").once("value").then(snap => {
         if (!snap.exists()) {
           div.innerHTML = "<div class='msg-info'>Aucune partie enregistrée.</div>";
           return;
@@ -322,18 +586,15 @@
         div.innerHTML = "<span style='color:#ff9393'>Erreur lors du chargement : " + e.message + "</span>";
       });
     }
-
-    // --- Suppression d'une partie ---
     function supprimerPartie(partieId) {
       if (confirm("Supprimer cette partie ?")) {
-        firebase.database().ref("parties/"+partieId).remove().then(() => {
+        db.ref("parties/"+partieId).remove().then(() => {
           const ligne = document.getElementById('ligne-'+partieId);
           if (ligne) ligne.remove();
         });
       }
     }
     window.supprimerPartie = supprimerPartie;
-    window.connecterPartie = connecterPartie;
   </script>
 </body>
 </html>
