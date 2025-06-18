@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
   const dureeEpreuve = 7 * 60; // 7 minutes chrono
-  const stepIndex = 5;
+  const stepIndex = 4;
 
   if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
     window.location.href = "accueil.html";
