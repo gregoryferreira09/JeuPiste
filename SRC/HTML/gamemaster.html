@@ -5,9 +5,140 @@
   <title>Gamemaster - Suivi des équipes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../Public/styles/style.css">
-  <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900|Roboto+Mono:400,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* ... (Garde tout ton CSS existant, tu peux juste ajouter ceci pour plus d'accessibilité & feedback) ... */
+    body {
+      background: #181212;
+      color: #f4e4c1;
+      font-family: 'Cormorant Garamond', serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(90deg, #e0c185, #ffeecb 60%);
+      box-shadow: 0 4px 24px #0002;
+      border-bottom: 2px solid #e0c185;
+      padding: 0;
+    }
+    .site-title {
+      margin: 0;
+      padding: 28px 0 18px 0;
+      text-align: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 700;
+      font-size: 2.2em;
+      color: #473714;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 12px #e0c18544;
+    }
+    .gm-wrapper {
+      max-width: 900px;
+      margin: 38px auto 0 auto;
+      background: #2c1b1b;
+      border-radius: 20px;
+      box-shadow: 0 4px 24px #0004;
+      border: 2px solid #e0c185;
+      padding: 32px 18px 22px 18px;
+      min-height: 300px;
+    }
+    .carousel {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 18px;
+    }
+    .nav-btn {
+      background: linear-gradient(90deg, #e0c185, #ffeecb 60%);
+      color: #473714;
+      font-size: 2em;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      box-shadow: 0 2px 14px #0002;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background .17s, color .17s, box-shadow .17s;
+      margin: 0 0 0 0;
+    }
+    .nav-btn:focus, .nav-btn:hover {
+      background: #ffeecb;
+      color: #181212;
+      box-shadow: 0 0 8px #e0c185a8;
+      outline: 2px solid #e0c185;
+      outline-offset: 2px;
+      transform: scale(1.05);
+    }
+    .carte-equipe {
+      flex: 1;
+      background: #231d1d;
+      border-radius: 16px;
+      border: 2px solid #e0c185;
+      box-shadow: 0 2px 14px #0003;
+      padding: 32px 22px 18px 22px;
+      min-height: 280px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .team-title {
+      font-size:1.23em;
+      color:#ffeecb;
+      margin-bottom:8px;
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    .team-members {
+      font-size:1.07em;
+      color:#e0c185;
+      margin-bottom:14px;
+      text-align: center;
+    }
+    .etape-encours {
+      margin: 10px 0 5px 0;
+      font-weight: bold;
+      font-size: 1.09em;
+      letter-spacing: 1px;
+      color: #ffe07e;
+      text-align: center;
+    }
+    .timer {
+      font-size: 1.14em;
+      margin-bottom: 10px;
+      background: #181212;
+      border-radius: 9px;
+      padding: 7px 20px;
+      color: #e0c185;
+      font-family: 'Roboto Mono', monospace;
+      letter-spacing: 1px;
+      box-shadow: 0 1px 6px #0002;
+      text-align: center;
+      display: inline-block;
+    }
+    .timer.late { color: #ff2f2f; background: #2b1313; }
+    .parcours-list {
+      margin-top: 16px;
+    }
+    .epreuve {
+      margin-bottom: 16px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #3a2c1d44;
+    }
+    .epreuve-titre {
+      font-weight: bold;
+      color: #e0c185;
+      font-size: 1.06em;
+      letter-spacing: .5px;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .step-status.done { color: #4caf50; font-weight: bold; }
     .step-status.current { color: #ffe07e; font-weight: bold; }
     .step-status.todo { color: #ccc; }
@@ -15,23 +146,86 @@
       background: #e0c185;
       color: #473714;
       border: none;
-      border-radius: 7px;
-      padding: 4px 13px;
+      border-radius: 6px;
+      padding: 2px 12px;
       margin-left: 8px;
-      font-size: .95em;
+      font-size: .96em;
       font-family: inherit;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.18s;
     }
     .invalidate-btn { background: #e55b5b; color: #fff; }
     .validate-btn:hover { background: #ffeecb; }
     .invalidate-btn:hover { background: #ffadad; }
+    .fichiers-epreuve {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .miniature, .miniature-video {
+      max-width: 72px;
+      max-height: 60px;
+      border-radius: 6px;
+      border: 1.5px solid #bfa87c;
+      background: #181212;
+      box-shadow: 0 1px 5px #0002;
+      transition: border .2s, box-shadow .2s;
+    }
+    .miniature:hover, .miniature-video:hover {
+      border: 2px solid #ffe07e;
+      box-shadow: 0 4px 10px #ffe07e33;
+    }
+    .fichier-bloc {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 2px;
+      background: #261b10bb;
+      border-radius: 5px;
+      padding: 3px 6px 3px 4px;
+      font-size: .97em;
+    }
+    .download-btn {
+      color: #e0c185;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 0.98em;
+      padding: 0 3px;
+      margin-left: 5px;
+      border-radius: 3px;
+      transition: background .2s, color .2s;
+    }
+    .download-btn:hover {
+      background: #ffe07e;
+      color: #1a1a1a;
+    }
+    .history-list {
+      font-size: .98em;
+      color: #ffe07e;
+      margin-top: 13px;
+      word-break: break-all;
+    }
     .error-message { color: #ff7777; font-weight: bold; margin: 13px 0; }
-    .history-list { font-size: .96em; color: #ffe07e; margin-top: 12px; }
+    @media (max-width: 900px) {
+      .gm-wrapper { max-width: 99vw; }
+      .carte-equipe { padding: 8px 3vw;}
+    }
+    @media (max-width: 700px) {
+      .gm-wrapper { padding: 2px; }
+      .carte-equipe { padding: 8px 2vw;}
+      .miniature, .miniature-video { max-width: 42px; max-height: 28px;}
+      .nav-btn { width: 34px; height: 34px; font-size: 1.3em; }
+      .site-title { font-size: 1.3em; padding: 17px 0 12px 0;}
+    }
   </style>
 </head>
 <body>
-  <h1>Gamemaster — Suivi des équipes</h1>
+  <header>
+    <h1 class="site-title">Gamemaster — Suivi des équipes</h1>
+  </header>
   <div class="gm-wrapper">
     <div class="carousel">
       <button class="nav-btn" id="prev-team" aria-label="Équipe précédente">&#8592;</button>
@@ -41,6 +235,10 @@
       <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
     </div>
   </div>
+  <!-- (le JS complet que tu avais déjà) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
