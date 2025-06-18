@@ -174,155 +174,158 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="../JS/gameflow.js"></script>
-  <script>
-    // Sécurité session
-    const salonCode = localStorage.getItem("salonCode");
-    const equipeNum = Number(localStorage.getItem("equipeNum"));
-    if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
-      window.location.href = "accueil.html";
-    }
-    // Firebase init
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.appspot.com",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+ <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="../JS/gameflow.js"></script>
+<script>
+  // Sécurité session
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = Number(localStorage.getItem("equipeNum"));
+  if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+    window.location.href = "accueil.html";
+  }
+  // Firebase init
+  const firebaseConfig = {
+    apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+    authDomain: "murder-party-ba8d1.firebaseapp.com",
+    databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "murder-party-ba8d1",
+    storageBucket: "murder-party-ba8d1.appspot.com",
+    messagingSenderId: "20295055805",
+    appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+    measurementId: "G-KSBMBB7KMJ"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    // Toast feedback
-    function showToast(msg) {
-      const toast = document.getElementById('toast-message');
-      if (toast) {
-        toast.textContent = msg;
-        toast.classList.add('visible');
-        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
-      }
+  // Toast feedback harmonisé
+  function showToast(msg) {
+    const toast = document.getElementById('toast-message');
+    if (toast) {
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => { toast.classList.remove('visible'); }, 2400);
     }
-    // Blocage mauvais choix indice
-    let blockTimeout = null;
-    document.getElementById('select-a').addEventListener('change', function() {
-      const btnIndice = document.getElementById('show-indice');
-      if (this.value === "F") {
-        btnIndice.disabled = false;
-      } else if (this.value !== "") {
-        btnIndice.disabled = true;
-        showBlocker();
-      } else {
-        btnIndice.disabled = true;
-      }
-    });
-    function showBlocker() {
-      const blocker = document.getElementById('blocker');
-      blocker.style.display = 'flex';
-      let count = 30;
+  }
+
+  // Blocage mauvais choix indice
+  let blockTimeout = null;
+  document.getElementById('select-a').addEventListener('change', function() {
+    const btnIndice = document.getElementById('show-indice');
+    if (this.value === "F") {
+      btnIndice.disabled = false;
+    } else if (this.value !== "") {
+      btnIndice.disabled = true;
+      showBlocker();
+    } else {
+      btnIndice.disabled = true;
+    }
+  });
+  function showBlocker() {
+    const blocker = document.getElementById('blocker');
+    blocker.style.display = 'flex';
+    let count = 30;
+    document.getElementById('blocker-countdown').textContent = count;
+    blockTimeout && clearInterval(blockTimeout);
+    blockTimeout = setInterval(() => {
+      count--;
       document.getElementById('blocker-countdown').textContent = count;
-      blockTimeout && clearInterval(blockTimeout);
-      blockTimeout = setInterval(() => {
-        count--;
-        document.getElementById('blocker-countdown').textContent = count;
-        if (count <= 0) {
-          clearInterval(blockTimeout);
-          blocker.style.display = 'none';
-          document.getElementById('select-a').value = '';
-        }
-      }, 1000);
-    }
-    // Modal indice
-    document.getElementById('show-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.add('active');
-    });
-    document.getElementById('close-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.remove('active');
-    });
-
-    // Mot de passe attendu pour la validation finale
-    const PASSWORD = "j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?"
-      .trim().toLowerCase()
-      .replace(/’/g, "'")
-      .replace(/\s+/g, ' ');
-
-    // Activation du bouton uniquement si password correct
-    document.getElementById('password-field').addEventListener('input', function() {
-      let userValue = this.value.trim().toLowerCase()
-        .replace(/’/g, "'")
-        .replace(/\s+/g, ' ');
-      const btn = document.getElementById('next-quest');
-      if (userValue === PASSWORD) {
-        btn.disabled = false;
-        btn.classList.add('enabled');
-      } else {
-        btn.disabled = true;
-        btn.classList.remove('enabled');
+      if (count <= 0) {
+        clearInterval(blockTimeout);
+        blocker.style.display = 'none';
+        document.getElementById('select-a').value = '';
       }
-    });
+    }, 1000);
+  }
+  // Modal indice
+  document.getElementById('show-indice').addEventListener('click', function() {
+    document.getElementById('indice-modal').classList.add('active');
+  });
+  document.getElementById('close-indice').addEventListener('click', function() {
+    document.getElementById('indice-modal').classList.remove('active');
+  });
 
-    // Navigation gameflow synchro
-    document.getElementById('next-quest').addEventListener('click', function() {
-      if (this.disabled) return;
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-        .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-          if (!error && committed) {
-            getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-              const step = snapshot.val();
-              if (step < parcours.length) {
-                const epreuveNum = parcours[step];
-                if (epreuveNum === 6) {
-                  window.location.href = "epreuve6.html";
-                } else if (epreuveNum === 7) {
-                  window.location.href = "révélation.html";
-                } else {
-                  window.location.href = `equipe${epreuveNum}-a.html`;
-                }
-              } else {
-                alert('Bravo, vous avez terminé !');
-              }
-            });
-          }
-        });
-    });
+  // Validation mot de passe très souple
+  function normalize(str) {
+    return str
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // enlève accents
+      .replace(/[^a-z0-9 ]+/g, "")                       // enlève toute ponctuation
+      .replace(/\s+/g, " ")                              // espaces multiples en 1
+      .trim();
+  }
+  const PASSWORD = normalize("j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?");
 
-    // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
-    function goToStep(stepIndex) {
-      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-          showToast('Bravo, vous avez terminé !');
-          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
-          return;
-        }
-        const epreuveNum = parcours[stepIndex];
-        let target = "";
-        if (epreuveNum === 6) target = "epreuve6.html";
-        else if (epreuveNum === 7) target = "révélation.html";
-        else target = `equipe${epreuveNum}-a.html`;
-        const current = window.location.pathname.split('/').pop();
-        if (current !== target) {
-          window.location.href = target;
-        }
-      });
+  document.getElementById('password-field').addEventListener('input', function() {
+    let userValue = normalize(this.value);
+    const btn = document.getElementById('next-quest');
+    if (userValue === PASSWORD) {
+      btn.disabled = false;
+      btn.classList.add('enabled');
+    } else {
+      btn.disabled = true;
+      btn.classList.remove('enabled');
     }
+  });
+
+  // Navigation gameflow synchro
+  document.getElementById('next-quest').addEventListener('click', function() {
+    if (this.disabled) return;
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-      .on('value', function(snapshot) {
-        const step = snapshot.val() || 0;
-        goToStep(step);
-      });
-    window.addEventListener("pageshow", function(evt) {
-      if (evt.persisted) {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .once('value', function(snapshot) {
-            const step = snapshot.val() || 0;
-            goToStep(step);
+      .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+        if (!error && committed) {
+          getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+            const step = snapshot.val();
+            if (step < parcours.length) {
+              const epreuveNum = parcours[step];
+              if (epreuveNum === 6) {
+                window.location.href = "epreuve6.html";
+              } else if (epreuveNum === 7) {
+                window.location.href = "révélation.html";
+              } else {
+                window.location.href = `equipe${epreuveNum}-a.html`;
+              }
+            } else {
+              alert('Bravo, vous avez terminé !');
+            }
           });
+        }
+      });
+  });
+
+  // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
+  function goToStep(stepIndex) {
+    getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+      if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+        showToast('Bravo, vous avez terminé !');
+        setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+        return;
+      }
+      const epreuveNum = parcours[stepIndex];
+      let target = "";
+      if (epreuveNum === 6) target = "epreuve6.html";
+      else if (epreuveNum === 7) target = "révélation.html";
+      else target = `equipe${epreuveNum}-a.html`;
+      const current = window.location.pathname.split('/').pop();
+      if (current !== target) {
+        window.location.href = target;
       }
     });
-  </script>
+  }
+  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+    .on('value', function(snapshot) {
+      const step = snapshot.val() || 0;
+      goToStep(step);
+    });
+  window.addEventListener("pageshow", function(evt) {
+    if (evt.persisted) {
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+        .once('value', function(snapshot) {
+          const step = snapshot.val() || 0;
+          goToStep(step);
+        });
+    }
+  });
+</script>
 </body>
 </html>
