@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
+    /* ... styles inchangés ... */
     .actions-row-horizontal {
       display: flex;
       justify-content: space-between;
@@ -168,7 +169,7 @@
         <div class="icon-action side-icon">
           <label for="photo-upload" aria-label="Télécharger une photo">
             <svg id="icon-photo" viewBox="0 0 24 24" width="38" height="38" fill="currentColor">
-  <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7-7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm-1 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+  <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7-7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm-1 6a1 1 0 1 0[...]"/>
 </svg>
             <span>Photo à envoyer</span>
             <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -191,6 +192,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
     // Sécurité et robustesse : vérification session
@@ -217,146 +219,156 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // Toast feedback
-    function showToast(msg) {
-      const toast = document.getElementById('toast-message');
-      if (toast) {
-        toast.textContent = msg;
-        toast.classList.add('visible');
-        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+    // Authentification anonyme obligatoire pour les accès Storage
+    firebase.auth().signInAnonymously().then(function() {
+      // Toutes les actions nécessitant le Storage doivent être placées ici ou après
+      demarreJeuFirebase();
+    }).catch(function(error) {
+      alert("Erreur d'authentification Firebase : " + error.message);
+    });
+
+    function demarreJeuFirebase() {
+      // Toast feedback
+      function showToast(msg) {
+        const toast = document.getElementById('toast-message');
+        if (toast) {
+          toast.textContent = msg;
+          toast.classList.add('visible');
+          setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+        }
       }
-    }
 
-    // Chrono/temps passé sur l’épreuve
-    const stepIndex = 0; // Numéro d'étape pour cette page
-    let startTime = null;
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-      .once('value', function(snap) {
-        startTime = snap.val();
-        if (!startTime) {
-          startTime = Date.now();
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
-        }
-      });
+      // Chrono/temps passé sur l’épreuve
+      const stepIndex = 0; // Numéro d'étape pour cette page
+      let startTime = null;
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+        .once('value', function(snap) {
+          startTime = snap.val();
+          if (!startTime) {
+            startTime = Date.now();
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
+          }
+        });
 
-    // Synchro navigation (currentStep)
-    function goToStep(stepIndex) {
-      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-          showToast('Bravo, vous avez terminé !');
-          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
-          return;
-        }
-        const epreuveNum = parcours[stepIndex];
-        let target = "";
-        if (epreuveNum === 6) target = "epreuve6.html";
-        else if (epreuveNum === 7) target = "révélation.html";
-        else target = `equipe${epreuveNum}-a.html`;
-        const current = window.location.pathname.split('/').pop();
-        if (current !== target) {
-          window.location.href = target;
-        }
-      });
-    }
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-      .on('value', function(snapshot) {
-        const step = snapshot.val() || 0;
-        goToStep(step);
-      });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      var input = document.getElementById('photo-upload');
-      var out = document.getElementById('photo-filename');
-      var btn = document.getElementById('next-quest');
-      var icon = document.getElementById('icon-photo');
-
-      // Upload dans Storage + DB
-      if(input && out && icon) {
-        input.addEventListener('change', function() {
-          if(this.files && this.files[0]) {
-            const file = this.files[0];
-            // Upload dans Firebase Storage
-            const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
-            storage.ref(storagePath).put(file).then(snapshot => {
-              // On enregistre le nom dans la DB pour la synchro UI
-              db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
-                name: file.name,
-                uploadedAt: Date.now()
-              });
-            }).catch(err => {
-              showToast("Erreur lors de l'upload : " + err.message);
-            });
+      // Synchro navigation (currentStep)
+      function goToStep(stepIndex) {
+        getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+          if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+            showToast('Bravo, vous avez terminé !');
+            setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+            return;
+          }
+          const epreuveNum = parcours[stepIndex];
+          let target = "";
+          if (epreuveNum === 6) target = "epreuve6.html";
+          else if (epreuveNum === 7) target = "révélation.html";
+          else target = `equipe${epreuveNum}-a.html`;
+          const current = window.location.pathname.split('/').pop();
+          if (current !== target) {
+            window.location.href = target;
           }
         });
       }
-
-      // Synchro multi-device, affichage et bouton + grisé de l'icône
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo')
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
         .on('value', function(snapshot) {
-          var input = document.getElementById('photo-upload');
-          var out = document.getElementById('photo-filename');
-          var btn = document.getElementById('next-quest');
-          var icon = document.getElementById('icon-photo');
-          const data = snapshot.val();
-          if (out && btn && input && icon) {
-            if (data && data.name) {
-              out.textContent = "Photo sélectionnée : " + data.name;
-              btn.disabled = false;
-              btn.classList.add('enabled');
-              input.disabled = true;
-              icon.classList.add('grayed');
-            } else {
-              out.textContent = "";
-              btn.disabled = true;
-              btn.classList.remove('enabled');
-              input.disabled = false;
-              icon.classList.remove('grayed');
-            }
-          }
+          const step = snapshot.val() || 0;
+          goToStep(step);
         });
 
-      // Navigation bouton
-      if (btn) {
-        btn.addEventListener('click', function() {
-          if (btn.disabled) return;
-          btn.disabled = true;
-          btn.classList.remove('enabled');
-          showToast("Validation en cours...");
-          // === ENREGISTRE LE TEMPS PASSÉ ===
-          const now = Date.now();
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-            .once('value', function(snap) {
-              const sTime = snap.val();
-              if (sTime) {
-                const elapsed = Math.round((now - sTime) / 1000);
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
-              }
-              // Puis passage à l'étape suivante
-              db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-                .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-                  if (!error && committed) {
-                    showToast("Étape validée !");
-                  } else {
-                    showToast("Erreur lors de la validation...");
-                    btn.disabled = false;
-                    btn.classList.add('enabled');
-                  }
+      document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('photo-upload');
+        var out = document.getElementById('photo-filename');
+        var btn = document.getElementById('next-quest');
+        var icon = document.getElementById('icon-photo');
+
+        // Upload dans Storage + DB
+        if(input && out && icon) {
+          input.addEventListener('change', function() {
+            if(this.files && this.files[0]) {
+              const file = this.files[0];
+              // Upload dans Firebase Storage
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
+              storage.ref(storagePath).put(file).then(snapshot => {
+                // On enregistre le nom dans la DB pour la synchro UI
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
+                  name: file.name,
+                  uploadedAt: Date.now()
                 });
-            });
-        });
-      }
-    });
-
-    // Anti-retour arrière
-    window.addEventListener("pageshow", function(evt) {
-      if (evt.persisted) {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .once('value', function(snapshot) {
-            const step = snapshot.val() || 0;
-            goToStep(step);
+              }).catch(err => {
+                showToast("Erreur lors de l'upload : " + err.message);
+              });
+            }
           });
-      }
-    });
+        }
+
+        // Synchro multi-device, affichage et bouton + grisé de l'icône
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo')
+          .on('value', function(snapshot) {
+            var input = document.getElementById('photo-upload');
+            var out = document.getElementById('photo-filename');
+            var btn = document.getElementById('next-quest');
+            var icon = document.getElementById('icon-photo');
+            const data = snapshot.val();
+            if (out && btn && input && icon) {
+              if (data && data.name) {
+                out.textContent = "Photo sélectionnée : " + data.name;
+                btn.disabled = false;
+                btn.classList.add('enabled');
+                input.disabled = true;
+                icon.classList.add('grayed');
+              } else {
+                out.textContent = "";
+                btn.disabled = true;
+                btn.classList.remove('enabled');
+                input.disabled = false;
+                icon.classList.remove('grayed');
+              }
+            }
+          });
+
+        // Navigation bouton
+        if (btn) {
+          btn.addEventListener('click', function() {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            btn.classList.remove('enabled');
+            showToast("Validation en cours...");
+            // === ENREGISTRE LE TEMPS PASSÉ ===
+            const now = Date.now();
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+              .once('value', function(snap) {
+                const sTime = snap.val();
+                if (sTime) {
+                  const elapsed = Math.round((now - sTime) / 1000);
+                  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+                }
+                // Puis passage à l'étape suivante
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+                  .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+                    if (!error && committed) {
+                      showToast("Étape validée !");
+                    } else {
+                      showToast("Erreur lors de la validation...");
+                      btn.disabled = false;
+                      btn.classList.add('enabled');
+                    }
+                  });
+              });
+          });
+        }
+      });
+
+      // Anti-retour arrière
+      window.addEventListener("pageshow", function(evt) {
+        if (evt.persisted) {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .once('value', function(snapshot) {
+              const step = snapshot.val() || 0;
+              goToStep(step);
+            });
+        }
+      });
+    }
   </script>
 </body>
 </html>
