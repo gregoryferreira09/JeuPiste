@@ -134,7 +134,7 @@
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
-            De l'Orcanie à l'Aquitaine en passant par la Carmélide, trois créatures veillent en silence sur le royaume de Logres. Chacune incarne une vertu oubliée&nbsp;: la patience, la vivacité et la vigilance.<br><br>
+            De l'Orcanie à l'Aquitaine en passant par la Carmélide, trois créatures veillent en silence sur le royaume de Logres. Chacune incarne une vertu oubliée&nbsp;: la patience, la vivacité[...]
             <strong>Défi&nbsp;:</strong><br>
             Pour espérer vous diriger vers la suite de votre aventure, il vous faudra trouver et capturer l’image de ces gardiennes&nbsp;:<br>
             🐢 la tortue<br>
@@ -210,6 +210,18 @@
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    // Chrono/temps passé sur l’épreuve
+    const stepIndex = 3;
+    let startTime = null;
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+      .once('value', function(snap) {
+        startTime = snap.val();
+        if (!startTime) {
+          startTime = Date.now();
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
+        }
+      });
 
     function showToast(msg) {
       const toast = document.getElementById('toast-message');
@@ -325,15 +337,26 @@
           btn.disabled = true;
           btn.classList.remove('enabled');
           showToast("Validation en cours...");
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-              if (!error && committed) {
-                showToast("Étape validée !");
-              } else {
-                showToast("Erreur lors de la validation...");
-                btn.disabled = false;
-                btn.classList.add('enabled');
+          // === ENREGISTRE LE TEMPS PASSÉ ===
+          const now = Date.now();
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+            .once('value', function(snap) {
+              const sTime = snap.val();
+              if (sTime) {
+                const elapsed = Math.round((now - sTime) / 1000);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
               }
+              // Puis passage à l'étape suivante
+              db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+                .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+                  if (!error && committed) {
+                    showToast("Étape validée !");
+                  } else {
+                    showToast("Erreur lors de la validation...");
+                    btn.disabled = false;
+                    btn.classList.add('enabled');
+                  }
+                });
             });
         });
       }
