@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Quête des bêtes mystiques - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
@@ -63,6 +62,10 @@
     .icon-action label[aria-disabled="true"] span {
       color: #9d8c62;
     }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
     .visually-hidden {
       position: absolute !important;
       height: 1px; width: 1px;
@@ -72,65 +75,6 @@
       border: 0;
       padding: 0;
       margin: -1px;
-    }
-    #indice-modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0; top: 0; right: 0; bottom: 0;
-      background: rgba(20,16,8,0.85);
-      justify-content: center;
-      align-items: center;
-    }
-    #indice-modal.active {
-      display: flex;
-    }
-    .modal-img-wrapper {
-      position: relative;
-      background: #fffbe0;
-      padding: 24px 24px 12px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-      max-width: 92vw;
-    }
-    .modal-img-wrapper img {
-      display: block;
-      max-width: 70vw;
-      max-height: 60vh;
-      margin: 0 auto;
-      border-radius: 7px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    .close-modal {
-      position: absolute;
-      top: 4px;
-      right: 12px;
-      font-size: 2.2em;
-      color: #a8832b;
-      cursor: pointer;
-      font-weight: bold;
-      background: transparent;
-      border: none;
-      z-index: 10;
-      transition: color 0.2s;
-    }
-    .close-modal:hover {
-      color: #e0c185;
-    }
-    #show-indice {
-      background: #e0c185;
-      color: #473714;
-      font-size: 0.98em;
-      border: none;
-      border-radius: 7px;
-      padding: 5px 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-      margin: 0 8px;
-    }
-    #show-indice:hover {
-      background: #ffeecb;
     }
     #next-quest {
       background: #aaa;
@@ -166,13 +110,6 @@
       }
       .icon-action span {
         text-align: left;
-      }
-      .image-fondue {
-        max-width: 98vw;
-      }
-      .modal-img-wrapper img {
-        max-width: 95vw;
-        max-height: 50vh;
       }
     }
   </style>
@@ -210,27 +147,12 @@
         </div>
       </div>
 
-      <!-- Bouton indice -->
-      <div style="display:flex; justify-content:center; margin:38px 0 10px 0;">
-        <button id="show-indice" type="button">
-          Voir l’indice
-        </button>
-      </div>
-
-      <!-- Modal d'indice -->
-      <div id="indice-modal">
-        <div class="modal-img-wrapper">
-          <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
-          <img src="../../Public/images/Plan parc photo.png" alt="Indice visuel du plan du parc">
-        </div>
-      </div>
-
       <!-- Trois boutons photo -->
       <div class="actions-row-horizontal">
         <div class="icon-action side-icon">
           <label id="label-photo1" for="photo-upload-1">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+            <svg id="icon-photo1" viewBox="0 0 24 24">
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
             </svg>
             <span>Photo de tortue à envoyer</span>
             <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -238,8 +160,8 @@
         </div>
         <div class="icon-action side-icon">
           <label id="label-photo2" for="photo-upload-2">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+            <svg id="icon-photo2" viewBox="0 0 24 24">
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
             </svg>
             <span>Photo de chevreau à envoyer</span>
             <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -247,8 +169,8 @@
         </div>
         <div class="icon-action side-icon">
           <label id="label-photo3" for="photo-upload-3">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+            <svg id="icon-photo3" viewBox="0 0 24 24">
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
             </svg>
             <span>Photo d'alpaga à envoyer</span>
             <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -256,8 +178,6 @@
         </div>
       </div>
       <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-
-      <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -266,52 +186,18 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <script>
-    // Modal indice
-    document.getElementById('show-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.add('active');
-    });
-    document.getElementById('close-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.remove('active');
-    });
-
-    // Gestion des uploads photo et désactivation des boutons
-    function handlePhotoUpload(inputId, labelId) {
-      var input = document.getElementById(inputId);
-      var label = document.getElementById(labelId);
-      input.addEventListener('change', function() {
-        if(this.files && this.files[0]) {
-          label.setAttribute('aria-disabled', 'true');
-          input.disabled = true;
-          // Affichage du nom du fichier
-          var out = document.getElementById('photo-filename');
-          var allFiles = [];
-          for (var i = 1; i <= 3; i++) {
-            var inp = document.getElementById('photo-upload-' + i);
-            if (inp && inp.files && inp.files[0]) {
-              allFiles.push(inp.files[0].name);
-            }
-          }
-          out.textContent = "Photos sélectionnées : " + allFiles.join(", ");
-          // Activation du bouton "Quête suivante" si 3 photos
-          if(allFiles.length === 3) {
-            var btn = document.getElementById('next-quest');
-            btn.disabled = false;
-            btn.classList.add('enabled');
-          }
-        }
-      });
-    }
-    handlePhotoUpload('photo-upload-1','label-photo1');
-    handlePhotoUpload('photo-upload-2','label-photo2');
-    handlePhotoUpload('photo-upload-3','label-photo3');
-  </script>
-  <!-- === GAMEFLOW DYNAMIQUE : navigation par chemin équipe === -->
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
-    // Initialisation Firebase
+    // Sécurité session
+    const salonCode = localStorage.getItem("salonCode");
+    const equipeNum = Number(localStorage.getItem("equipeNum"));
+    if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+      window.location.href = "accueil.html";
+    }
+    // Firebase init
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -323,33 +209,144 @@
       measurementId: "G-KSBMBB7KMJ"
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('visible');
+        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+      }
+    }
+
+    // Synchro navigation (currentStep)
+    function goToStep(stepIndex) {
+      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+          showToast('Bravo, vous avez terminé !');
+          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+          return;
+        }
+        const epreuveNum = parcours[stepIndex];
+        let target = "";
+        if (epreuveNum === 6) target = "epreuve6.html";
+        else if (epreuveNum === 7) target = "révélation.html";
+        else target = `equipe${epreuveNum}-a.html`;
+        const current = window.location.pathname.split('/').pop();
+        if (current !== target) {
+          window.location.href = target;
+        }
+      });
+    }
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+      .on('value', function(snapshot) {
+        const step = snapshot.val() || 0;
+        goToStep(step);
+      });
 
     document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('next-quest').addEventListener('click', function() {
-        const salonCode = localStorage.getItem("salonCode");
-        const equipeNum = Number(localStorage.getItem("equipeNum"));
-        const db = firebase.database();
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-            if (!error && committed) {
-              getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-const step = snapshot.val();
-if (step < parcours.length) {
-  const epreuveNum = parcours[step];
-  if (epreuveNum === 6) {
-    window.location.href = "epreuve6.html";
-  } else if (epreuveNum === 7) {
-    window.location.href = "révélation.html";
-  } else {
-    window.location.href = `equipe${epreuveNum}-a.html`;
-  }
-} else {
-  alert('Bravo, vous avez terminé !');
-}
-                });
+      var input1 = document.getElementById('photo-upload-1');
+      var input2 = document.getElementById('photo-upload-2');
+      var input3 = document.getElementById('photo-upload-3');
+      var out = document.getElementById('photo-filename');
+      var btn = document.getElementById('next-quest');
+      var icon1 = document.getElementById('icon-photo1');
+      var icon2 = document.getElementById('icon-photo2');
+      var icon3 = document.getElementById('icon-photo3');
+
+      // Uploads
+      if(input1 && out) {
+        input1.addEventListener('change', function() {
+          if(this.files && this.files[0]) {
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/3/photo1').set({
+              name: this.files[0].name,
+              uploadedAt: Date.now()
+            });
+          }
+        });
+      }
+      if(input2 && out) {
+        input2.addEventListener('change', function() {
+          if(this.files && this.files[0]) {
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/3/photo2').set({
+              name: this.files[0].name,
+              uploadedAt: Date.now()
+            });
+          }
+        });
+      }
+      if(input3 && out) {
+        input3.addEventListener('change', function() {
+          if(this.files && this.files[0]) {
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/3/photo3').set({
+              name: this.files[0].name,
+              uploadedAt: Date.now()
+            });
+          }
+        });
+      }
+
+      // Synchro multi-device et activation bouton + grisé des icônes
+      function updateUI() {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/3').once('value', function(snapshot) {
+          const data = snapshot.val() || {};
+          let txt = "";
+          if(data.photo1 && data.photo1.name) txt += "Tortue : " + data.photo1.name + " ";
+          if(data.photo2 && data.photo2.name) txt += "Chevreau : " + data.photo2.name + " ";
+          if(data.photo3 && data.photo3.name) txt += "Alpaga : " + data.photo3.name;
+          if(out) out.textContent = txt;
+          if(icon1) icon1.classList.toggle('grayed', !!(data.photo1 && data.photo1.name));
+          if(icon2) icon2.classList.toggle('grayed', !!(data.photo2 && data.photo2.name));
+          if(icon3) icon3.classList.toggle('grayed', !!(data.photo3 && data.photo3.name));
+          if(btn) {
+            if(data.photo1 && data.photo1.name && data.photo2 && data.photo2.name && data.photo3 && data.photo3.name) {
+              btn.disabled = false;
+              btn.classList.add('enabled');
+              if(input1) input1.disabled = true;
+              if(input2) input2.disabled = true;
+              if(input3) input3.disabled = true;
+            } else {
+              btn.disabled = true;
+              btn.classList.remove('enabled');
+              if(input1) input1.disabled = false;
+              if(input2) input2.disabled = false;
+              if(input3) input3.disabled = false;
             }
+          }
+        });
+      }
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/3').on('value', updateUI);
+
+      // Navigation bouton
+      if(btn) {
+        btn.addEventListener('click', function() {
+          if (btn.disabled) return;
+          btn.disabled = true;
+          btn.classList.remove('enabled');
+          showToast("Validation en cours...");
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+              if (!error && committed) {
+                showToast("Étape validée !");
+              } else {
+                showToast("Erreur lors de la validation...");
+                btn.disabled = false;
+                btn.classList.add('enabled');
+              }
+            });
+        });
+      }
+    });
+    // Anti-retour arrière
+    window.addEventListener("pageshow", function(evt) {
+      if (evt.persisted) {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          .once('value', function(snapshot) {
+            const step = snapshot.val() || 0;
+            goToStep(step);
           });
-      });
+      }
     });
   </script>
 </body>
