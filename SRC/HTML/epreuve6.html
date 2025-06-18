@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>La quête du bout du monde - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
@@ -34,36 +33,17 @@
       margin-bottom: 16px;
       margin-top: 0;
     }
-    .presentation-jeu {
-      margin-top: 6px;
-    }
-    .objectif-course {
-      margin-top: 20px;
-      margin-bottom: 18px;
-    }
-    .objectif-label {
-      background: #e0c185;
-      color: #473714;
-      font-weight: bold;
-      font-size: 1.08em;
-      border-radius: 6px;
-      padding: 6px 0;
-      text-align: center;
-      letter-spacing: 0.04em;
-      margin-bottom: 0;
-    }
-    .objectif-text {
-      margin-top: 17px;
+    .gps-instruction {
       color: #ffeecb;
+      font-size: 1.07em;
       text-align: center;
-      font-size: 1.09em;
-      line-height: 1.6;
+      margin: 18px 0 10px 0;
     }
     .actions-row-horizontal {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 32px;
+      margin-top: 18px;
       margin-bottom: 10px;
       gap: 28px;
       flex-wrap: wrap;
@@ -104,12 +84,6 @@
       margin-top: 2px;
       text-align: center;
     }
-    .gps-instruction {
-      color: #ffeecb;
-      font-size: 1.07em;
-      text-align: center;
-      margin: 18px 0 10px 0;
-    }
     #check-gps {
       padding: 12px 26px;
       border-radius: 8px;
@@ -134,12 +108,35 @@
       text-align: center;
       margin: 0 0 8px 0;
     }
+    .objectif-course {
+      margin-top: 20px;
+      margin-bottom: 18px;
+    }
+    .objectif-label {
+      background: #e0c185;
+      color: #473714;
+      font-weight: bold;
+      font-size: 1.08em;
+      border-radius: 6px;
+      padding: 6px 0;
+      text-align: center;
+      letter-spacing: 0.04em;
+      margin-bottom: 0;
+    }
+    .objectif-text {
+      margin-top: 17px;
+      color: #ffeecb;
+      text-align: center;
+      font-size: 1.09em;
+      line-height: 1.6;
+    }
     .photo-actions {
       display: flex;
       gap: 28px;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
+      margin-bottom: 14px;
     }
     .visually-hidden {
       position: absolute !important;
@@ -158,7 +155,7 @@
       border: none;
       border-radius: 8px;
       padding: 12px 30px;
-      margin: 28px auto 0 auto;
+      margin: 18px auto 0 auto;
       display: block;
       opacity: 0.6;
       cursor: not-allowed;
@@ -188,12 +185,13 @@
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
       <h2>La quête du bout du monde</h2>
-      <div class="presentation-jeu">
-        <div class="gps-instruction" id="gps-instruction">
-          Rendez-vous à la position&nbsp;:<br>
-          <strong>47.367167, -0.562611</strong>
+      <!-- Bandeau localisation uniquement au début -->
+      <div id="localisation-block">
+        <div class="gps-instruction">
+          Rendez-vous à la position :
+          <br><strong>47.367167, -0.562611</strong>
         </div>
-        <div class="actions-row-horizontal" id="gps-actions">
+        <div class="actions-row-horizontal">
           <div class="icon-action">
             <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
               <svg viewBox="0 0 24 24">
@@ -207,8 +205,10 @@
             <div id="gps-feedback"></div>
           </div>
         </div>
+      </div>
 
-        <!-- Objectif -->
+      <!-- Le reste apparait après validation GPS -->
+      <div id="suite-block" style="display:none;">
         <div class="objectif-course">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text">
@@ -224,9 +224,7 @@
             </span>
           </div>
         </div>
-
-        <!-- Actions photos -->
-        <div class="actions-row-horizontal" id="photos-actions" style="display:none;">
+        <div class="actions-row-horizontal">
           <div class="photo-actions">
             <div class="icon-action side-icon">
               <label id="label-photo1" for="photo-upload-1">
@@ -300,10 +298,8 @@
         }
         const dist = getDistanceMeters(lat, lon, DEST_LAT, DEST_LON);
         if (dist < TOLERANCE_METERS) {
-          document.getElementById("gps-actions").style.display = "none";
-          document.getElementById("gps-instruction").style.display = "none";
-          document.getElementById("photos-actions").style.display = "";
-          document.getElementById("next-quest").style.display = "block";
+          document.getElementById("localisation-block").style.display = "none";
+          document.getElementById("suite-block").style.display = "";
         } else {
           feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
         }
@@ -333,6 +329,7 @@
             var btn = document.getElementById('next-quest');
             btn.disabled = false;
             btn.classList.add('enabled');
+            btn.style.display = "block";
           }
         }
       });
