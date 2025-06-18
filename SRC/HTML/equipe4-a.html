@@ -7,8 +7,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    /* ... (tout ton CSS habituel + ce qui suit pour la logique progressive) ... */
-    #enigme-zone { display: none; }
+    .actions-row-horizontal { display: flex; justify-content: center; align-items: center; margin-top: 18px; margin-bottom: 10px; gap: 28px; flex-wrap: wrap; }
+    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
+    .icon-action a { cursor: pointer; color: #e0c185; text-decoration: none; transition: color 0.2s; }
+    .icon-action a:hover { color: #ffeecb; }
+    .icon-action svg { width: 38px; height: 38px; margin-bottom: 6px; fill: #e0c185; transition: fill 0.2s; display: block; margin-left: auto; margin-right: auto; }
+    .icon-action a:hover svg { fill: #ffeecb; }
+    .icon-action span { font-size: 0.98em; color: #e0c185; margin-top: 2px; text-align: center; }
+    .gps-btn-block { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    #check-gps {
+      padding: 12px 26px;
+      border-radius: 8px;
+      background: #e0c185;
+      color: #473714;
+      font-size: 1.08em;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 2px;
+      margin-top: 2px;
+      transition: background 0.2s;
+      box-shadow: 0 1px 4px #0003;
+    }
+    #check-gps:hover {
+      background: #ffeecb;
+      color: #473714;
+    }
+    #gps-feedback { color: #ffeecb; font-size: 1.07em; min-height: 1.3em; text-align: center; margin: 0 0 8px 0; }
     #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.04); margin: 20px auto 0 auto; display:block;}
     #show-indice:hover { background: #ffeecb; }
     #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
@@ -23,9 +48,36 @@
     .input-password-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
     .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 98vw;}
     .input-password-field:focus { border: 1.5px solid #ffeecb; }
+    .enigme-block { margin-top: 24px; }
+    .objectif-label { background: #e0c185; color: #473714; font-weight: bold; font-size: 1.08em; border-radius: 6px; padding: 6px 0; text-align: center; letter-spacing: 0.04em; margin-bottom: 0; }
+    .objectif-text { margin-top: 17px; color: #ffeecb; text-align: center; font-size: 1.09em; line-height: 1.6; }
     @media (max-width: 650px) {
+      .actions-row-horizontal { flex-direction: column; gap: 10px; }
+      .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
+      .icon-action span { text-align: left; }
       .input-password-field { width: 98vw; font-size: 1em; padding: 10px 7px; }
     }
+    .modal-toast {
+      display: none;
+      position: fixed;
+      left: 50%; top: 10%;
+      transform: translateX(-50%);
+      background: #231d1d;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-size: 1.14em;
+      z-index: 9999;
+      box-shadow: 0 4px 22px #0006;
+      text-align:center;
+      max-width: 90vw;
+    }
+    .modal-toast.visible {
+      display: block;
+      animation: fadein 0.3s;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
 </head>
 <body>
@@ -68,7 +120,7 @@
               <span>Boussole</span>
             </a>
           </div>
-          <div>
+          <div class="gps-btn-block">
             <button id="check-gps">Je suis arrivé !</button>
             <div id="gps-feedback"></div>
           </div>
@@ -155,6 +207,7 @@
     document.getElementById('close-indice').addEventListener('click', function() {
       document.getElementById('indice-modal').classList.remove('active');
       document.getElementById('enigme-zone').style.display = 'block';
+      document.getElementById('password-field').focus();
     });
 
     // ========== Firebase & Gameflow ==========
