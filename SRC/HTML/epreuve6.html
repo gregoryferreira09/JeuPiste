@@ -2,34 +2,175 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quête de l’esprit - Jeu de piste</title>
+  <title>La quête du bout du monde - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    .actions-row-horizontal { display: flex; justify-content: space-between; align-items: center; margin-top: 38px; margin-bottom: 10px; gap: 24px; }
-    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
-    .icon-action a { cursor: pointer; color: #e0c185; text-decoration: none; transition: color 0.2s; }
-    .icon-action a:hover { color: #ffeecb; }
-    .icon-action svg { width: 38px; height: 38px; margin-bottom: 6px; fill: #e0c185; transition: fill 0.2s; display: block; margin-left: auto; margin-right: auto; }
-    .icon-action a:hover svg { fill: #ffeecb; }
-    .icon-action span { font-size: 0.98em; color: #e0c185; margin-top: 2px; text-align: center; }
-    .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
-    #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; transition: background 0.2s, opacity 0.2s; }
-    #next-quest.enabled { background: #e0c185; opacity: 1; cursor: pointer; }
-    .input-password-wrapper { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
-    .input-password-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
-    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 90vw;}
-    .input-password-field:focus { border: 1.5px solid #ffeecb; }
-    .static-a-block { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; font-size: 1.13em; color: #e0c185; }
-    .enigme-block { margin-top: 24px; }
-    .objectif-label { background: #e0c185; color: #473714; font-weight: bold; font-size: 1.08em; border-radius: 6px; padding: 6px 0; text-align: center; letter-spacing: 0.04em; margin-bottom: 0; }
-    .objectif-text { margin-top: 17px; color: #ffeecb; text-align: center; font-size: 1.09em; line-height: 1.6; }
-    @media (max-width: 650px) {
-      .actions-row-horizontal { flex-direction: column; align-items: stretch; gap: 10px; }
-      .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
-      .icon-action span { text-align: left; }
-      .input-password-field { width: 98vw; font-size: 1em; padding: 10px 7px; }
+    body {
+      background: #231d1d;
+      color: #ffeecb;
+      font-family: 'Cormorant Garamond', serif;
+      margin: 0;
+    }
+    .center-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 12px 32px 12px;
+    }
+    .main-accueil {
+      margin-top: 28px;
+      background: #2c1b1b; /* harmonisation */
+      border-radius: 10px;
+      box-shadow: 0 2px 12px #0005;
+      padding: 28px 16px 22px 16px;
+    }
+    h2 {
+      color: #e0c185;
+      font-family: 'Cinzel Decorative', serif;
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 16px;
+      margin-top: 0;
+    }
+    .gps-instruction {
+      color: #ffeecb;
+      font-size: 1.07em;
+      text-align: center;
+      margin: 18px 0 10px 0;
+    }
+    .actions-row-horizontal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .icon-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90px;
+    }
+    .icon-action a, .icon-action label {
+      cursor: pointer;
+      color: #e0c185;
+      text-decoration: none;
+      transition: color 0.2s;
+      font-weight: 600;
+    }
+    .icon-action a:hover, .icon-action label:hover {
+      color: #ffeecb;
+    }
+    .icon-action svg {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 6px;
+      fill: #e0c185;
+      transition: fill 0.2s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .icon-action a:hover svg,
+    .icon-action label:hover svg {
+      fill: #ffeecb;
+    }
+    .icon-action span {
+      font-size: 0.98em;
+      color: #e0c185;
+      margin-top: 2px;
+      text-align: center;
+    }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
+    #check-gps {
+      padding: 12px 26px;
+      border-radius: 8px;
+      background: #e0c185;
+      color: #473714;
+      font-size: 1.08em;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 8px;
+      margin-top: 2px;
+      transition: background 0.2s;
+    }
+    #check-gps:hover {
+      background: #ffeecb;
+      color: #473714;
+    }
+    #gps-feedback {
+      color: #ffeecb;
+      font-size: 1.07em;
+      min-height: 1.3em;
+      text-align: center;
+      margin: 0 0 8px 0;
+    }
+    .objectif-course {
+      margin-top: 20px;
+      margin-bottom: 18px;
+    }
+    .objectif-label {
+      background: #e0c185;
+      color: #473714;
+      font-weight: bold;
+      font-size: 1.08em;
+      border-radius: 6px;
+      padding: 6px 0;
+      text-align: center;
+      letter-spacing: 0.04em;
+      margin-bottom: 0;
+    }
+    .objectif-text {
+      margin-top: 17px;
+      color: #ffeecb;
+      text-align: center;
+      font-size: 1.09em;
+      line-height: 1.6;
+    }
+    .photo-actions {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap;
+      border: 0;
+      padding: 0;
+      margin: -1px;
+    }
+    #next-quest {
+      background: #aaa;
+      color: #fff;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      margin: 18px auto 0 auto;
+      display: block;
+      opacity: 0.6;
+      cursor: not-allowed;
+      transition: background 0.2s, opacity 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    #next-quest.enabled {
+      background: #e0c185;
+      color: #473714;
+      opacity: 1;
+      cursor: pointer;
     }
     .modal-toast {
       display: none;
@@ -52,45 +193,34 @@
       animation: fadein 0.3s;
     }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    #gps-feedback { color: #ffeecb; font-size: 1.07em; min-height: 1.3em; text-align: center; margin: 0 0 8px 0; }
+    @media (max-width: 650px) {
+      .center-wrapper { max-width: 99vw; }
+      .main-accueil { padding: 12px 2vw 18px 2vw; }
+      .actions-row-horizontal { flex-direction: column; gap: 10px; }
+      .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
+      .icon-action span { text-align: left; }
+      .photo-actions { gap: 10px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
-
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête de l’esprit</h2>
-      <div class="presentation-jeu" style="margin-top: 24px;">
-        <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7;">
-          <em>
-            Il est des chemins que ni l’épée ni la course ne sauraient franchir.<br>
-            Seule la lumière de l’esprit éclaire ce que les yeux ne voient pas.
-          </em>
-        </div>
-        <div class="objectif-course" style="margin-top: 24px;">
-          <div class="objectif-label">Objectif</div>
-          <div class="objectif-text" style="margin-top:18px;">
-            Un indice qui permet de lire un message ancien, scellé par les sages, vous attend sur la pierre de Rosette.<br><br>
-            Parlez ami et entrez... Déchiffrez le texte, percez ses secrets et inscrivez-le ci-dessous<br><br>
-            Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.<br><br>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bloc GPS obligatoire au début -->
+      <h2>La quête du bout du monde</h2>
+      <!-- Bandeau localisation uniquement au début -->
       <div id="localisation-block">
         <div class="gps-instruction">
           Rendez-vous à la position :
-          <br><strong>47.47722211138926, -0.5798594274786282</strong>
+          <br><strong>47.367167, -0.562611</strong>
         </div>
         <div class="actions-row-horizontal">
-          <div class="icon-action side-icon">
-            <a href="https://maps.google.com/?q=47.47722211138926,-0.5798594274786282" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-              <svg viewBox="0 0 24 24" width="38" height="38">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
+          <div class="icon-action">
+            <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
               </svg>
               <span>Boussole</span>
             </a>
@@ -102,41 +232,82 @@
         </div>
       </div>
 
-      <!-- Bloc qui s'affiche après validation GPS -->
+      <!-- Le reste apparait après validation GPS -->
       <div id="suite-block" style="display:none;">
-        <div class="static-a-block">
-          <div><strong>Donnée :</strong> A = F</div>
+        <div class="objectif-course">
+          <div class="objectif-label">Objectif</div>
+          <div class="objectif-text">
+            <span style="color:#ffeecb;">
+              Au sommet de la butte, le vent murmure les secrets du royaume de l’Ogre.<br>
+              D’ici, le regard embrasse les terres du noble roi Arthur.<br><br>
+              Mais l’heure n’est plus à la contemplation.<br>
+              Descendez dans les plaines, preux aventuriers, et mêlez-vous au peuple errant.<br><br>
+              Pour localiser l’antre du Dragon, il vous faudra sonder les salutations et questionner les âmes croisées.<br><br>
+              📸 <strong>Votre quête : prendre la pose avec quatre inconnus du royaume.</strong><br>
+              Ces portraits seront la clé d’un savoir ancien.<br><br>
+              Envoyez vos preuves à Merlin : peut-être alors dévoilera-t-il le chemin du combat final.
+            </span>
+          </div>
         </div>
-        <div class="enigme-block">
-          <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
-          <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
-            O'FN YWTU IJ YJRU XQNGWJ, ATZX S'FWNJE UFX ZSJ FRNJ HJQNGFYFNWJ F RJ UWJXJSYJW ?
-          </span>
+        <div class="actions-row-horizontal">
+          <div class="photo-actions">
+            <div class="icon-action side-icon">
+              <label id="label-photo1" for="photo-upload-1">
+                <svg id="icon-photo1" viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                <span>Photo avec un paysan</span>
+                <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo2" for="photo-upload-2">
+                <svg id="icon-photo2" viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                <span>Photo avec un gueux</span>
+                <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo3" for="photo-upload-3">
+                <svg id="icon-photo3" viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                <span>Photo avec un troubadour</span>
+                <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo4" for="photo-upload-4">
+                <svg id="icon-photo4" viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                <span>Photo avec un fils d'unijambiste</span>
+                <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+          </div>
         </div>
-        <div class="input-password-wrapper">
-          <label for="password-field" class="input-password-label">
-            Entrez le mot de passe pour valider votre progression :
-          </label>
-          <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
-        </div>
+        <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
         <button id="next-quest" disabled>Quête suivante</button>
       </div>
-
     </main>
   </div>
-
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
+
+  <!-- Firebase & gameflow scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
     // GPS obligatoire
-    const DEST_LAT = 47.47722211138926;
-    const DEST_LON = -0.5798594274786282;
+    const DEST_LAT = 47.367167;
+    const DEST_LON = -0.562611;
     const TOLERANCE_METERS = 40;
     document.getElementById("check-gps").addEventListener("click", function() {
       const feedback = document.getElementById("gps-feedback");
@@ -205,55 +376,80 @@
       setTimeout(() => { toast.classList.remove('visible'); }, 2200);
     }
 
-    // Validation mot de passe très souple
-    function normalize(str) {
-      return str
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // enlève accents
-        .replace(/[^a-z0-9 ]+/g, "")                       // enlève toute ponctuation
-        .replace(/\s+/g, " ")                              // espaces multiples en 1
-        .trim();
+    // Upload photos + synchro multi-device
+    function updatePhotoUI() {
+      var out = document.getElementById('photo-filename');
+      var btn = document.getElementById('next-quest');
+      var allFiles = [];
+      var allSelected = true;
+      // Récupère l'état dans Firebase pour chaque photo
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/6').once('value', function(snapshot) {
+        const data = snapshot.val() || {};
+        for (var i = 1; i <= 4; i++) {
+          var inp = document.getElementById('photo-upload-' + i);
+          var label = document.getElementById('label-photo' + i);
+          var icon = document.getElementById('icon-photo' + i);
+          let fileName = data['photo'+i] && data['photo'+i].name ? data['photo'+i].name : "";
+          if (fileName) {
+            allFiles.push(fileName);
+            label.setAttribute('aria-disabled', 'true');
+            if(inp) inp.disabled = true;
+            if(label) label.classList.add('grayed');
+            if(icon) icon.classList.add('grayed');
+          } else {
+            allSelected = false;
+            label.removeAttribute('aria-disabled');
+            if(inp) inp.disabled = false;
+            if(label) label.classList.remove('grayed');
+            if(icon) icon.classList.remove('grayed');
+          }
+        }
+        out.textContent = allFiles.length ? "Photos sélectionnées : " + allFiles.join(", ") : "";
+        btn.style.display = "block";
+        if (allSelected) {
+          btn.disabled = false;
+          btn.classList.add('enabled');
+        } else {
+          btn.disabled = true;
+          btn.classList.remove('enabled');
+        }
+      });
     }
-    const PASSWORD = normalize("j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?");
+    for(let i=1; i<=4; i++) {
+      document.getElementById('photo-upload-' + i).addEventListener('change', function(e) {
+        const idx = this.id.split('-').pop();
+        if(this.files && this.files[0]) {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/6/photo' + idx).set({
+            name: this.files[0].name,
+            uploadedAt: Date.now()
+          }, updatePhotoUI);
+        }
+      });
+    }
+    // Synchro multi-device : met à jour à chaque changement
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/6').on('value', updatePhotoUI);
+    window.addEventListener('DOMContentLoaded', updatePhotoUI);
 
-    document.getElementById('password-field').addEventListener('input', function() {
-      let userValue = normalize(this.value);
-      const btn = document.getElementById('next-quest');
-      if (userValue === PASSWORD) {
-        btn.disabled = false;
-        btn.classList.add('enabled');
-      } else {
-        btn.disabled = true;
-        btn.classList.remove('enabled');
-      }
-    });
-
-    // Navigation gameflow synchro
+    // Gameflow navigation du bouton
     document.getElementById('next-quest').addEventListener('click', function() {
       if (this.disabled) return;
+      this.disabled = true;
+      this.classList.remove('enabled');
+      showToast("Validation en cours...");
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
         .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
           if (!error && committed) {
-            getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-              const step = snapshot.val();
-              if (step < parcours.length) {
-                const epreuveNum = parcours[step];
-                if (epreuveNum === 6) {
-                  window.location.href = "epreuve6.html";
-                } else if (epreuveNum === 7) {
-                  window.location.href = "révélation.html";
-                } else {
-                  window.location.href = `equipe${epreuveNum}-a.html`;
-                }
-              } else {
-                alert('Bravo, vous avez terminé !');
-              }
-            });
+            showToast("Étape validée !");
+          } else {
+            showToast("Erreur lors de la validation...");
+            let btn = document.getElementById('next-quest');
+            btn.disabled = false;
+            btn.classList.add('enabled');
           }
         });
     });
 
-    // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
+    // Navigation automatique gameflow
     function goToStep(stepIndex) {
       getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
         if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
@@ -277,6 +473,8 @@
         const step = snapshot.val() || 0;
         goToStep(step);
       });
+
+    // Anti-retour arrière
     window.addEventListener("pageshow", function(evt) {
       if (evt.persisted) {
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
