@@ -99,6 +99,28 @@
         max-width: 98vw;
       }
     }
+    /* Harmonisation des modales et messages (amélioration accessibilité/UX) */
+    .modal-toast {
+      display: none;
+      position: fixed;
+      left: 50%; top: 10%;
+      transform: translateX(-50%);
+      background: #231d1d;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-size: 1.14em;
+      z-index: 9999;
+      box-shadow: 0 4px 22px #0006;
+      text-align:center;
+      max-width: 90vw;
+    }
+    .modal-toast.visible {
+      display: block;
+      animation: fadein 0.3s;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
 </head>
 <body>
@@ -134,7 +156,7 @@
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3z"/>
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13[...]
             </svg>
             <span>Boussole</span>
           </a>
@@ -143,7 +165,7 @@
         <div class="icon-action side-icon">
           <label for="photo-upload" aria-label="Télécharger une photo">
             <svg viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24[...]
             </svg>
             <span>Photo à envoyer</span>
             <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -161,26 +183,75 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+
+  <!-- Toast de feedback harmonisé -->
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
+
   <!-- Firebase et gameflow.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
-    const firebaseConfig = {
-  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-  authDomain: "murder-party-ba8d1.firebaseapp.com",
-  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.appspot.com",
-  messagingSenderId: "20295055805",
-  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-  measurementId: "G-KSBMBB7KMJ"
-};
+    // ==== Sécurité et robustesse : vérification session ====
+    // Si salonCode ou equipeNum absent, redirige vers l'accueil pour éviter les états incohérents
+    const salonCode = localStorage.getItem("salonCode");
+    const equipeNum = Number(localStorage.getItem("equipeNum"));
+    if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+      window.location.href = "accueil.html";
+    }
 
-// Toujours initialiser AVANT d'utiliser firebase
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+    // === Initialisation Firebase ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // ==== Harmonisation feedback utilisateur ====
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+    }
+
+    // ==== Synchro en temps réel de l'étape d'équipe (navigation auto si currentStep change) ====
+    // Quand currentStep change (même si action par l'autre binôme), on redirige automatiquement.
+    function goToStep(stepIndex) {
+      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+          showToast('Bravo, vous avez terminé !');
+          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+          return;
+        }
+        const epreuveNum = parcours[stepIndex];
+        let target = "";
+        if (epreuveNum === 6) target = "epreuve6.html";
+        else if (epreuveNum === 7) target = "révélation.html";
+        else target = `equipe${epreuveNum}-a.html`;
+        const current = window.location.pathname.split('/').pop();
+        if (current !== target) {
+          window.location.href = target;
+        }
+      });
+    }
+
+    // Ecouteur temps réel sur currentStep pour synchro navigation
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+      .on('value', function(snapshot) {
+        const step = snapshot.val() || 0;
+        goToStep(step);
+      });
+
     document.addEventListener('DOMContentLoaded', function() {
       var input = document.getElementById('photo-upload');
       var out = document.getElementById('photo-filename');
@@ -193,6 +264,12 @@ if (!firebase.apps.length) {
             out.textContent = "Photo sélectionnée : " + this.files[0].name;
             btn.disabled = false;
             btn.classList.add('enabled');
+            // ==== Synchro preuve : on écrit la preuve dans firebase ====
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/1/photo').set({
+              name: this.files[0].name,
+              // Pour une vraie appli : uploader sur storage, stocker l'URL ici
+              uploadedAt: Date.now()
+            });
           } else {
             out.textContent = "";
             btn.disabled = true;
@@ -201,31 +278,51 @@ if (!firebase.apps.length) {
         });
       }
 
-      // === NAVIGATION GAMEFLOW COMME EQUIPE5 ===
+      // ===== Synchro preuve : affiche la photo sur tous les appareils du binôme ====
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/1/photo')
+        .on('value', function(snapshot) {
+          const data = snapshot.val();
+          if (data && data.name) {
+            out.textContent = "Photo sélectionnée : " + data.name;
+            btn.disabled = false;
+            btn.classList.add('enabled');
+            input.disabled = true;
+          } else {
+            out.textContent = "";
+            btn.disabled = true;
+            btn.classList.remove('enabled');
+            input.disabled = false;
+          }
+        });
+
+      // === NAVIGATION GAMEFLOW : passage à l'étape suivante + désactivation bouton (anti double clic) ===
       btn.addEventListener('click', function() {
-        const salonCode = localStorage.getItem("salonCode");
-        const equipeNum = Number(localStorage.getItem("equipeNum"));
-        const db = firebase.database();
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.classList.remove('enabled');
+        showToast("Validation en cours...");
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
           .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
             if (!error && committed) {
-             getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-const step = snapshot.val();
-if (step < parcours.length) {
-  const epreuveNum = parcours[step];
-  if (epreuveNum === 6) {
-    window.location.href = "epreuve6.html";
-  } else if (epreuveNum === 7) {
-    window.location.href = "révélation.html";
-  } else {
-    window.location.href = `equipe${epreuveNum}-a.html`;
-  }
-} else {
-  alert('Bravo, vous avez terminé !');
-}
+              // La navigation sera automatiquement gérée par l'écouteur temps réel plus haut
+              showToast("Étape validée !");
+            } else {
+              showToast("Erreur lors de la validation...");
+              btn.disabled = false;
+              btn.classList.add('enabled');
             }
           });
       });
+    });
+    // Anti-retour arrière : recharge l'état depuis Firebase pour éviter un retour à une ancienne étape
+    window.addEventListener("pageshow", function(evt) {
+      if (evt.persisted) {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          .once('value', function(snapshot) {
+            const step = snapshot.val() || 0;
+            goToStep(step);
+          });
+      }
     });
   </script>
 </body>
