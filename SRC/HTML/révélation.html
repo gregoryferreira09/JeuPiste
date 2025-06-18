@@ -52,25 +52,6 @@
       margin-top: 2px;
       text-align: center;
     }
-    #next-quest {
-      background: #e0c185;
-      color: #473714;
-      font-size: 1.08em;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 30px;
-      margin: 38px auto 0 auto;
-      display: block;
-      opacity: 1;
-      cursor: pointer;
-      transition: background 0.2s, opacity 0.2s;
-    }
-    #next-quest:disabled {
-      background: #aaa;
-      color: #fff;
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -133,8 +114,7 @@
           </a>
         </div>
       </div>
-
-      <button id="next-quest">Quête suivante</button>
+      <!-- PAS DE BOUTON ICI -->
     </main>
   </div>
 
@@ -160,77 +140,42 @@
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
-    // NAVIGATION GAMEFLOW
-    document.addEventListener('DOMContentLoaded', function() {
-      const nextBtn = document.getElementById('next-quest');
-      nextBtn.addEventListener('click', function() {
-        const salonCode = localStorage.getItem("salonCode");
-        const equipeNum = Number(localStorage.getItem("equipeNum"));
-        const db = firebase.database();
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-            if (!error && committed) {
-              getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-                const step = snapshot.val();
-                if (step < parcours.length) {
-                  const epreuveNum = parcours[step];
-                  if (epreuveNum === 6) {
-                    window.location.href = "epreuve6.html";
-                  } else if (epreuveNum === 7) {
-                    window.location.href = "révélation.html";
-                  } else {
-                    window.location.href = `equipe${epreuveNum}-a.html`;
-                  }
-                } else {
-                  // parcours terminé : juste masquer le bouton
-                  nextBtn.disabled = true;
-                  nextBtn.style.display = 'none';
-                }
-              });
-            }
-          });
-      });
-
-      // NAVIGATION GAMEFLOW SYNCHRO SANS TOAST
-      function goToStep(stepIndex) {
-        const salonCode = localStorage.getItem("salonCode");
-        const equipeNum = Number(localStorage.getItem("equipeNum"));
-        getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-          const nextBtn = document.getElementById('next-quest');
-          if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-            // parcours terminé : masquer le bouton, pas de toast !
-            nextBtn.disabled = true;
-            nextBtn.style.display = 'none';
-            return;
-          }
-          const epreuveNum = parcours[stepIndex];
-          let target = "";
-          if (epreuveNum === 6) target = "epreuve6.html";
-          else if (epreuveNum === 7) target = "révélation.html";
-          else target = `equipe${epreuveNum}-a.html`;
-          const current = window.location.pathname.split('/').pop();
-          if (current !== target) {
-            window.location.href = target;
-          }
-        });
-      }
+    // NAVIGATION GAMEFLOW SYNCHRO (si jamais on revient en arrière)
+    function goToStep(stepIndex) {
       const salonCode = localStorage.getItem("salonCode");
       const equipeNum = Number(localStorage.getItem("equipeNum"));
-      const db = firebase.database();
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-        .on('value', function(snapshot) {
-          const step = snapshot.val() || 0;
-          goToStep(step);
-        });
-      window.addEventListener("pageshow", function(evt) {
-        if (evt.persisted) {
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-            .once('value', function(snapshot) {
-              const step = snapshot.val() || 0;
-              goToStep(step);
-            });
+      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+          // FIN DE PARCOURS : ne rien faire du tout
+          return;
+        }
+        const epreuveNum = parcours[stepIndex];
+        let target = "";
+        if (epreuveNum === 6) target = "epreuve6.html";
+        else if (epreuveNum === 7) target = "révélation.html";
+        else target = `equipe${epreuveNum}-a.html`;
+        const current = window.location.pathname.split('/').pop();
+        if (current !== target) {
+          window.location.href = target;
         }
       });
+    }
+    const salonCode = localStorage.getItem("salonCode");
+    const equipeNum = Number(localStorage.getItem("equipeNum"));
+    const db = firebase.database();
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+      .on('value', function(snapshot) {
+        const step = snapshot.val() || 0;
+        goToStep(step);
+      });
+    window.addEventListener("pageshow", function(evt) {
+      if (evt.persisted) {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          .once('value', function(snapshot) {
+            const step = snapshot.val() || 0;
+            goToStep(step);
+          });
+      }
     });
   </script>
 </body>
