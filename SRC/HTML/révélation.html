@@ -112,7 +112,7 @@
           </a>
         </div>
       </div>
-      <!-- PAS DE BOUTON -->
+      <!-- PAGE STATIQUE : PAS DE JS, PAS D'ECOUTEUR, PAS DE BOUTON -->
     </main>
   </div>
 
@@ -120,61 +120,5 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="../JS/gameflow.js"></script>
-  <script>
-    // Initialisation Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.appspot.com",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-
-    // Synchronisation navigation, arrêt total si la partie est finie
-    let listenerRef = null;
-    function goToStep(stepIndex) {
-      const salonCode = localStorage.getItem("salonCode");
-      const equipeNum = Number(localStorage.getItem("equipeNum"));
-      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-          // FIN DE PARCOURS : détacher l'écouteur et ne plus rien faire
-          if (listenerRef) listenerRef.off();
-          return;
-        }
-        const epreuveNum = parcours[stepIndex];
-        let target = "";
-        if (epreuveNum === 6) target = "epreuve6.html";
-        else if (epreuveNum === 7) target = "révélation.html";
-        else target = `equipe${epreuveNum}-a.html`;
-        const current = window.location.pathname.split('/').pop();
-        if (current !== target) {
-          window.location.href = target;
-        }
-      });
-    }
-    const salonCode = localStorage.getItem("salonCode");
-    const equipeNum = Number(localStorage.getItem("equipeNum"));
-    const db = firebase.database();
-    listenerRef = db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep');
-    listenerRef.on('value', function(snapshot) {
-      const step = snapshot.val() || 0;
-      goToStep(step);
-    });
-    window.addEventListener("pageshow", function(evt) {
-      if (evt.persisted) {
-        listenerRef.once('value', function(snapshot) {
-          const step = snapshot.val() || 0;
-          goToStep(step);
-        });
-      }
-    });
-  </script>
 </body>
 </html>
