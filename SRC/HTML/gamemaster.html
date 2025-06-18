@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* ... (tout ton CSS, inchangé) ... */
     .chrono-value {
       color: #ffe07e;
       font-size: 0.98em;
@@ -61,7 +60,6 @@
     let currentIndex = 0;
     let stepsTime = {}; // <--- Pour stocker les chronos de l’équipe courante
 
-    // >>>>>>>>>>>> ADAPTE ici si tu veux plus d'étapes ou change les titres <<<<<<<<<<<
     let etapes = [
       { titre: "Épreuve 1", fichiersAttendus: ["Photo 1"] },
       { titre: "Épreuve 2", fichiersAttendus: ["Vidéo"] },
@@ -147,23 +145,48 @@
       }
     }
 
-    // --- TIMER : Chrono de présence sur la page équipe (affichage local, pas sauvegardé) ---
+    // --- TIMER : Chrono en temps réel basé sur le startTime Firebase de l'étape courante ---
     let timerInterval = null;
-    let chronoStart = null;
     function afficherTimer() {
       if (timerInterval) clearInterval(timerInterval);
-      chronoStart = Date.now();
       const timerDiv = document.getElementById('timer');
+      const equipe = equipes[currentIndex];
+      const step = equipe.currentStep ?? 0;
+
       function maj() {
-        const elapsed = Math.floor((Date.now() - chronoStart) / 1000);
-        const min = Math.floor(elapsed/60), sec = elapsed%60;
-        timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
-        if (elapsed >= 600) {
-          timerDiv.classList.add('late');
-          timerDiv.textContent += " ⏰";
-        } else {
+        // Quand l'épreuve est terminée (plus d'étape en cours)
+        if (step >= etapes.length) {
+          timerDiv.textContent = "Temps sur cette épreuve : terminé";
           timerDiv.classList.remove('late');
+          return;
         }
+        db.ref(`parties/${salonCode}/equipes/${equipe.num}/epreuves/${step}/startTime`).once('value', snap => {
+          const startTime = snap.val();
+          // Si jamais l'épreuve n'a pas (encore) de startTime
+          if (!startTime) {
+            timerDiv.textContent = "Temps sur cette épreuve : —";
+            timerDiv.classList.remove('late');
+            return;
+          }
+          // Si l'étape a déjà été validée, afficher le temps figé
+          const chronoVal = stepsTime && (stepsTime[step] !== undefined && stepsTime[step] !== null) ? stepsTime[step] : null;
+          if (chronoVal !== null) {
+            let min = Math.floor(chronoVal/60), sec = chronoVal%60;
+            timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
+            timerDiv.classList.remove('late');
+            return;
+          }
+          // Sinon, afficher le temps réel écoulé
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          const min = Math.floor(elapsed/60), sec = elapsed%60;
+          timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
+          if (elapsed >= 600) {
+            timerDiv.classList.add('late');
+            timerDiv.textContent += " ⏰";
+          } else {
+            timerDiv.classList.remove('late');
+          }
+        });
       }
       maj();
       timerInterval = setInterval(maj, 1000);
