@@ -16,18 +16,6 @@
       gap: 38px;
       flex-wrap: wrap;
     }
-    .boussole-action {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .photo-actions {
-      display: flex;
-      gap: 38px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-    }
     .icon-action {
       display: flex;
       flex-direction: column;
@@ -125,14 +113,13 @@
       display: block;
       animation: fadein 0.3s;
     }
-    #gps-block {
-      margin: 38px 0 22px 0;
-    }
     #gps-feedback {
       color: #ffeecb;
-      margin-top: 18px;
+      margin-top: 12px;
       font-size: 1.05em;
       min-height: 1.4em;
+      text-align:center;
+      width:100%;
     }
     #check-gps {
       padding: 12px 26px;
@@ -142,8 +129,8 @@
       font-size: 1.08em;
       border: none;
       cursor: pointer;
-      margin-top: 12px;
-      margin-bottom: 10px;
+      margin-top: 4px;
+      margin-bottom: 7px;
     }
     @media (max-width: 900px) {
       .actions-row-horizontal, .photo-actions {
@@ -173,25 +160,26 @@
   </header>
 
   <div class="center-wrapper">
-    <!-- Bloc GPS obligatoire -->
-    <div id="gps-block">
-      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Étape de localisation</h2>
-      <div class="actions-row-horizontal" style="margin-bottom:18px;">
-        <div class="icon-action boussole-action">
-          <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
-            </svg>
-            <span>Boussole</span>
-          </a>
-        </div>
+    <!-- Bandeau GPS harmonisé -->
+    <div class="actions-row-horizontal" id="gps-block">
+      <div class="icon-action boussole-action">
+        <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
+          </svg>
+          <span>Boussole</span>
+        </a>
       </div>
-      <div style="color:#ffeecb; font-size:1.08em; margin-bottom:18px;">
-        Pour poursuivre la quête, rends-toi à cet endroit précis :<br>
-        <strong>47.469222, -0.577722</strong>
+      <div style="min-width:220px; text-align:center;">
+        <span style="color:#ffeecb; font-size:1.06em;">
+          Pour poursuivre la quête, rends-toi à cet endroit précis :<br>
+          <strong>47.469222, -0.577722</strong>
+        </span>
       </div>
-      <button id="check-gps">Je suis arrivé !</button>
-      <div id="gps-feedback"></div>
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <button id="check-gps">Je suis arrivé !</button>
+        <div id="gps-feedback"></div>
+      </div>
     </div>
 
     <!-- Contenu principal (caché tant que GPS non validé) -->
