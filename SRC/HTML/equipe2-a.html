@@ -120,6 +120,11 @@
       animation: fadein 0.3s;
     }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+    /* AJOUT pour griser l'icône quand upload */
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body>
@@ -165,7 +170,7 @@
         <!-- Vidéo 1 -->
         <div class="icon-action side-icon">
           <label for="video-upload-1" aria-label="Télécharger la vidéo 1">
-            <svg viewBox="0 0 24 24" width="38" height="38">
+            <svg id="icon-video1" viewBox="0 0 24 24" width="38" height="38">
               <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
             </svg>
             <span>Vidéo 1 à envoyer</span>
@@ -175,7 +180,7 @@
         <!-- Vidéo 2 -->
         <div class="icon-action side-icon">
           <label for="video-upload-2" aria-label="Télécharger la vidéo 2">
-            <svg viewBox="0 0 24 24" width="38" height="38">
+            <svg id="icon-video2" viewBox="0 0 24 24" width="38" height="38">
               <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
             </svg>
             <span>Vidéo 2 à envoyer</span>
@@ -253,12 +258,13 @@
         goToStep(step);
       });
 
-    // Upload vidéo 1
     document.addEventListener('DOMContentLoaded', function() {
       var input1 = document.getElementById('video-upload-1');
       var input2 = document.getElementById('video-upload-2');
       var out = document.getElementById('video-filename');
       var btn = document.getElementById('next-quest');
+      var icon1 = document.getElementById('icon-video1');
+      var icon2 = document.getElementById('icon-video2');
       // Upload 1
       if(input1 && out) {
         input1.addEventListener('change', function() {
@@ -281,7 +287,7 @@
           }
         });
       }
-      // Synchro multi-device et activation bouton
+      // Synchro multi-device et activation bouton + grisé des icônes
       function updateUI() {
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2').once('value', function(snapshot) {
           const data = snapshot.val() || {};
@@ -289,6 +295,8 @@
           if(data.video1 && data.video1.name) txt += "Vidéo 1 : " + data.video1.name + " ";
           if(data.video2 && data.video2.name) txt += "Vidéo 2 : " + data.video2.name;
           if(out) out.textContent = txt;
+          if(icon1) icon1.classList.toggle('grayed', !!(data.video1 && data.video1.name));
+          if(icon2) icon2.classList.toggle('grayed', !!(data.video2 && data.video2.name));
           if(btn) {
             if(data.video1 && data.video1.name && data.video2 && data.video2.name) {
               btn.disabled = false;
