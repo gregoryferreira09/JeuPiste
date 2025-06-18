@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
+    /* Le CSS d'origine + ajustements */
     .actions-row-horizontal { display: flex; justify-content: center; align-items: center; margin-top: 18px; margin-bottom: 10px; gap: 28px; flex-wrap: wrap; }
     .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
     .icon-action a { cursor: pointer; color: #e0c185; text-decoration: none; transition: color 0.2s; }
@@ -33,19 +34,19 @@
       color: #473714;
     }
     #gps-feedback { color: #ffeecb; font-size: 1.07em; min-height: 1.3em; text-align: center; margin: 0 0 8px 0; }
-    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba[...]
+    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.04); margin: 20px auto 0 auto; display:block;}
     #show-indice:hover { background: #ffeecb; }
     #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
     #indice-modal.active { display: flex; }
     .modal-img-wrapper { position: relative; background: #fffbe0; padding: 24px 24px 12px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); max-width: 92vw; }
     .modal-img-wrapper img { display: block; max-width: 70vw; max-height: 60vh; margin: 0 auto; border-radius: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
-    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: colo[...]
+    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.2s; }
     .close-modal:hover { color: #e0c185; }
-    #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; t[...]
-    #next-quest.enabled { background: #e0c185; opacity: 1; cursor: pointer; }
+    #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; transition: background 0.2s, opacity 0.2s; }
+    #next-quest.enabled { background: #e0c185; opacity: 1; cursor: pointer; color:#473714;}
     .input-password-wrapper { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
     .input-password-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
-    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; ma[...]
+    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 98vw;}
     .input-password-field:focus { border: 1.5px solid #ffeecb; }
     .static-a-block { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; font-size: 1.13em; color: #e0c185; }
     .enigme-block { margin-top: 24px; }
@@ -129,25 +130,29 @@
 
       <!-- Bloc qui s'affiche après validation GPS -->
       <div id="suite-block" style="display:none;">
-        <div class="static-a-block">
-          <div><strong>Donnée :</strong> A = F</div>
+        <button id="show-indice" type="button">Voir l’indice</button>
+
+        <div id="enigme-zone" style="display:none;">
+          <div class="static-a-block">
+            <div><strong>Donnée :</strong> A = F</div>
+          </div>
+          <div>
+            <button id="btn-indice" type="button" style="display:none;">Voir l’indice visuel</button>
+          </div>
+          <div class="enigme-block">
+            <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
+            <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
+              O'FN YWTU IJ YJRU XQNGWJ, ATZX S'FWNJE UFX ZSJ FRNJ HJQNGFYFNWJ F RJ UWJXJSYJW ?
+            </span>
+          </div>
+          <div class="input-password-wrapper">
+            <label for="password-field" class="input-password-label">
+              Entrez le mot de passe pour valider votre progression :
+            </label>
+            <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
+          </div>
+          <button id="next-quest" disabled>Quête suivante</button>
         </div>
-        <div>
-          <button id="show-indice" type="button">Voir l’indice</button>
-        </div>
-        <div class="enigme-block">
-          <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
-          <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
-            O'FN YWTU IJ YJRU XQNGWJ, ATZX S'FWNJE UFX ZSJ FRNJ HJQNGFYFNWJ F RJ UWJXJSYJW ?
-          </span>
-        </div>
-        <div class="input-password-wrapper">
-          <label for="password-field" class="input-password-label">
-            Entrez le mot de passe pour valider votre progression :
-          </label>
-          <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
-        </div>
-        <button id="next-quest" disabled>Quête suivante</button>
       </div>
 
       <!-- Modal d'indice -->
@@ -203,8 +208,16 @@
       });
     });
 
-    // Indice modal
+    // ===== Affichage progressif après GPS =====
     document.getElementById('show-indice').addEventListener('click', function() {
+      document.getElementById('enigme-zone').style.display = 'block';
+      this.style.display = 'none';
+      // Optionnel : le bouton pour le visuel indice
+      document.getElementById('btn-indice').style.display = 'inline-block';
+    });
+
+    // Indice modal
+    document.getElementById('btn-indice').addEventListener('click', function() {
       document.getElementById('indice-modal').classList.add('active');
     });
     document.getElementById('close-indice').addEventListener('click', function() {
