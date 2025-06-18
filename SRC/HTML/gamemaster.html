@@ -7,6 +7,125 @@
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    /* Style harmonisé */
+    .main-accueil {
+      max-width: 600px;
+      margin: 38px auto;
+      background: #2c1b1b;
+      border-radius: 18px;
+      box-shadow: 0 4px 20px #0001;
+      padding: 32px 24px;
+      border: 2px solid #e0c185;
+      color: #f4e4c1;
+      font-family: 'Cormorant Garamond', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      min-width: 300px;
+    }
+    .main-accueil h1 {
+      text-align: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2.15em;
+      margin-bottom: 18px;
+      color: #e0c185;
+      margin-top: 0;
+    }
+    .carousel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin: 0 auto;
+    }
+    .carte-equipe {
+      background: #231d1d;
+      border: 2px solid #e0c185;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px #0002;
+      padding: 30px 18px 24px 18px;
+      min-width: 260px;
+      max-width: 410px;
+      flex: 1 1 0;
+      margin: 0 8px;
+      color: #ffeecb;
+      font-size: 1.05em;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .team-title {
+      font-family: 'Cinzel Decorative', serif;
+      color: #e0c185;
+      font-size: 1.28em;
+      text-align: center;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .team-members {
+      color: #ffeecb;
+      font-size: 1.08em;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .etape-encours {
+      color: #e9c78c;
+      background: #291d10;
+      border-radius: 7px;
+      padding: 6px 0;
+      font-weight: bold;
+      margin: 10px 0 12px 0;
+      text-align: center;
+      font-size: 1.08em;
+    }
+    .timer {
+      color: #ffeecb;
+      text-align: center;
+      margin: 9px 0 16px 0;
+      font-size: 1.04em;
+      font-family: 'Roboto Mono', monospace;
+      background: #241b14;
+      border-radius: 7px;
+      padding: 8px 0;
+    }
+    .late { color: #ffadad !important; }
+    .parcours-list {
+      margin-top: 8px;
+    }
+    .epreuve {
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #e0c18544;
+    }
+    .epreuve:last-child { border-bottom: none; }
+    .epreuve-titre {
+      color: #e0c185;
+      font-weight: bold;
+      font-size: 1.06em;
+      margin-bottom: 4px;
+    }
+    .fichiers-epreuve {
+      color: #b8b8b8;
+      font-size: 0.96em;
+      margin-bottom: 2px;
+    }
+    .download-btn {
+      background: #e0c185;
+      color: #473714;
+      border: none;
+      border-radius: 7px;
+      padding: 4px 16px;
+      font-size: 0.98em;
+      cursor: pointer;
+      margin-left: 7px;
+      margin-top: 4px;
+      transition: background 0.2s;
+    }
+    .download-btn:hover, .download-btn:focus {
+      background: #ffeecb;
+      color: #473714;
+      outline: 2px solid #e0c185;
+    }
     .chrono-value {
       color: #ffe07e;
       font-size: 0.98em;
@@ -15,25 +134,60 @@
       letter-spacing: 1px;
       font-family: 'Roboto Mono', monospace;
     }
+    .nav-btn {
+      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
+      color: #473714;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      font-size: 1.5em;
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: bold;
+      padding: 8px 18px;
+      cursor: pointer;
+      margin: 0 4px;
+      transition: box-shadow .2s, background .2s, color .2s;
+      min-width: 54px;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-btn:hover, .nav-btn:focus {
+      background: #e0c185;
+      color: #1a1a1a;
+      box-shadow: 0 0 8px #e0c18588;
+      outline: 2px solid #e0c185;
+    }
+    @media (max-width: 750px) {
+      .main-accueil { max-width: 97vw; padding: 10px 1vw; }
+      .carte-equipe { min-width: 0; max-width: 99vw; padding: 20px 4vw; }
+      .carousel { flex-direction: column; gap: 12px; }
+      .nav-btn { min-width: 46px; min-height: 46px; font-size: 1.1em; padding: 7px 9px;}
+    }
+    body { background: #1b1b1b; }
   </style>
 </head>
 <body>
   <header>
-    <h1 class="site-title">Gamemaster — Suivi des équipes</h1>
+    <div style="height: 22px;"></div>
   </header>
-  <div class="gm-wrapper">
-    <div class="carousel">
-      <button class="nav-btn" id="prev-team" aria-label="Équipe précédente">&#8592;</button>
-      <div class="carte-equipe" id="carte-equipe">
-        <div style="text-align:center;">Chargement…</div>
+  <div class="center-wrapper">
+    <main class="main-accueil" role="main">
+      <h1>Gamemaster — Suivi des équipes</h1>
+      <div class="carousel">
+        <button class="nav-btn" id="prev-team" aria-label="Équipe précédente">&#8592;</button>
+        <div class="carte-equipe" id="carte-equipe">
+          <div style="text-align:center;">Chargement…</div>
+        </div>
+        <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
       </div>
-      <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
-    </div>
+    </main>
   </div>
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- JS inchangé -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
@@ -53,12 +207,11 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // --- DONNÉES ---
     const salonCode = localStorage.getItem("salonCode") || prompt("Code salon à superviser ?");
     let equipes = [];
     let nomsEquipes = {};
     let currentIndex = 0;
-    let stepsTime = {}; // <--- Pour stocker les chronos de l’équipe courante
+    let stepsTime = {};
 
     let etapes = [
       { titre: "Épreuve 1", fichiersAttendus: ["Photo 1"] },
@@ -154,7 +307,6 @@
       const step = equipe.currentStep ?? 0;
 
       function maj() {
-        // Quand l'épreuve est terminée (plus d'étape en cours)
         if (step >= etapes.length) {
           timerDiv.textContent = "Temps sur cette épreuve : terminé";
           timerDiv.classList.remove('late');
@@ -162,13 +314,11 @@
         }
         db.ref(`parties/${salonCode}/equipes/${equipe.num}/epreuves/${step}/startTime`).once('value', snap => {
           const startTime = snap.val();
-          // Si jamais l'épreuve n'a pas (encore) de startTime
           if (!startTime) {
             timerDiv.textContent = "Temps sur cette épreuve : —";
             timerDiv.classList.remove('late');
             return;
           }
-          // Si l'étape a déjà été validée, afficher le temps figé
           const chronoVal = stepsTime && (stepsTime[step] !== undefined && stepsTime[step] !== null) ? stepsTime[step] : null;
           if (chronoVal !== null) {
             let min = Math.floor(chronoVal/60), sec = chronoVal%60;
@@ -176,7 +326,6 @@
             timerDiv.classList.remove('late');
             return;
           }
-          // Sinon, afficher le temps réel écoulé
           const elapsed = Math.floor((Date.now() - startTime) / 1000);
           const min = Math.floor(elapsed/60), sec = elapsed%60;
           timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
