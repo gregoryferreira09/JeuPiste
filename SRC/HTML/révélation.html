@@ -53,7 +53,6 @@
       margin-top: 2px;
       text-align: center;
     }
-    /* Nouveau pour le bouton */
     #next-quest {
       background: #e0c185;
       color: #473714;
@@ -73,6 +72,27 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
+    .modal-toast {
+      display: none;
+      position: fixed;
+      left: 50%; top: 10%;
+      transform: translateX(-50%);
+      background: #231d1d;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-size: 1.14em;
+      z-index: 9999;
+      box-shadow: 0 4px 22px #0006;
+      text-align:center;
+      max-width: 90vw;
+    }
+    .modal-toast.visible {
+      display: block;
+      animation: fadein 0.3s;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -129,14 +149,13 @@
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.469417,-0.574556" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13[...]
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
             </svg>
             <span>Boussole</span>
           </a>
         </div>
       </div>
 
-      <!-- BOUTON QUETE SUIVANTE (visible, mais inutilisé si fin) -->
       <button id="next-quest">Quête suivante</button>
     </main>
   </div>
@@ -145,7 +164,8 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <!-- === Ajouts pour navigation gameflow === -->
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
+  <!-- Firebase + Gameflow navigation -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
@@ -163,6 +183,16 @@
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
+    // Toast feedback harmonisé
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('visible');
+        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+      }
+    }
+
     // NAVIGATION GAMEFLOW
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('next-quest').addEventListener('click', function() {
@@ -173,21 +203,62 @@
           .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
             if (!error && committed) {
               getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-              const step = snapshot.val();
-              if (step < parcours.length) {
-                const epreuveNum = parcours[step];
-                if (epreuveNum === 6) {
-                  window.location.href = "epreuve6.html";
-                } else if (epreuveNum === 7) {
-                  window.location.href = "révélation.html";
+                const step = snapshot.val();
+                if (step < parcours.length) {
+                  const epreuveNum = parcours[step];
+                  if (epreuveNum === 6) {
+                    window.location.href = "epreuve6.html";
+                  } else if (epreuveNum === 7) {
+                    window.location.href = "révélation.html";
+                  } else {
+                    window.location.href = `equipe${epreuveNum}-a.html`;
+                  }
                 } else {
-                  window.location.href = `equipe${epreuveNum}-a.html`;
+                  showToast('Bravo, vous avez terminé !');
+                  setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
                 }
-              } else {
-                alert('Bravo, vous avez terminé !');
-              }
+              });
             }
           });
+      });
+
+      // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
+      function goToStep(stepIndex) {
+        const salonCode = localStorage.getItem("salonCode");
+        const equipeNum = Number(localStorage.getItem("equipeNum"));
+        getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+          if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+            showToast('Bravo, vous avez terminé !');
+            setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+            return;
+          }
+          const epreuveNum = parcours[stepIndex];
+          let target = "";
+          if (epreuveNum === 6) target = "epreuve6.html";
+          else if (epreuveNum === 7) target = "révélation.html";
+          else target = `equipe${epreuveNum}-a.html`;
+          const current = window.location.pathname.split('/').pop();
+          if (current !== target) {
+            window.location.href = target;
+          }
+        });
+      }
+      const salonCode = localStorage.getItem("salonCode");
+      const equipeNum = Number(localStorage.getItem("equipeNum"));
+      const db = firebase.database();
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+        .on('value', function(snapshot) {
+          const step = snapshot.val() || 0;
+          goToStep(step);
+        });
+      window.addEventListener("pageshow", function(evt) {
+        if (evt.persisted) {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .once('value', function(snapshot) {
+              const step = snapshot.val() || 0;
+              goToStep(step);
+            });
+        }
       });
     });
   </script>
