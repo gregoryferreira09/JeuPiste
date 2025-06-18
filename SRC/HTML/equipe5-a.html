@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    /* ... tout ton CSS inchangé ... */
     .chrono-block {
       display: flex;
       align-items: center;
@@ -293,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
   const dureeEpreuve = 7 * 60; // 7 minutes chrono
-  const epreuveId = 5;
+  const stepIndex = 5;
 
   if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
     window.location.href = "accueil.html";
@@ -310,13 +309,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // --- Chrono synchronisé via Firebase ---
   let chronoInterval = null;
-  db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${epreuveId}/startTime`)
+  db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
     .on('value', snap => {
       let startTime = snap.val();
       if (!startTime) {
         // Premier arrivé : écrit startTime UNE FOIS
         startTime = Date.now();
-        db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${epreuveId}/startTime`).set(startTime);
+        db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`).set(startTime);
         return;
       }
       lancerChrono(startTime);
@@ -397,26 +396,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // --- Passage à la quête suivante (synchro binôme + navigation dynamique) ---
   nextBtn.addEventListener('click', function() {
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-      if (!error && committed) {
-        getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-          const step = snapshot.val();
-          if (step < parcours.length) {
-            const epreuveNum = parcours[step];
-            if (epreuveNum === 6) {
-              window.location.href = "epreuve6.html";
-            } else if (epreuveNum === 7) {
-              window.location.href = "révélation.html";
-            } else {
-              window.location.href = `equipe${epreuveNum}-a.html`;
-            }
+    nextBtn.disabled = true;
+    nextBtn.classList.remove('enabled');
+    showToast("Validation en cours...");
+    // === ENREGISTRE LE TEMPS PASSÉ ===
+    const now = Date.now();
+    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
+      .once('value', function(snap) {
+        const sTime = snap.val();
+        if (sTime) {
+          const elapsed = Math.round((now - sTime) / 1000);
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+        }
+        // Puis passage à l'étape suivante
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+          if (!error && committed) {
+            getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+              const step = snapshot.val();
+              if (step < parcours.length) {
+                const epreuveNum = parcours[step];
+                if (epreuveNum === 6) {
+                  window.location.href = "epreuve6.html";
+                } else if (epreuveNum === 7) {
+                  window.location.href = "révélation.html";
+                } else {
+                  window.location.href = `equipe${epreuveNum}-a.html`;
+                }
+              } else {
+                alert('Bravo, vous avez terminé !');
+              }
+            });
           } else {
-            alert('Bravo, vous avez terminé !');
+            showToast("Erreur lors de la validation...");
+            nextBtn.disabled = false;
+            nextBtn.classList.add('enabled');
           }
+          window.name = ""; // reset pour ne pas réouvrir la fenêtre à la prochaine page
         });
-      }
-      window.name = ""; // reset pour ne pas réouvrir la fenêtre à la prochaine page
-    });
+      });
   });
 
   // --- NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également) ---
