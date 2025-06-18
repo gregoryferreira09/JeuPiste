@@ -165,7 +165,7 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
-  <!-- Firebase + Gameflow navigation -->
+
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
@@ -195,7 +195,8 @@
 
     // NAVIGATION GAMEFLOW
     document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('next-quest').addEventListener('click', function() {
+      const nextBtn = document.getElementById('next-quest');
+      nextBtn.addEventListener('click', function() {
         const salonCode = localStorage.getItem("salonCode");
         const equipeNum = Number(localStorage.getItem("equipeNum"));
         const db = firebase.database();
@@ -215,21 +216,25 @@
                   }
                 } else {
                   showToast('Bravo, vous avez terminé !');
-                  setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+                  nextBtn.disabled = true;
+                  nextBtn.style.display = 'none';
                 }
               });
             }
           });
       });
 
-      // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
+      // NAVIGATION GAMEFLOW SYNCHRO SANS BOUCLE INFINIE
       function goToStep(stepIndex) {
         const salonCode = localStorage.getItem("salonCode");
         const equipeNum = Number(localStorage.getItem("equipeNum"));
         getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+          const nextBtn = document.getElementById('next-quest');
           if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
             showToast('Bravo, vous avez terminé !');
-            setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+            nextBtn.disabled = true;
+            nextBtn.style.display = 'none';
+            // Surtout ne pas faire de redirection ici !
             return;
           }
           const epreuveNum = parcours[stepIndex];
