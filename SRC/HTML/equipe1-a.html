@@ -195,9 +195,12 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
+    console.log("JS chargé");
+
     // Sécurité et robustesse : vérification session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
+    console.log("salonCode =", salonCode, "equipeNum =", equipeNum);
     if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
       window.location.href = "accueil.html";
     }
@@ -221,10 +224,12 @@
 
     // Authentification anonyme obligatoire pour les accès Storage
     firebase.auth().signInAnonymously().then(function() {
+      console.log("Authentification anonyme réussie");
       // Toutes les actions nécessitant le Storage doivent être placées ici ou après
       demarreJeuFirebase();
     }).catch(function(error) {
       alert("Erreur d'authentification Firebase : " + error.message);
+      console.error("Erreur d'authentification Firebase :", error);
     });
 
     function demarreJeuFirebase() {
@@ -240,6 +245,7 @@
 
       // Chrono/temps passé sur l’épreuve
       const stepIndex = 0; // Numéro d'étape pour cette page
+      console.log("stepIndex =", stepIndex);
       let startTime = null;
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
         .once('value', function(snap) {
@@ -275,20 +281,27 @@
           goToStep(step);
         });
 
+      // --- DEBUG LOGS POUR L'UPLOAD ---
       document.addEventListener('DOMContentLoaded', function() {
         var input = document.getElementById('photo-upload');
         var out = document.getElementById('photo-filename');
         var btn = document.getElementById('next-quest');
         var icon = document.getElementById('icon-photo');
 
+        console.log("input =", input);
+
         // Upload dans Storage + DB
         if(input && out && icon) {
           input.addEventListener('change', function() {
+            console.log("Changement détecté !");
             if(this.files && this.files[0]) {
               const file = this.files[0];
-              // Upload dans Firebase Storage
+              console.log("Fichier sélectionné :", file);
+              console.log("salonCode=", salonCode, "equipeNum=", equipeNum, "stepIndex=", stepIndex);
               const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
+              console.log("Chemin d'upload :", storagePath);
               storage.ref(storagePath).put(file).then(snapshot => {
+                console.log("Upload réussi :", snapshot);
                 // On enregistre le nom dans la DB pour la synchro UI
                 db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
                   name: file.name,
@@ -296,9 +309,14 @@
                 });
               }).catch(err => {
                 showToast("Erreur lors de l'upload : " + err.message);
+                console.error("Erreur upload :", err);
               });
+            } else {
+              console.warn("Aucun fichier sélectionné !");
             }
           });
+        } else {
+          console.error("input/out/icon manquant :", {input, out, icon});
         }
 
         // Synchro multi-device, affichage et bouton + grisé de l'icône
@@ -309,6 +327,7 @@
             var btn = document.getElementById('next-quest');
             var icon = document.getElementById('icon-photo');
             const data = snapshot.val();
+            console.log("DB photo value reçu :", data);
             if (out && btn && input && icon) {
               if (data && data.name) {
                 out.textContent = "Photo sélectionnée : " + data.name;
