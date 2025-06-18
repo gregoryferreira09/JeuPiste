@@ -7,8 +7,39 @@
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* Harmonisation spécifique Gamemaster */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #181212;
+      color: #f4e4c1;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    header {
+      width: 100vw;
+      background: #000;
+      color: #e0c185;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      padding-top: 22px;
+      padding-bottom: 22px;
+      box-sizing: border-box;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    .site-title {
+      margin: 0;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2.1em;
+      color: #e0c185;
+      letter-spacing: 1.5px;
+    }
     .gm-wrapper {
+      flex: 1 0 auto;
       max-width: 900px;
       margin: 38px auto 0 auto;
       background: #2c1b1b;
@@ -17,6 +48,9 @@
       border: 2px solid #e0c185;
       padding: 32px 18px 22px 18px;
       min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
     .carousel {
       display: flex;
@@ -184,8 +218,27 @@
       color: #ffe07e;
       margin-top: 13px;
       word-break: break-all;
+      min-height: 22px;
     }
     .error-message { color: #ff7777; font-weight: bold; margin: 13px 0; }
+    footer, .footer {
+      flex-shrink: 0;
+      width: 100vw;
+      background: #000;
+      color: #e0c185;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      padding-top: 22px;
+      padding-bottom: 22px;
+      box-sizing: border-box;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      position: relative;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+      border: none;
+    }
     @media (max-width: 900px) {
       .gm-wrapper { max-width: 99vw; }
       .carte-equipe { padding: 8px 3vw;}
@@ -242,6 +295,7 @@
     let parcoursEquipes = []; // pour chaque équipe
     let cheminsParEquipe = {}; // mapping équipe => index parcours
     let timerInterval = null;
+    let equipeStepListener = null;
 
     document.getElementById('prev-team').onclick = function() {
       if (equipes.length) {
@@ -256,7 +310,8 @@
       }
     };
 
-    function chargerEquipes() {
+    // Rafraîchissement auto et synchro dynamique sur currentStep
+    function chargerEquipes(callback) {
       db.ref(`parties/${salonCode}/cheminsParEquipe`).once('value', snapChemins => {
         cheminsParEquipe = snapChemins.val() || {};
         db.ref(`parties/${salonCode}/parcoursEquipes`).once('value', snapParcours => {
@@ -270,7 +325,8 @@
                 document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée</div>";
               } else {
                 if (currentIndex >= equipes.length) currentIndex = 0;
-                afficherEquipe();
+                if (callback) callback();
+                else afficherEquipe();
               }
             });
           });
@@ -286,61 +342,71 @@
     }
 
     function afficherEquipe() {
+      if (equipeStepListener) equipeStepListener.off();
       const carte = document.getElementById('carte-equipe');
       const equipe = equipes[currentIndex];
       const parcours = getParcoursEquipe(equipe.num);
-      const step = equipe.currentStep ?? 0;
       const totalEtapes = parcours ? parcours.length : 0;
-      const etapeCourante = (step < totalEtapes) ? (step + 1) : totalEtapes;
-      let html = `
-        <div class='team-title'>${nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`}</div>
-        <div class='team-members'>${equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—'}</div>
-        <div class='etape-encours'>Étape ${etapeCourante} / ${totalEtapes}</div>
-        <div id="timer" class="timer">Temps sur cette épreuve : <span id="timer-inner">—</span></div>
-        <div class='parcours-list'>
-      `;
-      for (let i=0; i<totalEtapes; i++) {
-        html += `<div class='epreuve'>
-          <div class='epreuve-titre'>
-            Épreuve ${parcours[i]}
-            <span class="step-status ${i < step ? 'done' : (i === step ? 'current' : 'todo')}">
-              ${i < step ? "✔️" : (i === step ? "🟡" : "—")}
-            </span>
-            ${i === step && i < totalEtapes ? `<button class="validate-btn" onclick="validerEtape(${equipe.num},${i})" aria-label="Valider cette étape">Valider</button>
-            <button class="invalidate-btn" onclick="invaliderEtape(${equipe.num},${i})" aria-label="Invalider cette étape">Invalider</button>` : ""}
-          </div>
-          <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
-        </div>`;
-      }
-      html += `</div>`;
-      html += `<div class="history-list" id="history-eq${equipe.num}">Historique : chargement…</div>`;
-      carte.innerHTML = html;
-      afficherTimer(equipe, step, totalEtapes);
-      for (let i=0; i<totalEtapes; i++) {
-        listerFichiersEquipeEtape(equipe.num, parcours[i], i);
-      }
-      afficherHistorique(equipe.num);
+
+      // Synchronise dynamiquement sur le currentStep de l'équipe
+      equipeStepListener = db.ref(`parties/${salonCode}/equipes/${equipe.num}/currentStep`);
+      equipeStepListener.on('value', function(snapshot) {
+        const step = snapshot.val() ?? 0;
+        const etapeCourante = (step < totalEtapes) ? (step + 1) : totalEtapes;
+        let html = `
+          <div class='team-title'>${nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`}</div>
+          <div class='team-members'>${equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—'}</div>
+          <div class='etape-encours'>Étape ${etapeCourante} / ${totalEtapes}</div>
+          <div id="timer" class="timer">Temps sur cette épreuve : <span id="timer-inner">—</span></div>
+          <div class='parcours-list'>
+        `;
+        for (let i=0; i<totalEtapes; i++) {
+          html += `<div class='epreuve'>
+            <div class='epreuve-titre'>
+              Épreuve ${parcours[i]}
+              <span class="step-status ${i < step ? 'done' : (i === step ? 'current' : 'todo')}">
+                ${i < step ? "✔️" : (i === step ? "🟡" : "—")}
+              </span>
+              ${i === step && i < totalEtapes ? `<button class="validate-btn" onclick="validerEtape(${equipe.num},${i})" aria-label="Valider cette étape">Valider</button>
+              <button class="invalidate-btn" onclick="invaliderEtape(${equipe.num},${i})" aria-label="Invalider cette étape">Invalider</button>` : ""}
+            </div>
+            <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
+          </div>`;
+        }
+        html += `</div>`;
+        html += `<div class="history-list" id="history-eq${equipe.num}"></div>`;
+        carte.innerHTML = html;
+        afficherTimer(equipe, step, totalEtapes);
+        for (let i=0; i<totalEtapes; i++) {
+          listerFichiersEquipeEtape(equipe.num, parcours[i], i);
+        }
+        afficherHistorique(equipe.num);
+      });
     }
 
     function afficherTimer(equipe, step, totalEtapes) {
       if (timerInterval) clearInterval(timerInterval);
       const timerDiv = document.getElementById('timer-inner');
-      if (step >= totalEtapes) {
-        timerDiv.textContent = "—";
+      if (!timerDiv || step >= totalEtapes) {
+        if (timerDiv) timerDiv.textContent = "—";
         return;
       }
-      let start = equipe.etapes && equipe.etapes[step] && equipe.etapes[step].debut ? equipe.etapes[step].debut : null;
-      if (!start) {
-        timerDiv.textContent = "Non démarré";
-        return;
-      }
-      function maj() {
-        const elapsed = Math.floor((Date.now() - start) / 1000);
-        const min = Math.floor(elapsed/60), sec = elapsed%60;
-        timerDiv.textContent = `${min}:${sec.toString().padStart(2,'0')}`;
-      }
-      maj();
-      timerInterval = setInterval(maj, 1000);
+      db.ref(`parties/${salonCode}/equipes/${equipe.num}/etapes/${step}/debut`).once('value', snap => {
+        const start = snap.val();
+        if (!start) {
+          timerDiv.textContent = "Non démarré";
+          return;
+        }
+        function maj() {
+          const elapsed = Math.floor((Date.now() - start) / 1000);
+          const min = Math.floor(elapsed/60), sec = elapsed%60;
+          timerDiv.textContent = `${min}:${sec.toString().padStart(2,'0')}`;
+          if (elapsed >= 600) timerDiv.parentNode.classList.add('late');
+          else timerDiv.parentNode.classList.remove('late');
+        }
+        maj();
+        timerInterval = setInterval(maj, 1000);
+      });
     }
 
     function listerFichiersEquipeEtape(num, epreuveNum, etapeIdx) {
@@ -399,7 +465,11 @@
           const h = child.val();
           hist.push(`<li>${h.when || ''} — ${h.action}${h.etape != null ? ' (étape '+(Number(h.etape)+1)+')' : ''}</li>`);
         });
-        histDiv.innerHTML = `<ul>${hist.join('')}</ul>`;
+        if (hist.length === 0) {
+          histDiv.innerHTML = `<span style="color:#b8b8b8;">Aucun évènement</span>`;
+        } else {
+          histDiv.innerHTML = `<ul>${hist.join('')}</ul>`;
+        }
       });
     }
 
@@ -419,6 +489,7 @@
         });
     };
 
+    // Rafraîchissement auto de la liste des équipes (rafraîchit aussi navigation, membres, etc)
     function refreshLoop() {
       chargerEquipes();
       setTimeout(refreshLoop, 5000);
