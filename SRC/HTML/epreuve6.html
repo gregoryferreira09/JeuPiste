@@ -7,6 +7,56 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
+    .gold-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #e0c185;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 36px 0 22px 0;
+      box-shadow: 0 2px 12px #0002;
+      gap: 18px;
+    }
+    .gold-banner .icon-action {
+      width: 80px;
+      align-items: center;
+      justify-content: center;
+    }
+    .gold-banner .icon-action span {
+      color: #473714;
+      font-weight: 600;
+      font-size: 1em;
+    }
+    .gold-banner-text {
+      color: #473714;
+      font-size: 1.12em;
+      flex: 1 1 auto;
+      text-align: center;
+    }
+    #check-gps {
+      padding: 12px 26px;
+      border-radius: 8px;
+      background: #473714;
+      color: #ffeecb;
+      font-size: 1.08em;
+      border: none;
+      cursor: pointer;
+      margin-top: 0;
+      margin-bottom: 0;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    #check-gps:hover {
+      background: #2d2210;
+    }
+    #gps-feedback {
+      color: #473714;
+      font-size: 1.07em;
+      min-height: 1.3em;
+      text-align: center;
+      margin-top: 8px;
+    }
     .actions-row-horizontal {
       display: flex;
       justify-content: center;
@@ -64,6 +114,13 @@
     .icon-action label[aria-disabled="true"] span {
       color: #9d8c62;
     }
+    .photo-actions {
+      display: flex;
+      gap: 38px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
     .visually-hidden {
       position: absolute !important;
       height: 1px; width: 1px;
@@ -90,6 +147,7 @@
     }
     #next-quest.enabled {
       background: #e0c185;
+      color: #473714;
       opacity: 1;
       cursor: pointer;
     }
@@ -113,26 +171,12 @@
       display: block;
       animation: fadein 0.3s;
     }
-    #gps-feedback {
-      color: #ffeecb;
-      margin-top: 12px;
-      font-size: 1.05em;
-      min-height: 1.4em;
-      text-align:center;
-      width:100%;
-    }
-    #check-gps {
-      padding: 12px 26px;
-      border-radius: 8px;
-      background: #e0c185;
-      color: #473714;
-      font-size: 1.08em;
-      border: none;
-      cursor: pointer;
-      margin-top: 4px;
-      margin-bottom: 7px;
-    }
     @media (max-width: 900px) {
+      .gold-banner {
+        flex-direction: column;
+        gap: 8px;
+        padding: 18px 8px;
+      }
       .actions-row-horizontal, .photo-actions {
         flex-direction: column;
         gap: 18px;
@@ -160,21 +204,19 @@
   </header>
 
   <div class="center-wrapper">
-    <!-- Bandeau GPS harmonisé -->
-    <div class="actions-row-horizontal" id="gps-block">
+    <!-- Bandeau doré harmonisé GPS -->
+    <div class="gold-banner" id="gps-block">
       <div class="icon-action boussole-action">
-        <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+        <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
           <svg viewBox="0 0 24 24">
             <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
           </svg>
           <span>Boussole</span>
         </a>
       </div>
-      <div style="min-width:220px; text-align:center;">
-        <span style="color:#ffeecb; font-size:1.06em;">
-          Pour poursuivre la quête, rends-toi à cet endroit précis :<br>
-          <strong>47.469222, -0.577722</strong>
-        </span>
+      <div class="gold-banner-text">
+        <strong>Pour continuer, rends-toi à cet endroit précis :</strong><br>
+        <span style="font-size:1.09em;">47.367167, -0.562611</span>
       </div>
       <div style="display:flex; flex-direction:column; align-items:center;">
         <button id="check-gps">Je suis arrivé !</button>
@@ -190,20 +232,23 @@
           <div class="objectif-course" style="margin-top: 24px;">
             <div class="objectif-label">Objectif</div>
             <div class="objectif-text" style="margin-top:18px;">
-              Au sommet de la butte, le vent murmure les secrets du royaume de l’Ogre. D’ici, le regard embrasse les terres du noble roi Arthur.<br><br>
-              Mais l’heure n’est plus à la contemplation.<br>
-              Descendez dans les plaines, preux aventuriers, et mêlez-vous au peuple errant.<br><br>
-              Pour localiser l’antre du Dragon, il vous faudra sonder les salutations et questionner les âmes croisées.<br><br>
-              📸 <strong>Votre quête : prendre la pose avec quatre inconnus du royaume.</strong><br>
-              Ces portraits seront la clé d’un savoir ancien.<br><br>
-              Envoyez vos preuves à Merlin : peut-être alors dévoilera-t-il le chemin du combat final.
+              <span style="color:#ffeecb;">
+                Au sommet de la butte, le vent murmure les secrets du royaume de l’Ogre.<br>
+                D’ici, le regard embrasse les terres du noble roi Arthur.<br><br>
+                Mais l’heure n’est plus à la contemplation.<br>
+                Descendez dans les plaines, preux aventuriers, et mêlez-vous au peuple errant.<br><br>
+                Pour localiser l’antre du Dragon, il vous faudra sonder les salutations et questionner les âmes croisées.<br><br>
+                📸 <strong>Votre quête : prendre la pose avec quatre inconnus du royaume.</strong><br>
+                Ces portraits seront la clé d’un savoir ancien.<br><br>
+                Envoyez vos preuves à Merlin : peut-être alors dévoilera-t-il le chemin du combat final.
+              </span>
             </div>
           </div>
         </div>
 
         <div class="actions-row-horizontal">
           <div class="icon-action boussole-action">
-            <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
               <svg viewBox="0 0 24 24">
                 <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
               </svg>
@@ -241,26 +286,23 @@
                 <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
               </label>
             </div>
-            <div class="actions-row-horizontal" id="gps-block">
-  <div class="icon-action boussole-action">
-    <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
-      </svg>
-      <span>Boussole</span>
-    </a>
+            <div class="icon-action side-icon">
+              <label id="label-photo4" for="photo-upload-4">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
+                  <circle cx="12" cy="14" r="3"></circle>
+                </svg>
+                <span>Photo avec un fils d'unijambiste</span>
+                <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+          </div>
+        </div>
+        <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+        <button id="next-quest" disabled>Quête suivante</button>
+      </main>
+    </div>
   </div>
-  <div style="min-width:220px; text-align:center;">
-    <span style="color:#ffeecb; font-size:1.06em;">
-      Pour poursuivre la quête, rends-toi à cet endroit précis :<br>
-      <strong>47.367167, -0.562611</strong>
-    </span>
-  </div>
-  <div style="display:flex; flex-direction:column; align-items:center;">
-    <button id="check-gps">Je suis arrivé !</button>
-    <div id="gps-feedback"></div>
-  </div>
-</div>
 
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
@@ -272,8 +314,8 @@
   <script src="../JS/gameflow.js"></script>
   <script>
     // GPS obligatoire
-    const DEST_LAT = 47.469222;
-    const DEST_LON = -0.577722;
+    const DEST_LAT = 47.367167;
+    const DEST_LON = -0.562611;
     const TOLERANCE_METERS = 40;
 
     function getDistanceMeters(lat1, lon1, lat2, lon2) {
