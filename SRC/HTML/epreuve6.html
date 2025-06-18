@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Quête du bout du monde - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
@@ -127,9 +126,7 @@
       animation: fadein 0.3s;
     }
     #gps-block {
-      text-align: center;
-      margin: 32px 0;
-      padding: 16px 0 28px 0;
+      margin: 38px 0 22px 0;
     }
     #gps-feedback {
       color: #ffeecb;
@@ -146,8 +143,8 @@
       border: none;
       cursor: pointer;
       margin-top: 12px;
+      margin-bottom: 10px;
     }
-    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
     @media (max-width: 900px) {
       .actions-row-horizontal, .photo-actions {
         flex-direction: column;
@@ -175,92 +172,103 @@
     <h1 class="site-title">Jeu de piste</h1>
   </header>
 
-  <div id="gps-block">
-    <h3 style="color:#e0c185;">Étape de localisation</h3>
-    <p>
-      Pour poursuivre la quête, rends-toi à cet endroit précis :<br>
-      <strong>47.469222, -0.577722</strong>
-    </p>
-    <div style="margin:16px 0;">
-      <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" style="color:#e0c185;">Ouvrir dans Google Maps</a>
-    </div>
-    <button id="check-gps">Je suis arrivé !</button>
-    <div id="gps-feedback"></div>
-  </div>
-
-  <div class="center-wrapper" id="main-content" style="display:none;">
-    <main class="main-accueil" role="main">
-      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">La quête du bout du monde</h2>
-      <div class="presentation-jeu" style="margin-top: 24px;">
-        <div class="objectif-course" style="margin-top: 24px;">
-          <div class="objectif-label">Objectif</div>
-          <div class="objectif-text" style="margin-top:18px;">
-            Au sommet de la butte, le vent murmure les secrets du royaume de l’Ogre. D’ici, le regard embrasse les terres du noble roi Arthur.<br><br>
-            Mais l’heure n’est plus à la contemplation.<br>
-            Descendez dans les plaines, preux aventuriers, et mêlez-vous au peuple errant.<br><br>
-            Pour localiser l’antre du Dragon, il vous faudra sonder les salutations et questionner les âmes croisées.<br><br>
-            📸 <strong>Votre quête : prendre la pose avec quatre inconnus du royaume.</strong><br>
-            Ces portraits seront la clé d’un savoir ancien.<br><br>
-            Envoyez vos preuves à Merlin : peut-être alors dévoilera-t-il le chemin du combat final.
-          </div>
-        </div>
-      </div>
-
-      <div class="actions-row-horizontal">
+  <div class="center-wrapper">
+    <!-- Bloc GPS obligatoire -->
+    <div id="gps-block">
+      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Étape de localisation</h2>
+      <div class="actions-row-horizontal" style="margin-bottom:18px;">
         <div class="icon-action boussole-action">
           <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13[...]
+              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
             </svg>
             <span>Boussole</span>
           </a>
         </div>
-        <div class="photo-actions">
-          <div class="icon-action side-icon">
-            <label id="label-photo1" for="photo-upload-1">
-              <svg viewBox="0 0 24 24">
-                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
-                <circle cx="12" cy="14" r="3"></circle>
-              </svg>
-              <span>Photo avec un paysan</span>
-              <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
-            </label>
-          </div>
-          <div class="icon-action side-icon">
-            <label id="label-photo2" for="photo-upload-2">
-              <svg viewBox="0 0 24 24">
-                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
-                <circle cx="12" cy="14" r="3"></circle>
-              </svg>
-              <span>Photo avec un gueux</span>
-              <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
-            </label>
-          </div>
-          <div class="icon-action side-icon">
-            <label id="label-photo3" for="photo-upload-3">
-              <svg viewBox="0 0 24 24">
-                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
-                <circle cx="12" cy="14" r="3"></circle>
-              </svg>
-              <span>Photo avec un troubadour</span>
-              <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
-            </label>
-          </div>
-          <div class="icon-action side-icon">
-            <label id="label-photo4" for="photo-upload-4">
-              <svg viewBox="0 0 24 24">
-                <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
-                <circle cx="12" cy="14" r="3"></circle>
-              </svg>
-              <span>Photo avec un fils d'unijambiste</span>
-              <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
-            </label>
+      </div>
+      <div style="color:#ffeecb; font-size:1.08em; margin-bottom:18px;">
+        Pour poursuivre la quête, rends-toi à cet endroit précis :<br>
+        <strong>47.469222, -0.577722</strong>
+      </div>
+      <button id="check-gps">Je suis arrivé !</button>
+      <div id="gps-feedback"></div>
+    </div>
+
+    <!-- Contenu principal (caché tant que GPS non validé) -->
+    <div id="main-content" style="display:none;">
+      <main class="main-accueil" role="main">
+        <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">La quête du bout du monde</h2>
+        <div class="presentation-jeu" style="margin-top: 24px;">
+          <div class="objectif-course" style="margin-top: 24px;">
+            <div class="objectif-label">Objectif</div>
+            <div class="objectif-text" style="margin-top:18px;">
+              Au sommet de la butte, le vent murmure les secrets du royaume de l’Ogre. D’ici, le regard embrasse les terres du noble roi Arthur.<br><br>
+              Mais l’heure n’est plus à la contemplation.<br>
+              Descendez dans les plaines, preux aventuriers, et mêlez-vous au peuple errant.<br><br>
+              Pour localiser l’antre du Dragon, il vous faudra sonder les salutations et questionner les âmes croisées.<br><br>
+              📸 <strong>Votre quête : prendre la pose avec quatre inconnus du royaume.</strong><br>
+              Ces portraits seront la clé d’un savoir ancien.<br><br>
+              Envoyez vos preuves à Merlin : peut-être alors dévoilera-t-il le chemin du combat final.
+            </div>
           </div>
         </div>
-      </div>
-      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-      <button id="next-quest" disabled>Quête suivante</button>
-    </main>
+
+        <div class="actions-row-horizontal">
+          <div class="icon-action boussole-action">
+            <a href="https://maps.google.com/?q=47.469222,-0.577722" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
+              </svg>
+              <span>Boussole</span>
+            </a>
+          </div>
+          <div class="photo-actions">
+            <div class="icon-action side-icon">
+              <label id="label-photo1" for="photo-upload-1">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
+                  <circle cx="12" cy="14" r="3"></circle>
+                </svg>
+                <span>Photo avec un paysan</span>
+                <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo2" for="photo-upload-2">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
+                  <circle cx="12" cy="14" r="3"></circle>
+                </svg>
+                <span>Photo avec un gueux</span>
+                <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo3" for="photo-upload-3">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
+                  <circle cx="12" cy="14" r="3"></circle>
+                </svg>
+                <span>Photo avec un troubadour</span>
+                <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo4" for="photo-upload-4">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
+                  <circle cx="12" cy="14" r="3"></circle>
+                </svg>
+                <span>Photo avec un fils d'unijambiste</span>
+                <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+          </div>
+        </div>
+        <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+        <button id="next-quest" disabled>Quête suivante</button>
+      </main>
+    </div>
   </div>
 
   <footer class="footer">
@@ -272,7 +280,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
-    // --- Bloc GPS obligatoire ---
+    // GPS obligatoire
     const DEST_LAT = 47.469222;
     const DEST_LON = -0.577722;
     const TOLERANCE_METERS = 40;
@@ -310,9 +318,6 @@
       });
     });
 
-    // --- FIN BLOC GPS ---
-
-    // Le reste de ton JS (Firebase, photos, navigation, etc.) est inchangé :
     // Sécurité session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
