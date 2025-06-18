@@ -373,6 +373,8 @@
         <div class='parcours-list'>
       `;
 
+      // Affichage de chaque épreuve avec chrono correct
+      let timersLive = [];
       for (let i=0; i<etapes.length; i++) {
         let tempsEpreuve = '';
         if (etapesEquipe[i] && etapesEquipe[i].debut) {
@@ -383,6 +385,7 @@
           } else if (i === step) {
             // étape en cours
             tempsEpreuve = ` <span style='color:#ffe07e;'>(en cours - <span id="timer-epreuve${i}"></span>)</span>`;
+            timersLive.push({i, debut: etapesEquipe[i].debut});
           }
         } else {
           // pas commencée
@@ -399,7 +402,7 @@
 
       // Chrono principal sur étape courante (au-dessus)
       let timerLive = document.getElementById('timer-live');
-      if (etapesEquipe[step] && etapesEquipe[step].debut) {
+      if (etapesEquipe[step] && etapesEquipe[step].debut && (!etapesEquipe[step].fin)) {
         function maj() {
           let elapsed = Math.floor((Date.now() - etapesEquipe[step].debut) / 1000);
           timerLive.textContent = formatDuree(elapsed);
@@ -409,6 +412,10 @@
         }
         maj();
         timerLiveInterval = setInterval(maj, 1000);
+      } else if (etapesEquipe[step] && etapesEquipe[step].debut && etapesEquipe[step].fin) {
+        // Si terminée, affiche temps final
+        let elapsed = Math.floor((etapesEquipe[step].fin - etapesEquipe[step].debut) / 1000);
+        timerLive.textContent = formatDuree(elapsed);
       } else {
         timerLive.textContent = '—';
       }
