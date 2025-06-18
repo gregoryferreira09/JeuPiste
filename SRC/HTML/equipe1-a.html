@@ -219,9 +219,11 @@
     // ==== Harmonisation feedback utilisateur ====
     function showToast(msg) {
       const toast = document.getElementById('toast-message');
-      toast.textContent = msg;
-      toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('visible');
+        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+      }
     }
 
     // ==== Synchro en temps réel de l'étape d'équipe (navigation auto si currentStep change) ====
@@ -258,7 +260,7 @@
       var btn = document.getElementById('next-quest');
 
       // Affichage du nom de la photo + activation du bouton
-      if(input) {
+      if(input && out && btn) {
         input.addEventListener('change', function() {
           if(this.files && this.files[0]) {
             out.textContent = "Photo sélectionnée : " + this.files[0].name;
@@ -281,38 +283,45 @@
       // ===== Synchro preuve : affiche la photo sur tous les appareils du binôme ====
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/1/photo')
         .on('value', function(snapshot) {
+          var input = document.getElementById('photo-upload');
+          var out = document.getElementById('photo-filename');
+          var btn = document.getElementById('next-quest');
           const data = snapshot.val();
-          if (data && data.name) {
-            out.textContent = "Photo sélectionnée : " + data.name;
-            btn.disabled = false;
-            btn.classList.add('enabled');
-            input.disabled = true;
-          } else {
-            out.textContent = "";
-            btn.disabled = true;
-            btn.classList.remove('enabled');
-            input.disabled = false;
+          if (out && btn && input) {
+            if (data && data.name) {
+              out.textContent = "Photo sélectionnée : " + data.name;
+              btn.disabled = false;
+              btn.classList.add('enabled');
+              input.disabled = true;
+            } else {
+              out.textContent = "";
+              btn.disabled = true;
+              btn.classList.remove('enabled');
+              input.disabled = false;
+            }
           }
         });
 
       // === NAVIGATION GAMEFLOW : passage à l'étape suivante + désactivation bouton (anti double clic) ===
-      btn.addEventListener('click', function() {
-        if (btn.disabled) return;
-        btn.disabled = true;
-        btn.classList.remove('enabled');
-        showToast("Validation en cours...");
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-            if (!error && committed) {
-              // La navigation sera automatiquement gérée par l'écouteur temps réel plus haut
-              showToast("Étape validée !");
-            } else {
-              showToast("Erreur lors de la validation...");
-              btn.disabled = false;
-              btn.classList.add('enabled');
-            }
-          });
-      });
+      if (btn) {
+        btn.addEventListener('click', function() {
+          if (btn.disabled) return;
+          btn.disabled = true;
+          btn.classList.remove('enabled');
+          showToast("Validation en cours...");
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+              if (!error && committed) {
+                // La navigation sera automatiquement gérée par l'écouteur temps réel plus haut
+                showToast("Étape validée !");
+              } else {
+                showToast("Erreur lors de la validation...");
+                btn.disabled = false;
+                btn.classList.add('enabled');
+              }
+            });
+        });
+      }
     });
     // Anti-retour arrière : recharge l'état depuis Firebase pour éviter un retour à une ancienne étape
     window.addEventListener("pageshow", function(evt) {
