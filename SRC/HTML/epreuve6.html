@@ -241,23 +241,26 @@
                 <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
               </label>
             </div>
-            <div class="icon-action side-icon">
-              <label id="label-photo4" for="photo-upload-4">
-                <svg viewBox="0 0 24 24">
-                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.[...]
-                  <circle cx="12" cy="14" r="3"></circle>
-                </svg>
-                <span>Photo avec un fils d'unijambiste</span>
-                <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
-              </label>
-            </div>
-          </div>
-        </div>
-        <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-        <button id="next-quest" disabled>Quête suivante</button>
-      </main>
-    </div>
+            <div class="actions-row-horizontal" id="gps-block">
+  <div class="icon-action boussole-action">
+    <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
+      </svg>
+      <span>Boussole</span>
+    </a>
   </div>
+  <div style="min-width:220px; text-align:center;">
+    <span style="color:#ffeecb; font-size:1.06em;">
+      Pour poursuivre la quête, rends-toi à cet endroit précis :<br>
+      <strong>47.367167, -0.562611</strong>
+    </span>
+  </div>
+  <div style="display:flex; flex-direction:column; align-items:center;">
+    <button id="check-gps">Je suis arrivé !</button>
+    <div id="gps-feedback"></div>
+  </div>
+</div>
 
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
