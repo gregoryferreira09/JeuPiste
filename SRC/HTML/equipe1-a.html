@@ -168,7 +168,7 @@
         <div class="icon-action side-icon">
           <label for="photo-upload" aria-label="Télécharger une photo">
             <svg id="icon-photo" viewBox="0 0 24 24" width="38" height="38">
-              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-[...]
             </svg>
             <span>Photo à envoyer</span>
             <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
@@ -190,6 +190,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
     // Sécurité et robustesse : vérification session
@@ -214,6 +215,7 @@
       firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.database();
+    const storage = firebase.storage();
 
     // Toast feedback
     function showToast(msg) {
@@ -268,20 +270,28 @@
       var btn = document.getElementById('next-quest');
       var icon = document.getElementById('icon-photo');
 
-      // Upload
+      // Upload dans Storage + DB
       if(input && out && icon) {
         input.addEventListener('change', function() {
           if(this.files && this.files[0]) {
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/1/photo').set({
-              name: this.files[0].name,
-              uploadedAt: Date.now()
+            const file = this.files[0];
+            // Upload dans Firebase Storage
+            const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
+            storage.ref(storagePath).put(file).then(snapshot => {
+              // On enregistre le nom dans la DB pour la synchro UI
+              db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
+                name: file.name,
+                uploadedAt: Date.now()
+              });
+            }).catch(err => {
+              showToast("Erreur lors de l'upload : " + err.message);
             });
           }
         });
       }
 
       // Synchro multi-device, affichage et bouton + grisé de l'icône
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/1/photo')
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo')
         .on('value', function(snapshot) {
           var input = document.getElementById('photo-upload');
           var out = document.getElementById('photo-filename');
