@@ -118,7 +118,7 @@
       align-items: center;
       width: 90px;
     }
-    .icon-action a, .icon-action label {
+    .icon-action a {
       cursor: pointer;
       color: #e0c185;
       text-decoration: none;
@@ -127,7 +127,7 @@
       flex-direction: column;
       align-items: center;
     }
-    .icon-action a:hover, .icon-action label:hover {
+    .icon-action a:hover {
       color: #ffeecb;
     }
     .icon-action svg {
@@ -140,7 +140,7 @@
       margin-left: auto;
       margin-right: auto;
     }
-    .icon-action a:hover svg, .icon-action label:hover svg {
+    .icon-action a:hover svg {
       fill: #ffeecb;
     }
     .icon-action span {
@@ -148,10 +148,6 @@
       color: #e0c185;
       margin-top: 2px;
       text-align: center;
-    }
-    .grayed {
-      filter: grayscale(1) brightness(0.8);
-      opacity: 0.6;
     }
     @media (max-width: 700px) {
       .chrono-block { flex-direction: column; padding: 12px 6vw; gap: 8px; max-width: 99vw; }
@@ -238,14 +234,13 @@
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
-            Rendez-vous sur le lieu, cherchez l’indice, prenez une photo de ce que vous trouvez et inscrivez ci-dessous ce que vous avez trouvé pour poursuivre la quête.
+            Rendez-vous sur le lieu, cherchez l’indice, et inscrivez ci-dessous ce que vous avez trouvé pour poursuivre la quête.
           </div>
         </div>
       </div>
 
-      <!-- Bloc boussole + bloc appareil photo harmonisé -->
+      <!-- Bloc boussole harmonisé -->
       <div class="actions-row-horizontal">
-        <!-- Boussole -->
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.477556,-0.578583" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
@@ -254,18 +249,8 @@
             <span>Boussole</span>
           </a>
         </div>
-        <!-- Appareil photo -->
-        <div class="icon-action side-icon">
-          <label for="photo-upload" aria-label="Télécharger une photo de l'indice">
-            <svg id="icon-photo" viewBox="0 0 24 24" width="38" height="38">
-              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
-            </svg>
-            <span>Photo de l'indice à envoyer</span>
-            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
-        </div>
       </div>
-      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+      <!-- Fin bloc boussole -->
 
       <!-- Saisie de la réponse -->
       <div class="input-answer-wrapper">
@@ -306,9 +291,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const nextBtn = document.getElementById('next-quest');
   const blocker = document.getElementById('blocker');
   const blockerBtn = document.getElementById('blocker-btn');
-  const input = document.getElementById('photo-upload');
-  const out = document.getElementById('photo-filename');
-  const icon = document.getElementById('icon-photo');
 
   // CHRONO SYNCHRO
   let chronoInterval = null;
@@ -381,49 +363,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // --- Gestion upload photo + synchro multi-device ---
-  let isPhotoOk = false, isAnswerOk = false;
-  if(input && out && icon) {
-    input.addEventListener('change', function() {
-      if(this.files && this.files[0]) {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + epreuveId + '/photo').set({
-          name: this.files[0].name,
-          uploadedAt: Date.now()
-        });
-      }
-    });
-  }
-  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + epreuveId + '/photo')
-    .on('value', function(snapshot) {
-      const data = snapshot.val();
-      if (out && input && icon) {
-        if (data && data.name) {
-          out.textContent = "Photo sélectionnée : " + data.name;
-          isPhotoOk = true;
-          input.disabled = true;
-          icon.classList.add('grayed');
-        } else {
-          out.textContent = "";
-          isPhotoOk = false;
-          input.disabled = false;
-          icon.classList.remove('grayed');
-        }
-        updateNextQuestState();
-      }
-    });
-
   // --- Gestion réponse ---
   answerField.addEventListener('input', function() {
     let value = this.value.trim().toLowerCase()
       .replace(/’/g, "'")
       .replace(/\s+/g, ' ')
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    isAnswerOk = (value === "rien" || value === "determination");
-    updateNextQuestState();
-  });
-
-  function updateNextQuestState() {
-    if(isPhotoOk && isAnswerOk && !answerField.disabled) {
+    if ((value === "rien" || value === "determination") && !this.disabled) {
       nextBtn.disabled = false;
       nextBtn.classList.add('enabled');
       if ("vibrate" in navigator) navigator.vibrate(70);
@@ -431,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
       nextBtn.disabled = true;
       nextBtn.classList.remove('enabled');
     }
-  }
+  });
 
   // Passage à la quête suivante (synchro binôme) et redirection dynamique
   nextBtn.addEventListener('click', function() {
