@@ -7,30 +7,7 @@
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: #181212;
-      color: #f4e4c1;
-      font-family: 'Cormorant Garamond', serif;
-      margin: 0;
-      min-height: 100vh;
-    }
-    header {
-      background: linear-gradient(90deg, #e0c185, #ffeecb 60%);
-      box-shadow: 0 4px 24px #0002;
-      border-bottom: 2px solid #e0c185;
-      padding: 0;
-    }
-    .site-title {
-      margin: 0;
-      padding: 28px 0 18px 0;
-      text-align: center;
-      font-family: 'Cinzel Decorative', serif;
-      font-weight: 700;
-      font-size: 2.2em;
-      color: #473714;
-      letter-spacing: 1px;
-      text-shadow: 0 2px 12px #e0c18544;
-    }
+    /* Harmonisation spécifique Gamemaster */
     .gm-wrapper {
       max-width: 900px;
       margin: 38px auto 0 auto;
@@ -61,7 +38,7 @@
       justify-content: center;
       cursor: pointer;
       transition: background .17s, color .17s, box-shadow .17s;
-      margin: 0 0 0 0;
+      margin: 0;
     }
     .nav-btn:focus, .nav-btn:hover {
       background: #ffeecb;
@@ -235,10 +212,10 @@
       <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
     </div>
   </div>
-  <!-- (le JS complet que tu avais déjà) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <footer class="footer">
+    <p>© 2025 Jeu de piste. Tous droits réservés.</p>
+    <a href="mentions-legales.html">Mentions légales</a>
+  </footer>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
@@ -264,8 +241,8 @@
     let currentIndex = 0;
     let parcoursEquipes = []; // pour chaque équipe
     let cheminsParEquipe = {}; // mapping équipe => index parcours
+    let timerInterval = null;
 
-    // --- NAVIGATION ---
     document.getElementById('prev-team').onclick = function() {
       if (equipes.length) {
         currentIndex = (currentIndex - 1 + equipes.length) % equipes.length;
@@ -279,7 +256,6 @@
       }
     };
 
-    // --- CHARGEMENT & AFFICHAGE ---
     function chargerEquipes() {
       db.ref(`parties/${salonCode}/cheminsParEquipe`).once('value', snapChemins => {
         cheminsParEquipe = snapChemins.val() || {};
@@ -312,60 +288,61 @@
     function afficherEquipe() {
       const carte = document.getElementById('carte-equipe');
       const equipe = equipes[currentIndex];
-      const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
-      const membres = equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—';
-      const step = equipe.currentStep ?? 0;
       const parcours = getParcoursEquipe(equipe.num);
+      const step = equipe.currentStep ?? 0;
+      const totalEtapes = parcours ? parcours.length : 0;
+      const etapeCourante = (step < totalEtapes) ? (step + 1) : totalEtapes;
       let html = `
-        <div class='team-title'>${nom}</div>
-        <div class='team-members'>${membres}</div>
-        <div class='etape-encours'>Étape ${step+1} / ${parcours.length} (${parcours[step] ? "Épreuve "+parcours[step] : "Terminé"})</div>
-        <div id="timer" class="timer">Temps sur cette étape : …</div>
+        <div class='team-title'>${nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`}</div>
+        <div class='team-members'>${equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—'}</div>
+        <div class='etape-encours'>Étape ${etapeCourante} / ${totalEtapes}</div>
+        <div id="timer" class="timer">Temps sur cette épreuve : <span id="timer-inner">—</span></div>
         <div class='parcours-list'>
       `;
-      // Affiche chaque étape du parcours de l'équipe avec statut
-      for (let i=0; i<parcours.length; i++) {
+      for (let i=0; i<totalEtapes; i++) {
         html += `<div class='epreuve'>
           <div class='epreuve-titre'>
             Épreuve ${parcours[i]}
             <span class="step-status ${i < step ? 'done' : (i === step ? 'current' : 'todo')}">
               ${i < step ? "✔️" : (i === step ? "🟡" : "—")}
             </span>
-            ${i === step ? `<button class="validate-btn" onclick="validerEtape(${equipe.num},${i})" aria-label="Valider cette étape">Valider</button>
+            ${i === step && i < totalEtapes ? `<button class="validate-btn" onclick="validerEtape(${equipe.num},${i})" aria-label="Valider cette étape">Valider</button>
             <button class="invalidate-btn" onclick="invaliderEtape(${equipe.num},${i})" aria-label="Invalider cette étape">Invalider</button>` : ""}
           </div>
           <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
         </div>`;
       }
-      html += '</div>';
+      html += `</div>`;
       html += `<div class="history-list" id="history-eq${equipe.num}">Historique : chargement…</div>`;
       carte.innerHTML = html;
-      afficherTimer(equipe, step);
-      for (let i=0; i<parcours.length; i++) {
+      afficherTimer(equipe, step, totalEtapes);
+      for (let i=0; i<totalEtapes; i++) {
         listerFichiersEquipeEtape(equipe.num, parcours[i], i);
       }
       afficherHistorique(equipe.num);
     }
 
-    // --- TIMER ---
-    let timerInterval = null;
-    function afficherTimer(equipe, step) {
+    function afficherTimer(equipe, step, totalEtapes) {
       if (timerInterval) clearInterval(timerInterval);
-      const timerDiv = document.getElementById('timer');
+      const timerDiv = document.getElementById('timer-inner');
+      if (step >= totalEtapes) {
+        timerDiv.textContent = "—";
+        return;
+      }
+      let start = equipe.etapes && equipe.etapes[step] && equipe.etapes[step].debut ? equipe.etapes[step].debut : null;
+      if (!start) {
+        timerDiv.textContent = "Non démarré";
+        return;
+      }
       function maj() {
-        let start = equipe.etapes && equipe.etapes[step] && equipe.etapes[step].debut ? equipe.etapes[step].debut : null;
-        if (!start) { timerDiv.textContent = "Temps sur cette étape : —"; return; }
         const elapsed = Math.floor((Date.now() - start) / 1000);
         const min = Math.floor(elapsed/60), sec = elapsed%60;
-        timerDiv.textContent = `Temps sur cette étape : ${min}:${sec.toString().padStart(2,'0')}`;
-        if (elapsed >= 600) { timerDiv.classList.add('late'); timerDiv.textContent += " ⏰"; }
-        else timerDiv.classList.remove('late');
+        timerDiv.textContent = `${min}:${sec.toString().padStart(2,'0')}`;
       }
       maj();
       timerInterval = setInterval(maj, 1000);
     }
 
-    // --- AFFICHAGE FICHIERS PAR ÉQUIPE & ÉPREUVE ---
     function listerFichiersEquipeEtape(num, epreuveNum, etapeIdx) {
       const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
       if (!div) return;
@@ -394,7 +371,6 @@
       }).catch(()=>{div.innerHTML = "<span class='error-message'>Erreur de récupération fichiers !</span>";});
     }
 
-    // --- Validation manuelle étape (pour gamemaster) ---
     window.validerEtape = function(num, etapeIdx) {
       if (!confirm("Valider cette étape ?")) return;
       db.ref(`parties/${salonCode}/equipes/${num}/currentStep`).transaction(step => {
@@ -404,7 +380,6 @@
         if (committed) { chargerEquipes(); }
         else alert("Erreur validation.");
       });
-      // Historique :
       const time = new Date().toLocaleString();
       db.ref(`parties/${salonCode}/equipes/${num}/historique`).push({ action: "Validation manuelle", etape: etapeIdx, when: time });
     };
@@ -416,7 +391,6 @@
       chargerEquipes();
     };
 
-    // --- Historique des actions ---
     function afficherHistorique(num) {
       const histDiv = document.getElementById('history-eq'+num);
       db.ref(`parties/${salonCode}/equipes/${num}/historique`).once('value', snap => {
@@ -429,7 +403,6 @@
       });
     }
 
-    // --- Download helper ---
     window.downloadFile = function(url, fileName) {
       fetch(url)
         .then(resp => resp.blob())
@@ -446,7 +419,6 @@
         });
     };
 
-    // --- RAFRAICHISSEMENT AUTO ---
     function refreshLoop() {
       chargerEquipes();
       setTimeout(refreshLoop, 5000);
