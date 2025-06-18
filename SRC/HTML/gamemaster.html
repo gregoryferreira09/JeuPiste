@@ -126,6 +126,14 @@
       color: #473714;
       outline: 2px solid #e0c185;
     }
+    .miniature, .miniature-video {
+      max-width: 100px;
+      max-height: 100px;
+      margin-right: 10px;
+      border-radius: 6px;
+      vertical-align: middle;
+      display: inline-block;
+    }
     .chrono-value {
       color: #ffe07e;
       font-size: 0.98em;
@@ -341,35 +349,37 @@
       timerInterval = setInterval(maj, 1000);
     }
 
+    // --- CORRECTION : AFFICHAGE DES FICHIERS À PARTIR DU NOM EN DB ---
     function listerFichiersEquipeEtape(num, etapeIdx, fichiersAttendus) {
       const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
       if (!div) return;
-      const basePath = `parties/${salonCode}/equipe${num}/etape${etapeIdx}/`;
-      storage.ref(basePath).listAll().then(res => {
-        if (res.items.length === 0) {
-          div.innerHTML = fichiersAttendus.map(nom=> `<div class="fichier-bloc"><span>${nom} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`).join('');
-        } else {
-          div.innerHTML = '';
-          fichiersAttendus.forEach(nomAttendu => {
-            const fichier = res.items.find(item => item.name.toLowerCase().includes(nomAttendu.toLowerCase().replace(/\s/g,'')));
-            if (!fichier) {
-              div.innerHTML += `<div class="fichier-bloc"><span>${nomAttendu} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`;
-            } else {
-              fichier.getDownloadURL().then(url => {
-                const ext = fichier.name.split('.').pop().toLowerCase();
-                let mini = '';
-                if(['jpg','jpeg','png','gif'].includes(ext)) {
-                  mini = `<img src="${url}" class="miniature" alt="Photo">`;
-                } else if(['mp4','webm','ogg'].includes(ext)) {
-                  mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
-                }
-                div.innerHTML += `<div class="fichier-bloc">${mini}<span>${fichier.name}</span>
-                  <button class="download-btn" onclick="downloadFile('${url}','${fichier.name}')">Télécharger</button></div>`;
-              });
-            }
-          });
+
+      // Chemin de la DB pour nom du fichier
+      db.ref(`parties/${salonCode}/equipes/${num}/epreuves/${etapeIdx}/photo`).once('value', snap => {
+        const photoData = snap.val();
+
+        if (!photoData || !photoData.name) {
+          // Si pas de photo DB, affiche "Non envoyé"
+          div.innerHTML = fichiersAttendus.map(nom => `<div class="fichier-bloc"><span>${nom} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`).join('');
+          return;
         }
-      }).catch(()=>{div.innerHTML = "<span style='color:#b8b8b8;'>Erreur</span>";});
+
+        // Sinon on affiche la miniature et le bouton download
+        const storagePath = `parties/${salonCode}/equipe${num}/etape${etapeIdx}/${photoData.name}`;
+        storage.ref(storagePath).getDownloadURL().then(url => {
+          const ext = photoData.name.split('.').pop().toLowerCase();
+          let mini = '';
+          if(['jpg','jpeg','png','gif'].includes(ext)) {
+            mini = `<img src="${url}" class="miniature" alt="Photo">`;
+          } else if(['mp4','webm','ogg'].includes(ext)) {
+            mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
+          }
+          div.innerHTML = `<div class="fichier-bloc">${mini}<span>${photoData.name}</span>
+            <button class="download-btn" onclick="downloadFile('${url}','${photoData.name}')">Télécharger</button></div>`;
+        }).catch(() => {
+          div.innerHTML = `<span style='color:#b8b8b8;'>Fichier non trouvé</span>`;
+        });
+      });
     }
 
     window.downloadFile = function(url, fileName) {
