@@ -209,7 +209,7 @@ if (!firebase.apps.length) {
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
           .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
             if (!error && committed) {
-             const parcours = window.parcoursEquipes[equipeNum];
+             getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
 const step = snapshot.val();
 if (step < parcours.length) {
   const epreuveNum = parcours[step];
