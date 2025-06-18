@@ -234,7 +234,7 @@
       window.location.href = "accueil.html";
     }
     // Chrono/temps passé sur l’épreuve
-    const stepIndex = 4;
+    const stepIndex = 3;
     let startTime = null;
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
       .once('value', function(snap) {
