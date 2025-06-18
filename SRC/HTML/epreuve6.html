@@ -19,12 +19,12 @@
       padding: 0 12px 32px 12px;
     }
     .main-accueil {
-  margin-top: 28px;
-  background: #2c1b1b;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px #0005;
-  padding: 28px 16px 22px 16px;
-}
+      margin-top: 28px;
+      background: #2c1b1b; /* harmonisation */
+      border-radius: 10px;
+      box-shadow: 0 2px 12px #0005;
+      padding: 28px 16px 22px 16px;
+    }
     h2 {
       color: #e0c185;
       font-family: 'Cinzel Decorative', serif;
@@ -83,6 +83,10 @@
       color: #e0c185;
       margin-top: 2px;
       text-align: center;
+    }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
     }
     #check-gps {
       padding: 12px 26px;
@@ -228,7 +232,7 @@
           <div class="photo-actions">
             <div class="icon-action side-icon">
               <label id="label-photo1" for="photo-upload-1">
-                <svg viewBox="0 0 24 24">
+                <svg id="icon-photo1" viewBox="0 0 24 24">
                   <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
                 </svg>
                 <span>Photo avec un paysan</span>
@@ -237,7 +241,7 @@
             </div>
             <div class="icon-action side-icon">
               <label id="label-photo2" for="photo-upload-2">
-                <svg viewBox="0 0 24 24">
+                <svg id="icon-photo2" viewBox="0 0 24 24">
                   <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
                 </svg>
                 <span>Photo avec un gueux</span>
@@ -246,7 +250,7 @@
             </div>
             <div class="icon-action side-icon">
               <label id="label-photo3" for="photo-upload-3">
-                <svg viewBox="0 0 24 24">
+                <svg id="icon-photo3" viewBox="0 0 24 24">
                   <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
                 </svg>
                 <span>Photo avec un troubadour</span>
@@ -255,7 +259,7 @@
             </div>
             <div class="icon-action side-icon">
               <label id="label-photo4" for="photo-upload-4">
-                <svg viewBox="0 0 24 24">
+                <svg id="icon-photo4" viewBox="0 0 24 24">
                   <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
                 </svg>
                 <span>Photo avec un fils d'unijambiste</span>
@@ -265,7 +269,7 @@
           </div>
         </div>
         <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-        <button id="next-quest" disabled style="display:none;">Quête suivante</button>
+        <button id="next-quest" disabled>Quête suivante</button>
       </div>
     </main>
   </div>
@@ -308,36 +312,44 @@
       });
     });
 
-    // Gestion des uploads photo (4 boutons)
-    function handlePhotoUpload(inputId, labelId) {
-      var input = document.getElementById(inputId);
-      var label = document.getElementById(labelId);
-      input.addEventListener('change', function() {
-        if(this.files && this.files[0]) {
+    // Gestion des uploads photo (4 boutons) + grisé + bouton quête suivante
+    function updatePhotoUI() {
+      var allFiles = [];
+      var allSelected = true;
+      for (var i = 1; i <= 4; i++) {
+        var inp = document.getElementById('photo-upload-' + i);
+        var label = document.getElementById('label-photo' + i);
+        var icon = document.getElementById('icon-photo' + i);
+        if (inp && inp.files && inp.files[0]) {
+          allFiles.push(inp.files[0].name);
           label.setAttribute('aria-disabled', 'true');
-          input.disabled = true;
-          var out = document.getElementById('photo-filename');
-          var allFiles = [];
-          for (var i = 1; i <= 4; i++) {
-            var inp = document.getElementById('photo-upload-' + i);
-            if (inp && inp.files && inp.files[0]) {
-              allFiles.push(inp.files[0].name);
-            }
-          }
-          out.textContent = "Photos sélectionnées : " + allFiles.join(", ");
-          if(allFiles.length === 4) {
-            var btn = document.getElementById('next-quest');
-            btn.disabled = false;
-            btn.classList.add('enabled');
-            btn.style.display = "block";
-          }
+          inp.disabled = true;
+          if(label) label.classList.add('grayed');
+          if(icon) icon.classList.add('grayed');
+        } else {
+          allSelected = false;
+          label.removeAttribute('aria-disabled');
+          inp.disabled = false;
+          if(label) label.classList.remove('grayed');
+          if(icon) icon.classList.remove('grayed');
         }
-      });
+      }
+      document.getElementById('photo-filename').textContent =
+        allFiles.length ? "Photos sélectionnées : " + allFiles.join(", ") : "";
+      var btn = document.getElementById('next-quest');
+      btn.style.display = "block";
+      if (allSelected) {
+        btn.disabled = false;
+        btn.classList.add('enabled');
+      } else {
+        btn.disabled = true;
+        btn.classList.remove('enabled');
+      }
     }
-    handlePhotoUpload('photo-upload-1','label-photo1');
-    handlePhotoUpload('photo-upload-2','label-photo2');
-    handlePhotoUpload('photo-upload-3','label-photo3');
-    handlePhotoUpload('photo-upload-4','label-photo4');
+    for(let i=1; i<=4; i++) {
+      document.getElementById('photo-upload-' + i).addEventListener('change', updatePhotoUI);
+    }
+    window.addEventListener('DOMContentLoaded', updatePhotoUI);
   </script>
 </body>
 </html>
