@@ -33,19 +33,19 @@
       color: #473714;
     }
     #gps-feedback { color: #ffeecb; font-size: 1.07em; min-height: 1.3em; text-align: center; margin: 0 0 8px 0; }
-    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.07); margin-top: 14px; margin-bottom: 0; }
+    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba[...]
     #show-indice:hover { background: #ffeecb; }
     #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
     #indice-modal.active { display: flex; }
     .modal-img-wrapper { position: relative; background: #fffbe0; padding: 24px 24px 12px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); max-width: 92vw; }
     .modal-img-wrapper img { display: block; max-width: 70vw; max-height: 60vh; margin: 0 auto; border-radius: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
-    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.15s; }
+    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: colo[...]
     .close-modal:hover { color: #e0c185; }
-    #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; transition: background 0.2s, opacity 0.2s; }
+    #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; t[...]
     #next-quest.enabled { background: #e0c185; opacity: 1; cursor: pointer; }
     .input-password-wrapper { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
     .input-password-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
-    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 90vw;}
+    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; ma[...]
     .input-password-field:focus { border: 1.5px solid #ffeecb; }
     .static-a-block { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; font-size: 1.13em; color: #e0c185; }
     .enigme-block { margin-top: 24px; }
@@ -219,20 +219,18 @@
     if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
       window.location.href = "accueil.html";
     }
-
-    // Initialisation Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.appspot.com",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    // Chrono/temps passé sur l’épreuve
+    const stepIndex = 4;
+    let startTime = null;
     const db = firebase.database();
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+      .once('value', function(snap) {
+        startTime = snap.val();
+        if (!startTime) {
+          startTime = Date.now();
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
+        }
+      });
 
     function showToast(msg) {
       let toast = document.getElementById('toast-message');
@@ -274,25 +272,44 @@
     // Navigation gameflow synchro
     document.getElementById('next-quest').addEventListener('click', function() {
       if (this.disabled) return;
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-        .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-          if (!error && committed) {
-            getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-              const step = snapshot.val();
-              if (step < parcours.length) {
-                const epreuveNum = parcours[step];
-                if (epreuveNum === 6) {
-                  window.location.href = "epreuve6.html";
-                } else if (epreuveNum === 7) {
-                  window.location.href = "révélation.html";
-                } else {
-                  window.location.href = `equipe${epreuveNum}-a.html`;
-                }
+      this.disabled = true;
+      this.classList.remove('enabled');
+      showToast("Validation en cours...");
+      // === ENREGISTRE LE TEMPS PASSÉ ===
+      const now = Date.now();
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+        .once('value', function(snap) {
+          const sTime = snap.val();
+          if (sTime) {
+            const elapsed = Math.round((now - sTime) / 1000);
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+          }
+          // Puis passage à l'étape suivante
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+              if (!error && committed) {
+                getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+                  const step = snapshot.val();
+                  if (step < parcours.length) {
+                    const epreuveNum = parcours[step];
+                    if (epreuveNum === 6) {
+                      window.location.href = "epreuve6.html";
+                    } else if (epreuveNum === 7) {
+                      window.location.href = "révélation.html";
+                    } else {
+                      window.location.href = `equipe${epreuveNum}-a.html`;
+                    }
+                  } else {
+                    alert('Bravo, vous avez terminé !');
+                  }
+                });
               } else {
-                alert('Bravo, vous avez terminé !');
+                showToast("Erreur lors de la validation...");
+                const btn = document.getElementById('next-quest');
+                btn.disabled = false;
+                btn.classList.add('enabled');
               }
             });
-          }
         });
     });
 
