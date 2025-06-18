@@ -226,7 +226,7 @@
     }
 
     // Chrono/temps passé sur l’épreuve
-    const stepIndex = 1; // Numéro d'étape pour cette page
+    const stepIndex = 0; // Numéro d'étape pour cette page
     let startTime = null;
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
       .once('value', function(snap) {
