@@ -3,39 +3,187 @@
 <head>
   <meta charset="UTF-8">
   <title>Gamemaster - Jeu de Piste</title>
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <!-- Style amélioré -->
   <style>
-    #auth-section { margin: 2em 0; }
-    #gm-content { display: none; }
-    .tab-btn { padding: 0.5em 1em; margin-right: 1em; cursor: pointer; }
-    .tab-btn.active { background: #007bff; color: #fff; }
-    .cross { color: red; font-weight: bold; cursor: pointer; }
-    table { border-collapse: collapse; margin: 1em 0; }
-    th, td { border: 1px solid #ccc; padding: 0.3em 0.7em; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      background: #2d3e50;
+      color: #fff;
+      margin: 0;
+      padding: 1em 0;
+      text-align: center;
+      box-shadow: 0 2px 8px #0002;
+    }
+    #main-container {
+      max-width: 900px;
+      margin: 2em auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 32px #0001;
+      padding: 2em 2em 3em 2em;
+    }
+    #auth-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1em;
+      margin-bottom: 2em;
+    }
+    #auth-section input {
+      padding: 0.5em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    #gm-login {
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      border-radius: 5px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #gm-login:hover {
+      background: #0056b3;
+    }
+    .tabs {
+      margin-bottom: 1.5em;
+    }
+    .tab-btn {
+      padding: 0.6em 1.2em;
+      margin-right: 1em;
+      border: none;
+      border-radius: 5px 5px 0 0;
+      background: #eee;
+      color: #222;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .tab-btn.active {
+      background: #007bff;
+      color: #fff;
+    }
+    .tab-btn:focus { outline: none; }
+    #suivi-partie, #historique-parties {
+      animation: fadein 0.4s;
+    }
+    @keyframes fadein {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    .partie-box {
+      border: 1px solid #007bff22;
+      background: #f9faff;
+      border-radius: 7px;
+      margin-bottom: 2em;
+      padding: 1.3em 2em;
+      box-shadow: 0 2px 8px #007bff11;
+    }
+    .partie-title {
+      color: #007bff;
+      font-size: 1.2em;
+      margin-bottom: 0.2em;
+    }
+    .btn-connecter {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5em 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 1em;
+      transition: background 0.2s;
+    }
+    .btn-connecter:hover {
+      background: #217c36;
+    }
+    .equipe-list {
+      margin-top: 1em;
+    }
+    .equipe-list ul {
+      list-style: none;
+      padding: 0;
+    }
+    .equipe-list li {
+      background: #e8f1ff;
+      border-radius: 5px;
+      margin-bottom: 0.5em;
+      padding: 0.6em 1em;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 1em;
+      background: #fbfbfe;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 0.75em 1em;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: left;
+    }
+    th {
+      background: #007bff;
+      color: #fff;
+    }
+    tr:last-child td { border-bottom: none; }
+    .cross {
+      color: #dc3545;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .cross:hover {
+      color: #b21f2d;
+    }
+    .msg-info {
+      color: #555;
+      font-style: italic;
+    }
+    @media (max-width: 600px) {
+      #main-container { padding: 1em; }
+      .tab-btn { padding: 0.4em 0.6em; }
+      th, td { padding: 0.5em 0.4em; }
+    }
   </style>
 </head>
 <body>
   <h1>Gamemaster : Interface de suivi</h1>
-  <!-- Auth section -->
-  <div id="auth-section">
-    <input type="email" id="gm-email" placeholder="Email du gamemaster" required>
-    <input type="password" id="gm-password" placeholder="Mot de passe" required>
-    <button id="gm-login">Connexion Gamemaster</button>
-    <div id="gm-auth-error" style="color:red;"></div>
-  </div>
-
-  <!-- Contenu réservé au gamemaster -->
-  <div id="gm-content">
-    <div>
-      <button class="tab-btn active" id="btn-courante" onclick="afficherSuivi()">Partie en cours</button>
-      <button class="tab-btn" id="btn-historique" onclick="afficherHistorique()">Historique</button>
+  <div id="main-container">
+    <!-- Auth section -->
+    <div id="auth-section">
+      <input type="email" id="gm-email" placeholder="Email du gamemaster" required>
+      <input type="password" id="gm-password" placeholder="Mot de passe" required>
+      <button id="gm-login">Connexion Gamemaster</button>
+      <div id="gm-auth-error" style="color:red;"></div>
     </div>
-    <!-- Suivi partie en cours -->
-    <div id="suivi-partie"></div>
-    <!-- Historique -->
-    <div id="historique-parties" style="display:none"></div>
+
+    <!-- Contenu réservé au gamemaster -->
+    <div id="gm-content" style="display:none;">
+      <div class="tabs">
+        <button class="tab-btn active" id="btn-courante" onclick="afficherSuivi()">Partie en cours</button>
+        <button class="tab-btn" id="btn-historique" onclick="afficherHistorique()">Historique</button>
+      </div>
+      <!-- Suivi partie en cours -->
+      <div id="suivi-partie"></div>
+      <!-- Historique -->
+      <div id="historique-parties" style="display:none"></div>
+    </div>
   </div>
 
   <script>
@@ -72,7 +220,7 @@
         document.getElementById('gm-content').style.display = "block";
         afficherSuivi(); // Affiche la partie en cours par défaut
       } else {
-        document.getElementById('auth-section').style.display = "block";
+        document.getElementById('auth-section').style.display = "flex";
         document.getElementById('gm-content').style.display = "none";
       }
     });
@@ -94,6 +242,8 @@
     }
 
     // --- Partie en cours (la plus récente, par clé la plus haute) ---
+    let partieCouranteId = null;
+
     function chargerPartieEnCours() {
       const div = document.getElementById('suivi-partie');
       div.innerHTML = "<em>Chargement en cours...</em>";
@@ -103,25 +253,39 @@
           return;
         }
         snap.forEach(partieSnap => {
-          let partieId = partieSnap.key;
+          partieCouranteId = partieSnap.key;
           let data = partieSnap.val();
-          let html = `<h3>Partie en cours : <span style='color:#007bff'>${partieId}</span></h3>`;
+          let html = `<div class='partie-box'><div class='partie-title'>Partie en cours : <span style='color:#007bff'>${partieCouranteId}</span>
+              <button class='btn-connecter' onclick="connecterPartie()">Se connecter à la partie</button>
+            </div>`;
           if (data.equipes && Object.keys(data.equipes).length > 0) {
-            html += "<ul>";
+            html += `<div class='equipe-list'><strong>Équipes :</strong><ul>`;
             Object.entries(data.equipes).forEach(([eqId, eqData]) => {
               if (eqId !== "0" && eqData) {
-                html += `<li><strong>Équipe ${eqId}</strong> — Avancement : ${eqData.etapeActuelle || 0}</li>`;
+                html += `<li><strong>Équipe ${eqId}</strong> — Avancement : <b>${eqData.etapeActuelle || 0}</b></li>`;
               }
             });
-            html += "</ul>";
+            html += "</ul></div>";
           } else {
-            html += "<em>Aucune équipe enregistrée pour cette partie.</em>";
+            html += "<div class='msg-info'>Aucune équipe enregistrée pour cette partie.</div>";
           }
+          html += "</div>";
           div.innerHTML = html;
         });
       }).catch(e => {
         div.innerHTML = "<span style='color:red'>Erreur lors du chargement : " + e.message + "</span>";
       });
+    }
+
+    // Fonction pour "se connecter" à la partie courante (peut être modifiée pour charger le suivi en temps réel, etc.)
+    function connecterPartie() {
+      if (!partieCouranteId) {
+        alert("Aucune partie en cours !");
+        return;
+      }
+      // Ici tu peux charger un affichage plus détaillé, ou activer le suivi en temps réel...
+      alert("Connecté à la partie " + partieCouranteId + " ! (à personnaliser selon ton besoin)");
+      // Exemple : tu pourrais charger ici le suivi d'étape, les scores en live, etc.
     }
 
     // --- Historique ---
@@ -157,8 +321,9 @@
         });
       }
     }
-    // --- Pour compatibilité globale (onclick inline) ---
+    // Pour compatibilité globale (onclick inline)
     window.supprimerPartie = supprimerPartie;
+    window.connecterPartie = connecterPartie;
   </script>
 </body>
 </html>
