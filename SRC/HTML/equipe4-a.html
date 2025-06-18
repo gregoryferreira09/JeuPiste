@@ -33,6 +33,14 @@
       color: #473714;
     }
     #gps-feedback { color: #ffeecb; font-size: 1.07em; min-height: 1.3em; text-align: center; margin: 0 0 8px 0; }
+    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.07); margin-top: 14px; margin-bottom: 0; }
+    #show-indice:hover { background: #ffeecb; }
+    #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
+    #indice-modal.active { display: flex; }
+    .modal-img-wrapper { position: relative; background: #fffbe0; padding: 24px 24px 12px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); max-width: 92vw; }
+    .modal-img-wrapper img { display: block; max-width: 70vw; max-height: 60vh; margin: 0 auto; border-radius: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.15s; }
+    .close-modal:hover { color: #e0c185; }
     #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; transition: background 0.2s, opacity 0.2s; }
     #next-quest.enabled { background: #e0c185; opacity: 1; cursor: pointer; }
     .input-password-wrapper { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
@@ -124,6 +132,9 @@
         <div class="static-a-block">
           <div><strong>Donnée :</strong> A = F</div>
         </div>
+        <div>
+          <button id="show-indice" type="button">Voir l’indice</button>
+        </div>
         <div class="enigme-block">
           <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
           <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
@@ -139,6 +150,13 @@
         <button id="next-quest" disabled>Quête suivante</button>
       </div>
 
+      <!-- Modal d'indice -->
+      <div id="indice-modal">
+        <div class="modal-img-wrapper">
+          <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
+          <img src="../../Public/images/enigme.png" alt="Indice visuel alphabet">
+        </div>
+      </div>
     </main>
   </div>
 
@@ -154,7 +172,7 @@
     // GPS obligatoire
     const DEST_LAT = 47.367167;
     const DEST_LON = -0.562611;
-    const TOLERANCE_METERS = 40;
+    const TOLERANCE_METERS = 10;
     document.getElementById("check-gps").addEventListener("click", function() {
       const feedback = document.getElementById("gps-feedback");
       feedback.textContent = "Recherche de votre position...";
@@ -183,6 +201,14 @@
       }, function(err) {
         document.getElementById("gps-feedback").textContent = "Position non trouvée (" + err.message + ")";
       });
+    });
+
+    // Indice modal
+    document.getElementById('show-indice').addEventListener('click', function() {
+      document.getElementById('indice-modal').classList.add('active');
+    });
+    document.getElementById('close-indice').addEventListener('click', function() {
+      document.getElementById('indice-modal').classList.remove('active');
     });
 
     // ========== Firebase & Gameflow ==========
