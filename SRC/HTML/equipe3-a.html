@@ -212,7 +212,7 @@
     const db = firebase.database();
 
     // Chrono/temps passé sur l’épreuve
-    const stepIndex = 3;
+    const stepIndex = 2;
     let startTime = null;
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
       .once('value', function(snap) {
