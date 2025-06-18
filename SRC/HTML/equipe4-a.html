@@ -15,33 +15,21 @@
     .icon-action a:hover svg { fill: #ffeecb; }
     .icon-action span { font-size: 0.98em; color: #e0c185; margin-top: 2px; text-align: center; }
     .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
-    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.07);}
-    #show-indice:disabled { opacity: 0.6; background: #b7a170; cursor: not-allowed; }
-    #show-indice:hover:enabled { background: #ffeecb; }
-    #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
-    #indice-modal.active { display: flex; }
-    .modal-img-wrapper { position: relative; background: #fffbe0; padding: 24px 24px 12px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); max-width: 92vw; }
-    .modal-img-wrapper img { display: block; max-width: 70vw; max-height: 60vh; margin: 0 auto; border-radius: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
-    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.2s; }
-    .close-modal:hover { color: #e0c185; }
     #next-quest { background: #aaa; color: #fff; font-size: 1.08em; border: none; border-radius: 8px; padding: 12px 30px; margin: 28px auto 0 auto; display: block; opacity: 0.6; cursor: not-allowed; transition: background 0.2s, opacity 0.2s; }
     #next-quest.enabled { background: #e0c185; opacity: 1; cursor: pointer; }
     .input-password-wrapper { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
     .input-password-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
-    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 95vw;}
+    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 90vw;}
     .input-password-field:focus { border: 1.5px solid #ffeecb; }
-    .indice-unlock-block { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
-    .indice-unlock-row { margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .indice-unlock-row select { font-size: 1em; padding: 3px 8px; border-radius: 6px; background: #2b2323; color: #e0c185; border: 1px solid #e0c185; }
-    #blocker { display: none; position: fixed; z-index: 2000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(24,18,18,0.7); color: #fff; justify-content: center; align-items: center; flex-direction: column; }
-    #blocker-message { margin-bottom: 24px; font-size: 1.2em; font-weight: bold; }
-    #blocker-countdown { font-size: 2.2em; font-weight: bold; }
+    .static-a-block { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; font-size: 1.13em; color: #e0c185; }
+    .enigme-block { margin-top: 24px; }
+    .objectif-label { background: #e0c185; color: #473714; font-weight: bold; font-size: 1.08em; border-radius: 6px; padding: 6px 0; text-align: center; letter-spacing: 0.04em; margin-bottom: 0; }
+    .objectif-text { margin-top: 17px; color: #ffeecb; text-align: center; font-size: 1.09em; line-height: 1.6; }
     @media (max-width: 650px) {
       .actions-row-horizontal { flex-direction: column; align-items: stretch; gap: 10px; }
       .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
       .icon-action span { text-align: left; }
       .input-password-field { width: 98vw; font-size: 1em; padding: 10px 7px; }
-      .modal-img-wrapper img { max-width: 95vw; max-height: 50vh; }
     }
     .modal-toast {
       display: none;
@@ -64,17 +52,13 @@
       animation: fadein 0.3s;
     }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+    #gps-feedback { color: #ffeecb; font-size: 1.07em; min-height: 1.3em; text-align: center; margin: 0 0 8px 0; }
   </style>
 </head>
 <body>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
-
-  <div id="blocker">
-    <div id="blocker-message">Il faut vous rendre à la pierre de Rosette et inscrire ce que vous y trouverez. (Bande de feignassou !)<br><br>Déblocage dans :</div>
-    <div id="blocker-countdown">30</div>
-  </div>
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
@@ -92,80 +76,52 @@
             Un indice qui permet de lire un message ancien, scellé par les sages, vous attend sur la pierre de Rosette.<br><br>
             Parlez ami et entrez... Déchiffrez le texte, percez ses secrets et inscrivez-le ci-dessous<br><br>
             Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.<br><br>
-            <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
-            <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
-              O'FN YWTU IJ YJRU XQNGWJ, ATZX S'FWNJE UFX ZSJ FRNJ HJQNGFYFNWJ F RJ UWJXJSYJW ?
-            </span>
           </div>
         </div>
       </div>
 
-      <div class="indice-unlock-block">
-        <div class="indice-unlock-row">
-          <label for="select-a">A = ?</label>
-          <select id="select-a">
-            <option value="">Choisir…</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="E">E</option>
-            <option value="F">F</option>
-            <option value="G">G</option>
-            <option value="H">H</option>
-            <option value="I">I</option>
-            <option value="J">J</option>
-            <option value="K">K</option>
-            <option value="L">L</option>
-            <option value="M">M</option>
-            <option value="N">N</option>
-            <option value="O">O</option>
-            <option value="P">P</option>
-            <option value="Q">Q</option>
-            <option value="R">R</option>
-            <option value="S">S</option>
-            <option value="T">T</option>
-            <option value="U">U</option>
-            <option value="V">V</option>
-            <option value="W">W</option>
-            <option value="X">X</option>
-            <option value="Y">Y</option>
-            <option value="Z">Z</option>
-          </select>
+      <!-- Bloc GPS obligatoire au début -->
+      <div id="localisation-block">
+        <div class="gps-instruction">
+          Rendez-vous à la position :
+          <br><strong>47.47722211138926, -0.5798594274786282</strong>
         </div>
-        <button id="show-indice" type="button" disabled>Voir l’indice</button>
-      </div>
-
-      <!-- Modal d'indice -->
-      <div id="indice-modal">
-        <div class="modal-img-wrapper">
-          <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
-          <img src="../../Public/images/enigme.png" alt="Indice visuel alphabet">
-        </div>
-      </div>
-      
-      <!-- Bloc boussole uniquement -->
-      <div class="actions-row-horizontal">
-        <div class="icon-action side-icon">
-          <a href="https://maps.google.com/?q=47.47722211138926,-0.5798594274786282" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-            <svg viewBox="0 0 24 24" width="38" height="38">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
-            </svg>
-            <span>Boussole</span>
-          </a>
+        <div class="actions-row-horizontal">
+          <div class="icon-action side-icon">
+            <a href="https://maps.google.com/?q=47.47722211138926,-0.5798594274786282" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+              <svg viewBox="0 0 24 24" width="38" height="38">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
+              </svg>
+              <span>Boussole</span>
+            </a>
+          </div>
+          <div>
+            <button id="check-gps">Je suis arrivé !</button>
+            <div id="gps-feedback"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Zone de saisie mot de passe -->
-      <div class="input-password-wrapper">
-        <label for="password-field" class="input-password-label">
-          Entrez le mot de passe pour valider votre progression :
-        </label>
-        <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
+      <!-- Bloc qui s'affiche après validation GPS -->
+      <div id="suite-block" style="display:none;">
+        <div class="static-a-block">
+          <div><strong>Donnée :</strong> A = F</div>
+        </div>
+        <div class="enigme-block">
+          <span style="display:block; margin:18px 0 8px 0; color:#e0c185; font-weight:bold; font-size:1.08em;">Énigme&nbsp;:</span>
+          <span style="display:block; background:#231d1d; color:#ffeecb; border-radius:7px; padding:12px 14px; font-family:monospace; font-size:1.08em; letter-spacing:0.08em;">
+            O'FN YWTU IJ YJRU XQNGWJ, ATZX S'FWNJE UFX ZSJ FRNJ HJQNGFYFNWJ F RJ UWJXJSYJW ?
+          </span>
+        </div>
+        <div class="input-password-wrapper">
+          <label for="password-field" class="input-password-label">
+            Entrez le mot de passe pour valider votre progression :
+          </label>
+          <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
+        </div>
+        <button id="next-quest" disabled>Quête suivante</button>
       </div>
 
-      <!-- Bouton Quête suivante désactivé par défaut -->
-      <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
 
@@ -174,158 +130,162 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
- <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="../JS/gameflow.js"></script>
-<script>
-  // Sécurité session
-  const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = Number(localStorage.getItem("equipeNum"));
-  if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
-    window.location.href = "accueil.html";
-  }
-  // Firebase init
-  const firebaseConfig = {
-    apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-    authDomain: "murder-party-ba8d1.firebaseapp.com",
-    databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "murder-party-ba8d1",
-    storageBucket: "murder-party-ba8d1.appspot.com",
-    messagingSenderId: "20295055805",
-    appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-    measurementId: "G-KSBMBB7KMJ"
-  };
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  // Toast feedback harmonisé
-  function showToast(msg) {
-    const toast = document.getElementById('toast-message');
-    if (toast) {
-      toast.textContent = msg;
-      toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 2400);
-    }
-  }
-
-  // Blocage mauvais choix indice
-  let blockTimeout = null;
-  document.getElementById('select-a').addEventListener('change', function() {
-    const btnIndice = document.getElementById('show-indice');
-    if (this.value === "F") {
-      btnIndice.disabled = false;
-    } else if (this.value !== "") {
-      btnIndice.disabled = true;
-      showBlocker();
-    } else {
-      btnIndice.disabled = true;
-    }
-  });
-  function showBlocker() {
-    const blocker = document.getElementById('blocker');
-    blocker.style.display = 'flex';
-    let count = 30;
-    document.getElementById('blocker-countdown').textContent = count;
-    blockTimeout && clearInterval(blockTimeout);
-    blockTimeout = setInterval(() => {
-      count--;
-      document.getElementById('blocker-countdown').textContent = count;
-      if (count <= 0) {
-        clearInterval(blockTimeout);
-        blocker.style.display = 'none';
-        document.getElementById('select-a').value = '';
-      }
-    }, 1000);
-  }
-  // Modal indice
-  document.getElementById('show-indice').addEventListener('click', function() {
-    document.getElementById('indice-modal').classList.add('active');
-  });
-  document.getElementById('close-indice').addEventListener('click', function() {
-    document.getElementById('indice-modal').classList.remove('active');
-  });
-
-  // Validation mot de passe très souple
-  function normalize(str) {
-    return str
-      .toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // enlève accents
-      .replace(/[^a-z0-9 ]+/g, "")                       // enlève toute ponctuation
-      .replace(/\s+/g, " ")                              // espaces multiples en 1
-      .trim();
-  }
-  const PASSWORD = normalize("j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?");
-
-  document.getElementById('password-field').addEventListener('input', function() {
-    let userValue = normalize(this.value);
-    const btn = document.getElementById('next-quest');
-    if (userValue === PASSWORD) {
-      btn.disabled = false;
-      btn.classList.add('enabled');
-    } else {
-      btn.disabled = true;
-      btn.classList.remove('enabled');
-    }
-  });
-
-  // Navigation gameflow synchro
-  document.getElementById('next-quest').addEventListener('click', function() {
-    if (this.disabled) return;
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-      .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-        if (!error && committed) {
-          getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-            const step = snapshot.val();
-            if (step < parcours.length) {
-              const epreuveNum = parcours[step];
-              if (epreuveNum === 6) {
-                window.location.href = "epreuve6.html";
-              } else if (epreuveNum === 7) {
-                window.location.href = "révélation.html";
-              } else {
-                window.location.href = `equipe${epreuveNum}-a.html`;
-              }
-            } else {
-              alert('Bravo, vous avez terminé !');
-            }
-          });
-        }
-      });
-  });
-
-  // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
-  function goToStep(stepIndex) {
-    getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-      if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-        showToast('Bravo, vous avez terminé !');
-        setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="../JS/gameflow.js"></script>
+  <script>
+    // GPS obligatoire
+    const DEST_LAT = 47.47722211138926;
+    const DEST_LON = -0.5798594274786282;
+    const TOLERANCE_METERS = 40;
+    document.getElementById("check-gps").addEventListener("click", function() {
+      const feedback = document.getElementById("gps-feedback");
+      feedback.textContent = "Recherche de votre position...";
+      if (!navigator.geolocation) {
+        feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
         return;
       }
-      const epreuveNum = parcours[stepIndex];
-      let target = "";
-      if (epreuveNum === 6) target = "epreuve6.html";
-      else if (epreuveNum === 7) target = "révélation.html";
-      else target = `equipe${epreuveNum}-a.html`;
-      const current = window.location.pathname.split('/').pop();
-      if (current !== target) {
-        window.location.href = target;
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        function getDistanceMeters(lat1, lon1, lat2, lon2) {
+          const R = 6378137;
+          const dLat = (lat2-lat1)*Math.PI/180;
+          const dLon = (lon2-lon1)*Math.PI/180;
+          const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          return R * c;
+        }
+        const dist = getDistanceMeters(lat, lon, DEST_LAT, DEST_LON);
+        if (dist < TOLERANCE_METERS) {
+          document.getElementById("localisation-block").style.display = "none";
+          document.getElementById("suite-block").style.display = "";
+        } else {
+          feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
+        }
+      }, function(err) {
+        document.getElementById("gps-feedback").textContent = "Position non trouvée (" + err.message + ")";
+      });
+    });
+
+    // ========== Firebase & Gameflow ==========
+
+    // Sécurité session
+    const salonCode = localStorage.getItem("salonCode");
+    const equipeNum = Number(localStorage.getItem("equipeNum"));
+    if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+      window.location.href = "accueil.html";
+    }
+
+    // Initialisation Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function showToast(msg) {
+      let toast = document.getElementById('toast-message');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-message';
+        toast.className = 'modal-toast';
+        toast.setAttribute('role', 'alert');
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => { toast.classList.remove('visible'); }, 2200);
+    }
+
+    // Validation mot de passe très souple
+    function normalize(str) {
+      return str
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // enlève accents
+        .replace(/[^a-z0-9 ]+/g, "")                       // enlève toute ponctuation
+        .replace(/\s+/g, " ")                              // espaces multiples en 1
+        .trim();
+    }
+    const PASSWORD = normalize("j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?");
+
+    document.getElementById('password-field').addEventListener('input', function() {
+      let userValue = normalize(this.value);
+      const btn = document.getElementById('next-quest');
+      if (userValue === PASSWORD) {
+        btn.disabled = false;
+        btn.classList.add('enabled');
+      } else {
+        btn.disabled = true;
+        btn.classList.remove('enabled');
       }
     });
-  }
-  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-    .on('value', function(snapshot) {
-      const step = snapshot.val() || 0;
-      goToStep(step);
-    });
-  window.addEventListener("pageshow", function(evt) {
-    if (evt.persisted) {
+
+    // Navigation gameflow synchro
+    document.getElementById('next-quest').addEventListener('click', function() {
+      if (this.disabled) return;
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-        .once('value', function(snapshot) {
-          const step = snapshot.val() || 0;
-          goToStep(step);
+        .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+          if (!error && committed) {
+            getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+              const step = snapshot.val();
+              if (step < parcours.length) {
+                const epreuveNum = parcours[step];
+                if (epreuveNum === 6) {
+                  window.location.href = "epreuve6.html";
+                } else if (epreuveNum === 7) {
+                  window.location.href = "révélation.html";
+                } else {
+                  window.location.href = `equipe${epreuveNum}-a.html`;
+                }
+              } else {
+                alert('Bravo, vous avez terminé !');
+              }
+            });
+          }
         });
+    });
+
+    // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
+    function goToStep(stepIndex) {
+      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+          showToast('Bravo, vous avez terminé !');
+          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+          return;
+        }
+        const epreuveNum = parcours[stepIndex];
+        let target = "";
+        if (epreuveNum === 6) target = "epreuve6.html";
+        else if (epreuveNum === 7) target = "révélation.html";
+        else target = `equipe${epreuveNum}-a.html`;
+        const current = window.location.pathname.split('/').pop();
+        if (current !== target) {
+          window.location.href = target;
+        }
+      });
     }
-  });
-</script>
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+      .on('value', function(snapshot) {
+        const step = snapshot.val() || 0;
+        goToStep(step);
+      });
+    window.addEventListener("pageshow", function(evt) {
+      if (evt.persisted) {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          .once('value', function(snapshot) {
+            const step = snapshot.val() || 0;
+            goToStep(step);
+          });
+      }
+    });
+  </script>
 </body>
 </html>
