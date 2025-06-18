@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quête de l’esprit - Jeu de piste</title>
+  <title>La quête du bout du monde - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
@@ -36,28 +37,26 @@
     .presentation-jeu {
       margin-top: 6px;
     }
-    .texte-course {
-      font-size: 1.12em;
-      color: #ffeecb;
-      margin-bottom: 14px;
-      text-align: center;
-      line-height: 1.6;
-    }
     .objectif-course {
       margin-top: 20px;
+      margin-bottom: 18px;
     }
     .objectif-label {
-      color: #e0c185;
+      background: #e0c185;
+      color: #473714;
       font-weight: bold;
-      font-size: 1.09em;
-      margin-bottom: 7px;
+      font-size: 1.08em;
+      border-radius: 6px;
+      padding: 6px 0;
       text-align: center;
+      letter-spacing: 0.04em;
+      margin-bottom: 0;
     }
     .objectif-text {
-      margin-top: 0;
+      margin-top: 17px;
       color: #ffeecb;
       text-align: center;
-      font-size: 1.08em;
+      font-size: 1.09em;
       line-height: 1.6;
     }
     .actions-row-horizontal {
@@ -68,13 +67,6 @@
       margin-bottom: 10px;
       gap: 28px;
       flex-wrap: wrap;
-      background: #e0c185;
-      border-radius: 9px;
-      padding: 16px 0 10px 0;
-      box-shadow: 0 1px 8px #0002;
-      max-width: 430px;
-      margin-left: auto;
-      margin-right: auto;
     }
     .icon-action {
       display: flex;
@@ -84,67 +76,108 @@
     }
     .icon-action a, .icon-action label {
       cursor: pointer;
-      color: #473714;
+      color: #e0c185;
       text-decoration: none;
       transition: color 0.2s;
       font-weight: 600;
     }
     .icon-action a:hover, .icon-action label:hover {
-      color: #bfa258;
+      color: #ffeecb;
     }
     .icon-action svg {
       width: 38px;
       height: 38px;
       margin-bottom: 6px;
-      fill: #473714;
+      fill: #e0c185;
       transition: fill 0.2s;
       display: block;
       margin-left: auto;
       margin-right: auto;
     }
-    .icon-action a:hover svg, .icon-action label:hover svg {
-      fill: #bfa258;
+    .icon-action a:hover svg,
+    .icon-action label:hover svg {
+      fill: #ffeecb;
     }
     .icon-action span {
       font-size: 0.98em;
-      color: #473714;
+      color: #e0c185;
       margin-top: 2px;
       text-align: center;
     }
-    .input-password-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 38px 0 10px 0;
-    }
-    .input-password-label {
-      color: #e0c185;
-      font-size: 1.06em;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .input-password-field {
-      padding: 10px 16px;
-      font-size: 1.11em;
-      border-radius: 7px;
-      border: 1px solid #e0c185;
-      outline: none;
-      margin-bottom: 0;
-      background: #2b2323;
+    .gps-instruction {
       color: #ffeecb;
-      width: 320px;
-      max-width: 95vw;
+      font-size: 1.07em;
+      text-align: center;
+      margin: 18px 0 10px 0;
     }
-    .input-password-field:focus {
-      border: 1.5px solid #ffeecb;
+    #check-gps {
+      padding: 12px 26px;
+      border-radius: 8px;
+      background: #e0c185;
+      color: #473714;
+      font-size: 1.08em;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 8px;
+      margin-top: 2px;
+      transition: background 0.2s;
+    }
+    #check-gps:hover {
+      background: #ffeecb;
+      color: #473714;
+    }
+    #gps-feedback {
+      color: #ffeecb;
+      font-size: 1.07em;
+      min-height: 1.3em;
+      text-align: center;
+      margin: 0 0 8px 0;
+    }
+    .photo-actions {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap;
+      border: 0;
+      padding: 0;
+      margin: -1px;
+    }
+    #next-quest {
+      background: #aaa;
+      color: #fff;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      margin: 28px auto 0 auto;
+      display: block;
+      opacity: 0.6;
+      cursor: not-allowed;
+      transition: background 0.2s, opacity 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    #next-quest.enabled {
+      background: #e0c185;
+      color: #473714;
+      opacity: 1;
+      cursor: pointer;
     }
     @media (max-width: 650px) {
       .center-wrapper { max-width: 99vw; }
       .main-accueil { padding: 12px 2vw 18px 2vw; }
-      .actions-row-horizontal { flex-direction: column; gap: 10px; padding: 10px 0 5px 0; }
+      .actions-row-horizontal { flex-direction: column; gap: 10px; }
       .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
       .icon-action span { text-align: left; }
-      .input-password-field { width: 98vw; font-size: 1em; padding: 10px 7px; }
+      .photo-actions { gap: 10px; }
     }
   </style>
 </head>
@@ -154,40 +187,87 @@
   </header>
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <h2>Quête de l’esprit</h2>
+      <h2>La quête du bout du monde</h2>
       <div class="presentation-jeu">
-        <div class="texte-course">
-          <em>
-            Il est des chemins que ni l’épée ni la course ne sauraient franchir.<br>
-            Seule la lumière de l’esprit éclaire ce que les yeux ne voient pas.
-          </em>
+        <div class="gps-instruction" id="gps-instruction">
+          Rendez-vous à la position&nbsp;:<br>
+          <strong>47.367167, -0.562611</strong>
         </div>
+        <div class="actions-row-horizontal" id="gps-actions">
+          <div class="icon-action">
+            <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
+              </svg>
+              <span>Boussole</span>
+            </a>
+          </div>
+          <div>
+            <button id="check-gps">Je suis arrivé !</button>
+            <div id="gps-feedback"></div>
+          </div>
+        </div>
+
+        <!-- Objectif -->
         <div class="objectif-course">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text">
-            Un indice qui permet de lire un message ancien, scellé par les sages, vous attend.<br>
-            Parlez ami et entrez... Déchiffrez le texte, percez ses secrets.<br>
-            Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.<br>
+            <span style="color:#ffeecb;">
+              Au sommet de la butte, le vent murmure les secrets du royaume de l’Ogre.<br>
+              D’ici, le regard embrasse les terres du noble roi Arthur.<br><br>
+              Mais l’heure n’est plus à la contemplation.<br>
+              Descendez dans les plaines, preux aventuriers, et mêlez-vous au peuple errant.<br><br>
+              Pour localiser l’antre du Dragon, il vous faudra sonder les salutations et questionner les âmes croisées.<br><br>
+              📸 <strong>Votre quête : prendre la pose avec quatre inconnus du royaume.</strong><br>
+              Ces portraits seront la clé d’un savoir ancien.<br><br>
+              Envoyez vos preuves à Merlin : peut-être alors dévoilera-t-il le chemin du combat final.
+            </span>
           </div>
         </div>
-      </div>
-      <div class="actions-row-horizontal">
-        <div class="icon-action">
-          <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
-            </svg>
-            <span>Boussole</span>
-          </a>
+
+        <!-- Actions photos -->
+        <div class="actions-row-horizontal" id="photos-actions" style="display:none;">
+          <div class="photo-actions">
+            <div class="icon-action side-icon">
+              <label id="label-photo1" for="photo-upload-1">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                <span>Photo avec un paysan</span>
+                <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo2" for="photo-upload-2">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                <span>Photo avec un gueux</span>
+                <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo3" for="photo-upload-3">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                <span>Photo avec un troubadour</span>
+                <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+            <div class="icon-action side-icon">
+              <label id="label-photo4" for="photo-upload-4">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.2.4-.2h2.83c.16 0 .31.07.4.2L15.95 7H20v13zm-8-4c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                </svg>
+                <span>Photo avec un fils d'unijambiste</span>
+                <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
+              </label>
+            </div>
+          </div>
         </div>
-        <!-- Ajoute d'autres actions si besoin -->
-      </div>
-      <!-- Exemple d'une zone de saisie pour la réponse -->
-      <div class="input-password-wrapper">
-        <label for="password-field" class="input-password-label">
-          Entrez le mot de passe pour valider&nbsp;:
-        </label>
-        <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici...">
+        <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+        <button id="next-quest" disabled style="display:none;">Quête suivante</button>
       </div>
     </main>
   </div>
@@ -195,5 +275,72 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <script>
+    // GPS obligatoire
+    const DEST_LAT = 47.367167;
+    const DEST_LON = -0.562611;
+    const TOLERANCE_METERS = 40;
+    document.getElementById("check-gps").addEventListener("click", function() {
+      const feedback = document.getElementById("gps-feedback");
+      feedback.textContent = "Recherche de votre position...";
+      if (!navigator.geolocation) {
+        feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        function getDistanceMeters(lat1, lon1, lat2, lon2) {
+          const R = 6378137;
+          const dLat = (lat2-lat1)*Math.PI/180;
+          const dLon = (lon2-lon1)*Math.PI/180;
+          const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          return R * c;
+        }
+        const dist = getDistanceMeters(lat, lon, DEST_LAT, DEST_LON);
+        if (dist < TOLERANCE_METERS) {
+          document.getElementById("gps-actions").style.display = "none";
+          document.getElementById("gps-instruction").style.display = "none";
+          document.getElementById("photos-actions").style.display = "";
+          document.getElementById("next-quest").style.display = "block";
+        } else {
+          feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
+        }
+      }, function(err) {
+        document.getElementById("gps-feedback").textContent = "Position non trouvée (" + err.message + ")";
+      });
+    });
+
+    // Gestion des uploads photo (4 boutons)
+    function handlePhotoUpload(inputId, labelId) {
+      var input = document.getElementById(inputId);
+      var label = document.getElementById(labelId);
+      input.addEventListener('change', function() {
+        if(this.files && this.files[0]) {
+          label.setAttribute('aria-disabled', 'true');
+          input.disabled = true;
+          var out = document.getElementById('photo-filename');
+          var allFiles = [];
+          for (var i = 1; i <= 4; i++) {
+            var inp = document.getElementById('photo-upload-' + i);
+            if (inp && inp.files && inp.files[0]) {
+              allFiles.push(inp.files[0].name);
+            }
+          }
+          out.textContent = "Photos sélectionnées : " + allFiles.join(", ");
+          if(allFiles.length === 4) {
+            var btn = document.getElementById('next-quest');
+            btn.disabled = false;
+            btn.classList.add('enabled');
+          }
+        }
+      });
+    }
+    handlePhotoUpload('photo-upload-1','label-photo1');
+    handlePhotoUpload('photo-upload-2','label-photo2');
+    handlePhotoUpload('photo-upload-3','label-photo3');
+    handlePhotoUpload('photo-upload-4','label-photo4');
+  </script>
 </body>
 </html>
