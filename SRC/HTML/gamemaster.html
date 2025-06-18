@@ -5,206 +5,40 @@
   <title>Gamemaster - Suivi des équipes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../Public/styles/style.css">
-  <!-- Google Fonts pour typos premium -->
   <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900|Roboto+Mono:400,700&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: linear-gradient(120deg, #1a1414 0%, #2b2323 100%);
-      color: #FFEFD8;
-      font-family: 'Segoe UI', 'Cormorant Garamond', serif;
-      margin: 0;
-      min-height: 100vh;
-    }
-    h1 {
-      color: #e0c185;
-      text-align: center;
-      margin: 36px 0 22px 0;
-      font-family: 'Playfair Display', serif;
-      font-weight: bold;
-      font-size: 2.1em;
-      letter-spacing: 2px;
-      text-shadow: 0 3px 18px #0007;
-    }
-    .gm-wrapper {
-      max-width: 880px;
-      margin: 32px auto 0 auto;
-      padding: 24px 22px 30px 22px;
-      background: rgba(41,34,27,0.94);
-      border-radius: 22px;
-      box-shadow: 0 9px 40px #0008, 0 1.5px 28px #bfa87c44 inset;
-      border: 1.5px solid #57391c;
-      transition: box-shadow .3s;
-    }
-    .carousel {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 22px;
-    }
-    .nav-btn {
-      font-size: 2.5em;
-      cursor: pointer;
-      color: #f5dab1;
-      background: linear-gradient(140deg, #3a2c1d 0%, #715740 100%);
+    /* ... (Garde tout ton CSS existant, tu peux juste ajouter ceci pour plus d'accessibilité & feedback) ... */
+    .step-status.done { color: #4caf50; font-weight: bold; }
+    .step-status.current { color: #ffe07e; font-weight: bold; }
+    .step-status.todo { color: #ccc; }
+    .validate-btn, .invalidate-btn {
+      background: #e0c185;
+      color: #473714;
       border: none;
-      border-radius: 50%;
-      width: 58px;
-      height: 58px;
-      box-shadow: 0 4px 16px #0005;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .2s, transform .2s;
-      user-select: none;
-    }
-    .nav-btn:hover {
-      background: linear-gradient(140deg, #715740 0%, #e0c185 100%);
-      color: #1a1414;
-      transform: scale(1.13);
-      box-shadow: 0 6px 22px #e0c18555, 0 4px 16px #0005;
-    }
-    .carte-equipe {
-      flex: 1;
-      background: rgba(24,18,18,0.98);
-      border-radius: 18px;
-      padding: 34px 30px 24px 30px;
-      min-height: 360px;
-      box-shadow: 0 4px 28px #0006;
-      border: 1.5px solid #583f24;
-      transition: box-shadow .2s;
-    }
-    .team-title {
-      font-size:1.45em;
-      color:#ffeecb;
-      margin-bottom:10px;
-      font-family: 'Playfair Display', serif;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-shadow: 0 2px 12px #bfa87c33;
-    }
-    .team-members {
-      font-size:1.07em;
-      color:#ffe07e;
-      margin-bottom:19px;
-      opacity: .92;
-    }
-    .etape-encours {
-      margin: 18px 0 8px 0;
-      font-weight: bold;
-      font-size: 1.09em;
-      letter-spacing: 1px;
-    }
-    .timer {
-      font-size: 1.21em;
-      margin-bottom: 10px;
-      background: linear-gradient(90deg, #412e18 0%, #bfa87c33 100%);
-      border-radius: 10px;
-      padding: 6px 13px;
-      display: inline-block;
-      box-shadow: 0 2px 10px #0002;
-      color: #e0c185;
-      font-family: 'Roboto Mono', monospace;
-      letter-spacing: 1px;
-    }
-    .timer.late {
-      color: #fff1e2;
-      background: linear-gradient(90deg, #b32e2e 0%, #ffb88a 100%);
-      animation: blink 1s linear infinite alternate;
-    }
-    @keyframes blink {
-      0% { box-shadow: 0 0 0 0 #ffb88a44; }
-      100% { box-shadow: 0 0 24px 8px #b32e2e55; }
-    }
-    .parcours-list {
-      margin-top: 22px;
-    }
-    .parcours-list > .epreuve {
-      margin-bottom: 22px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #3a2c1d44;
-    }
-    .epreuve-titre {
-      font-weight: bold;
-      color: #f5dab1;
-      font-size: 1.09em;
-      letter-spacing: .5px;
-      margin-bottom: 3px;
-    }
-    .fichiers-epreuve {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 8px;
-    }
-    .miniature, .miniature-video {
-      max-width: 104px;
-      max-height: 84px;
-      border-radius: 9px;
-      border: 1.5px solid #bfa87c;
-      background: #181212;
-      box-shadow: 0 2px 12px #0004;
-      transition: border .2s, box-shadow .2s;
-    }
-    .miniature:hover, .miniature-video:hover {
-      border: 2px solid #ffe07e;
-      box-shadow: 0 4px 22px #ffe07e33;
-    }
-    .fichier-bloc {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-bottom: 2px;
-      background: #261b10bb;
       border-radius: 7px;
-      padding: 4px 7px 4px 4px;
-      box-shadow: 0 1px 4px #e0c18515;
-      font-size: .98em;
-    }
-    .download-btn {
-      color: #e0c185;
-      text-decoration: underline;
+      padding: 4px 13px;
+      margin-left: 8px;
+      font-size: .95em;
+      font-family: inherit;
       cursor: pointer;
-      background: none;
-      border: none;
-      font-size: 0.99em;
-      padding: 0 3px;
-      margin-left: 5px;
-      border-radius: 5px;
-      transition: background .2s, color .2s;
+      transition: background 0.2s;
     }
-    .download-btn:hover {
-      background: #ffe07e;
-      color: #1a1414;
-    }
-    ::-webkit-scrollbar {
-      width: 9px;
-      background: #2b2323;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #bfa87c55;
-      border-radius: 8px;
-    }
-    @media (max-width: 900px) {
-      .gm-wrapper { max-width: 97vw; }
-      .carte-equipe { padding: 12px 6vw;}
-    }
-    @media (max-width: 700px) {
-      .gm-wrapper { padding: 5px; }
-      .carte-equipe { padding: 8px 1vw;}
-      .miniature, .miniature-video { max-width: 60px; max-height: 40px;}
-      .nav-btn { width: 40px; height: 40px; font-size: 1.4em; }
-    }
+    .invalidate-btn { background: #e55b5b; color: #fff; }
+    .validate-btn:hover { background: #ffeecb; }
+    .invalidate-btn:hover { background: #ffadad; }
+    .error-message { color: #ff7777; font-weight: bold; margin: 13px 0; }
+    .history-list { font-size: .96em; color: #ffe07e; margin-top: 12px; }
   </style>
 </head>
 <body>
   <h1>Gamemaster — Suivi des équipes</h1>
   <div class="gm-wrapper">
     <div class="carousel">
-      <button class="nav-btn" id="prev-team">&#8592;</button>
+      <button class="nav-btn" id="prev-team" aria-label="Équipe précédente">&#8592;</button>
       <div class="carte-equipe" id="carte-equipe">
         <div style="text-align:center;">Chargement…</div>
       </div>
-      <button class="nav-btn" id="next-team">&#8594;</button>
+      <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
     </div>
   </div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -226,18 +60,12 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // --- DONNÉES ---
     const salonCode = localStorage.getItem("salonCode") || prompt("Code salon à superviser ?");
     let equipes = [];
     let nomsEquipes = {};
     let currentIndex = 0;
-    let etapes = [
-      // Exemple de structure, à adapter selon ta logique de jeu :
-      { titre: "Épreuve 1", fichiersAttendus: ["Photo 1"] },
-      { titre: "Épreuve 2", fichiersAttendus: ["Vidéo"] },
-      { titre: "Épreuve 3", fichiersAttendus: ["Photo 2"] },
-      // Ajoute ici la suite des épreuves et fichiers attendus…
-    ];
+    let parcoursEquipes = []; // pour chaque équipe
+    let cheminsParEquipe = {}; // mapping équipe => index parcours
 
     // --- NAVIGATION ---
     document.getElementById('prev-team').onclick = function() {
@@ -255,19 +83,32 @@
 
     // --- CHARGEMENT & AFFICHAGE ---
     function chargerEquipes() {
-      db.ref(`parties/${salonCode}/equipes`).once('value', snap => {
-        const data = snap.val() || {};
-        equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
-        db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
-          nomsEquipes = snapNoms.val() || {};
-          if (equipes.length === 0) {
-            document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée</div>";
-          } else {
-            if (currentIndex >= equipes.length) currentIndex = 0;
-            afficherEquipe();
-          }
+      db.ref(`parties/${salonCode}/cheminsParEquipe`).once('value', snapChemins => {
+        cheminsParEquipe = snapChemins.val() || {};
+        db.ref(`parties/${salonCode}/parcoursEquipes`).once('value', snapParcours => {
+          parcoursEquipes = snapParcours.val() || [];
+          db.ref(`parties/${salonCode}/equipes`).once('value', snap => {
+            const data = snap.val() || {};
+            equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
+            db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
+              nomsEquipes = snapNoms.val() || {};
+              if (equipes.length === 0) {
+                document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée</div>";
+              } else {
+                if (currentIndex >= equipes.length) currentIndex = 0;
+                afficherEquipe();
+              }
+            });
+          });
         });
       });
+    }
+
+    // Donne le vrai parcours d'une équipe selon la config
+    function getParcoursEquipe(equipeNum) {
+      if (!cheminsParEquipe || !parcoursEquipes || !parcoursEquipes.length) return [];
+      const idx = cheminsParEquipe[equipeNum];
+      return parcoursEquipes[idx] || [];
     }
 
     function afficherEquipe() {
@@ -276,28 +117,36 @@
       const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
       const membres = equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—';
       const step = equipe.currentStep ?? 0;
+      const parcours = getParcoursEquipe(equipe.num);
       let html = `
         <div class='team-title'>${nom}</div>
         <div class='team-members'>${membres}</div>
-        <div class='etape-encours'>Étape actuelle : <span>${etapes[step]?.titre || 'Terminé'}</span></div>
+        <div class='etape-encours'>Étape ${step+1} / ${parcours.length} (${parcours[step] ? "Épreuve "+parcours[step] : "Terminé"})</div>
         <div id="timer" class="timer">Temps sur cette étape : …</div>
         <div class='parcours-list'>
       `;
-      // Affiche toutes les étapes (parcours)
-      for (let i=0; i<etapes.length; i++) {
+      // Affiche chaque étape du parcours de l'équipe avec statut
+      for (let i=0; i<parcours.length; i++) {
         html += `<div class='epreuve'>
-            <div class='epreuve-titre'>${etapes[i].titre}${i==step ? " <span style='color:#ffe07e;'>(en cours)</span>": (i<step ? " <span style='color:#a8ffb9;'>(réalisée)</span>":"")}</div>
-            <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
-          </div>`;
+          <div class='epreuve-titre'>
+            Épreuve ${parcours[i]}
+            <span class="step-status ${i < step ? 'done' : (i === step ? 'current' : 'todo')}">
+              ${i < step ? "✔️" : (i === step ? "🟡" : "—")}
+            </span>
+            ${i === step ? `<button class="validate-btn" onclick="validerEtape(${equipe.num},${i})" aria-label="Valider cette étape">Valider</button>
+            <button class="invalidate-btn" onclick="invaliderEtape(${equipe.num},${i})" aria-label="Invalider cette étape">Invalider</button>` : ""}
+          </div>
+          <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
+        </div>`;
       }
       html += '</div>';
+      html += `<div class="history-list" id="history-eq${equipe.num}">Historique : chargement…</div>`;
       carte.innerHTML = html;
-      // Timer
       afficherTimer(equipe, step);
-      // Fichiers pour chaque étape
-      for (let i=0; i<etapes.length; i++) {
-        listerFichiersEquipeEtape(equipe.num, i, etapes[i].fichiersAttendus);
+      for (let i=0; i<parcours.length; i++) {
+        listerFichiersEquipeEtape(equipe.num, parcours[i], i);
       }
+      afficherHistorique(equipe.num);
     }
 
     // --- TIMER ---
@@ -306,7 +155,6 @@
       if (timerInterval) clearInterval(timerInterval);
       const timerDiv = document.getElementById('timer');
       function maj() {
-        // timestamp début étape stocké dans equipe.etapes
         let start = equipe.etapes && equipe.etapes[step] && equipe.etapes[step].debut ? equipe.etapes[step].debut : null;
         if (!start) { timerDiv.textContent = "Temps sur cette étape : —"; return; }
         const elapsed = Math.floor((Date.now() - start) / 1000);
@@ -320,36 +168,67 @@
     }
 
     // --- AFFICHAGE FICHIERS PAR ÉQUIPE & ÉPREUVE ---
-    function listerFichiersEquipeEtape(num, etapeIdx, fichiersAttendus) {
+    function listerFichiersEquipeEtape(num, epreuveNum, etapeIdx) {
       const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
       if (!div) return;
-      const basePath = `parties/${salonCode}/equipe${num}/etape${etapeIdx}/`;
+      const basePath = `parties/${salonCode}/equipes/${num}/epreuves/${epreuveNum}`;
       storage.ref(basePath).listAll().then(res => {
         if (res.items.length === 0) {
-          div.innerHTML = fichiersAttendus.map(nom=> `<div class="fichier-bloc"><span>${nom} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`).join('');
+          div.innerHTML = `<span style="color:#b8b8b8;">Aucun fichier envoyé</span>`;
         } else {
           div.innerHTML = '';
-          fichiersAttendus.forEach(nomAttendu => {
-            // Cherche le fichier correspondant (par nom)
-            const fichier = res.items.find(item => item.name.toLowerCase().includes(nomAttendu.toLowerCase().replace(/\s/g,'') ));
-            if (!fichier) {
-              div.innerHTML += `<div class="fichier-bloc"><span>${nomAttendu} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`;
-            } else {
-              fichier.getDownloadURL().then(url => {
-                const ext = fichier.name.split('.').pop().toLowerCase();
-                let mini = '';
-                if(['jpg','jpeg','png','gif'].includes(ext)) {
-                  mini = `<img src="${url}" class="miniature" alt="Photo">`;
-                } else if(['mp4','webm','ogg'].includes(ext)) {
-                  mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
-                }
-                div.innerHTML += `<div class="fichier-bloc">${mini}<span>${fichier.name}</span>
-                  <button class="download-btn" onclick="downloadFile('${url}','${fichier.name}')">Télécharger</button></div>`;
-              });
-            }
+          res.items.forEach(fichier => {
+            fichier.getDownloadURL().then(url => {
+              const ext = fichier.name.split('.').pop().toLowerCase();
+              let mini = '';
+              if(['jpg','jpeg','png','gif'].includes(ext)) {
+                mini = `<img src="${url}" class="miniature" alt="Photo">`;
+              } else if(['mp4','webm','ogg'].includes(ext)) {
+                mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls></video>`;
+              }
+              div.innerHTML += `<div class="fichier-bloc">${mini}<span>${fichier.name}</span>
+                <button class="download-btn" onclick="downloadFile('${url}','${fichier.name}')">Télécharger</button>
+                <a href="${url}" target="_blank" class="download-btn" style="text-decoration:none;">Voir</a>
+              </div>`;
+            });
           });
         }
-      }).catch(()=>{div.innerHTML = "<span style='color:#b8b8b8;'>Erreur</span>";});
+      }).catch(()=>{div.innerHTML = "<span class='error-message'>Erreur de récupération fichiers !</span>";});
+    }
+
+    // --- Validation manuelle étape (pour gamemaster) ---
+    window.validerEtape = function(num, etapeIdx) {
+      if (!confirm("Valider cette étape ?")) return;
+      db.ref(`parties/${salonCode}/equipes/${num}/currentStep`).transaction(step => {
+        if (step == null || etapeIdx >= step) return etapeIdx + 1;
+        return step;
+      }, function(error, committed, snapshot) {
+        if (committed) { chargerEquipes(); }
+        else alert("Erreur validation.");
+      });
+      // Historique :
+      const time = new Date().toLocaleString();
+      db.ref(`parties/${salonCode}/equipes/${num}/historique`).push({ action: "Validation manuelle", etape: etapeIdx, when: time });
+    };
+    window.invaliderEtape = function(num, etapeIdx) {
+      if (!confirm("Invalider/retourner à cette étape ?")) return;
+      db.ref(`parties/${salonCode}/equipes/${num}/currentStep`).set(etapeIdx);
+      const time = new Date().toLocaleString();
+      db.ref(`parties/${salonCode}/equipes/${num}/historique`).push({ action: "Retour étape", etape: etapeIdx, when: time });
+      chargerEquipes();
+    };
+
+    // --- Historique des actions ---
+    function afficherHistorique(num) {
+      const histDiv = document.getElementById('history-eq'+num);
+      db.ref(`parties/${salonCode}/equipes/${num}/historique`).once('value', snap => {
+        const hist = [];
+        snap.forEach(child => {
+          const h = child.val();
+          hist.push(`<li>${h.when || ''} — ${h.action}${h.etape != null ? ' (étape '+(Number(h.etape)+1)+')' : ''}</li>`);
+        });
+        histDiv.innerHTML = `<ul>${hist.join('')}</ul>`;
+      });
     }
 
     // --- Download helper ---
