@@ -79,6 +79,10 @@
       opacity: 1;
       cursor: pointer;
     }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -99,7 +103,6 @@
         max-width: 98vw;
       }
     }
-    /* Harmonisation des modales et messages (amélioration accessibilité/UX) */
     .modal-toast {
       display: none;
       position: fixed;
@@ -150,30 +153,29 @@
           </div>
         </div>
       </div>
-      <!-- Actions et image entre les deux boutons -->
       <div class="actions-row-horizontal">
         <!-- GPS à gauche -->
         <div class="icon-action side-icon">
-  <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-    <svg viewBox="0 0 24 24" width="38" height="38">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
-    </svg>
-    <span>Boussole</span>
-  </a>
-</div>
-<div class="icon-action side-icon">
-  <label for="photo-upload" aria-label="Télécharger une photo">
-    <svg viewBox="0 0 24 24" width="38" height="38">
-      <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
-    </svg>
-    <span>Photo à envoyer</span>
-    <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
-  </label>
-</div>
+          <a href="https://maps.google.com/?q=47.477821911935,-0.5778960696910476" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <svg viewBox="0 0 24 24" width="38" height="38">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
+            </svg>
+            <span>Boussole</span>
+          </a>
         </div>
+        <!-- Appareil photo à droite -->
+        <div class="icon-action side-icon">
+          <label for="photo-upload" aria-label="Télécharger une photo">
+            <svg id="icon-photo" viewBox="0 0 24 24" width="38" height="38">
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
+            </svg>
+            <span>Photo à envoyer</span>
+            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
+          </label>
+        </div>
+      </div>
       <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
 
-      <!-- Bouton Quête suivante désactivé par défaut -->
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -183,23 +185,20 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
-  <!-- Toast de feedback harmonisé -->
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
 
-  <!-- Firebase et gameflow.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
-    // ==== Sécurité et robustesse : vérification session ====
-    // Si salonCode ou equipeNum absent, redirige vers l'accueil pour éviter les états incohérents
+    // Sécurité et robustesse : vérification session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
     if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
       window.location.href = "accueil.html";
     }
 
-    // === Initialisation Firebase ===
+    // Initialisation Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -215,7 +214,7 @@
     }
     const db = firebase.database();
 
-    // ==== Harmonisation feedback utilisateur ====
+    // Toast feedback
     function showToast(msg) {
       const toast = document.getElementById('toast-message');
       if (toast) {
@@ -225,8 +224,7 @@
       }
     }
 
-    // ==== Synchro en temps réel de l'étape d'équipe (navigation auto si currentStep change) ====
-    // Quand currentStep change (même si action par l'autre binôme), on redirige automatiquement.
+    // Synchro navigation (currentStep)
     function goToStep(stepIndex) {
       getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
         if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
@@ -245,8 +243,6 @@
         }
       });
     }
-
-    // Ecouteur temps réel sur currentStep pour synchro navigation
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
       .on('value', function(snapshot) {
         const step = snapshot.val() || 0;
@@ -257,51 +253,46 @@
       var input = document.getElementById('photo-upload');
       var out = document.getElementById('photo-filename');
       var btn = document.getElementById('next-quest');
+      var icon = document.getElementById('icon-photo');
 
-      // Affichage du nom de la photo + activation du bouton
-      if(input && out && btn) {
+      // Upload
+      if(input && out && icon) {
         input.addEventListener('change', function() {
           if(this.files && this.files[0]) {
-            out.textContent = "Photo sélectionnée : " + this.files[0].name;
-            btn.disabled = false;
-            btn.classList.add('enabled');
-            // ==== Synchro preuve : on écrit la preuve dans firebase ====
             db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/1/photo').set({
               name: this.files[0].name,
-              // Pour une vraie appli : uploader sur storage, stocker l'URL ici
               uploadedAt: Date.now()
             });
-          } else {
-            out.textContent = "";
-            btn.disabled = true;
-            btn.classList.remove('enabled');
           }
         });
       }
 
-      // ===== Synchro preuve : affiche la photo sur tous les appareils du binôme ====
+      // Synchro multi-device, affichage et bouton + grisé de l'icône
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/1/photo')
         .on('value', function(snapshot) {
           var input = document.getElementById('photo-upload');
           var out = document.getElementById('photo-filename');
           var btn = document.getElementById('next-quest');
+          var icon = document.getElementById('icon-photo');
           const data = snapshot.val();
-          if (out && btn && input) {
+          if (out && btn && input && icon) {
             if (data && data.name) {
               out.textContent = "Photo sélectionnée : " + data.name;
               btn.disabled = false;
               btn.classList.add('enabled');
               input.disabled = true;
+              icon.classList.add('grayed');
             } else {
               out.textContent = "";
               btn.disabled = true;
               btn.classList.remove('enabled');
               input.disabled = false;
+              icon.classList.remove('grayed');
             }
           }
         });
 
-      // === NAVIGATION GAMEFLOW : passage à l'étape suivante + désactivation bouton (anti double clic) ===
+      // Navigation bouton
       if (btn) {
         btn.addEventListener('click', function() {
           if (btn.disabled) return;
@@ -311,7 +302,6 @@
           db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
             .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
               if (!error && committed) {
-                // La navigation sera automatiquement gérée par l'écouteur temps réel plus haut
                 showToast("Étape validée !");
               } else {
                 showToast("Erreur lors de la validation...");
@@ -322,7 +312,8 @@
         });
       }
     });
-    // Anti-retour arrière : recharge l'état depuis Firebase pour éviter un retour à une ancienne étape
+
+    // Anti-retour arrière
     window.addEventListener("pageshow", function(evt) {
       if (evt.persisted) {
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
