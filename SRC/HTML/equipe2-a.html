@@ -99,6 +99,27 @@
         max-width: 98vw;
       }
     }
+    .modal-toast {
+      display: none;
+      position: fixed;
+      left: 50%; top: 10%;
+      transform: translateX(-50%);
+      background: #231d1d;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-size: 1.14em;
+      z-index: 9999;
+      box-shadow: 0 4px 22px #0006;
+      text-align:center;
+      max-width: 90vw;
+    }
+    .modal-toast.visible {
+      display: block;
+      animation: fadein 0.3s;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
 </head>
 <body>
@@ -131,66 +152,59 @@
           </div>
         </div>
       </div>
-
-      <!-- Actions et image entre les deux boutons -->
       <div class="actions-row-horizontal">
-        <!-- GPS à gauche -->
+        <!-- GPS -->
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.473976,-0.576762" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm2.65-13.35l-5.3 2.18a1 1 0 0 0-.59.59l-2.18 5.3a1 1 0 0 0 .59 1.28l5.3 2.18a1 1 0 0 0 1.28-.59l2.18-5.3a1 1 0 0 0-.59-1.28z"/>
+            <svg viewBox="0 0 24 24" width="38" height="38">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
             </svg>
             <span>Boussole</span>
           </a>
         </div>
-
         <!-- Vidéo 1 -->
         <div class="icon-action side-icon">
-          <label id="label-video1" for="video-upload-1" aria-label="Télécharger la vidéo 1">
-            <svg id="icon-video1" viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+          <label for="video-upload-1" aria-label="Télécharger la vidéo 1">
+            <svg viewBox="0 0 24 24" width="38" height="38">
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
             </svg>
             <span>Vidéo 1 à envoyer</span>
             <input id="video-upload-1" class="visually-hidden" type="file" accept="video/*">
-            <div id="progress-container-1" style="display:none;">
-              <progress id="progress-1" value="0" max="100"></progress>
-              <span id="percent-1">0%</span>
-            </div>
           </label>
         </div>
-
         <!-- Vidéo 2 -->
         <div class="icon-action side-icon">
-          <label id="label-video2" for="video-upload-2" aria-label="Télécharger la vidéo 2">
-            <svg id="icon-video2" viewBox="0 0 24 24">
-              <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.13.24-.21.39-.21h2.83c.15 0 .3.08.39.21L15.95 7H20v13zM12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+          <label for="video-upload-2" aria-label="Télécharger la vidéo 2">
+            <svg viewBox="0 0 24 24" width="38" height="38">
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
             </svg>
             <span>Vidéo 2 à envoyer</span>
             <input id="video-upload-2" class="visually-hidden" type="file" accept="video/*">
-            <div id="progress-container-2" style="display:none;">
-              <progress id="progress-2" value="0" max="100"></progress>
-              <span id="percent-2">0%</span>
-            </div>
           </label>
         </div>
       </div>
-      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-
-      <!-- Bouton Quête suivante désactivé par défaut -->
+      <div id="video-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
-
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- Toast harmonisé -->
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <!-- Firebase et gameflow.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
-    // Initialisation Firebase (AVANT tout usage)
+    // Sécurité : vérif session
+    const salonCode = localStorage.getItem("salonCode");
+    const equipeNum = Number(localStorage.getItem("equipeNum"));
+    if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+      window.location.href = "accueil.html";
+    }
+    // Firebase init
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -202,84 +216,126 @@
       measurementId: "G-KSBMBB7KMJ"
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  </script>
-  <script>
-    function handleVideoUpload(inputId, progressContainerId, progressId, percentId, labelId, iconId, state) {
-      var input = document.getElementById(inputId);
-      var progressContainer = document.getElementById(progressContainerId);
-      var progress = document.getElementById(progressId);
-      var percent = document.getElementById(percentId);
-      var label = document.getElementById(labelId);
-      var icon = document.getElementById(iconId);
+    const db = firebase.database();
 
-      input.addEventListener('change', function() {
-        if(this.files && this.files[0]) {
-          progressContainer.style.display = 'block';
-          progress.value = 0;
-          percent.textContent = '0%';
-
-          // Simule un upload (remplace par ton vrai upload AJAX/XHR si besoin !)
-          var uploaded = 0;
-          var interval = setInterval(function() {
-            if(uploaded >= 100) {
-              clearInterval(interval);
-              progress.value = 100;
-              percent.textContent = '100%';
-              input.disabled = true;
-              label.style.opacity = 0.5;
-              icon.style.filter = "grayscale(1)";
-              state.done = true;
-              checkAllUploads();
-            } else {
-              uploaded += 10;
-              progress.value = uploaded;
-              percent.textContent = uploaded + '%';
-            }
-          }, 200);
-        }
-      });
-    }
-
-    function checkAllUploads() {
-      if(window.uploadState1.done && window.uploadState2.done) {
-        var btn = document.getElementById('next-quest');
-        btn.disabled = false;
-        btn.classList.add('enabled');
+    // Toast feedback
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('visible');
+        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      window.uploadState1 = { done: false };
-      window.uploadState2 = { done: false };
-      handleVideoUpload('video-upload-1', 'progress-container-1', 'progress-1', 'percent-1', 'label-video1', 'icon-video1', window.uploadState1);
-      handleVideoUpload('video-upload-2', 'progress-container-2', 'progress-2', 'percent-2', 'label-video2', 'icon-video2', window.uploadState2);
-
-      // ----- GESTION DE LA NAVIGATION GAMEFLOW -----
-      document.getElementById('next-quest').addEventListener('click', function() {
-        const salonCode = localStorage.getItem("salonCode");
-        const equipeNum = Number(localStorage.getItem("equipeNum"));
-        const db = firebase.database();
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-            if (!error && committed) {
-              getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-const step = snapshot.val();
-if (step < parcours.length) {
-  const epreuveNum = parcours[step];
-  if (epreuveNum === 6) {
-    window.location.href = "epreuve6.html";
-  } else if (epreuveNum === 7) {
-    window.location.href = "révélation.html";
-  } else {
-    window.location.href = `equipe${epreuveNum}-a.html`;
-  }
-} else {
-  alert('Bravo, vous avez terminé !');
-}
-            }
-          });
+    // Synchro navigation (currentStep)
+    function goToStep(stepIndex) {
+      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+          showToast('Bravo, vous avez terminé !');
+          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+          return;
+        }
+        const epreuveNum = parcours[stepIndex];
+        let target = "";
+        if (epreuveNum === 6) target = "epreuve6.html";
+        else if (epreuveNum === 7) target = "révélation.html";
+        else target = `equipe${epreuveNum}-a.html`;
+        const current = window.location.pathname.split('/').pop();
+        if (current !== target) {
+          window.location.href = target;
+        }
       });
-      // ----- FIN NAVIGATION -----
+    }
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+      .on('value', function(snapshot) {
+        const step = snapshot.val() || 0;
+        goToStep(step);
+      });
+
+    // Upload vidéo 1
+    document.addEventListener('DOMContentLoaded', function() {
+      var input1 = document.getElementById('video-upload-1');
+      var input2 = document.getElementById('video-upload-2');
+      var out = document.getElementById('video-filename');
+      var btn = document.getElementById('next-quest');
+      // Upload 1
+      if(input1 && out) {
+        input1.addEventListener('change', function() {
+          if(this.files && this.files[0]) {
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video1').set({
+              name: this.files[0].name,
+              uploadedAt: Date.now()
+            });
+          }
+        });
+      }
+      // Upload 2
+      if(input2 && out) {
+        input2.addEventListener('change', function() {
+          if(this.files && this.files[0]) {
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video2').set({
+              name: this.files[0].name,
+              uploadedAt: Date.now()
+            });
+          }
+        });
+      }
+      // Synchro multi-device et activation bouton
+      function updateUI() {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2').once('value', function(snapshot) {
+          const data = snapshot.val() || {};
+          let txt = "";
+          if(data.video1 && data.video1.name) txt += "Vidéo 1 : " + data.video1.name + " ";
+          if(data.video2 && data.video2.name) txt += "Vidéo 2 : " + data.video2.name;
+          if(out) out.textContent = txt;
+          if(btn) {
+            if(data.video1 && data.video1.name && data.video2 && data.video2.name) {
+              btn.disabled = false;
+              btn.classList.add('enabled');
+              if(input1) input1.disabled = true;
+              if(input2) input2.disabled = true;
+            } else {
+              btn.disabled = true;
+              btn.classList.remove('enabled');
+              if(input1) input1.disabled = false;
+              if(input2) input2.disabled = false;
+            }
+          }
+        });
+      }
+      // On écoute les deux uploads
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2').on('value', updateUI);
+
+      // Navigation bouton
+      if(btn) {
+        btn.addEventListener('click', function() {
+          if (btn.disabled) return;
+          btn.disabled = true;
+          btn.classList.remove('enabled');
+          showToast("Validation en cours...");
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+              if (!error && committed) {
+                showToast("Étape validée !");
+              } else {
+                showToast("Erreur lors de la validation...");
+                btn.disabled = false;
+                btn.classList.add('enabled');
+              }
+            });
+        });
+      }
+    });
+    // Anti-retour arrière
+    window.addEventListener("pageshow", function(evt) {
+      if (evt.persisted) {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          .once('value', function(snapshot) {
+            const step = snapshot.val() || 0;
+            goToStep(step);
+          });
+      }
     });
   </script>
 </body>
