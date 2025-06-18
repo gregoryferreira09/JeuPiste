@@ -166,6 +166,21 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
+    // === Initialisation Firebase ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.database();
+
     // GPS obligatoire
     const DEST_LAT = 47.367167;
     const DEST_LON = -0.562611;
@@ -221,7 +236,6 @@
     // Chrono/temps passé sur l’épreuve
     const stepIndex = 4;
     let startTime = null;
-    const db = firebase.database();
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
       .once('value', function(snap) {
         startTime = snap.val();
@@ -249,9 +263,9 @@
     function normalize(str) {
       return str
         .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // enlève accents
-        .replace(/[^a-z0-9 ]+/g, "")                       // enlève toute ponctuation
-        .replace(/\s+/g, " ")                              // espaces multiples en 1
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9 ]+/g, "")
+        .replace(/\s+/g, " ")
         .trim();
     }
     const PASSWORD = normalize("j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?");
