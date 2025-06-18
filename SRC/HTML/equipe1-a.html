@@ -225,6 +225,18 @@
       }
     }
 
+    // Chrono/temps passé sur l’épreuve
+    const stepIndex = 1; // Numéro d'étape pour cette page
+    let startTime = null;
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+      .once('value', function(snap) {
+        startTime = snap.val();
+        if (!startTime) {
+          startTime = Date.now();
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
+        }
+      });
+
     // Synchro navigation (currentStep)
     function goToStep(stepIndex) {
       getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
@@ -300,15 +312,26 @@
           btn.disabled = true;
           btn.classList.remove('enabled');
           showToast("Validation en cours...");
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-              if (!error && committed) {
-                showToast("Étape validée !");
-              } else {
-                showToast("Erreur lors de la validation...");
-                btn.disabled = false;
-                btn.classList.add('enabled');
+          // === ENREGISTRE LE TEMPS PASSÉ ===
+          const now = Date.now();
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+            .once('value', function(snap) {
+              const sTime = snap.val();
+              if (sTime) {
+                const elapsed = Math.round((now - sTime) / 1000);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
               }
+              // Puis passage à l'étape suivante
+              db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+                .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+                  if (!error && committed) {
+                    showToast("Étape validée !");
+                  } else {
+                    showToast("Erreur lors de la validation...");
+                    btn.disabled = false;
+                    btn.classList.add('enabled');
+                  }
+                });
             });
         });
       }
