@@ -64,10 +64,10 @@
     .epreuve:last-child { border-bottom: none; }
     .epreuve-titre { color: #e0c185; font-weight: bold; font-size: 1.06em; margin-bottom: 4px;}
     .fichiers-epreuve { color: #b8b8b8; font-size: 0.96em; margin-bottom: 2px;}
-    .download-btn { background: #e0c185; color: #473714; border: none; border-radius: 7px; padding: 4px 16px; font-size: 0.98em; cursor: pointer; margin-left: 7px; margin-top: 4px; transition: background 0.18s;}
+    .download-btn { background: #e0c185; color: #473714; border: none; border-radius: 7px; padding: 4px 16px; font-size: 0.98em; cursor: pointer; margin-left: 7px; margin-top: 4px; transition: background 0.2s;}
     .download-btn:hover, .download-btn:focus { background: #ffeecb; color: #473714; outline: 2px solid #e0c185;}
     .chrono-value { color: #ffe07e; font-size: 0.98em; font-weight: bold; margin-left: 8px; letter-spacing: 1px; font-family: 'Roboto Mono', monospace;}
-    .nav-btn { background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #473714; border: 2px solid #e0c185; border-radius: 8px; font-size: 1.5em; font-family: 'Cinzel Decorative', serif; font-weight: bold; min-width: 58px; min-height: 58px; cursor: pointer; outline: none; margin: 0 6px; transition: background 0.15s, color 0.15s, box-shadow 0.12s;}
+    .nav-btn { background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #473714; border: 2px solid #e0c185; border-radius: 8px; font-size: 1.5em; font-family: 'Cinzel Decorative', serif; font-weight: bold; min-width: 54px; min-height: 54px; cursor: pointer; transition: background 0.2s;}
     .nav-btn:hover, .nav-btn:focus { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588; outline: 2px solid #e0c185;}
     .msg-info { color: #c9b49a; font-style: italic; margin: 16px 0 0 0; text-align: center;}
     .gm-table { width: 100%; border-collapse: collapse; background: #200f0f; margin-bottom: 20px; border-radius: 8px; overflow: hidden;}
@@ -76,16 +76,17 @@
     .gm-table tr:nth-child(even) { background: #241313;}
     .cross { color: #e06c6c; font-size: 1.23em; font-weight: bold; cursor: pointer; transition: color 0.15s;}
     .cross:hover { color: #ff2f0a;}
-    /* Onglet + Auth */
     .gm-tabs { display: flex; gap: 16px; margin-bottom: 18px; justify-content: center;}
-    .gm-tab-btn { background: #2c1b1b; color: #e0c185; border: 2px solid #e0c185; border-bottom: none; border-radius: 8px 8px 0 0; font-family: 'Cinzel Decorative', serif; padding: 7px 24px; font-size: 1.12em; cursor: pointer; font-weight: bold; outline: none; transition: background 0.13s, color 0.13s;}
+    .gm-tab-btn { background: #2c1b1b; color: #e0c185; border: 2px solid #e0c185; border-bottom: none; border-radius: 8px 8px 0 0; font-family: 'Cinzel Decorative', serif; padding: 7px 24px; font-size: 1.08em; font-weight: bold; cursor: pointer; margin-bottom: -2px;}
     .gm-tab-btn.active { background: #e0c185; color: #2c1b1b;}
     .gm-section { margin: 22px 0 12px 0; text-align: center;}
     .gm-label { display: block; margin-bottom: 7px; color: #e0c185;}
-    .gm-input, .gm-btn { font-family: inherit; border-radius: 7px; border: 2px solid #e0c185; font-size: 1em; padding: 11px 16px; margin-bottom: 10px; background: #281813; color: #f4e4c1; transition: border 0.11s, background 0.12s;}
+    .gm-input, .gm-btn { font-family: inherit; border-radius: 7px; border: 2px solid #e0c185; font-size: 1em; padding: 11px 16px; margin-bottom: 10px; background: #281813; color: #f4e4c1; transition: border 0.2s;}
     .gm-btn { cursor: pointer; background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #3d2b1f; font-family: 'Cinzel Decorative', cursive; font-size: 1.09em; font-weight: bold; min-width: 130px;}
     .gm-btn:hover { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588;}
     .gm-error { color: #ff9393; margin-top: 6px; min-height: 22px; text-align: center;}
+    .miniature { max-width: 70px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003;}
+    .miniature-video { max-width: 80px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003;}
     @media (max-width: 750px) {
       .main-accueil { max-width: 97vw; padding: 10px 1vw; }
       .carte-equipe { min-width: 0; max-width: 99vw; padding: 20px 4vw; }
@@ -184,7 +185,7 @@
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "murder-party-ba8d1.appspot.com",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
@@ -237,12 +238,12 @@
     let stepsTime = {};
 
     let etapes = [
-      { titre: "Épreuve 1", fichiersAttendus: ["Photo 1"] },
-      { titre: "Épreuve 2", fichiersAttendus: ["Vidéo"] },
-      { titre: "Épreuve 3", fichiersAttendus: ["Photo 2"] },
-      { titre: "Épreuve 4", fichiersAttendus: [] },
-      { titre: "Épreuve 5", fichiersAttendus: [] },
-      { titre: "Épreuve 6", fichiersAttendus: [] }
+      { titre: "Épreuve 1" },
+      { titre: "Épreuve 2" },
+      { titre: "Épreuve 3" },
+      { titre: "Épreuve 4" },
+      { titre: "Épreuve 5" },
+      { titre: "Épreuve 6" }
     ];
 
     // Gestion safe des listeners
@@ -332,7 +333,7 @@
       carte.innerHTML = html;
       afficherTimer();
       for (let i=0; i<etapes.length; i++) {
-        listerFichiersEquipeEtape(equipe.num, i, etapes[i].fichiersAttendus);
+        listerFichiersEquipeEtape(equipe.num, i);
       }
     }
 
@@ -378,36 +379,35 @@
       timerInterval = setInterval(maj, 1000);
     }
 
-    function listerFichiersEquipeEtape(num, etapeIdx, fichiersAttendus) {
+    // ----------- CORRECTION PRINCIPALE ICI -----------
+    function listerFichiersEquipeEtape(num, etapeIdx) {
       const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
       if (!div) return;
       const basePath = `parties/${salonCode}/equipe${num}/etape${etapeIdx}/`;
       storage.ref(basePath).listAll().then(res => {
         if (res.items.length === 0) {
-          div.innerHTML = fichiersAttendus.map(nom=> `<div class="fichier-bloc"><span>${nom} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`).join('');
+          div.innerHTML = `<span style="color:#b8b8b8;">Aucun fichier envoyé</span>`;
         } else {
           div.innerHTML = '';
-          fichiersAttendus.forEach(nomAttendu => {
-            const fichier = res.items.find(item => item.name.toLowerCase().includes(nomAttendu.toLowerCase().replace(/\s/g,'')));
-            if (!fichier) {
-              div.innerHTML += `<div class="fichier-bloc"><span>${nomAttendu} :</span> <span style="color:#b8b8b8;">Non envoyé</span></div>`;
-            } else {
-              fichier.getDownloadURL().then(url => {
-                const ext = fichier.name.split('.').pop().toLowerCase();
-                let mini = '';
-                if(['jpg','jpeg','png','gif'].includes(ext)) {
-                  mini = `<img src="${url}" class="miniature" alt="Photo">`;
-                } else if(['mp4','webm','ogg'].includes(ext)) {
-                  mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
-                }
-                div.innerHTML += `<div class="fichier-bloc">${mini}<span>${fichier.name}</span>
-                  <button class="download-btn" onclick="downloadFile('${url}','${fichier.name}')">Télécharger</button></div>`;
-              });
-            }
+          res.items.forEach(fichier => {
+            fichier.getDownloadURL().then(url => {
+              const ext = fichier.name.split('.').pop().toLowerCase();
+              let mini = '';
+              if(['jpg','jpeg','png','gif'].includes(ext)) {
+                mini = `<img src="${url}" class="miniature" alt="Photo">`;
+              } else if(['mp4','webm','ogg'].includes(ext)) {
+                mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
+              }
+              div.innerHTML += `<div class="fichier-bloc">${mini}<span>${fichier.name}</span>
+                <button class="download-btn" onclick="downloadFile('${url}','${fichier.name}')">Télécharger</button></div>`;
+            });
           });
         }
-      }).catch(()=>{div.innerHTML = "<span style='color:#b8b8b8;'>Erreur</span>";});
+      }).catch(()=>{
+        div.innerHTML = "<span style='color:#b8b8b8;'>Erreur</span>";
+      });
     }
+    // --------------------------------------------------
 
     window.downloadFile = function(url, fileName) {
       fetch(url)
@@ -465,7 +465,6 @@
 
     // --- LOGIQUE MODALE & DÉTECTION NOUVEAU SALON ---
     let ancienneListeParties = [];
-    // Initialisation à l'ouverture pour détecter seulement les nouveaux salons
     db.ref("parties").once("value").then(snap => {
       let initList = [];
       snap.forEach(child => initList.push(child.key));
