@@ -48,7 +48,7 @@
       margin: 24px 0 0 0;
       align-items: center;
     }
-    .gold-btn {
+    .main-btn, .gold-btn {
       background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
       color: #3d2b1f;
       border: 2px solid #e0c185;
@@ -66,8 +66,8 @@
       max-width: 350px;
       box-sizing: border-box;
     }
-    .gold-btn:hover,
-    .gold-btn:focus {
+    .main-btn:hover, .main-btn:focus,
+    .gold-btn:hover, .gold-btn:focus {
       background: #e0c185;
       color: #1a1a1a;
       box-shadow: 0 0 8px #e0c18588;
@@ -83,27 +83,64 @@
       outline: 2px solid #e0c185;
       outline-offset: 3px;
     }
+    /* ----------- MOBILE ----------- */
     @media (max-width: 650px) {
       html { font-size: 16px; }
-      body { overflow-x: hidden; }
+      body {
+        overflow-x: hidden;
+        background: #1b1b1b;
+        padding-bottom: 80px; /* espace pour le footer fixe */
+        margin: 0;
+      }
+      .center-wrapper {
+        width: 100vw !important;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
       .main-accueil {
         max-width: 98vw;
-        margin: 10px auto;
+        margin: 10vh auto;
         padding: 12px 2vw;
         border-radius: 12px;
+        box-sizing: border-box;
       }
       .main-accueil h1 { font-size: 2em; }
       .main-accueil h2 { font-size: 1.1em; }
       .bienvenue-message { font-size: 1.05em; margin-bottom: 10px; }
       .menu-buttons { gap: 10px; }
-      .gold-btn, button, .main-btn {
+      .main-btn, .gold-btn, button {
         width: 100%;
         max-width: 99vw;
         min-width: 0;
         padding: 14px 10px;
         font-size: 1em;
+        background: linear-gradient(90deg, #e9c78c, #e0c185 60%) !important;
+        color: #3d2b1f !important;
+        border: 2px solid #e0c185 !important;
       }
       .info { margin: 12px 0 0 0; }
+      .footer {
+        font-size: 0.85em;
+        padding: 8px 2vw;
+        text-align: center;
+        width: 100vw !important;
+        min-width: 100vw !important;
+        left: 0;
+        right: 0;
+        position: fixed;
+        bottom: 0;
+        background: #000 !important;
+        color: #e0c185 !important;
+        border-top: 2px solid #e0c185;
+        box-sizing: border-box;
+        z-index: 100;
+      }
     }
   </style>
 </head>
@@ -136,7 +173,7 @@
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
     });
-  
+
     // Affichage du pseudo dans le message de bienvenue
     document.addEventListener("DOMContentLoaded", function() {
       var pseudo = localStorage.getItem("pseudo");
