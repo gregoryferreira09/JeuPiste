@@ -79,6 +79,10 @@
       opacity: 1;
       cursor: pointer;
     }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -120,11 +124,6 @@
       animation: fadein 0.3s;
     }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    /* AJOUT pour griser l'icône quand upload */
-    .grayed {
-      filter: grayscale(1) brightness(0.8);
-      opacity: 0.6;
-    }
   </style>
 </head>
 <body>
@@ -171,7 +170,7 @@
         <div class="icon-action side-icon">
           <label for="video-upload-1" aria-label="Télécharger la vidéo 1">
             <svg id="icon-video1" viewBox="0 0 24 24" width="38" height="38">
-              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-[...]
             </svg>
             <span>Vidéo 1 à envoyer</span>
             <input id="video-upload-1" class="visually-hidden" type="file" accept="video/*">
@@ -181,7 +180,7 @@
         <div class="icon-action side-icon">
           <label for="video-upload-2" aria-label="Télécharger la vidéo 2">
             <svg id="icon-video2" viewBox="0 0 24 24" width="38" height="38">
-              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-[...]
             </svg>
             <span>Vidéo 2 à envoyer</span>
             <input id="video-upload-2" class="visually-hidden" type="file" accept="video/*">
@@ -189,6 +188,9 @@
         </div>
       </div>
       <div id="video-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+      <div style="color:#c9b49a; font-size:0.95em; text-align:right; margin-bottom:8px;">
+        <em>Chaque vidéo ne doit pas dépasser 50 Mo</em>
+      </div>
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -201,6 +203,7 @@
   <!-- Firebase et gameflow.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
     // Sécurité : vérif session
@@ -215,13 +218,14 @@
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "murder-party-ba8d1.appspot.com",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const storage = firebase.storage();
 
     // Chrono/temps passé sur l’épreuve
     const stepIndex = 1;
@@ -277,36 +281,86 @@
       var btn = document.getElementById('next-quest');
       var icon1 = document.getElementById('icon-video1');
       var icon2 = document.getElementById('icon-video2');
-      // Upload 1
+      const MAX_VIDEO_SIZE = 52428800; // 50 Mo
+
+      // Upload vidéo 1
       if(input1 && out) {
         input1.addEventListener('change', function() {
           if(this.files && this.files[0]) {
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video1').set({
-              name: this.files[0].name,
-              uploadedAt: Date.now()
+            const file = this.files[0];
+            if(file.size > MAX_VIDEO_SIZE) {
+              showToast("Vidéo trop volumineuse (max 50 Mo)");
+              input1.value = "";
+              return;
+            }
+            const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape2/video1_${Date.now()}_${file.name}`;
+            storage.ref(storagePath).put(file).then(snapshot => {
+              snapshot.ref.getDownloadURL().then(url => {
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video1').set({
+                  name: file.name,
+                  uploadedAt: Date.now(),
+                  url: url
+                });
+              });
+            }).catch(err => {
+              showToast("Erreur lors de l'upload : " + err.message);
             });
           }
         });
       }
-      // Upload 2
+      // Upload vidéo 2
       if(input2 && out) {
         input2.addEventListener('change', function() {
           if(this.files && this.files[0]) {
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video2').set({
-              name: this.files[0].name,
-              uploadedAt: Date.now()
+            const file = this.files[0];
+            if(file.size > MAX_VIDEO_SIZE) {
+              showToast("Vidéo trop volumineuse (max 50 Mo)");
+              input2.value = "";
+              return;
+            }
+            const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape2/video2_${Date.now()}_${file.name}`;
+            storage.ref(storagePath).put(file).then(snapshot => {
+              snapshot.ref.getDownloadURL().then(url => {
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video2').set({
+                  name: file.name,
+                  uploadedAt: Date.now(),
+                  url: url
+                });
+              });
+            }).catch(err => {
+              showToast("Erreur lors de l'upload : " + err.message);
             });
           }
         });
       }
-      // Synchro multi-device et activation bouton + grisé des icônes
+
+      // Synchro multi-device et activation bouton + grisé des icônes + affichage vidéos
       function updateUI() {
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2').once('value', function(snapshot) {
           const data = snapshot.val() || {};
           let txt = "";
-          if(data.video1 && data.video1.name) txt += "Vidéo 1 : " + data.video1.name + " ";
-          if(data.video2 && data.video2.name) txt += "Vidéo 2 : " + data.video2.name;
-          if(out) out.textContent = txt;
+          let videoHtml = "";
+          if(data.video1 && data.video1.name && data.video1.url) {
+            txt += "Vidéo 1 : " + data.video1.name + " ";
+            videoHtml += `<div>
+              <video controls style="max-width:200px;max-height:120px;display:block;margin:8px 0;">
+                <source src="${data.video1.url}">
+                Votre navigateur ne supporte pas la lecture vidéo.
+              </video>
+              <a href="${data.video1.url}" class="download-btn" download="${data.video1.name}" target="_blank">Télécharger Vidéo 1</a>
+            </div>`;
+          }
+          if(data.video2 && data.video2.name && data.video2.url) {
+            txt += "Vidéo 2 : " + data.video2.name;
+            videoHtml += `<div>
+              <video controls style="max-width:200px;max-height:120px;display:block;margin:8px 0;">
+                <source src="${data.video2.url}">
+                Votre navigateur ne supporte pas la lecture vidéo.
+              </video>
+              <a href="${data.video2.url}" class="download-btn" download="${data.video2.name}" target="_blank">Télécharger Vidéo 2</a>
+            </div>`;
+          }
+          if(out) out.innerHTML = txt + videoHtml;
           if(icon1) icon1.classList.toggle('grayed', !!(data.video1 && data.video1.name));
           if(icon2) icon2.classList.toggle('grayed', !!(data.video2 && data.video2.name));
           if(btn) {
