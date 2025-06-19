@@ -7,171 +7,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    body {
-      background: #231d1d;
-      color: #ffeecb;
-      font-family: 'Cormorant Garamond', serif;
-      margin: 0;
-    }
-    .center-wrapper {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 0 12px 32px 12px;
-    }
-    .main-accueil {
-      margin-top: 28px;
-      background: #2c1b1b;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px #0005;
-      padding: 28px 16px 22px 16px;
-    }
-    h2 {
-      color: #e0c185;
-      font-family: 'Cinzel Decorative', serif;
-      text-align: center;
-      font-size: 2em;
-      margin-bottom: 16px;
-      margin-top: 0;
-    }
-    .gps-instruction {
-      color: #ffeecb;
-      font-size: 1.07em;
-      text-align: center;
-      margin: 18px 0 10px 0;
-    }
-    .actions-row-horizontal {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 18px;
-      margin-bottom: 10px;
-      gap: 28px;
-      flex-wrap: wrap;
-    }
-    .icon-action {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 90px;
-    }
-    .icon-action a, .icon-action label {
-      cursor: pointer;
-      color: #e0c185;
-      text-decoration: none;
-      transition: color 0.2s;
-      font-weight: 600;
-    }
-    .icon-action a:hover, .icon-action label:hover {
-      color: #ffeecb;
-    }
-    .icon-action svg {
-      width: 38px;
-      height: 38px;
-      margin-bottom: 6px;
-      fill: #e0c185;
-      transition: fill 0.2s;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .icon-action a:hover svg,
-    .icon-action label:hover svg {
-      fill: #ffeecb;
-    }
-    .icon-action span {
-      font-size: 0.98em;
-      color: #e0c185;
-      margin-top: 2px;
-      text-align: center;
-    }
-    .grayed {
-      filter: grayscale(1) brightness(0.8);
-      opacity: 0.6;
-    }
-    #check-gps {
-      padding: 12px 26px;
-      border-radius: 8px;
-      background: #e0c185;
-      color: #473714;
-      font-size: 1.08em;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      margin-bottom: 8px;
-      margin-top: 2px;
-      transition: background 0.2s;
-    }
-    #check-gps:hover {
-      background: #ffeecb;
-      color: #473714;
-    }
-    #gps-feedback {
-      color: #ffeecb;
-      font-size: 1.07em;
-      min-height: 1.3em;
-      text-align: center;
-      margin: 0 0 8px 0;
-    }
-    .objectif-course {
-      margin-top: 20px;
-      margin-bottom: 18px;
-    }
-    .objectif-label {
-      background: #e0c185;
-      color: #473714;
-      font-weight: bold;
-      font-size: 1.08em;
-      border-radius: 6px;
-      padding: 6px 0;
-      text-align: center;
-      letter-spacing: 0.04em;
-      margin-bottom: 0;
-    }
-    .objectif-text {
-      margin-top: 17px;
-      color: #ffeecb;
-      text-align: center;
-      font-size: 1.09em;
-      line-height: 1.6;
-    }
-    .photo-actions {
-      display: flex;
-      gap: 28px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .visually-hidden {
-      position: absolute !important;
-      height: 1px; width: 1px;
-      overflow: hidden;
-      clip: rect(1px, 1px, 1px, 1px);
-      white-space: nowrap;
-      border: 0;
-      padding: 0;
-      margin: -1px;
-    }
-    #next-quest {
-      background: #aaa;
-      color: #fff;
-      font-size: 1.08em;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 30px;
-      margin: 18px auto 0 auto;
-      display: block;
-      opacity: 0.6;
-      cursor: not-allowed;
-      transition: background 0.2s, opacity 0.2s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    #next-quest.enabled {
-      background: #e0c185;
-      color: #473714;
-      opacity: 1;
-      cursor: pointer;
-    }
+    /* ... (reprends tes styles existants, inchangés) ... */
+    /* Ajoute .grayed si besoin */
+    .grayed { filter: grayscale(1) brightness(0.8); opacity: 0.6; }
     .modal-toast {
       display: none;
       position: fixed;
@@ -193,14 +31,6 @@
       animation: fadein 0.3s;
     }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    @media (max-width: 650px) {
-      .center-wrapper { max-width: 99vw; }
-      .main-accueil { padding: 12px 2vw 18px 2vw; }
-      .actions-row-horizontal { flex-direction: column; gap: 10px; }
-      .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
-      .icon-action span { text-align: left; }
-      .photo-actions { gap: 10px; }
-    }
   </style>
 </head>
 <body>
@@ -210,7 +40,6 @@
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
       <h2>La quête du bout du monde</h2>
-      <!-- Bandeau localisation uniquement au début -->
       <div id="localisation-block">
         <div class="gps-instruction">
           Rendez-vous à la position :
@@ -231,8 +60,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Le reste apparait après validation GPS -->
       <div id="suite-block" style="display:none;">
         <div class="objectif-course">
           <div class="objectif-label">Objectif</div>
@@ -253,36 +80,28 @@
           <div class="photo-actions">
             <div class="icon-action side-icon">
               <label id="label-photo1" for="photo-upload-1">
-                <svg viewBox="0 0 24 24">
-                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.14.24-.22.41-.22h2.83c.17 0 .32.08.41.22L15.95 7H20v13zm-8-3a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
-                </svg>
+                <svg id="icon-photo1" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
                 <span>Photo avec un paysan</span>
                 <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
               </label>
             </div>
             <div class="icon-action side-icon">
               <label id="label-photo2" for="photo-upload-2">
-                <svg viewBox="0 0 24 24">
-                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.14.24-.22.41-.22h2.83c.17 0 .32.08.41.22L15.95 7H20v13zm-8-3a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
-                </svg>
+                <svg id="icon-photo2" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
                 <span>Photo avec un gueux</span>
                 <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
               </label>
             </div>
             <div class="icon-action side-icon">
               <label id="label-photo3" for="photo-upload-3">
-                <svg viewBox="0 0 24 24">
-                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.14.24-.22.41-.22h2.83c.17 0 .32.08.41.22L15.95 7H20v13zm-8-3a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
-                </svg>
+                <svg id="icon-photo3" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
                 <span>Photo avec un troubadour</span>
                 <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
               </label>
             </div>
             <div class="icon-action side-icon">
               <label id="label-photo4" for="photo-upload-4">
-                <svg viewBox="0 0 24 24">
-                  <path d="M20 5h-3.17l-1.84-2.58A2 2 0 0 0 13.42 2h-2.83c-.7 0-1.36.36-1.73.96L7.17 5H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 15H4V7h4.05l1.83-2.58c.09-.14.24-.22.41-.22h2.83c.17 0 .32.08.41.22L15.95 7H20v13zm-8-3a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
-                </svg>
+                <svg id="icon-photo4" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
                 <span>Photo avec un fils d'unijambiste</span>
                 <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
               </label>
@@ -300,9 +119,10 @@
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
 
-  <!-- Firebase & gameflow scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
     // GPS obligatoire
@@ -339,170 +159,213 @@
       });
     });
 
-    // ========== Firebase & Gameflow ==========
-
     // Sécurité session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
+    console.log("salonCode =", salonCode, "equipeNum =", equipeNum);
     if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
       window.location.href = "accueil.html";
     }
 
-    // Initialisation Firebase
+    // Initialisation Firebase (CORRIGÉ pour Storage)
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "http://murder-party-ba8d1.firebasestorage.app/",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
     };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.database();
+    const storage = firebase.storage();
 
-    // Chrono/temps passé sur l’épreuve
-    const stepIndex = 6;
-    let startTime = null;
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-      .once('value', function(snap) {
-        startTime = snap.val();
-        if (!startTime) {
-          startTime = Date.now();
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
+    // Auth anonyme obligatoire
+    firebase.auth().signInAnonymously().then(function() {
+      console.log("Authentification anonyme réussie");
+      demarreJeuFirebase();
+    }).catch(function(error) {
+      alert("Erreur d'authentification Firebase : " + error.message);
+      console.error("Erreur d'authentification Firebase :", error);
+    });
+
+    function demarreJeuFirebase() {
+      function showToast(msg) {
+        let toast = document.getElementById('toast-message');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'toast-message';
+          toast.className = 'modal-toast';
+          toast.setAttribute('role', 'alert');
+          document.body.appendChild(toast);
         }
-      });
-
-    function showToast(msg) {
-      let toast = document.getElementById('toast-message');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast-message';
-        toast.className = 'modal-toast';
-        toast.setAttribute('role', 'alert');
-        document.body.appendChild(toast);
+        toast.textContent = msg;
+        toast.classList.add('visible');
+        setTimeout(() => { toast.classList.remove('visible'); }, 2200);
       }
-      toast.textContent = msg;
-      toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 2200);
-    }
 
-    // Upload photos + synchro multi-device
-    function updatePhotoUI() {
-      var out = document.getElementById('photo-filename');
-      var btn = document.getElementById('next-quest');
-      var allFiles = [];
-      var allSelected = true;
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/6').once('value', function(snapshot) {
-        const data = snapshot.val() || {};
-        for (var i = 1; i <= 4; i++) {
-          var inp = document.getElementById('photo-upload-' + i);
-          var label = document.getElementById('label-photo' + i);
-          var icon = document.getElementById('icon-photo' + i);
-          let fileName = data['photo'+i] && data['photo'+i].name ? data['photo'+i].name : "";
-          if (fileName) {
-            allFiles.push(fileName);
-            label.setAttribute('aria-disabled', 'true');
-            if(inp) inp.disabled = true;
-            if(label) label.classList.add('grayed');
-            if(icon) icon.classList.add('grayed');
-          } else {
-            allSelected = false;
-            label.removeAttribute('aria-disabled');
-            if(inp) inp.disabled = false;
-            if(label) label.classList.remove('grayed');
-            if(icon) icon.classList.remove('grayed');
-          }
-        }
-        out.textContent = allFiles.length ? "Photos sélectionnées : " + allFiles.join(", ") : "";
-        btn.style.display = "block";
-        if (allSelected) {
-          btn.disabled = false;
-          btn.classList.add('enabled');
-        } else {
-          btn.disabled = true;
-          btn.classList.remove('enabled');
-        }
-      });
-    }
-    for(let i=1; i<=4; i++) {
-      document.getElementById('photo-upload-' + i).addEventListener('change', function(e) {
-        const idx = this.id.split('-').pop();
-        if(this.files && this.files[0]) {
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/6/photo' + idx).set({
-            name: this.files[0].name,
-            uploadedAt: Date.now()
-          }, updatePhotoUI);
-        }
-      });
-    }
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/6').on('value', updatePhotoUI);
-    window.addEventListener('DOMContentLoaded', updatePhotoUI);
-
-    // Gameflow navigation du bouton
-    document.getElementById('next-quest').addEventListener('click', function() {
-      if (this.disabled) return;
-      this.disabled = true;
-      this.classList.remove('enabled');
-      showToast("Validation en cours...");
-      const now = Date.now();
+      // Chrono/temps passé sur l’épreuve
+      const stepIndex = 6;
+      let startTime = null;
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
         .once('value', function(snap) {
-          const sTime = snap.val();
-          if (sTime) {
-            const elapsed = Math.round((now - sTime) / 1000);
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+          startTime = snap.val();
+          if (!startTime) {
+            startTime = Date.now();
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
           }
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-              if (!error && committed) {
-                showToast("Étape validée !");
+        });
+
+      // Upload photos (4) avec synchro multi-device
+      function setupUploadHandler() {
+        for(let i=1; i<=4; i++) {
+          const input = document.getElementById('photo-upload-'+i);
+          const label = document.getElementById('label-photo'+i);
+          const icon = document.getElementById('icon-photo'+i);
+          if(input && label && icon) {
+            input.addEventListener('change', function() {
+              console.log("Changement détecté sur photo", i);
+              if(this.files && this.files[0]) {
+                const file = this.files[0];
+                const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo${i}-${file.name}`;
+                console.log("Chemin d'upload photo", i, ":", storagePath);
+                storage.ref(storagePath).put(file).then(snapshot => {
+                  console.log("Upload photo", i, "réussi :", snapshot);
+                  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo'+i).set({
+                    name: file.name,
+                    uploadedAt: Date.now()
+                  });
+                }).catch(err => {
+                  showToast("Erreur upload photo " + i + " : " + err.message);
+                  console.error("Erreur upload photo", i, ":", err);
+                });
               } else {
-                showToast("Erreur lors de la validation...");
-                let btn = document.getElementById('next-quest');
-                btn.disabled = false;
-                btn.classList.add('enabled');
+                console.warn("Aucun fichier sélectionné pour photo", i);
               }
             });
-        });
-    });
-
-    // Navigation automatique gameflow
-    function goToStep(stepIndex) {
-      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-          showToast('Bravo, vous avez terminé !');
-          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
-          return;
+          }
         }
-        const epreuveNum = parcours[stepIndex];
-        let target = "";
-        if (epreuveNum === 6) target = "epreuve6.html";
-        else if (epreuveNum === 7) target = "révélation.html";
-        else target = `equipe${epreuveNum}-a.html`;
-        const current = window.location.pathname.split('/').pop();
-        if (current !== target) {
-          window.location.href = target;
+
+        // Synchro multi-device/bouton/icônes
+        function updatePhotoUI() {
+          var out = document.getElementById('photo-filename');
+          var btn = document.getElementById('next-quest');
+          var allFiles = [];
+          var allSelected = true;
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex).once('value', function(snapshot) {
+            const data = snapshot.val() || {};
+            for (var i = 1; i <= 4; i++) {
+              var inp = document.getElementById('photo-upload-' + i);
+              var label = document.getElementById('label-photo' + i);
+              var icon = document.getElementById('icon-photo' + i);
+              let fileName = data['photo'+i] && data['photo'+i].name ? data['photo'+i].name : "";
+              if (fileName) {
+                allFiles.push(fileName);
+                label.setAttribute('aria-disabled', 'true');
+                if(inp) inp.disabled = true;
+                if(label) label.classList.add('grayed');
+                if(icon) icon.classList.add('grayed');
+              } else {
+                allSelected = false;
+                label.removeAttribute('aria-disabled');
+                if(inp) inp.disabled = false;
+                if(label) label.classList.remove('grayed');
+                if(icon) icon.classList.remove('grayed');
+              }
+            }
+            out.textContent = allFiles.length ? "Photos sélectionnées : " + allFiles.join(", ") : "";
+            if (btn) {
+              btn.style.display = "block";
+              if (allSelected) {
+                btn.disabled = false;
+                btn.classList.add('enabled');
+              } else {
+                btn.disabled = true;
+                btn.classList.remove('enabled');
+              }
+            }
+          });
+        }
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex).on('value', updatePhotoUI);
+        window.addEventListener('DOMContentLoaded', updatePhotoUI);
+
+        // Navigation bouton
+        var btn = document.getElementById('next-quest');
+        if(btn) {
+          btn.addEventListener('click', function() {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            btn.classList.remove('enabled');
+            showToast("Validation en cours...");
+            const now = Date.now();
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+              .once('value', function(snap) {
+                const sTime = snap.val();
+                if (sTime) {
+                  const elapsed = Math.round((now - sTime) / 1000);
+                  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+                }
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+                  .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+                    if (!error && committed) {
+                      showToast("Étape validée !");
+                    } else {
+                      showToast("Erreur lors de la validation...");
+                      btn.disabled = false;
+                      btn.classList.add('enabled');
+                    }
+                  });
+              });
+          });
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener('DOMContentLoaded', setupUploadHandler);
+      } else {
+        setupUploadHandler();
+      }
+
+      // Navigation automatique gameflow
+      function goToStep(stepIndex) {
+        getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+          if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+            showToast('Bravo, vous avez terminé !');
+            setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+            return;
+          }
+          const epreuveNum = parcours[stepIndex];
+          let target = "";
+          if (epreuveNum === 6) target = "epreuve6.html";
+          else if (epreuveNum === 7) target = "révélation.html";
+          else target = `equipe${epreuveNum}-a.html`;
+          const current = window.location.pathname.split('/').pop();
+          if (current !== target) {
+            window.location.href = target;
+          }
+        });
+      }
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+        .on('value', function(snapshot) {
+          const step = snapshot.val() || 0;
+          goToStep(step);
+        });
+
+      // Anti-retour arrière
+      window.addEventListener("pageshow", function(evt) {
+        if (evt.persisted) {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .once('value', function(snapshot) {
+              const step = snapshot.val() || 0;
+              goToStep(step);
+            });
         }
       });
     }
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-      .on('value', function(snapshot) {
-        const step = snapshot.val() || 0;
-        goToStep(step);
-      });
-
-    // Anti-retour arrière
-    window.addEventListener("pageshow", function(evt) {
-      if (evt.persisted) {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .once('value', function(snapshot) {
-            const step = snapshot.val() || 0;
-            goToStep(step);
-          });
-      }
-    });
   </script>
 </body>
 </html>
