@@ -261,7 +261,7 @@
       <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête émotionnelle</h2>
       <!-- Chrono et message harmonisés -->
       <div class="chrono-block">
-        <span class="chrono-timer" id="timer">07:00</span>
+        <span class="chrono-timer" id="timer">01:00</span>
         <span class="chrono-message" id="chrono-message">
           Chevaliers, en selle sans tarder ! Vous n'avez que sept minutes pour atteindre ce lieu mystérieux et découvrir ce qui s'y cache, avant que le temps ne vous soit impitoyablement retiré.
         </span>
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // --- Sécurité session ---
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
-  const dureeEpreuve = 7 * 60; // 7 minutes chrono
+  const dureeEpreuve = 1 * 60; // 7 minutes chrono
   const stepIndex = 4;
 
   if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
