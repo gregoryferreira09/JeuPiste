@@ -79,6 +79,10 @@
       opacity: 1;
       cursor: pointer;
     }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
     @media (max-width: 650px) {
       .actions-row-horizontal {
         flex-direction: column;
@@ -120,11 +124,6 @@
       animation: fadein 0.3s;
     }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    /* AJOUT pour griser l'icône quand upload */
-    .grayed {
-      filter: grayscale(1) brightness(0.8);
-      opacity: 0.6;
-    }
   </style>
 </head>
 <body>
@@ -167,28 +166,18 @@
             <span>Boussole</span>
           </a>
         </div>
-        <!-- Vidéo 1 -->
+        <!-- Appareil photo -->
         <div class="icon-action side-icon">
-          <label for="video-upload-1" aria-label="Télécharger la vidéo 1">
-            <svg id="icon-video1" viewBox="0 0 24 24" width="38" height="38">
-              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
+          <label for="photo-upload" aria-label="Télécharger une photo">
+            <svg id="icon-photo" viewBox="0 0 24 24" width="38" height="38" fill="currentColor">
+              <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
             </svg>
-            <span>Vidéo 1 à envoyer</span>
-            <input id="video-upload-1" class="visually-hidden" type="file" accept="video/*">
-          </label>
-        </div>
-        <!-- Vidéo 2 -->
-        <div class="icon-action side-icon">
-          <label for="video-upload-2" aria-label="Télécharger la vidéo 2">
-            <svg id="icon-video2" viewBox="0 0 24 24" width="38" height="38">
-              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
-            </svg>
-            <span>Vidéo 2 à envoyer</span>
-            <input id="video-upload-2" class="visually-hidden" type="file" accept="video/*">
+            <span>Photo à envoyer</span>
+            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
           </label>
         </div>
       </div>
-      <div id="video-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -196,178 +185,211 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <!-- Toast harmonisé -->
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
-  <!-- Firebase et gameflow.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
-    // Sécurité : vérif session
+    console.log("JS chargé");
+
+    // Sécurité session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
+    console.log("salonCode =", salonCode, "equipeNum =", equipeNum);
     if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
       window.location.href = "accueil.html";
     }
-    // Firebase init
+
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "murder-party-ba8d1.appspot.com",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
     };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.database();
+    const storage = firebase.storage();
 
-    // Chrono/temps passé sur l’épreuve
-    const stepIndex = 1;
-    let startTime = null;
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-      .once('value', function(snap) {
-        startTime = snap.val();
-        if (!startTime) {
-          startTime = Date.now();
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
+    // Auth anonyme obligatoire
+    firebase.auth().signInAnonymously().then(function() {
+      console.log("Authentification anonyme réussie");
+      demarreJeuFirebase();
+    }).catch(function(error) {
+      alert("Erreur d'authentification Firebase : " + error.message);
+      console.error("Erreur d'authentification Firebase :", error);
+    });
+
+    function demarreJeuFirebase() {
+      // Toast feedback
+      function showToast(msg) {
+        const toast = document.getElementById('toast-message');
+        if (toast) {
+          toast.textContent = msg;
+          toast.classList.add('visible');
+          setTimeout(() => { toast.classList.remove('visible'); }, 2400);
         }
-      });
-
-    // Toast feedback
-    function showToast(msg) {
-      const toast = document.getElementById('toast-message');
-      if (toast) {
-        toast.textContent = msg;
-        toast.classList.add('visible');
-        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
       }
-    }
 
-    // Synchro navigation (currentStep)
-    function goToStep(stepIndex) {
-      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-          showToast('Bravo, vous avez terminé !');
-          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
-          return;
-        }
-        const epreuveNum = parcours[stepIndex];
-        let target = "";
-        if (epreuveNum === 6) target = "epreuve6.html";
-        else if (epreuveNum === 7) target = "révélation.html";
-        else target = `equipe${epreuveNum}-a.html`;
-        const current = window.location.pathname.split('/').pop();
-        if (current !== target) {
-          window.location.href = target;
-        }
-      });
-    }
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-      .on('value', function(snapshot) {
-        const step = snapshot.val() || 0;
-        goToStep(step);
-      });
+      // Chrono/temps passé sur l’épreuve
+      const stepIndex = 1; // Numéro d'étape pour cette page
+      console.log("stepIndex =", stepIndex);
+      let startTime = null;
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+        .once('value', function(snap) {
+          startTime = snap.val();
+          if (!startTime) {
+            startTime = Date.now();
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
+          }
+        });
 
-    document.addEventListener('DOMContentLoaded', function() {
-      var input1 = document.getElementById('video-upload-1');
-      var input2 = document.getElementById('video-upload-2');
-      var out = document.getElementById('video-filename');
-      var btn = document.getElementById('next-quest');
-      var icon1 = document.getElementById('icon-video1');
-      var icon2 = document.getElementById('icon-video2');
-      // Upload 1
-      if(input1 && out) {
-        input1.addEventListener('change', function() {
-          if(this.files && this.files[0]) {
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video1').set({
-              name: this.files[0].name,
-              uploadedAt: Date.now()
-            });
+      // Synchro navigation (currentStep)
+      function goToStep(stepIndex) {
+        getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+          if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+            showToast('Bravo, vous avez terminé !');
+            setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+            return;
+          }
+          const epreuveNum = parcours[stepIndex];
+          let target = "";
+          if (epreuveNum === 6) target = "epreuve6.html";
+          else if (epreuveNum === 7) target = "révélation.html";
+          else target = `equipe${epreuveNum}-a.html`;
+          const current = window.location.pathname.split('/').pop();
+          if (current !== target) {
+            window.location.href = target;
           }
         });
       }
-      // Upload 2
-      if(input2 && out) {
-        input2.addEventListener('change', function() {
-          if(this.files && this.files[0]) {
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video2').set({
-              name: this.files[0].name,
-              uploadedAt: Date.now()
-            });
-          }
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+        .on('value', function(snapshot) {
+          const step = snapshot.val() || 0;
+          goToStep(step);
         });
-      }
-      // Synchro multi-device et activation bouton + grisé des icônes
-      function updateUI() {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2').once('value', function(snapshot) {
-          const data = snapshot.val() || {};
-          let txt = "";
-          if(data.video1 && data.video1.name) txt += "Vidéo 1 : " + data.video1.name + " ";
-          if(data.video2 && data.video2.name) txt += "Vidéo 2 : " + data.video2.name;
-          if(out) out.textContent = txt;
-          if(icon1) icon1.classList.toggle('grayed', !!(data.video1 && data.video1.name));
-          if(icon2) icon2.classList.toggle('grayed', !!(data.video2 && data.video2.name));
-          if(btn) {
-            if(data.video1 && data.video1.name && data.video2 && data.video2.name) {
-              btn.disabled = false;
-              btn.classList.add('enabled');
-              if(input1) input1.disabled = true;
-              if(input2) input2.disabled = true;
-            } else {
-              btn.disabled = true;
-              btn.classList.remove('enabled');
-              if(input1) input1.disabled = false;
-              if(input2) input2.disabled = false;
-            }
-          }
-        });
-      }
-      // On écoute les deux uploads
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2').on('value', updateUI);
 
-      // Navigation bouton
-      if(btn) {
-        btn.addEventListener('click', function() {
-          if (btn.disabled) return;
-          btn.disabled = true;
-          btn.classList.remove('enabled');
-          showToast("Validation en cours...");
-          // === ENREGISTRE LE TEMPS PASSÉ ===
-          const now = Date.now();
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-            .once('value', function(snap) {
-              const sTime = snap.val();
-              if (sTime) {
-                const elapsed = Math.round((now - sTime) / 1000);
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
-              }
-              // Puis passage à l'étape suivante
-              db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-                .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-                  if (!error && committed) {
-                    showToast("Étape validée !");
-                  } else {
-                    showToast("Erreur lors de la validation...");
-                    btn.disabled = false;
-                    btn.classList.add('enabled');
-                  }
+      // GESTION UPLOAD photo
+      function setupUploadHandler() {
+        var input = document.getElementById('photo-upload');
+        var out = document.getElementById('photo-filename');
+        var btn = document.getElementById('next-quest');
+        var icon = document.getElementById('icon-photo');
+
+        console.log("input =", input);
+
+        // Upload dans Storage + DB
+        if(input && out && icon) {
+          input.addEventListener('change', function() {
+            console.log("Changement détecté !");
+            if(this.files && this.files[0]) {
+              const file = this.files[0];
+              console.log("Fichier sélectionné :", file);
+              console.log("salonCode=", salonCode, "equipeNum=", equipeNum, "stepIndex=", stepIndex);
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
+              console.log("Chemin d'upload :", storagePath);
+              storage.ref(storagePath).put(file).then(snapshot => {
+                console.log("Upload réussi :", snapshot);
+                // Enregistre le nom dans la DB pour la synchro UI
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
+                  name: file.name,
+                  uploadedAt: Date.now()
                 });
-            });
-        });
-      }
-    });
-    // Anti-retour arrière
-    window.addEventListener("pageshow", function(evt) {
-      if (evt.persisted) {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .once('value', function(snapshot) {
-            const step = snapshot.val() || 0;
-            goToStep(step);
+              }).catch(err => {
+                showToast("Erreur lors de l'upload : " + err.message);
+                console.error("Erreur upload :", err);
+              });
+            } else {
+              console.warn("Aucun fichier sélectionné !");
+            }
           });
+        } else {
+          console.error("input/out/icon manquant :", {input, out, icon});
+        }
+
+        // Synchro multi-device, affichage et bouton + grisé de l'icône
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo')
+          .on('value', function(snapshot) {
+            var input = document.getElementById('photo-upload');
+            var out = document.getElementById('photo-filename');
+            var btn = document.getElementById('next-quest');
+            var icon = document.getElementById('icon-photo');
+            const data = snapshot.val();
+            console.log("DB photo value reçu :", data);
+            if (out && btn && input && icon) {
+              if (data && data.name) {
+                out.textContent = "Photo sélectionnée : " + data.name;
+                btn.disabled = false;
+                btn.classList.add('enabled');
+                input.disabled = true;
+                icon.classList.add('grayed');
+              } else {
+                out.textContent = "";
+                btn.disabled = true;
+                btn.classList.remove('enabled');
+                input.disabled = false;
+                icon.classList.remove('grayed');
+              }
+            }
+          });
+
+        // Navigation bouton
+        if (btn) {
+          btn.addEventListener('click', function() {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            btn.classList.remove('enabled');
+            showToast("Validation en cours...");
+            // ENREGISTRE LE TEMPS PASSÉ
+            const now = Date.now();
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+              .once('value', function(snap) {
+                const sTime = snap.val();
+                if (sTime) {
+                  const elapsed = Math.round((now - sTime) / 1000);
+                  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+                }
+                // Passage à l'étape suivante
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+                  .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+                    if (!error && committed) {
+                      showToast("Étape validée !");
+                    } else {
+                      showToast("Erreur lors de la validation...");
+                      btn.disabled = false;
+                      btn.classList.add('enabled');
+                    }
+                  });
+              });
+          });
+        }
       }
-    });
+
+      if (document.readyState === "loading") {
+        document.addEventListener('DOMContentLoaded', setupUploadHandler);
+      } else {
+        setupUploadHandler();
+      }
+
+      // Anti-retour arrière
+      window.addEventListener("pageshow", function(evt) {
+        if (evt.persisted) {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .once('value', function(snapshot) {
+              const step = snapshot.val() || 0;
+              goToStep(step);
+            });
+        }
+      });
+    }
   </script>
 </body>
 </html>
