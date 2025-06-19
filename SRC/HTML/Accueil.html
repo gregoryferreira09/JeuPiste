@@ -96,7 +96,7 @@
       .main-accueil h2 { font-size: 1.1em; }
       .bienvenue-message { font-size: 1.05em; margin-bottom: 10px; }
       .menu-buttons { gap: 10px; }
-      .gold-btn, button {
+      .gold-btn, button, .main-btn {
         width: 100%;
         max-width: 99vw;
         min-width: 0;
@@ -107,7 +107,7 @@
     }
   </style>
 </head>
-<body class="accueil">
+<body class="accueil" style="background:#1b1b1b;">
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
       <h1>Jeu de piste</h1>
@@ -150,10 +150,8 @@
     // Nettoyage code salon si existant
     localStorage.removeItem("salonCode");
   </script>
-
   <script src="../JS/security-enhance.js"></script>
   <script src="../JS/ux-enhance.js"></script>
   <script src="../JS/scalability.js"></script>
-  
 </body>
 </html>
