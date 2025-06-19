@@ -202,54 +202,52 @@
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <!-- Firebase et gameflow.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="../JS/gameflow.js"></script>
-  <script>
-    // Sécurité : vérif session
-    const salonCode = localStorage.getItem("salonCode");
-    const equipeNum = Number(localStorage.getItem("equipeNum"));
-    if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
-      window.location.href = "accueil.html";
-    }
-    // Firebase init
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const storage = firebase.storage();
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="../JS/gameflow.js"></script>
+<script>
+  // Sécurité : vérif session
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = Number(localStorage.getItem("equipeNum"));
+  if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+    window.location.href = "accueil.html";
+  }
+  // Firebase init
+  const firebaseConfig = {
+    apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+    authDomain: "murder-party-ba8d1.firebaseapp.com",
+    databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "murder-party-ba8d1",
+    storageBucket: "murder-party-ba8d1.appspot.com", // CORRIGÉ (important)
+    messagingSenderId: "20295055805",
+    appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+    measurementId: "G-KSBMBB7KMJ"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const storage = firebase.storage();
 
-   // Authentification anonyme obligatoire pour les accès Storage
-    firebase.auth().signInAnonymously().then(function() {
-      console.log("Authentification anonyme réussie");
-      demarreJeuFirebase();
-    }).catch(function(error) {
-      alert("Erreur d'authentification Firebase : " + error.message);
-      console.error("Erreur d'authentification Firebase :", error);
-    });
+  // Authentification anonyme obligatoire pour les accès Storage
+  firebase.auth().signInAnonymously().then(function() {
+    console.log("Authentification anonyme réussie");
+    demarreJeuFirebase();
+  }).catch(function(error) {
+    alert("Erreur d'authentification Firebase : " + error.message);
+    console.error("Erreur d'authentification Firebase :", error);
+  });
 
-    function demarreJeuFirebase() {
-      // Toast feedback
-      function showToast(msg) {
-        const toast = document.getElementById('toast-message');
-        if (toast) {
-          toast.textContent = msg;
-          toast.classList.add('visible');
-          setTimeout(() => { toast.classList.remove('visible'); }, 2400);
-        }
+  function demarreJeuFirebase() {
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('visible');
+        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
       }
-    
-    // Chrono/temps passé sur l’épreuve
-    const stepIndex = 1;
+    }
+
+    const stepIndex = 1; // Attention : équipe 2 = étape 1
     let startTime = null;
     db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
       .once('value', function(snap) {
@@ -260,17 +258,7 @@
         }
       });
 
-    // Toast feedback
-    function showToast(msg) {
-      const toast = document.getElementById('toast-message');
-      if (toast) {
-        toast.textContent = msg;
-        toast.classList.add('visible');
-        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
-      }
-    }
-
-    // Synchro navigation (currentStep)
+    // Navigation (inchangé)
     function goToStep(stepIndex) {
       getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
         if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
@@ -304,28 +292,37 @@
       var icon2 = document.getElementById('icon-video2');
       const MAX_VIDEO_SIZE = 52428800; // 50 Mo
 
+      // --- LOGS FORTS à CHAQUE ETAPE ---
+
       // Upload vidéo 1
       if(input1 && out) {
         input1.addEventListener('change', function() {
           if(this.files && this.files[0]) {
             const file = this.files[0];
+            console.log("video1 fichier =", file);
             if(file.size > MAX_VIDEO_SIZE) {
               showToast("Vidéo trop volumineuse (max 50 Mo)");
               input1.value = "";
               return;
             }
-            const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape2/video1_${Date.now()}_${file.name}`;
+            const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/video1_${Date.now()}_${file.name}`;
+            console.log("video1 path =", storagePath);
             storage.ref(storagePath).put(file).then(snapshot => {
               snapshot.ref.getDownloadURL().then(url => {
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video1').set({
+                console.log("video1 upload url =", url);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/video1').set({
                   name: file.name,
                   uploadedAt: Date.now(),
                   url: url
                 });
+                showToast("Vidéo 1 uploadée !");
               });
             }).catch(err => {
-              showToast("Erreur lors de l'upload : " + err.message);
+              showToast("Erreur lors de l'upload vidéo 1 : " + err.message);
+              console.error("Erreur upload vidéo 1 :", err);
             });
+          } else {
+            console.warn("Aucun fichier pour video 1");
           }
         });
       }
@@ -334,31 +331,39 @@
         input2.addEventListener('change', function() {
           if(this.files && this.files[0]) {
             const file = this.files[0];
+            console.log("video2 fichier =", file);
             if(file.size > MAX_VIDEO_SIZE) {
               showToast("Vidéo trop volumineuse (max 50 Mo)");
               input2.value = "";
               return;
             }
-            const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape2/video2_${Date.now()}_${file.name}`;
+            const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/video2_${Date.now()}_${file.name}`;
+            console.log("video2 path =", storagePath);
             storage.ref(storagePath).put(file).then(snapshot => {
               snapshot.ref.getDownloadURL().then(url => {
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2/video2').set({
+                console.log("video2 upload url =", url);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/video2').set({
                   name: file.name,
                   uploadedAt: Date.now(),
                   url: url
                 });
+                showToast("Vidéo 2 uploadée !");
               });
             }).catch(err => {
-              showToast("Erreur lors de l'upload : " + err.message);
+              showToast("Erreur lors de l'upload vidéo 2 : " + err.message);
+              console.error("Erreur upload vidéo 2 :", err);
             });
+          } else {
+            console.warn("Aucun fichier pour video 2");
           }
         });
       }
 
-      // Synchro multi-device et activation bouton + grisé des icônes + affichage vidéos
+      // Update UI très verbeux
       function updateUI() {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2').once('value', function(snapshot) {
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex).once('value', function(snapshot) {
           const data = snapshot.val() || {};
+          console.log("updateUI DB step data =", data);
           let txt = "";
           let videoHtml = "";
           if(data.video1 && data.video1.name && data.video1.url) {
@@ -385,7 +390,8 @@
           if(icon1) icon1.classList.toggle('grayed', !!(data.video1 && data.video1.name));
           if(icon2) icon2.classList.toggle('grayed', !!(data.video2 && data.video2.name));
           if(btn) {
-            if(data.video1 && data.video1.name && data.video2 && data.video2.name) {
+            if(data.video1 && data.video1.name && data.video1.url &&
+               data.video2 && data.video2.name && data.video2.url) {
               btn.disabled = false;
               btn.classList.add('enabled');
               if(input1) input1.disabled = true;
@@ -399,8 +405,7 @@
           }
         });
       }
-      // On écoute les deux uploads
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/2').on('value', updateUI);
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex).on('value', updateUI);
 
       // Navigation bouton
       if(btn) {
@@ -409,7 +414,6 @@
           btn.disabled = true;
           btn.classList.remove('enabled');
           showToast("Validation en cours...");
-          // === ENREGISTRE LE TEMPS PASSÉ ===
           const now = Date.now();
           db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
             .once('value', function(snap) {
@@ -418,7 +422,6 @@
                 const elapsed = Math.round((now - sTime) / 1000);
                 db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
               }
-              // Puis passage à l'étape suivante
               db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
                 .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
                   if (!error && committed) {
@@ -443,7 +446,7 @@
           });
       }
     });
-  } 
-  </script>
+  }
+</script>
 </body>
 </html>
