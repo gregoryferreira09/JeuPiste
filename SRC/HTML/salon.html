@@ -110,64 +110,18 @@
       #confirmationModal .main-accueil {max-width:90vw;}
       #listeJoueurs {max-width:96vw;}
     }
-    /* Loader & toast */
-    #loader { display: none; position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(24,18,18,0.35); z-index: 99999; justify-content: center; align-items: center;}
-    .spinner { border: 4px solid #eee; border-top: 4px solid #e0c185; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;}
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .modal-toast { display: none; position: fixed; left: 50%; top: 12%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 99999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw;}
-    .modal-toast.visible { display: block; animation: fadein 0.3s;}
-    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
 </head>
 <body class="accueil">
-  <div id="loader" aria-live="polite"><div class="spinner"></div></div>
-  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
+  <!-- BANDEAU HAUT -->
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script>
-    // -- Sécurisation navigation (empêche accès salon si partie lancée, ne touche à rien d'autre !) --
-    function showLoader() { document.getElementById('loader').style.display = 'flex'; }
-    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
-    function showToast(msg) {
-      const toast = document.getElementById('toast-message');
-      toast.textContent = msg;
-      toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 2700);
-    }
+    // Récupération centrale du code salon
     const salonCode = localStorage.getItem("salonCode");
-    const equipeNum = localStorage.getItem("equipeNum");
-    if (salonCode && equipeNum !== null && equipeNum !== undefined) {
-      showLoader();
-      if (!firebase.apps.length) firebase.initializeApp({
-        apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-        authDomain: "murder-party-ba8d1.firebaseapp.com",
-        databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "murder-party-ba8d1",
-        storageBucket: "murder-party-ba8d1.firebasestorage.app",
-        messagingSenderId: "20295055805",
-        appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-        measurementId: "G-KSBMBB7KMJ"
-      });
-      const db = firebase.database();
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', function(snapshot) {
-        hideLoader();
-        const step = snapshot.val();
-        if (step !== undefined && step !== null && step > 0) {
-          db.ref('parties/' + salonCode + '/cheminsParEquipe/' + equipeNum).once('value', function(snapIdx) {
-            const parcoursIdx = snapIdx.val();
-            db.ref('parties/' + salonCode + '/parcoursEquipes/' + parcoursIdx).once('value', function(snapParcours) {
-              const parcours = snapParcours.val() || [1,2,3,4,5];
-              const target = parcours[step-1];
-              if (target === 6) window.location.href = "epreuve6.html";
-              else if (target === 7) window.location.href = "révélation.html";
-              else window.location.href = `equipe${target}-a.html`;
-            });
-          });
-        }
-      });
+    if (!salonCode) {
+      window.location.replace("creer-partie.html");
     }
   </script>
   <div class="center-wrapper">
@@ -203,6 +157,7 @@
       </div>
     </main>
   </div>
+  <!-- BANDEAU BAS -->
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
@@ -214,7 +169,8 @@
       if (main) main.classList.add('visible');
     });
   </script>
-  <!-- CI-DESSOUS : ton JS salon historique, inchangé -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById("codeSalon").textContent = salonCode || "------";
@@ -342,12 +298,12 @@
       db.ref('parties/' + salonCode).on('value', snapshot => {
         const etatPartie = snapshot.child('etat').val();
        if (etatPartie === 'en_cours') {
-          localStorage.setItem("enCours", "1");
-          localStorage.setItem("pseudo", pseudoOrigine);
-          localStorage.removeItem("pseudoOrigine");
-          window.location.href = "lancement-partie.html";
-          return;
-        }
+  localStorage.setItem("enCours", "1");
+  localStorage.setItem("pseudo", pseudoOrigine);
+  localStorage.removeItem("pseudoOrigine");
+  window.location.href = "lancement-partie.html";
+  return;
+}
         if (!snapshot.exists()) {
           // Si la partie n’était PAS en cours, on affiche le message d’erreur
           if (localStorage.getItem("enCours") !== "1") {
@@ -429,8 +385,10 @@
       // });
     });
   </script>
+
   <script src="../JS/security-enhance.js"></script>
   <script src="../JS/ux-enhance.js"></script>
   <script src="../JS/scalability.js"></script>
+  
 </body>
 </html>
