@@ -14,7 +14,7 @@
       background: #2c1b1b;
       border-radius: 18px;
       box-shadow: 0 4px 20px #0001;
-      padding: 32px 24px;
+      padding: 32px 24px 72px 24px;
       border: 2px solid #e0c185;
       color: #f4e4c1;
       font-family: 'Cormorant Garamond', serif;
@@ -22,6 +22,7 @@
       flex-direction: column;
       align-items: stretch;
       min-width: 300px;
+      position: relative;
     }
     .main-accueil h1 {
       text-align: center;
@@ -87,7 +88,75 @@
     .gm-error { color: #ff9393; margin-top: 6px; min-height: 22px; text-align: center;}
     .miniature { max-width: 70px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003; cursor: pointer;}
     .miniature-video { max-width: 80px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003;}
+    #retour-accueil-btn {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
+      color: #3d2b1f; font-family: 'Cinzel Decorative', cursive; font-size: 1.06em; font-weight: bold; border-radius: 14px; border:2px solid #e0c185;
+      padding: 13px 38px; cursor: pointer; z-index: 900;
+      box-shadow: 0 4px 14px #0007;
+      transition: background 0.2s, color 0.2s;
+    }
+    #retour-accueil-btn:hover { background: #ffeecb; color: #1a1a1a; }
+    #confirmRetourModal {
+      display: none;
+      position: fixed;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(24,18,18,0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #confirmRetourModal .modal-content {
+      background: #2c1b1b;
+      border: 2px solid #e0c185;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      color: #f4e4c1;
+      box-shadow: 0 8px 32px #0007;
+      min-width: 280px;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    #confirmRetourModal .modal-actions {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+    }
+    #confirmRetourModal .gm-btn { min-width: 80px; }
     /* Modal styles */
+    #nouvellePartieModal {
+      display: none;
+      position: fixed;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(24,18,18,0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #nouvellePartieModal .modal-content {
+      background: #2c1b1b;
+      border: 2px solid #e0c185;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      color: #f4e4c1;
+      box-shadow: 0 8px 32px #0007;
+      min-width: 280px;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    #nouvellePartieModal .modal-actions {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+    }
+    #nouvellePartieModal .gm-btn { min-width: 80px; }
     #lightbox-modal {
       display: none;
       position: fixed;
@@ -141,6 +210,7 @@
       .gm-btn { padding: 12px 7px; font-size: 0.99em; }
       #lightbox-img { max-width: 96vw; max-height: 70vh; }
       #lightbox-content { max-width: 99vw; }
+      #retour-accueil-btn { padding: 13px 10vw; min-width: calc(99vw - 60px);}
     }
   </style>
 </head>
@@ -171,6 +241,7 @@
           </div>
         </div>
         <div id="historique-parties" style="display:none;"></div>
+        <button id="retour-accueil-btn" style="display:none;">Retour à l'accueil</button>
       </div>
     </main>
   </div>
@@ -179,6 +250,7 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
+  <!-- Modale nouvelle partie -->
   <div id="nouvellePartieModal">
     <div class="modal-content">
       <div>
@@ -188,6 +260,20 @@
       <div class="modal-actions">
         <button id="btnSuivrePartieOui" class="gm-btn">Oui</button>
         <button id="btnSuivrePartieNon" class="gm-btn">Non</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modale retour accueil -->
+  <div id="confirmRetourModal">
+    <div class="modal-content">
+      <div>
+        <span style="font-size:1.1em;">Retourner à l'accueil ?</span><br>
+        <span style="color:#c9b49a; font-size:.98em;">Tu perdras le suivi en direct de cette partie.</span>
+      </div>
+      <div class="modal-actions">
+        <button id="btnConfirmRetourOui" class="gm-btn">Oui</button>
+        <button id="btnConfirmRetourNon" class="gm-btn">Non</button>
       </div>
     </div>
   </div>
@@ -205,12 +291,18 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script>
+    // Cache sécurité : modales masquées au chargement
+    document.addEventListener('DOMContentLoaded',function(){
+      document.getElementById('nouvellePartieModal').style.display="none";
+      document.getElementById('confirmRetourModal').style.display="none";
+    });
+
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "murder-party-ba8d1.appspot.com",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
@@ -219,7 +311,7 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // --- AUTH ---
+    // AUTH
     document.getElementById('gm-login').onclick = function() {
       const email = document.getElementById('gm-email').value;
       const pass = document.getElementById('gm-password').value;
@@ -236,9 +328,13 @@
         document.getElementById('auth-section').style.display = "none";
         document.getElementById('gm-content').style.display = "block";
         afficherSuivi();
+        // Affiche bouton retour accueil si partie sélectionnée
+        document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
       } else {
         document.getElementById('auth-section').style.display = "block";
         document.getElementById('gm-content').style.display = "none";
+        // Quand on se déconnecte, on retire la partie suivie = passe dans historique
+        localStorage.removeItem("salonCode");
       }
     });
 
@@ -247,20 +343,25 @@
       document.getElementById('historique-parties').style.display = 'none';
       document.getElementById('btn-courante').classList.add('active');
       document.getElementById('btn-historique').classList.remove('active');
+      // Affiche bouton retour accueil si partie sélectionnée
+      document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
     }
     function afficherHistorique() {
       document.getElementById('suivi-partie').style.display = 'none';
       document.getElementById('historique-parties').style.display = 'block';
       document.getElementById('btn-courante').classList.remove('active');
       document.getElementById('btn-historique').classList.add('active');
+      document.getElementById('retour-accueil-btn').style.display = "none";
       chargerHistorique();
     }
 
+    // Salon courant
     let salonCode = null;
     let equipes = [];
     let nomsEquipes = {};
     let currentIndex = 0;
     let stepsTime = {};
+    let partieDataCache = {}; // Pour historique
 
     let etapes = [
       { titre: "Épreuve 1" },
@@ -279,9 +380,10 @@
       salonCode = localStorage.getItem("salonCode");
       if (!salonCode) {
         document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune partie sélectionnée</div>";
+        document.getElementById('retour-accueil-btn').style.display = "none";
         return;
       }
-      // Détache l'ancien listener si existant
+      document.getElementById('retour-accueil-btn').style.display = "block";
       if (listenerRef && currentEquipeListener) {
         listenerRef.off('value', currentEquipeListener);
       }
@@ -479,16 +581,126 @@
         snap.forEach(partieSnap => {
           let partieId = partieSnap.key;
           html += `<tr id="ligne-${partieId}">
-            <td>${partieId}</td>
+            <td><a href="#" class="partie-lien" data-id="${partieId}" style="color:#e0c185;text-decoration:underline;cursor:pointer;">${partieId}</a></td>
             <td><span class="cross" onclick="supprimerPartie('${partieId}')">❌</span></td>
           </tr>`;
         });
         html += "</table>";
         div.innerHTML = html;
+        // Attach click on partie-lien
+        Array.from(document.getElementsByClassName('partie-lien')).forEach(link=>{
+          link.onclick = function(e){
+            e.preventDefault();
+            chargerPartieHistorique(this.dataset.id);
+          }
+        });
       }).catch(e => {
         div.innerHTML = "<span style='color:#ff9393'>Erreur lors du chargement : " + e.message + "</span>";
       });
     }
+
+    // Affiche partie en mode historique (comme une partie en cours)
+    function chargerPartieHistorique(partieId) {
+      // Charge data d'une partie comme dans afficherSuivi
+      db.ref(`parties/${partieId}/equipes`).once('value').then(snapEq=>{
+        equipes = [];
+        snapEq.forEach(child=>{
+          let eq = child.val();
+          eq.num = child.key;
+          equipes.push(eq);
+        });
+        db.ref(`parties/${partieId}/nomsEquipes`).once('value').then(snapNoms=>{
+          nomsEquipes = snapNoms.val() || {};
+          // stepsTime pour chaque équipe
+          currentIndex = 0;
+          salonCode = partieId;
+          let promises = equipes.map(eq=>
+            db.ref(`parties/${partieId}/equipes/${eq.num}/stepsTime`).once('value').then(snapST=>{
+              eq.stepsTime = snapST.val() || {};
+            })
+          );
+          Promise.all(promises).then(()=>{
+            stepsTime = equipes[0]?.stepsTime || {};
+            afficherEquipeHistorique(partieId);
+          });
+        });
+      });
+    }
+
+    function afficherEquipeHistorique(partieId) {
+      // Affiche interface identique à "en cours" mais lecture seule (pas de bouton retour, pas de nav)
+      const carte = document.getElementById('carte-equipe');
+      const equipe = equipes[currentIndex];
+      const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
+      const membres = equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—';
+      const step = equipe.currentStep ?? 0;
+      let html = `
+        <div class='team-title'>${nom}</div>
+        <div class='team-members'>${membres}</div>
+        <div class='etape-encours'>Étape actuelle : <span>${etapes[step]?.titre || 'Terminé'}</span></div>
+        <div id="timer" class="timer">Temps sur cette épreuve : 0:00</div>
+        <div class='parcours-list'>
+      `;
+      // stepsTime = equipe.stepsTime (en historique)
+      const stepsTimeLocal = equipe.stepsTime || {};
+      for (let i=0; i<etapes.length; i++) {
+        let statut = "";
+        let chrono = "";
+        if (i == step) {
+          statut = " <span style='color:#ffe07e;'>(en cours)</span>";
+        } else if (i < step) {
+          let t = stepsTimeLocal && (stepsTimeLocal[i] !== undefined && stepsTimeLocal[i] !== null) ? stepsTimeLocal[i] : null;
+          if (t !== null) {
+            let min = Math.floor(t/60), sec = t%60;
+            chrono = `<span class="chrono-value">(${min}:${sec.toString().padStart(2, '0')})</span>`;
+          }
+          statut = ` <span style='color:#a8ffb9;'>(réalisée)</span> ${chrono}`;
+        }
+        html += `<div class='epreuve'>
+          <div class='epreuve-titre'>${etapes[i].titre}${statut}</div>
+          <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
+        </div>`;
+      }
+      html += '</div>';
+      carte.innerHTML = html;
+      afficherTimerHistorique(equipe, stepsTimeLocal);
+      for (let i=0; i<etapes.length; i++) {
+        listerFichiersEquipeEtape(equipe.num, i);
+      }
+      // Ajoute navigation par équipe
+      document.getElementById('prev-team').onclick = function() {
+        if (equipes.length) {
+          currentIndex = (currentIndex - 1 + equipes.length) % equipes.length;
+          afficherEquipeHistorique(partieId);
+        }
+      };
+      document.getElementById('next-team').onclick = function() {
+        if (equipes.length) {
+          currentIndex = (currentIndex + 1) % equipes.length;
+          afficherEquipeHistorique(partieId);
+        }
+      };
+    }
+
+    function afficherTimerHistorique(equipe, stepsTimeLocal) {
+      const timerDiv = document.getElementById('timer');
+      const step = equipe.currentStep ?? 0;
+      if (step >= etapes.length) {
+        timerDiv.textContent = "Temps sur cette épreuve : terminé";
+        timerDiv.classList.remove('late');
+        return;
+      }
+      const chronoVal = stepsTimeLocal && (stepsTimeLocal[step] !== undefined && stepsTimeLocal[step] !== null) ? stepsTimeLocal[step] : null;
+      if (chronoVal !== null) {
+        let min = Math.floor(chronoVal/60), sec = chronoVal%60;
+        timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
+        timerDiv.classList.remove('late');
+        return;
+      }
+      timerDiv.textContent = "Temps sur cette épreuve : —";
+      timerDiv.classList.remove('late');
+    }
+
     function supprimerPartie(partieId) {
       if (confirm("Supprimer cette partie ?")) {
         db.ref("parties/"+partieId).remove().then(() => {
@@ -499,12 +711,6 @@
     }
     window.supprimerPartie = supprimerPartie;
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        chargerSalonCodeEtLive();
-      }
-    });
-
     // --- LOGIQUE MODALE & DÉTECTION NOUVEAU SALON ---
     let ancienneListeParties = [];
     db.ref("parties").once("value").then(snap => {
@@ -514,13 +720,17 @@
     });
 
     function showNouvellePartieModal(codeSalon) {
-      if (localStorage.getItem("salonCode") === codeSalon) return;
+      if (!codeSalon || localStorage.getItem("salonCode") === codeSalon) {
+        document.getElementById("nouvellePartieModal").style.display = "none";
+        return;
+      }
       document.getElementById("codeNouvellePartie").textContent = codeSalon;
       document.getElementById("nouvellePartieModal").style.display = "flex";
       document.getElementById("btnSuivrePartieOui").onclick = function() {
         localStorage.setItem("salonCode", codeSalon);
         document.getElementById("nouvellePartieModal").style.display = "none";
         chargerSalonCodeEtLive();
+        document.getElementById('retour-accueil-btn').style.display = "block";
       };
       document.getElementById("btnSuivrePartieNon").onclick = function() {
         document.getElementById("nouvellePartieModal").style.display = "none";
@@ -539,6 +749,20 @@
       }
       ancienneListeParties = nouvelleListe;
     });
+
+    // MODALE RETOUR ACCUEIL ------------------------------------
+    document.getElementById('retour-accueil-btn').onclick = function() {
+      document.getElementById('confirmRetourModal').style.display = "flex";
+    };
+    document.getElementById('btnConfirmRetourNon').onclick = function() {
+      document.getElementById('confirmRetourModal').style.display = "none";
+    };
+    document.getElementById('btnConfirmRetourOui').onclick = function() {
+      // On retire la partie suivie, page reset
+      localStorage.removeItem("salonCode");
+      document.getElementById('confirmRetourModal').style.display = "none";
+      afficherSuivi();
+    };
   </script>
 </body>
 </html>
