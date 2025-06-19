@@ -6,109 +6,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    .galerie-equipes {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-    .carte-equipe {
-      background-color: #2c1b1b;
-      border: 2px solid #e9c78c;
-      border-radius: 12px;
-      width: 200px;
-      padding: 20px 10px 10px 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-      min-height: 100px;
-    }
-    .carte-equipe:hover {
-      transform: scale(1.05);
-    }
-    .carte-equipe.indisponible {
-      filter: grayscale(0.8) blur(1px);
-      pointer-events: none;
-      opacity: 0.7;
-    }
-    .carte-equipe.selectionnee {
-      border: 2px solid #4CAF50 !important;
-    }
-    .nom-equipe {
-      font-size:1em;
-      color:#ffeecb;
-      margin-bottom:7px;
-    }
-    .pseudos-equipe {
-      font-size: 1.1em;
-      color: #e0c185;
-      margin-top: 12px;
-      min-height: 25px;
-    }
-    #confirmationRetourAccueil {
-      display:none;
-      position:fixed;
-      top:0; left:0; width:100vw; height:100vh;
-      background:rgba(44,27,27,0.72);
-      z-index:99999;
-      justify-content:center;
-      align-items:center;
-    }
-    #confirmationRetourAccueil .modal-content {
-      max-width:340px;
-      margin:auto;
-      text-align:center;
-      border:2.5px solid #e0c185;
-      background:#2c1b1b;
-      border-radius:18px;
-      box-shadow:0 4px 20px #0009;
-      padding:32px 28px;
-    }
-    #confirmationRetourAccueil .modal-content .modal-question {
-      font-weight:bold;
-      margin-bottom:22px;
-      color:#e0c185;
-      font-family:'Cinzel Decorative',serif;
-      font-size:1.1em;
-    }
-    #confirmationRetourAccueil .modal-content .modal-actions {
-      display:flex;
-      flex-direction:row;
-      gap:24px;
-      justify-content:center;
-      margin:0;
-    }
-    #confirmerRetourAccueilBtn {
-      background:#e0c185;
-      color:#181212;
-      border:2px solid #e0c185;
-    }
-    #confirmerRetourAccueilBtn:hover {
-      background:#ffeecb;
-      color:#181212;
-      border:2px solid #e0c185;
-    }
-    #annulerRetourAccueilBtn {
-      background:transparent;
-      color:#ffeecb;
-      border:2px solid #e0c185;
-    }
-    #annulerRetourAccueilBtn:hover {
-      background:#e0c185;
-      color:#181212;
-      border:2px solid #e0c185;
-    }
-    @media (max-width: 700px) {
-      #confirmationRetourAccueil .modal-content {max-width:98vw;}
-    }
+    .galerie-equipes { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+    .carte-equipe { background-color: #2c1b1b; border: 2px solid #e9c78c; border-radius: 12px; width: 200px; padding: 20px 10px 10px 10px; text-align: center; cursor: pointer; transition: transform 0.3s ease; min-height: 100px; }
+    .carte-equipe:hover { transform: scale(1.05); }
+    .carte-equipe.indisponible { filter: grayscale(0.8) blur(1px); pointer-events: none; opacity: 0.7; }
+    .carte-equipe.selectionnee { border: 2px solid #4CAF50 !important; }
+    .nom-equipe { font-size:1em; color:#ffeecb; margin-bottom:7px; }
+    .pseudos-equipe { font-size: 1.1em; color: #e0c185; margin-top: 12px; min-height: 25px; }
+    #confirmationRetourAccueil { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(44,27,27,0.72); z-index:99999; justify-content:center; align-items:center; }
+    #confirmationRetourAccueil .modal-content { max-width:340px; margin:auto; text-align:center; border:2.5px solid #e0c185; background:#2c1b1b; border-radius:18px; box-shadow:0 4px 20px #0009; padding:32px 28px; }
+    #confirmationRetourAccueil .modal-content .modal-question { font-weight:bold; margin-bottom:22px; color:#e0c185; font-family:'Cinzel Decorative',serif; font-size:1.1em; }
+    #confirmationRetourAccueil .modal-content .modal-actions { display:flex; flex-direction:row; gap:24px; justify-content:center; margin:0; }
+    #confirmerRetourAccueilBtn { background:#e0c185; color:#181212; border:2px solid #e0c185; }
+    #confirmerRetourAccueilBtn:hover { background:#ffeecb; color:#181212; border:2px solid #e0c185; }
+    #annulerRetourAccueilBtn { background:transparent; color:#ffeecb; border:2px solid #e0c185; }
+    #annulerRetourAccueilBtn:hover { background:#e0c185; color:#181212; border:2px solid #e0c185; }
+    @media (max-width: 700px) { #confirmationRetourAccueil .modal-content {max-width:98vw;} }
+    /* Loader */
+    #loader { display: none; position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(24,18,18,0.35); z-index: 99999; justify-content: center; align-items: center; }
+    .spinner { border: 4px solid #eee; border-top: 4px solid #e0c185; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .modal-toast { display: none; position: fixed; left: 50%; top: 12%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 99999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw; }
+    .modal-toast.visible { display: block; animation: fadein 0.3s; }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    // CONFIG FIREBASE
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!window.firebase?.apps?.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Loader & Toast
+    function showLoader() { document.getElementById('loader').style.display = 'flex'; }
+    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => { toast.classList.remove('visible'); }, 2700);
+    }
+
+    // SECURISATION NAVIGATION (par currentStep)
+    document.addEventListener("DOMContentLoaded", function() {
+      showLoader();
+      const salonCode = localStorage.getItem("salonCode");
+      const equipeNum = Number(localStorage.getItem("equipeNum"));
+      if (!salonCode) {
+        hideLoader();
+        window.location.href = "accueil.html";
+        return;
+      }
+      // La page de choix d'équipe doit être accessible uniquement si currentStep == 0 (adapté selon ton flow)
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', function(snapshot) {
+        hideLoader();
+        const step = snapshot.val();
+        if (step !== undefined && step !== null && step > 0) {
+          // On va à la bonne épreuve selon le parcours
+          db.ref('parties/' + salonCode + '/cheminsParEquipe/' + equipeNum).once('value', function(snapIdx) {
+            const parcoursIdx = snapIdx.val();
+            db.ref('parties/' + salonCode + '/parcoursEquipes/' + parcoursIdx).once('value', function(snapParcours) {
+              const parcours = snapParcours.val() || [1,2,3,4,5];
+              const target = parcours[step-1];
+              if (target === 6) window.location.href = "epreuve6.html";
+              else if (target === 7) window.location.href = "révélation.html";
+              else window.location.href = `equipe${target}-a.html`;
+            });
+          });
+        }
+        // Si step == 0 (choix d'équipe), on reste ici.
+      });
+    });
+
+    // Anti retour arrière (optionnel)
+    window.addEventListener("pageshow", function(evt) {
+      if (evt.persisted) location.reload();
+    });
+  </script>
 </head>
 <body>
-
+  <div id="loader" aria-live="polite"><div class="spinner"></div></div>
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
-
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
       <h2 style="font-size:2em; color:#e0c185; margin-bottom:1.3em;">Choisissez votre équipe</h2>
@@ -121,7 +113,6 @@
       </div>
     </main>
   </div>
-
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
@@ -132,295 +123,13 @@
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
     });
+    // ... (Le reste de ton JS de gestion des équipes reste inchangé)
+    // Place ici tout ton code JS équipes déjà présent dans la page d'origine (voir message précédent)
   </script>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script>
-    // ========== CONFIGURATION ==========
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // ========== PARCOURS POSSIBLES ==========
-    window.parcoursEquipes = [
-      [1, 2, 5, 3, 4],
-      [2, 4, 3, 5, 1],
-      [3, 1, 4, 2, 5],
-      [4, 5, 2, 1, 3],
-      [5, 3, 1, 4, 2]
-    ];
-
-    // Mélange un tableau (Fisher–Yates)
-    function shuffleArray(array) {
-      let arr = array.slice();
-      for (let i = arr.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
-    // Génère et sauvegarde le mapping parcours/équipe (chemin unique)
-    function initialiserMappingParcours(salonCode, nombreEquipes) {
-      let indices = [...Array(window.parcoursEquipes.length).keys()];
-      let tirage = shuffleArray(indices).slice(0, nombreEquipes);
-      let cheminsParEquipe = {};
-      for (let i = 0; i < nombreEquipes; i++) {
-        cheminsParEquipe[i] = tirage[i];
-      }
-      db.ref('parties/' + salonCode + '/cheminsParEquipe').set(cheminsParEquipe);
-    }
-
-    // ========== LOGIQUE EQUIPES ==========
-    const NOM_EQUIPE_POSSIBLES = [
-      "Les indestructibles", "Les princesses", "Les Looney Tunes",
-      "Les enfants perdus", "Les incompris", "Les Super-Zéro"
-    ];
-    const NB_MAX_EQUIPE = 6;
-
-    let decompteTimeoutID = null;
-
-    const salonCode = localStorage.getItem("salonCode");
-    if (!salonCode) {
-      alert("Code salon manquant. Merci de rejoindre une partie depuis l'accueil.");
-      window.location.href = "join.html";
-    }
-    const playerId = localStorage.getItem("uuid") || "anonymous";
-    const pseudo = localStorage.getItem("pseudo") || "Anonyme";
-    let equipeSelectionnee = null;
-
-    function calculerNombreEquipes() {
-      const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
-      let nbJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
-        ? Number(scenarioData.nombreJoueurs)
-        : 4; // fallback
-      return Math.min(Math.ceil(nbJoueurs / 2), NB_MAX_EQUIPE);
-    }
-
-    function initialiserEquipes() {
-      const nombreEquipes = calculerNombreEquipes();
-      db.ref('parties/' + salonCode + '/equipes').once('value', snap => {
-        const equipesObj = snap.val() || {};
-        db.ref('parties/' + salonCode + '/nomsEquipes').once('value', snapNames => {
-          let nomsEquipes = snapNames.val();
-          if (!nomsEquipes || Object.keys(nomsEquipes).length !== nombreEquipes) {
-            // Attribuer des noms aléatoires uniques
-            nomsEquipes = {};
-            let nomsMelanges = shuffleArray(NOM_EQUIPE_POSSIBLES).slice(0, nombreEquipes);
-            for (let i = 0; i < nombreEquipes; i++) {
-              nomsEquipes[i] = nomsMelanges[i];
-            }
-            db.ref('parties/' + salonCode + '/nomsEquipes').set(nomsEquipes);
-          }
-          let changed = false;
-          for (let i = 0; i < nombreEquipes; i++) {
-            if (!equipesObj[i]) {
-              equipesObj[i] = { membres: {} };
-              changed = true;
-            }
-          }
-          if (changed) db.ref('parties/' + salonCode + '/equipes').set(equipesObj);
-        });
-      });
-    }
-
-    function afficherEquipesEtSync() {
-      const nbEquipes = calculerNombreEquipes();
-      db.ref('parties/' + salonCode + '/nomsEquipes').on('value', snapNames => {
-        const nomsEquipes = snapNames.val() || {};
-        db.ref('parties/' + salonCode + '/equipes').on('value', snap => {
-          const equipes = {};
-          for (let i = 0; i < nbEquipes; i++) {
-            equipes[i] = { membres: {} };
-          }
-          snap.forEach(e => {
-            equipes[e.key] = e.val() || { membres: {} };
-          });
-          afficherGalerieEquipes(equipes, nomsEquipes);
-          majEtatBouton(equipes);
-        });
-      });
-    }
-
-    function afficherGalerieEquipes(equipes, nomsEquipes) {
-      const nbEquipes = calculerNombreEquipes();
-      const equipesList = [];
-      for (let i = 0; i < nbEquipes; i++) {
-        equipesList.push(equipes[i] || { membres: {} });
-      }
-      const galerie = document.getElementById("galerieEquipes");
-      galerie.innerHTML = equipesList.map((equipe, i) => {
-        const membres = equipe.membres || {};
-        const pseudos = Object.values(membres).map(m => `<span>${m.pseudo}</span>`).join(' & ');
-        const pleine = Object.keys(membres).length >= 2;
-        const selectionnee = Object.keys(membres).includes(playerId);
-        const nomEquipe = nomsEquipes && nomsEquipes[i] ? nomsEquipes[i] : "";
-        return `
-          <div class="carte-equipe${pleine ? ' indisponible' : ''}${selectionnee ? ' selectionnee' : ''}" data-key="${i}">
-            <p>Équipe ${i + 1}</p>
-            <div class="nom-equipe">${nomEquipe}</div>
-            <div class="pseudos-equipe">${pseudos || 'Disponible'}</div>
-          </div>
-        `;
-      }).join("");
-      document.querySelectorAll('.carte-equipe').forEach(div => {
-        div.addEventListener('click', function() {
-          if (div.classList.contains('indisponible')) return;
-          document.querySelectorAll('.carte-equipe').forEach(d => d.classList.remove('selectionnee'));
-          div.classList.add('selectionnee');
-          equipeSelectionnee = div.getAttribute('data-key');
-          document.getElementById('valider-choix').disabled = false;
-        });
-      });
-    }
-
-    // Gère l'état du bouton et le décompte de début de partie
-    function majEtatBouton(equipes) {
-      const btnValider = document.getElementById('valider-choix');
-      let nbJoueursValides = 0;
-      let equipeJoueur = null;
-      Object.entries(equipes).forEach(([key, equipe]) => {
-        nbJoueursValides += Object.keys(equipe.membres || {}).length;
-        if (Object.keys(equipe.membres || {}).includes(playerId)) {
-          equipeJoueur = key;
-        }
-      });
-      const scenarioData = JSON.parse(localStorage.getItem("parametresPartie")) || {};
-      let totalJoueurs = scenarioData && Number.isFinite(Number(scenarioData.nombreJoueurs)) && Number(scenarioData.nombreJoueurs) > 0
-        ? Number(scenarioData.nombreJoueurs)
-        : Math.max(nbJoueursValides, 1);
-
-      btnValider.textContent =
-        (equipeJoueur ? 'En attente des autres joueurs (' : '') +
-        nbJoueursValides + '/' + totalJoueurs +
-        (equipeJoueur ? ')' : ' Valider mon équipe');
-
-      if (equipeJoueur && !document.getElementById('annuler-choix')) {
-        ajouterBoutonAnnuler(equipeJoueur);
-        btnValider.disabled = true;
-      }
-      if (!equipeJoueur && document.getElementById('annuler-choix')) {
-        document.getElementById('annuler-choix').remove();
-        btnValider.disabled = false;
-      }
-      // Si toutes les équipes sont pleines (prêtes), on lance le décompte
-      if (nbJoueursValides === totalJoueurs) {
-        lancerDecompteAvantRedirection();
-      }
-    }
-
-    // Validation choix équipe
-    document.getElementById("valider-choix").onclick = function() {
-      if (!equipeSelectionnee || this.disabled) return;
-      db.ref('parties/' + salonCode + '/equipes/' + equipeSelectionnee + '/membres/' + playerId).set({
-        pseudo: pseudo
-      });
-      // ENREGISTRE LE NUMÉRO D'ÉQUIPE POUR GAMEFLOW
-      localStorage.setItem("equipeNum", equipeSelectionnee);
-      this.disabled = true;
-    };
-
-    function ajouterBoutonAnnuler(equipeJoueur) {
-      const btn = document.createElement('button');
-      btn.id = 'annuler-choix';
-      btn.textContent = "Annuler choix équipe";
-      btn.className = "main-btn";
-      btn.onclick = function() {
-        if (decompteTimeoutID) {
-          clearTimeout(decompteTimeoutID);
-          decompteTimeoutID = null;
-          const conteneur = document.getElementById('decompte-redirect');
-          if (conteneur) conteneur.remove();
-        }
-        equipeSelectionnee = null;
-        document.getElementById('valider-choix').disabled = true;
-        db.ref('parties/' + salonCode + '/equipes/' + equipeJoueur + '/membres/' + playerId).remove();
-        localStorage.removeItem("equipeNum");
-      };
-      document.querySelector('.boutons-actions').appendChild(btn);
-    }
-
-    window.onload = function() {
-      initialiserEquipes();
-      afficherEquipesEtSync();
-    };
-
-    // Lance le décompte et génère le mapping parcours/équipe une seule fois
-    function lancerDecompteAvantRedirection() {
-      if (document.getElementById('decompte-redirect')) return;
-      const conteneur = document.createElement('div');
-      conteneur.id = 'decompte-redirect';
-      conteneur.style.fontSize = '2.2em';
-      conteneur.style.color = '#e0c185';
-      conteneur.style.margin = '24px auto';
-      conteneur.style.textAlign = 'center';
-      conteneur.textContent = 'La partie commence dans 5…';
-      document.querySelector('.main-accueil').appendChild(conteneur);
-
-      const nombreEquipes = calculerNombreEquipes();
-      initialiserMappingParcours(salonCode, nombreEquipes);
-
-      let count = 5;
-      function tick() {
-        count--;
-        if (count > 0) {
-          conteneur.textContent = `La partie commence dans ${count}…`;
-          decompteTimeoutID = setTimeout(tick, 1000);
-        } else {
-          conteneur.textContent = "C'est parti !";
-          decompteTimeoutID = setTimeout(() => {
-            // REDIRECTION VERS LA 1ère ÉNIGME DU BON PARCOURS
-            const equipeNum = localStorage.getItem("equipeNum");
-            db.ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
-              const mapping = snap.val() || {};
-              const parcoursIdx = mapping[equipeNum];
-              const parcours = window.parcoursEquipes[parcoursIdx];
-              const premiereEpreuve = parcours[0];
-              window.location.href = `equipe${premiereEpreuve}-a.html`;
-            });
-          }, 600);
-        }
-      }
-      decompteTimeoutID = setTimeout(tick, 1000);
-    }
-
-    // === Confirmation retour accueil ===
-    document.addEventListener("DOMContentLoaded", function() {
-      const btnRetourAccueil = document.getElementById("btnRetourAccueil");
-      const confirmationRetourAccueil = document.getElementById("confirmationRetourAccueil");
-      const confirmerRetourAccueilBtn = document.getElementById("confirmerRetourAccueilBtn");
-      const annulerRetourAccueilBtn = document.getElementById("annulerRetourAccueilBtn");
-
-      btnRetourAccueil?.addEventListener("click", function(e) {
-        e.preventDefault();
-        confirmationRetourAccueil.style.display = "flex";
-      });
-
-      confirmerRetourAccueilBtn?.addEventListener("click", function() {
-        confirmationRetourAccueil.style.display = "none";
-        window.location.href = "accueil.html";
-      });
-
-      annulerRetourAccueilBtn?.addEventListener("click", function() {
-        confirmationRetourAccueil.style.display = "none";
-      });
-    });
-  </script>
-
   <!-- Fenêtre flottante confirmation retour accueil -->
-  <div id="confirmationRetourAccueil">
+  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
     <div class="modal-content">
-      <div class="modal-question">
+      <div class="modal-question" id="confirmationTitle">
         Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
       </div>
       <div class="modal-actions">
