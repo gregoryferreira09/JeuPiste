@@ -88,7 +88,7 @@
     .gm-error { color: #ff9393; margin-top: 6px; min-height: 22px; text-align: center;}
     .miniature { max-width: 70px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003; cursor: pointer;}
     .miniature-video { max-width: 80px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003;}
-    #retour-accueil-btn {
+    #retour-accueil-btn, #clore-partie-btn {
       background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
       color: #3d2b1f;
       font-family: 'Cinzel Decorative', cursive;
@@ -100,11 +100,13 @@
       cursor: pointer;
       box-shadow: 0 4px 14px #0007;
       transition: background 0.2s, color 0.2s;
-      margin: 32px auto 0 auto;
+      margin: 18px auto 0 auto;
       display: block;
     }
-    #retour-accueil-btn:hover { background: #ffeecb; color: #1a1a1a; }
-    #confirmRetourModal {
+    #retour-accueil-btn:hover, #clore-partie-btn:hover { background: #ffeecb; color: #1a1a1a; }
+    #clore-partie-btn { background: #e06c6c; color: #fff; border-color:#e06c6c; margin-top:12px;}
+    #clore-partie-btn:hover { background: #ff2f0a; color: #fff;}
+    #confirmRetourModal, #confirmCloreModal {
       display: none;
       position: fixed;
       left: 0; top: 0;
@@ -114,7 +116,7 @@
       justify-content: center;
       align-items: center;
     }
-    #confirmRetourModal .modal-content {
+    #confirmRetourModal .modal-content, #confirmCloreModal .modal-content {
       background: #2c1b1b;
       border: 2px solid #e0c185;
       border-radius: 16px;
@@ -125,13 +127,13 @@
       min-width: 280px;
       font-family: 'Cormorant Garamond', serif;
     }
-    #confirmRetourModal .modal-actions {
+    #confirmRetourModal .modal-actions, #confirmCloreModal .modal-actions {
       margin-top: 24px;
       display: flex;
       justify-content: center;
       gap: 18px;
     }
-    #confirmRetourModal .gm-btn { min-width: 80px; }
+    #confirmRetourModal .gm-btn, #confirmCloreModal .gm-btn { min-width: 80px; }
     /* Modal styles */
     #nouvellePartieModal {
       display: none;
@@ -214,7 +216,7 @@
       .gm-btn { padding: 12px 7px; font-size: 0.99em; }
       #lightbox-img { max-width: 96vw; max-height: 70vh; }
       #lightbox-content { max-width: 99vw; }
-      #retour-accueil-btn { padding: 13px 10vw; min-width: calc(99vw - 60px);}
+      #retour-accueil-btn, #clore-partie-btn { padding: 13px 10vw; min-width: calc(99vw - 60px);}
     }
   </style>
 </head>
@@ -246,6 +248,7 @@
         </div>
         <div id="historique-parties" style="display:none;"></div>
         <button id="retour-accueil-btn" style="display:none;">Retour à l'accueil</button>
+        <button id="clore-partie-btn" style="display:none;">Clore cette partie</button>
       </div>
     </main>
   </div>
@@ -281,7 +284,19 @@
       </div>
     </div>
   </div>
-
+  <!-- Modale clore partie -->
+  <div id="confirmCloreModal">
+    <div class="modal-content">
+      <div>
+        <span style="font-size:1.1em;">Clore définitivement cette partie ?</span><br>
+        <span style="color:#e06c6c; font-size:.98em;">Elle sera supprimée de la liste et ne pourra plus être rejointe.</span>
+      </div>
+      <div class="modal-actions">
+        <button id="btnConfirmCloreOui" class="gm-btn" style="background:#e06c6c;color:#fff;">Oui</button>
+        <button id="btnConfirmCloreNon" class="gm-btn">Non</button>
+      </div>
+    </div>
+  </div>
   <!-- Lightbox modal pour affichage grand format -->
   <div id="lightbox-modal">
     <div id="lightbox-content">
@@ -298,6 +313,7 @@
     document.addEventListener('DOMContentLoaded',function(){
       document.getElementById('nouvellePartieModal').style.display="none";
       document.getElementById('confirmRetourModal').style.display="none";
+      document.getElementById('confirmCloreModal').style.display="none";
     });
 
     const firebaseConfig = {
@@ -313,6 +329,17 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const storage = firebase.storage();
+
+    // Maj activité GM toutes les 2min + action/focus
+    function majActivityGamemaster() {
+      const codeSalon = localStorage.getItem("salonCode");
+      if (!codeSalon) return;
+      db.ref("parties/" + codeSalon + "/gamemasterLastActive").set(Date.now());
+    }
+    setInterval(majActivityGamemaster, 120000);
+    window.addEventListener('focus', majActivityGamemaster);
+    window.addEventListener('mousemove', majActivityGamemaster);
+    window.addEventListener('keydown', majActivityGamemaster);
 
     // AUTH
     document.getElementById('gm-login').onclick = function() {
@@ -333,20 +360,36 @@
         document.getElementById('gm-content').style.display = "block";
         afficherSuivi();
         document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
+        document.getElementById('clore-partie-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
         if (!localStorage.getItem("salonCode")) {
           proposeDernierePartie();
         }
+        majActivityGamemaster();
       } else {
         document.getElementById('auth-section').style.display = "block";
         document.getElementById('gm-content').style.display = "none";
-        // NE PAS retirer salonCode ici
       }
     });
 
     function proposeDernierePartie() {
       db.ref("parties").once("value").then(snap => {
         let lastPart = null;
-        snap.forEach(child => { lastPart = child.key; });
+        let lastTime = 0;
+        let now = Date.now();
+        snap.forEach(child => {
+          const partData = child.val();
+          // Ne propose PAS les parties clôturées
+          if (partData.cloturee) return;
+          // Vérifie la présence d'équipes et leur activité
+          let equipes = partData.equipes || {};
+          let joueurActif = Object.values(equipes).some(eq => eq && eq.connected);
+          let gmActif = partData.gamemasterLastActive && (now - partData.gamemasterLastActive < 300000);
+          // On ne prend que si au moins un joueur actif ET GM actif
+          if (joueurActif && gmActif && partData.timestamp && partData.timestamp > lastTime) {
+            lastTime = partData.timestamp;
+            lastPart = child.key;
+          }
+        });
         if (lastPart) {
           showNouvellePartieModal(lastPart);
         }
@@ -359,6 +402,7 @@
       document.getElementById('btn-courante').classList.add('active');
       document.getElementById('btn-historique').classList.remove('active');
       document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
+      document.getElementById('clore-partie-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
     }
     function afficherHistorique() {
       document.getElementById('suivi-partie').style.display = 'none';
@@ -366,6 +410,7 @@
       document.getElementById('btn-courante').classList.remove('active');
       document.getElementById('btn-historique').classList.add('active');
       document.getElementById('retour-accueil-btn').style.display = "none";
+      document.getElementById('clore-partie-btn').style.display = "none";
       chargerHistorique();
     }
 
@@ -393,9 +438,11 @@
       if (!salonCode) {
         document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune partie sélectionnée</div>";
         document.getElementById('retour-accueil-btn').style.display = "none";
+        document.getElementById('clore-partie-btn').style.display = "none";
         return;
       }
       document.getElementById('retour-accueil-btn').style.display = "block";
+      document.getElementById('clore-partie-btn').style.display = "block";
       if (listenerRef && currentEquipeListener) {
         listenerRef.off('value', currentEquipeListener);
       }
@@ -569,7 +616,6 @@
       if (e.key === "Escape") closeLightbox();
     });
 
-    // ----------- Téléchargement SANS fetch (CORS safe) ----------- //
     window.downloadFile = function(url, fileName) {
       const a = document.createElement('a');
       a.href = url;
@@ -580,7 +626,6 @@
       setTimeout(() => document.body.removeChild(a), 100);
     };
 
-    // ----------- Historique etc. ----------- //
     function chargerHistorique() {
       const div = document.getElementById('historique-parties');
       div.innerHTML = "<div class='msg-info'>Chargement en cours...</div>";
@@ -599,7 +644,6 @@
         });
         html += "</table>";
         div.innerHTML = html;
-        // Attach click on partie-lien
         Array.from(document.getElementsByClassName('partie-lien')).forEach(link=>{
           link.onclick = function(e){
             e.preventDefault();
@@ -611,7 +655,6 @@
       });
     }
 
-    // Affiche partie en mode historique (comme une partie en cours)
     function chargerPartieHistorique(partieId) {
       db.ref(`parties/${partieId}/equipes`).once('value').then(snapEq=>{
         equipes = [];
@@ -738,6 +781,8 @@
         document.getElementById("nouvellePartieModal").style.display = "none";
         chargerSalonCodeEtLive();
         document.getElementById('retour-accueil-btn').style.display = "block";
+        document.getElementById('clore-partie-btn').style.display = "block";
+        majActivityGamemaster();
       };
       document.getElementById("btnSuivrePartieNon").onclick = function() {
         document.getElementById("nouvellePartieModal").style.display = "none";
@@ -769,10 +814,34 @@
       document.getElementById('confirmRetourModal').style.display = "none";
     };
     document.getElementById('btnConfirmRetourOui').onclick = function() {
-      // On retire la partie suivie, page reset
+      // On retire la partie suivie, page reset et retour accueil.html
       localStorage.removeItem("salonCode");
       document.getElementById('confirmRetourModal').style.display = "none";
-      afficherSuivi();
+      location.href = "accueil.html";
+    };
+
+    // MODALE CLORE PARTIE ------------------------------------
+    document.getElementById('clore-partie-btn').onclick = function() {
+      document.getElementById('confirmCloreModal').style.display = "flex";
+    };
+    document.getElementById('btnConfirmCloreNon').onclick = function() {
+      document.getElementById('confirmCloreModal').style.display = "none";
+    };
+    document.getElementById('btnConfirmCloreOui').onclick = function() {
+      // On marque la partie comme clôturée et on la supprime
+      const salon = localStorage.getItem("salonCode");
+      if (salon) {
+        db.ref("parties/"+salon).update({cloturee:true});
+        setTimeout(function(){
+          db.ref("parties/"+salon).remove().then(() => {
+            localStorage.removeItem("salonCode");
+            document.getElementById('confirmCloreModal').style.display = "none";
+            location.href = "accueil.html";
+          });
+        }, 400);
+      } else {
+        document.getElementById('confirmCloreModal').style.display = "none";
+      }
     };
   </script>
 </body>
