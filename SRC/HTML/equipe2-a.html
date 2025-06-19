@@ -9,71 +9,218 @@
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
     /* ... styles inchangés ... */
+    .actions-row-horizontal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 38px;
+      margin-bottom: 10px;
+      gap: 24px;
+    }
+    .icon-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90px;
+    }
+    .icon-action a, .icon-action label {
+      cursor: pointer;
+      color: #e0c185;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .icon-action a:hover, .icon-action label:hover {
+      color: #ffeecb;
+    }
+    .icon-action svg {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 6px;
+      fill: #e0c185;
+      transition: fill 0.2s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .icon-action a:hover svg,
+    .icon-action label:hover svg {
+      fill: #ffeecb;
+    }
+    .icon-action span {
+      font-size: 0.98em;
+      color: #e0c185;
+      margin-top: 2px;
+      text-align: center;
+    }
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap;
+      border: 0;
+      padding: 0;
+      margin: -1px;
+    }
+    #next-quest {
+      background: #aaa;
+      color: #fff;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      margin: 28px auto 0 auto;
+      display: block;
+      opacity: 0.6;
+      cursor: not-allowed;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    #next-quest.enabled {
+      background: #e0c185;
+      opacity: 1;
+      cursor: pointer;
+    }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
+    @media (max-width: 650px) {
+      .actions-row-horizontal {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .icon-action {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .icon-action span {
+        text-align: left;
+      }
+      .image-fondue {
+        max-width: 98vw;
+      }
+    }
+    .modal-toast {
+      display: none;
+      position: fixed;
+      left: 50%; top: 10%;
+      transform: translateX(-50%);
+      background: #231d1d;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-size: 1.14em;
+      z-index: 9999;
+      box-shadow: 0 4px 22px #0006;
+      text-align:center;
+      max-width: 90vw;
+    }
+    .modal-toast.visible {
+      display: block;
+      animation: fadein 0.3s;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
 </head>
 <body>
-  <!-- ... HTML inchangé ... -->
-  <div class="actions-row-horizontal">
-    <!-- GPS -->
-    <div class="icon-action side-icon">
-      <a href="https://maps.google.com/?q=47.473976,-0.576762" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-        <svg viewBox="0 0 24 24" width="38" height="38">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
-        </svg>
-        <span>Boussole</span>
-      </a>
-    </div>
-    <!-- Fichier 1 -->
-    <div class="icon-action side-icon">
-      <label for="video-upload-1" aria-label="Télécharger un fichier (photo ou vidéo) 1">
-        <svg id="icon-video1" viewBox="0 0 24 24" width="38" height="38" fill="currentColor">
-          <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
-        </svg>
-        <span>Fichier 1 à envoyer</span>
-        <input id="video-upload-1" class="visually-hidden" type="file" accept="image/*,video/*">
-      </label>
-    </div>
-    <!-- Fichier 2 -->
-    <div class="icon-action side-icon">
-      <label for="video-upload-2" aria-label="Télécharger un fichier (photo ou vidéo) 2">
-        <svg id="icon-video2" viewBox="0 0 24 24" width="38" height="38" fill="currentColor">
-          <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
-        </svg>
-        <span>Fichier 2 à envoyer</span>
-        <input id="video-upload-2" class="visually-hidden" type="file" accept="image/*,video/*">
-      </label>
-    </div>
-  </div>
-  <div id="video-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
-  <div style="color:#c9b49a; font-size:0.95em; text-align:right; margin-bottom:8px;">
-    <em>Chaque fichier ne doit pas dépasser 50 Mo (photo ou vidéo)</em>
-  </div>
-  <button id="next-quest" disabled>Quête suivante</button>
-  <!-- ... fin HTML ... -->
+  <header>
+    <h1 class="site-title">Jeu de piste</h1>
+  </header>
 
+  <div class="center-wrapper">
+    <main class="main-accueil" role="main">
+      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête du bras d'acier</h2>
+      <div class="presentation-jeu" style="margin-top: 24px;">
+        <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 14px;">
+          <em>
+            Sous le ciel ouvert, là où l'effort fait loi,<br>
+            Vous trouverez un lieu où l'on grimpe et l'on se bat.
+          </em>
+        </div>
+        <div class="objectif-course" style="margin-top: 24px;">
+          <div class="objectif-label">Objectif</div>
+          <div class="objectif-text" style="margin-top: 18px;">
+            Avant d'espérer avancer, il vous faut d'abord prouver que vos bras sont dignes de porter l'épée.<br><br>
+            <strong>Défi :</strong><br>
+            Chaque chevalier doit accomplir <strong>trois tractions</strong> en gage d'entraînement.<br>
+            <em>L'exploit doit être filmé, car seule l'image témoigne de la vérité.</em><br><br>
+            ⚔️ <strong>Mais prenez garde…</strong><br>
+            Si l'un de vous échoue à relever le défi, il perdra son titre de chevalier et sera relégué au rang d'écuyer.<br>
+            Pour sauver l'honneur de votre duo, son binôme devra alors accomplir à lui seul <strong>six tractions</strong>.<br>
+            Un fardeau lourd, mais possible… pour un véritable héros.<br><br>
+            À vos muscles, preux compagnons. Le Graal n'attend que les plus solides !
+          </div>
+        </div>
+      </div>
+      <div class="actions-row-horizontal">
+        <!-- GPS -->
+        <div class="icon-action side-icon">
+          <a href="https://maps.google.com/?q=47.473976,-0.576762" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <svg viewBox="0 0 24 24" width="38" height="38">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
+            </svg>
+            <span>Boussole</span>
+          </a>
+        </div>
+        <!-- Fichier 1 -->
+        <div class="icon-action side-icon">
+          <label for="video-upload-1" aria-label="Télécharger un fichier (photo ou vidéo) 1">
+            <svg id="icon-video1" viewBox="0 0 24 24" width="38" height="38" fill="currentColor">
+              <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
+            </svg>
+            <span>Fichier 1 à envoyer</span>
+            <input id="video-upload-1" class="visually-hidden" type="file" accept="image/*,video/*">
+          </label>
+        </div>
+        <!-- Fichier 2 -->
+        <div class="icon-action side-icon">
+          <label for="video-upload-2" aria-label="Télécharger un fichier (photo ou vidéo) 2">
+            <svg id="icon-video2" viewBox="0 0 24 24" width="38" height="38" fill="currentColor">
+              <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
+            </svg>
+            <span>Fichier 2 à envoyer</span>
+            <input id="video-upload-2" class="visually-hidden" type="file" accept="image/*,video/*">
+          </label>
+        </div>
+      </div>
+      <div id="video-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+      <div style="color:#c9b49a; font-size:0.95em; text-align:right; margin-bottom:8px;">
+        <em>Chaque fichier ne doit pas dépasser 50 Mo (photo ou vidéo)</em>
+      </div>
+      <button id="next-quest" disabled>Quête suivante</button>
+    </main>
+  </div>
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- Toast harmonisé -->
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
+  <!-- Firebase et gameflow.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
+    // Sécurité : vérif session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
     if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
       window.location.href = "accueil.html";
     }
-    // CORRIGE ICI !
+    // Firebase init
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app", // <----- CORRIGÉ
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
@@ -82,12 +229,13 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
+    // Authentification anonyme obligatoire pour les accès Storage
     firebase.auth().signInAnonymously().then(function() {
-      console.log("Authentification anonyme réussie");
+      console.log("[DEBUG] Authentification anonyme réussie");
       demarreJeuFirebase();
     }).catch(function(error) {
       alert("Erreur d'authentification Firebase : " + error.message);
-      console.error("Erreur d'authentification Firebase :", error);
+      console.error("[DEBUG] Erreur d'authentification Firebase :", error);
     });
 
     function demarreJeuFirebase() {
@@ -133,7 +281,30 @@
         }
       }
 
-      // POUR DEBUG
+      function goToStep(stepIndex) {
+        getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+          if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+            showToast('Bravo, vous avez terminé !');
+            setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+            return;
+          }
+          const epreuveNum = parcours[stepIndex];
+          let target = "";
+          if (epreuveNum === 6) target = "epreuve6.html";
+          else if (epreuveNum === 7) target = "révélation.html";
+          else target = `equipe${epreuveNum}-a.html`;
+          const current = window.location.pathname.split('/').pop();
+          if (current !== target) {
+            window.location.href = target;
+          }
+        });
+      }
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+        .on('value', function(snapshot) {
+          const step = snapshot.val() || 0;
+          goToStep(step);
+        });
+
       document.addEventListener('DOMContentLoaded', function() {
         console.log("[DEBUG] DOMContentLoaded fired");
         var input1 = document.getElementById('video-upload-1');
@@ -174,9 +345,8 @@
                     name: file.name,
                     uploadedAt: Date.now(),
                     url: url
-                  }).then(()=>{
-                    console.log("[DEBUG] DB video1 mise à jour");
                   });
+                  console.log("[DEBUG] DB video1 mise à jour");
                   showToast("Fichier 1 uploadé !");
                 });
               }).catch(err => {
@@ -209,9 +379,8 @@
                     name: file.name,
                     uploadedAt: Date.now(),
                     url: url
-                  }).then(()=>{
-                    console.log("[DEBUG] DB video2 mise à jour");
                   });
+                  console.log("[DEBUG] DB video2 mise à jour");
                   showToast("Fichier 2 uploadé !");
                 });
               }).catch(err => {
@@ -291,6 +460,16 @@
                   });
               });
           });
+        }
+      });
+      // Anti-retour arrière
+      window.addEventListener("pageshow", function(evt) {
+        if (evt.persisted) {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .once('value', function(snapshot) {
+              const step = snapshot.val() || 0;
+              goToStep(step);
+            });
         }
       });
     }
