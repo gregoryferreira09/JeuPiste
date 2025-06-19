@@ -302,7 +302,7 @@
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.appspot.com",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
@@ -323,20 +323,31 @@
           document.getElementById('gm-auth-error').textContent = "Connexion échouée : " + e.message;
         });
     };
+    
     firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('auth-section').style.display = "none";
-        document.getElementById('gm-content').style.display = "block";
-        afficherSuivi();
-        // Affiche bouton retour accueil si partie sélectionnée
-        document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
-      } else {
-        document.getElementById('auth-section').style.display = "block";
-        document.getElementById('gm-content').style.display = "none";
-        // Quand on se déconnecte, on retire la partie suivie = passe dans historique
-        localStorage.removeItem("salonCode");
-      }
-    });
+  if (user) {
+    document.getElementById('auth-section').style.display = "none";
+    document.getElementById('gm-content').style.display = "block";
+    afficherSuivi();
+    document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
+
+    // AJOUT : Si aucune partie suivie, propose de suivre la dernière existante
+    if (!localStorage.getItem("salonCode")) {
+      db.ref("parties").once("value").then(snap => {
+        let lastPart = null;
+        snap.forEach(child => { lastPart = child.key; });
+        if (lastPart) {
+          showNouvellePartieModal(lastPart);
+        }
+      });
+    }
+  } else {
+    document.getElementById('auth-section').style.display = "block";
+    document.getElementById('gm-content').style.display = "none";
+    // Quand on se déconnecte, on retire la partie suivie = passe dans historique
+    localStorage.removeItem("salonCode");
+  }
+});
 
     function afficherSuivi() {
       document.getElementById('suivi-partie').style.display = 'block';
