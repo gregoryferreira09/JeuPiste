@@ -227,6 +227,26 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
+   // Authentification anonyme obligatoire pour les accès Storage
+    firebase.auth().signInAnonymously().then(function() {
+      console.log("Authentification anonyme réussie");
+      demarreJeuFirebase();
+    }).catch(function(error) {
+      alert("Erreur d'authentification Firebase : " + error.message);
+      console.error("Erreur d'authentification Firebase :", error);
+    });
+
+    function demarreJeuFirebase() {
+      // Toast feedback
+      function showToast(msg) {
+        const toast = document.getElementById('toast-message');
+        if (toast) {
+          toast.textContent = msg;
+          toast.classList.add('visible');
+          setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+        }
+      }
+    
     // Chrono/temps passé sur l’épreuve
     const stepIndex = 1;
     let startTime = null;
