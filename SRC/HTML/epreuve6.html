@@ -7,9 +7,130 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <style>
-    /* ... (reprends tes styles existants, inchangés) ... */
-    /* Ajoute .grayed si besoin */
-    .grayed { filter: grayscale(1) brightness(0.8); opacity: 0.6; }
+    body {
+      background: #231d1d;
+      color: #ffeecb;
+      font-family: 'Cormorant Garamond', serif;
+      margin: 0;
+    }
+    .center-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 12px 32px 12px;
+    }
+    .main-accueil {
+      margin-top: 28px;
+      background: #2c1b1b;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px #0005;
+      padding: 28px 16px 22px 16px;
+    }
+    h2 {
+      color: #e0c185;
+      font-family: 'Cinzel Decorative', serif;
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 16px;
+      margin-top: 0;
+    }
+    .gps-instruction {
+      color: #ffeecb;
+      font-size: 1.07em;
+      text-align: center;
+      margin: 18px 0 10px 0;
+    }
+    .actions-row-horizontal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 38px;
+      margin-bottom: 10px;
+      gap: 24px;
+    }
+    .icon-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90px;
+    }
+    .icon-action a, .icon-action label {
+      cursor: pointer;
+      color: #e0c185;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .icon-action a:hover, .icon-action label:hover {
+      color: #ffeecb;
+    }
+    .icon-action svg {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 6px;
+      fill: #e0c185;
+      transition: fill 0.2s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .icon-action a:hover svg,
+    .icon-action label:hover svg {
+      fill: #ffeecb;
+    }
+    .icon-action span {
+      font-size: 0.98em;
+      color: #e0c185;
+      margin-top: 2px;
+      text-align: center;
+    }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden;
+      clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap;
+      border: 0;
+      padding: 0;
+      margin: -1px;
+    }
+    #next-quest {
+      background: #aaa;
+      color: #fff;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      margin: 28px auto 0 auto;
+      display: block;
+      opacity: 0.6;
+      cursor: not-allowed;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    #next-quest.enabled {
+      background: #e0c185;
+      opacity: 1;
+      cursor: pointer;
+    }
+    @media (max-width: 650px) {
+      .actions-row-horizontal {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .icon-action {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .icon-action span {
+        text-align: left;
+      }
+    }
     .modal-toast {
       display: none;
       position: fixed;
@@ -40,26 +161,27 @@
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
       <h2>La quête du bout du monde</h2>
-      <div id="localisation-block">
-        <div class="gps-instruction">
-          Rendez-vous à la position :
-          <br><strong>47.367167, -0.562611</strong>
+      <!-- GPS -->
+      <div class="gps-instruction">
+        Rendez-vous à la position :
+        <br><strong>47.367167, -0.562611</strong>
+      </div>
+      <div class="actions-row-horizontal" id="gps-row">
+        <div class="icon-action side-icon">
+          <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/>
+            </svg>
+            <span>Boussole</span>
+          </a>
         </div>
-        <div class="actions-row-horizontal">
-          <div class="icon-action">
-            <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/>
-              </svg>
-              <span>Boussole</span>
-            </a>
-          </div>
-          <div>
-            <button id="check-gps">Je suis arrivé !</button>
-            <div id="gps-feedback"></div>
-          </div>
+        <div style="flex:1;text-align:center;">
+          <button id="check-gps" style="margin-top:10px;">Je suis arrivé !</button>
+          <div id="gps-feedback"></div>
         </div>
       </div>
+
+      <!-- Suite (objectif + upload photos) -->
       <div id="suite-block" style="display:none;">
         <div class="objectif-course">
           <div class="objectif-label">Objectif</div>
@@ -77,35 +199,41 @@
           </div>
         </div>
         <div class="actions-row-horizontal">
-          <div class="photo-actions">
-            <div class="icon-action side-icon">
-              <label id="label-photo1" for="photo-upload-1">
-                <svg id="icon-photo1" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-                <span>Photo avec un paysan</span>
-                <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
-              </label>
-            </div>
-            <div class="icon-action side-icon">
-              <label id="label-photo2" for="photo-upload-2">
-                <svg id="icon-photo2" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-                <span>Photo avec un gueux</span>
-                <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
-              </label>
-            </div>
-            <div class="icon-action side-icon">
-              <label id="label-photo3" for="photo-upload-3">
-                <svg id="icon-photo3" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-                <span>Photo avec un troubadour</span>
-                <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
-              </label>
-            </div>
-            <div class="icon-action side-icon">
-              <label id="label-photo4" for="photo-upload-4">
-                <svg id="icon-photo4" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-                <span>Photo avec un fils d'unijambiste</span>
-                <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
-              </label>
-            </div>
+          <div class="icon-action side-icon">
+            <label id="label-photo1" for="photo-upload-1">
+              <svg id="icon-photo1" viewBox="0 0 24 24">
+                <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              </svg>
+              <span>Photo avec un paysan</span>
+              <input id="photo-upload-1" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            </label>
+          </div>
+          <div class="icon-action side-icon">
+            <label id="label-photo2" for="photo-upload-2">
+              <svg id="icon-photo2" viewBox="0 0 24 24">
+                <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              </svg>
+              <span>Photo avec un gueux</span>
+              <input id="photo-upload-2" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            </label>
+          </div>
+          <div class="icon-action side-icon">
+            <label id="label-photo3" for="photo-upload-3">
+              <svg id="icon-photo3" viewBox="0 0 24 24">
+                <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              </svg>
+              <span>Photo avec un troubadour</span>
+              <input id="photo-upload-3" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            </label>
+          </div>
+          <div class="icon-action side-icon">
+            <label id="label-photo4" for="photo-upload-4">
+              <svg id="icon-photo4" viewBox="0 0 24 24">
+                <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+              </svg>
+              <span>Photo avec un fils d'unijambiste</span>
+              <input id="photo-upload-4" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            </label>
           </div>
         </div>
         <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
@@ -149,7 +277,7 @@
         }
         const dist = getDistanceMeters(lat, lon, DEST_LAT, DEST_LON);
         if (dist < TOLERANCE_METERS) {
-          document.getElementById("localisation-block").style.display = "none";
+          document.getElementById("gps-row").style.display = "none";
           document.getElementById("suite-block").style.display = "";
         } else {
           feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
@@ -173,7 +301,7 @@
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "http://murder-party-ba8d1.firebasestorage.app/",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
