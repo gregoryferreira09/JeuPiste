@@ -41,17 +41,6 @@
       font-size: 1.33em;
       text-align: center;
     }
-    .scenario-detail {
-      margin-bottom: 10px;
-      color: #ffeecb;
-      font-size: 1.09em;
-      text-align: center;
-    }
-    .scenario-label {
-      color: #e0c185;
-      font-weight: 600;
-      margin-right: 4px;
-    }
     .actions-bandeau {
       display: flex;
       gap: 18px;
@@ -101,7 +90,6 @@
       .main-btn { width: 100%; min-width: 0; max-width: 99vw; font-size: 1em;}
       .actions-bandeau { flex-direction: column; gap: 10px;}
     }
-    /* Fenêtre flottante */
     #confirmationRetourAccueil {
       display: none;
       position: fixed;
@@ -131,6 +119,45 @@
     #confirmationRetourAccueil .main-btn {
       min-width: 80px;
     }
+    /* Loader */
+    #loader {
+      display: none;
+      position: fixed;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(24,18,18,0.35);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+    }
+    .spinner {
+      border: 4px solid #eee;
+      border-top: 4px solid #e0c185;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .modal-toast {
+      display: none;
+      position: fixed;
+      left: 50%; top: 12%;
+      transform: translateX(-50%);
+      background: #231d1d;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-size: 1.14em;
+      z-index: 99999;
+      box-shadow: 0 4px 22px #0006;
+      text-align:center;
+      max-width: 90vw;
+    }
+    .modal-toast.visible {
+      display: block;
+      animation: fadein 0.3s;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
 </head>
 <body>
@@ -141,21 +168,21 @@
     <main>
       <section class="page-lancement fadeIn" role="main" aria-live="polite">
         <div class="bandeau-principal">
-<div class="presentation-jeu">
-  <div class="titre-course">Avalon</div>
-  <div class="texte-course">
-    Moi, Merlin l'Enchanteur, vous convoque pour la plus noble des aventures : la quête du Saint-Graal.<br>
-    Les temps sont sombres, et seul les plus dignes des chevaliers parmi vous pourrez retrouver le Graal sacré, source de sagesse et de paix pour le royaume.
-  </div>
-  <div class="objectif-course">
-    <span class="objectif-label">Objectif&nbsp;:</span>
-    <span class="objectif-text">Rassemblez votre équipe, serrez les rangs… et courez, car les vents de la destinée soufflent sur votre route.</span>
-  </div>
-  <div class="regles-course">
-    <strong>Règles du jeu&nbsp;:</strong><br>
-    Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis tant de siècles
-  </div>
-</div>
+          <div class="presentation-jeu">
+            <div class="titre-course">Avalon</div>
+            <div class="texte-course">
+              Moi, Merlin l'Enchanteur, vous convoque pour la plus noble des aventures : la quête du Saint-Graal.<br>
+              Les temps sont sombres, et seul les plus dignes des chevaliers parmi vous pourrez retrouver le Graal sacré, source de sagesse et de paix pour le royaume.
+            </div>
+            <div class="objectif-course">
+              <span class="objectif-label">Objectif&nbsp;:</span>
+              <span class="objectif-text">Rassemblez votre équipe, serrez les rangs… et courez, car les vents de la destinée soufflent sur votre route.</span>
+            </div>
+            <div class="regles-course">
+              <strong>Règles du jeu&nbsp;:</strong><br>
+              Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis tant de siècles…
+            </div>
+          </div>
           <div class="actions-bandeau">
             <a class="main-btn" id="demarrerBtn" href="personnages.html" style="pointer-events:none; opacity:0.6;">Disponible dans 30s</a>
             <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
@@ -171,9 +198,9 @@
   </footer>
 
   <!-- Fenêtre flottante confirmation retour accueil -->
-  <div id="confirmationRetourAccueil">
+  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
     <div class="modal-content">
-      <div class="modal-question">
+      <div class="modal-question" id="confirmationTitle">
         Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
       </div>
       <div class="modal-actions">
@@ -183,8 +210,40 @@
     </div>
   </div>
 
-  <!-- Script unique -->
+  <!-- Loader visuel -->
+  <div id="loader" aria-live="polite"><div class="spinner"></div></div>
+  <!-- Toast feedback -->
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
+
+  <!-- Firebase SDK (moderne) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
   <script>
+    // === CONFIG FIREBASE ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // === FONCTIONS UTILITAIRES ===
+    function showLoader() { document.getElementById('loader').style.display = 'flex'; }
+    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => { toast.classList.remove('visible'); }, 2700);
+    }
+
     // Effet fade-in
     document.addEventListener("DOMContentLoaded", function() {
       var section = document.querySelector('.fadeIn');
@@ -220,13 +279,58 @@
       if (btnRetour && confirmation && btnConfirmer && btnAnnuler) {
         btnRetour.addEventListener("click", () => {
           confirmation.style.display = "flex";
+          document.getElementById('confirmerRetourAccueilBtn').focus();
         });
         btnConfirmer.addEventListener("click", () => {
           window.location.href = "accueil.html";
         });
         btnAnnuler.addEventListener("click", () => {
           confirmation.style.display = "none";
+          btnRetour.focus();
         });
+      }
+    });
+
+    // === VERROUILLAGE NAVIGATION/FORCING ===
+    // Cette page doit être accessible SEULEMENT si l'étape courante correspond à l'étape "lancement"
+    // Adapte le stepIndex cible selon ta logique (exemple ici: étape "lancement" = -1)
+    document.addEventListener("DOMContentLoaded", function() {
+      showLoader();
+      // Recup contexte session
+      const salonCode = localStorage.getItem("salonCode");
+      const equipeNum = Number(localStorage.getItem("equipeNum"));
+      if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+        hideLoader();
+        window.location.href = "accueil.html";
+        return;
+      }
+      // On écoute currentStep en temps réel
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', function(snapshot) {
+        hideLoader();
+        const step = snapshot.val();
+        // Ici, tu adaptes la logique: si currentStep == -1, c'est le lancement, sinon on redirige
+        // Si ta page de lancement doit être accessible avec step == 0, adapte ci-dessous
+        if (step !== undefined && step !== null && step > 0) {
+          // On va à la bonne épreuve selon le parcours
+          db.ref('parties/' + salonCode + '/cheminsParEquipe/' + equipeNum).once('value', function(snapIdx) {
+            const parcoursIdx = snapIdx.val();
+            db.ref('parties/' + salonCode + '/parcoursEquipes/' + parcoursIdx).once('value', function(snapParcours) {
+              const parcours = snapParcours.val() || [1,2,3,4,5];
+              const target = parcours[step-1];
+              if (target === 6) window.location.href = "epreuve6.html";
+              else if (target === 7) window.location.href = "révélation.html";
+              else window.location.href = `equipe${target}-a.html`;
+            });
+          });
+        }
+        // Si le step est bien "lancement" (ici step == 0), on reste sur la page, sinon redirige
+      });
+    });
+
+    // Optionnel : gestion du retour arrière (anti-back)
+    window.addEventListener("pageshow", function(evt) {
+      if (evt.persisted) {
+        location.reload();
       }
     });
   </script>
