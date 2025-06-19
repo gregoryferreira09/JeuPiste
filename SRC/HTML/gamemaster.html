@@ -95,8 +95,6 @@
       .gm-tab-btn { padding: 7px 4vw; font-size: 1em; }
       .gm-btn { padding: 12px 7px; font-size: 0.99em; }
     }
-
-    /* --- MODALE NOUVELLE PARTIE --- */
     #nouvellePartieModal {
       display: none;
       position: fixed;
@@ -145,7 +143,6 @@
           <button class="gm-tab-btn active" id="btn-courante" onclick="afficherSuivi()">Partie en cours</button>
           <button class="gm-tab-btn" id="btn-historique" onclick="afficherHistorique()">Historique</button>
         </div>
-        <!-- Onglet suivi équipe classique (carousel) -->
         <div id="suivi-partie">
           <div class="carousel">
             <button class="nav-btn" id="prev-team" aria-label="Équipe précédente">&#8592;</button>
@@ -155,7 +152,6 @@
             <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
           </div>
         </div>
-        <!-- Onglet historique -->
         <div id="historique-parties" style="display:none;"></div>
       </div>
     </main>
@@ -165,7 +161,6 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
-  <!-- --- MODALE NOUVELLE PARTIE --- -->
   <div id="nouvellePartieModal">
     <div class="modal-content">
       <div>
@@ -178,15 +173,12 @@
       </div>
     </div>
   </div>
-  <!-- --- FIN MODALE --- -->
 
-  <!-- FIREBASE & JS -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script>
-    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -224,7 +216,6 @@
       }
     });
 
-    // --- Onglets ---
     function afficherSuivi() {
       document.getElementById('suivi-partie').style.display = 'block';
       document.getElementById('historique-parties').style.display = 'none';
@@ -239,7 +230,6 @@
       chargerHistorique();
     }
 
-    // --- LIVE suivi équipe, navigation et timers ---
     let salonCode = null;
     let equipes = [];
     let nomsEquipes = {};
@@ -255,39 +245,30 @@
       { titre: "Épreuve 6", fichiersAttendus: [] }
     ];
 
-    // --- LIVE LISTENING ---
+    // Gestion safe des listeners
+    let currentEquipeListener = null;
+    let listenerRef = null;
+
     function chargerSalonCodeEtLive() {
-      salonCode = localStorage.getItem("salonCode"); // On récupère le code si déjà stocké
-      if (salonCode) {
-        db.ref(`parties/${salonCode}/equipes`).on('value', function(snap) {
-          const data = snap.val() || {};
-          equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
-          db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
-            nomsEquipes = snapNoms.val() || {};
-            chargerStepsTimeEtAfficher();
-          });
-        });
+      salonCode = localStorage.getItem("salonCode");
+      if (!salonCode) {
+        document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune partie sélectionnée</div>";
         return;
       }
-      // S'il n'y a pas de code, on prend le dernier créé
-      db.ref("parties").orderByKey().limitToLast(1).once("value", snap => {
-        if (!snap.exists()) {
-          document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune partie en cours</div>";
-          return;
-        }
-        snap.forEach(partieSnap => salonCode = partieSnap.key);
-        localStorage.setItem("salonCode", salonCode);
-
-        // Ecoute en temps réel
-        db.ref(`parties/${salonCode}/equipes`).on('value', function(snap) {
-          const data = snap.val() || {};
-          equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
-          db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
-            nomsEquipes = snapNoms.val() || {};
-            chargerStepsTimeEtAfficher();
-          });
+      // Détache l'ancien listener si existant
+      if (listenerRef && currentEquipeListener) {
+        listenerRef.off('value', currentEquipeListener);
+      }
+      listenerRef = db.ref(`parties/${salonCode}/equipes`);
+      currentEquipeListener = function(snap) {
+        const data = snap.val() || {};
+        equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
+        db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
+          nomsEquipes = snapNoms.val() || {};
+          chargerStepsTimeEtAfficher();
         });
-      });
+      };
+      listenerRef.on('value', currentEquipeListener);
     }
 
     document.getElementById('prev-team').onclick = function() {
@@ -305,7 +286,7 @@
 
     function chargerStepsTimeEtAfficher() {
       if (equipes.length === 0) {
-        document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée</div>";
+        document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée<br><span style='color:#e0c185'>En attente d'une équipe...</span></div>";
         return;
       }
       const equipe = equipes[currentIndex];
@@ -355,7 +336,6 @@
       }
     }
 
-    // --- TIMER : Chrono en temps réel basé sur le startTime Firebase de l'étape courante ---
     let timerInterval = null;
     function afficherTimer() {
       if (timerInterval) clearInterval(timerInterval);
@@ -445,7 +425,6 @@
         });
     };
 
-    // --- HISTORIQUE ---
     function chargerHistorique() {
       const div = document.getElementById('historique-parties');
       div.innerHTML = "<div class='msg-info'>Chargement en cours...</div>";
@@ -478,18 +457,23 @@
     }
     window.supprimerPartie = supprimerPartie;
 
-    // --- Lancement du LIVE dès affichage de la page (après login) ---
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        // Lance l'écoute live (carousel) dès l'affichage du suivi
         chargerSalonCodeEtLive();
       }
     });
 
-    // --- MODALE NOTIF NOUVELLE PARTIE ---
+    // --- LOGIQUE MODALE & DÉTECTION NOUVEAU SALON ---
     let ancienneListeParties = [];
+    // Initialisation à l'ouverture pour détecter seulement les nouveaux salons
+    db.ref("parties").once("value").then(snap => {
+      let initList = [];
+      snap.forEach(child => initList.push(child.key));
+      ancienneListeParties = initList;
+    });
+
     function showNouvellePartieModal(codeSalon) {
-      if (localStorage.getItem("salonCode") === codeSalon) return; // déjà suivi
+      if (localStorage.getItem("salonCode") === codeSalon) return;
       document.getElementById("codeNouvellePartie").textContent = codeSalon;
       document.getElementById("nouvellePartieModal").style.display = "flex";
       document.getElementById("btnSuivrePartieOui").onclick = function() {
@@ -514,8 +498,6 @@
       }
       ancienneListeParties = nouvelleListe;
     });
-    // --- FIN MODALE ---
-
   </script>
 </body>
 </html>
