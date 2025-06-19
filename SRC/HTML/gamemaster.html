@@ -85,8 +85,52 @@
     .gm-btn { cursor: pointer; background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #3d2b1f; font-family: 'Cinzel Decorative', cursive; font-size: 1.09em; font-weight: bold; min-width: 130px;}
     .gm-btn:hover { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588;}
     .gm-error { color: #ff9393; margin-top: 6px; min-height: 22px; text-align: center;}
-    .miniature { max-width: 70px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003;}
+    .miniature { max-width: 70px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003; cursor: pointer;}
     .miniature-video { max-width: 80px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003;}
+    /* Modal styles */
+    #lightbox-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(18,14,10,0.88);
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.2s;
+    }
+    #lightbox-modal.active { display: flex; }
+    #lightbox-content {
+      position: relative;
+      max-width: 96vw;
+      max-height: 93vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #lightbox-img {
+      max-width: 94vw;
+      max-height: 88vh;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px #000b;
+      background: #fff;
+      object-fit: contain;
+    }
+    #lightbox-close {
+      position: absolute;
+      top: -16px; right: -16px;
+      background: #fff;
+      color: #2c1b1b;
+      border: none;
+      border-radius: 50%;
+      font-size: 2.2em;
+      font-weight: bold;
+      width: 40px; height: 40px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #0006;
+      transition: background 0.18s, color 0.18s;
+      z-index: 10;
+    }
+    #lightbox-close:hover { background: #f4e4c1; color: #a22; }
     @media (max-width: 750px) {
       .main-accueil { max-width: 97vw; padding: 10px 1vw; }
       .carte-equipe { min-width: 0; max-width: 99vw; padding: 20px 4vw; }
@@ -95,35 +139,8 @@
       .gm-table th, .gm-table td { padding: 7px 2px; font-size: 1em; }
       .gm-tab-btn { padding: 7px 4vw; font-size: 1em; }
       .gm-btn { padding: 12px 7px; font-size: 0.99em; }
-    }
-    #nouvellePartieModal {
-      display: none;
-      position: fixed;
-      left: 0; top: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(24,18,18,0.7);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-    }
-    #nouvellePartieModal .modal-content {
-      background: #2c1b1b;
-      border: 2px solid #e0c185;
-      border-radius: 16px;
-      padding: 32px;
-      text-align: center;
-      color: #f4e4c1;
-      box-shadow: 0 8px 32px #0007;
-      min-width: 280px;
-    }
-    #nouvellePartieModal .modal-actions {
-      margin-top: 24px;
-      display: flex;
-      justify-content: center;
-      gap: 18px;
-    }
-    #nouvellePartieModal .gm-btn {
-      min-width: 80px;
+      #lightbox-img { max-width: 96vw; max-height: 70vh; }
+      #lightbox-content { max-width: 99vw; }
     }
   </style>
 </head>
@@ -175,6 +192,14 @@
     </div>
   </div>
 
+  <!-- Lightbox modal pour affichage grand format -->
+  <div id="lightbox-modal">
+    <div id="lightbox-content">
+      <button id="lightbox-close" aria-label="Fermer">&times;</button>
+      <img id="lightbox-img" src="" alt="Agrandissement">
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -185,7 +210,7 @@
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "murder-party-ba8d1.appspot.com",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
@@ -379,7 +404,7 @@
       timerInterval = setInterval(maj, 1000);
     }
 
-    // ----------- CORRECTION PRINCIPALE ICI -----------
+    // ----------- Affichage fichiers et lightbox ----------- //
     function listerFichiersEquipeEtape(num, etapeIdx) {
       const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
       if (!div) return;
@@ -394,7 +419,7 @@
               const ext = fichier.name.split('.').pop().toLowerCase();
               let mini = '';
               if(['jpg','jpeg','png','gif'].includes(ext)) {
-                mini = `<img src="${url}" class="miniature" alt="Photo">`;
+                mini = `<img src="${url}" class="miniature" alt="Photo" onclick="openLightbox('${url}')" />`;
               } else if(['mp4','webm','ogg'].includes(ext)) {
                 mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
               }
@@ -407,24 +432,41 @@
         div.innerHTML = "<span style='color:#b8b8b8;'>Erreur</span>";
       });
     }
-    // --------------------------------------------------
 
+    // Lightbox JS
+    function openLightbox(url) {
+      const modal = document.getElementById('lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      img.src = url;
+      modal.classList.add('active');
+      document.body.style.overflow = "hidden";
+    }
+    function closeLightbox() {
+      const modal = document.getElementById('lightbox-modal');
+      modal.classList.remove('active');
+      document.getElementById('lightbox-img').src = "";
+      document.body.style.overflow = "";
+    }
+    document.getElementById('lightbox-close').onclick = closeLightbox;
+    document.getElementById('lightbox-modal').onclick = function(e) {
+      if (e.target === this) closeLightbox();
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === "Escape") closeLightbox();
+    });
+
+    // ----------- Téléchargement SANS fetch (CORS safe) ----------- //
     window.downloadFile = function(url, fileName) {
-      fetch(url)
-        .then(resp => resp.blob())
-        .then(blob => {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(a.href);
-          }, 100);
-        });
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => document.body.removeChild(a), 100);
     };
 
+    // ----------- Historique etc. ----------- //
     function chargerHistorique() {
       const div = document.getElementById('historique-parties');
       div.innerHTML = "<div class='msg-info'>Chargement en cours...</div>";
