@@ -7,13 +7,116 @@
   <link rel="stylesheet" href="../../Public/styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
+    #confirmationModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(44,27,27,0.75);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    #confirmationModal.active {
+      display: flex;
+    }
+    #confirmationModal .main-accueil {
+      max-width: 340px;
+      margin: auto;
+      text-align: center;
+      border: 2px solid #e0c185;
+      background: #2c1b1b;
+      border-radius: 18px;
+      box-shadow: 0 4px 20px #0008;
+      padding: 32px 28px;
+    }
+    #confirmationModal .modal-question {
+      font-weight: bold;
+      margin-bottom: 22px;
+      color: #e0c185;
+      font-family: 'Cinzel Decorative',serif;
+      font-size: 1.1em;
+    }
+    #confirmationModal .boutons-actions {
+      display: flex;
+      flex-direction: row;
+      gap: 24px;
+      justify-content: center;
+      margin: 0;
+    }
+    #confirmationModal .main-btn {
+      width: 130px;
+      margin-bottom: 0;
+    }
+    .boutons-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+    .main-btn {
+      min-width: 120px;
+    }
+    #listeJoueurs {
+      margin: 18px auto 0 auto;
+      padding: 0;
+      list-style: none;
+      max-width: 320px;
+      text-align: left;
+    }
+    #listeJoueurs li {
+      background: #3a2727;
+      color: #e0c185;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      padding: 6px 14px;
+      font-family: 'Cormorant Garamond', serif;
+      letter-spacing: 1px;
+      font-size: 1.16em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #listeJoueurs .check-vert {
+      color: #4caf50;
+      font-size: 1.1em;
+      margin-left: 6px;
+    }
+    #etatSalon {
+      margin-top: 16px;
+      font-size: 1.1em;
+      color: #e0c185;
+      font-weight: bold;
+      text-align: center;
+    }
+    #codeSalon {
+      letter-spacing: 0.18em;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #e0c185;
+      background: #392626;
+      border-radius: 10px;
+      padding: 8px 20px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .bienvenue-message {
+      margin-bottom: 20px;
+      font-size: 1.2em;
+      color: #e0c185;
+    }
+    @media (max-width: 570px) {
+      #confirmationModal .main-accueil {max-width:90vw;}
+      #listeJoueurs {max-width:96vw;}
+    }
+    /* Loader & toast */
     #loader { display: none; position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(24,18,18,0.35); z-index: 99999; justify-content: center; align-items: center;}
     .spinner { border: 4px solid #eee; border-top: 4px solid #e0c185; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;}
     @keyframes spin { to { transform: rotate(360deg); } }
     .modal-toast { display: none; position: fixed; left: 50%; top: 12%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 99999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw;}
     .modal-toast.visible { display: block; animation: fadein 0.3s;}
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    /* ... le reste de tes styles inchangés ... */
   </style>
 </head>
 <body class="accueil">
@@ -22,7 +125,51 @@
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
-
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script>
+    // -- Sécurisation navigation (empêche accès salon si partie lancée, ne touche à rien d'autre !) --
+    function showLoader() { document.getElementById('loader').style.display = 'flex'; }
+    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => { toast.classList.remove('visible'); }, 2700);
+    }
+    const salonCode = localStorage.getItem("salonCode");
+    const equipeNum = localStorage.getItem("equipeNum");
+    if (salonCode && equipeNum !== null && equipeNum !== undefined) {
+      showLoader();
+      if (!firebase.apps.length) firebase.initializeApp({
+        apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+        authDomain: "murder-party-ba8d1.firebaseapp.com",
+        databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "murder-party-ba8d1",
+        storageBucket: "murder-party-ba8d1.firebasestorage.app",
+        messagingSenderId: "20295055805",
+        appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+        measurementId: "G-KSBMBB7KMJ"
+      });
+      const db = firebase.database();
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', function(snapshot) {
+        hideLoader();
+        const step = snapshot.val();
+        if (step !== undefined && step !== null && step > 0) {
+          db.ref('parties/' + salonCode + '/cheminsParEquipe/' + equipeNum).once('value', function(snapIdx) {
+            const parcoursIdx = snapIdx.val();
+            db.ref('parties/' + salonCode + '/parcoursEquipes/' + parcoursIdx).once('value', function(snapParcours) {
+              const parcours = snapParcours.val() || [1,2,3,4,5];
+              const target = parcours[step-1];
+              if (target === 6) window.location.href = "epreuve6.html";
+              else if (target === 7) window.location.href = "révélation.html";
+              else window.location.href = `equipe${target}-a.html`;
+            });
+          });
+        }
+      });
+    }
+  </script>
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
       <h1>Salon de la partie</h1>
@@ -45,7 +192,7 @@
         </div>
       </div>
       <!-- Modale confirmation harmonisée -->
-      <div id="confirmationModal" role="dialog" aria-modal="true" aria-labelledby="modalQuestion">
+      <div id="confirmationModal">
         <div class="main-accueil">
           <div class="modal-question" id="modalQuestion"></div>
           <div class="boutons-actions">
@@ -60,81 +207,17 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script>
-    // === SECURISATION NAVIGATION ===
-    // Ajouté avant tout le JS salon original pour ne rien casser
-    function showLoader() { document.getElementById('loader').style.display = 'flex'; }
-    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
-    function showToast(msg) {
-      const toast = document.getElementById('toast-message');
-      toast.textContent = msg;
-      toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 2700);
-    }
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
+    // Effet fade-in sur le bloc principal au chargement
     document.addEventListener("DOMContentLoaded", function() {
-      showLoader();
-      const salonCode = localStorage.getItem("salonCode");
-      const equipeNum = localStorage.getItem("equipeNum");
-      // Si pas de code salon, on redirige comme avant
-      if (!salonCode) {
-        hideLoader();
-        window.location.replace("creer-partie.html");
-        return;
-      }
-      // Sécurisation : si la partie a démarré (currentStep > 0), on redirige
-      if (equipeNum !== null && equipeNum !== undefined) {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', function(snapshot) {
-          hideLoader();
-          const step = snapshot.val();
-          if (step !== undefined && step !== null && step > 0) {
-            // Redirection automatique vers la bonne étape
-            db.ref('parties/' + salonCode + '/cheminsParEquipe/' + equipeNum).once('value', function(snapIdx) {
-              const parcoursIdx = snapIdx.val();
-              db.ref('parties/' + salonCode + '/parcoursEquipes/' + parcoursIdx).once('value', function(snapParcours) {
-                const parcours = snapParcours.val() || [1,2,3,4,5];
-                const target = parcours[step-1];
-                if (target === 6) window.location.href = "epreuve6.html";
-                else if (target === 7) window.location.href = "révélation.html";
-                else window.location.href = `equipe${target}-a.html`;
-              });
-            });
-          }
-        });
-      } else {
-        hideLoader();
-      }
-    });
-
-    // Optionnel : anti-retour arrière
-    window.addEventListener("pageshow", function(evt) {
-      if (evt.persisted) location.reload();
+      var main = document.querySelector('.fadeIn');
+      if (main) main.classList.add('visible');
     });
   </script>
-
+  <!-- CI-DESSOUS : ton JS salon historique, inchangé -->
   <script>
-    // === TON JS SALON ORIGINAL CI-DESSOUS (INCHANGÉ) ===
     document.addEventListener('DOMContentLoaded', function() {
-      // ... tout ton code salon d'avant, intact ...
-      // (Affichage code salon, gestion joueurs, boutons, lancement, etc.)
-      document.getElementById("codeSalon").textContent = localStorage.getItem("salonCode") || "------";
+      document.getElementById("codeSalon").textContent = salonCode || "------";
       const pseudoAffiche = document.getElementById("pseudoAffiche");
       const etatSalon = document.getElementById("etatSalon");
       const joueursDiv = document.getElementById("listeJoueurs");
@@ -146,11 +229,204 @@
       const cancelModalBtn = document.getElementById("cancelModalBtn");
       const alertSalonSupprime = document.getElementById("alertSalonSupprime");
 
-      // ... puis la gestion des pseudos, boutons, events, etc. (comme dans ta version précédente)
-      // (le code inchangé, collé ici)
+      // Firebase config
+      const firebaseConfig = {
+        apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+        authDomain: "murder-party-ba8d1.firebaseapp.com",
+        databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "murder-party-ba8d1",
+        storageBucket: "murder-party-ba8d1.firebasestorage.app",
+        messagingSenderId: "20295055805",
+        appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+        measurementId: "G-KSBMBB7KMJ"
+      };
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      const db = firebase.database();
 
-      // (Voir ton code historique salon.html fourni plus haut)
-      // (N'oublie pas les effets de fade-in, gestion du créateur, etc.)
+      // Quand le créateur clique sur "Démarrer"
+      function demarrerPartie() {
+        db.ref('parties/' + salonCode + '/etat').set('lancement');
+      }
+
+      // Tous les joueurs écoutent l'état
+      db.ref('parties/' + salonCode + '/etat').on('value', snap => {
+        if (snap.val() === 'lancement' || snap.val() === 'en_cours') {
+          window.location.href = "Lancement-partie.html";
+        }
+      });
+
+      // Gestion des pseudos d'origine pour affichage temporaire
+      let monPseudo = localStorage.getItem("pseudo") || "invité";
+      let pseudoOrigine = monPseudo;
+      if (!localStorage.getItem("pseudoOrigine")) {
+        localStorage.setItem("pseudoOrigine", pseudoOrigine);
+      } else {
+        pseudoOrigine = localStorage.getItem("pseudoOrigine");
+      }
+      pseudoAffiche.textContent = pseudoOrigine;
+      let jeSuisCreateur = false;
+      let countdownInterval = null;
+      let lancementAutomatiqueDemarre = false;
+
+      // Gestion boutons selon créateur
+      db.ref('parties/' + salonCode + '/parametres/createur').once('value', snap => {
+        if (snap.exists() && snap.val().pseudo === pseudoOrigine) {
+          jeSuisCreateur = true;
+          cloturerSalonBtn.style.display = "inline-block";
+          quitterSalonBtn.style.display = "none";
+        } else {
+          jeSuisCreateur = false;
+          cloturerSalonBtn.style.display = "none";
+          quitterSalonBtn.style.display = "inline-block";
+        }
+      });
+
+      // Modale confirmation
+      let currentAction = null;
+      cloturerSalonBtn.addEventListener("click", function() {
+        modalQuestion.textContent = "Es-tu sûr de vouloir clôturer le salon ?";
+        confirmationModal.classList.add('active');
+        currentAction = "cloture";
+      });
+      quitterSalonBtn.addEventListener("click", function() {
+        modalQuestion.textContent = "Es-tu sûr de vouloir quitter le salon ?";
+        confirmationModal.classList.add('active');
+        currentAction = "quitter";
+      });
+      confirmModalBtn.addEventListener("click", function() {
+        if(currentAction === "cloture") {
+          db.ref('parties/' + salonCode).remove().then(() => {
+            // Fin de partie : restauration pseudo
+            localStorage.setItem("pseudo", pseudoOrigine);
+            localStorage.removeItem("pseudoOrigine");
+            localStorage.removeItem("salonCode");
+            localStorage.removeItem("enCours");
+            window.location.href = "creer-partie.html";
+          });
+        } else if(currentAction === "quitter") {
+          db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
+            snap.forEach(child => {
+              if(child.val().pseudo === monPseudo || child.val().pseudo === pseudoOrigine) {
+                db.ref('parties/' + salonCode + '/joueurs/' + child.key).remove();
+              }
+            });
+          });
+          setTimeout(() => {
+            // Restaure pseudo à la sortie du salon
+            localStorage.setItem("pseudo", pseudoOrigine);
+            localStorage.removeItem("pseudoOrigine");
+            localStorage.removeItem("salonCode");
+            localStorage.removeItem("enCours");
+            window.location.href = "rejoindre-partie.html";
+          }, 300);
+        }
+        confirmationModal.classList.remove('active');
+        currentAction = null;
+      });
+      cancelModalBtn.addEventListener("click", function() {
+        confirmationModal.classList.remove('active');
+        currentAction = null;
+      });
+
+      // Affichage joueurs, état, et décompte
+      let totalJoueurs = 1;
+      db.ref('parties/' + salonCode + '/parametres').once('value', snap => {
+        if (snap.exists()) {
+          const parametres = snap.val();
+          totalJoueurs = parseInt(parametres.nombreJoueurs) || 1;
+        }
+      });
+
+      db.ref('parties/' + salonCode).on('value', snapshot => {
+        const etatPartie = snapshot.child('etat').val();
+       if (etatPartie === 'en_cours') {
+          localStorage.setItem("enCours", "1");
+          localStorage.setItem("pseudo", pseudoOrigine);
+          localStorage.removeItem("pseudoOrigine");
+          window.location.href = "lancement-partie.html";
+          return;
+        }
+        if (!snapshot.exists()) {
+          // Si la partie n’était PAS en cours, on affiche le message d’erreur
+          if (localStorage.getItem("enCours") !== "1") {
+            alertSalonSupprime.style.display = "block";
+            setTimeout(() => {
+              localStorage.setItem("pseudo", pseudoOrigine);
+              localStorage.removeItem("pseudoOrigine");
+              localStorage.removeItem("salonCode");
+              localStorage.removeItem("enCours");
+              window.location.href = "rejoindre-partie.html";
+            }, 2000);
+          } else {
+            // Si la partie était en cours, redirection silencieuse
+            localStorage.setItem("pseudo", pseudoOrigine);
+            localStorage.removeItem("pseudoOrigine");
+            localStorage.removeItem("salonCode");
+            localStorage.removeItem("enCours");
+            window.location.href = "rejoindre-partie.html";
+          }
+          return;
+        }
+        joueursDiv.innerHTML = "";
+        let nbJoueurs = 0;
+        const joueursSnap = snapshot.child('joueurs');
+        let pseudosUtilises = {};
+        if(joueursSnap && joueursSnap.forEach) {
+          joueursSnap.forEach(joueurSnap => {
+            let pseudoJ = joueurSnap.val().pseudo;
+            // Génère un pseudo unique à l'affichage seulement (ne touche pas au localStorage)
+            let affichagePseudo = pseudoJ;
+            if (pseudosUtilises[pseudoJ]) {
+              pseudosUtilises[pseudoJ]++;
+              affichagePseudo = pseudoJ + pseudosUtilises[pseudoJ];
+            } else {
+              pseudosUtilises[pseudoJ] = 1;
+            }
+            // Ajoute le check vert pour tous
+            const li = document.createElement("li");
+            li.innerHTML = affichagePseudo + ' <span class="check-vert">✔️</span>';
+            joueursDiv.appendChild(li);
+            nbJoueurs++;
+          });
+        }
+        etatSalon.textContent = `${nbJoueurs} / ${totalJoueurs} joueurs connectés`;
+
+        // Décompte si complet (lancement automatique, propre)
+        if (nbJoueurs >= totalJoueurs && !lancementAutomatiqueDemarre) {
+          lancementAutomatiqueDemarre = true;
+          let countdown = 5;
+          etatSalon.textContent = `Tous les joueurs sont connectés ! La partie va commencer dans ${countdown}...`;
+          if (countdownInterval) clearInterval(countdownInterval);
+          countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+              etatSalon.textContent = `Tous les joueurs sont connectés ! La partie va commencer dans ${countdown}...`;
+            } else {
+              clearInterval(countdownInterval);
+              etatSalon.textContent = "La partie commence !";
+              // Mets juste /etat, NE SUPPRIME PAS salonCode
+              db.ref('parties/' + salonCode + '/etat').set('en_cours');
+            }
+          }, 1000);
+        } else if (nbJoueurs < totalJoueurs) {
+          lancementAutomatiqueDemarre = false;
+          if (countdownInterval) clearInterval(countdownInterval);
+        }
+      });
+
+      // Suppression automatique si le créateur ferme l'onglet
+      // *** ON NE SUPPRIME PLUS salonCode ICI ***
+      // window.addEventListener("beforeunload", function () {
+      //   if (jeSuisCreateur) {
+      //     db.ref('parties/' + salonCode).remove();
+      //   }
+      //   localStorage.setItem("pseudo", pseudoOrigine);
+      //   localStorage.removeItem("pseudoOrigine");
+      //   localStorage.removeItem("salonCode");
+      //   localStorage.removeItem("enCours");
+      // });
     });
   </script>
   <script src="../JS/security-enhance.js"></script>
