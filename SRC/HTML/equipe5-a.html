@@ -171,7 +171,6 @@
         text-align: left;
       }
     }
-    #blocker { display: none; }
     .modal-toast {
       display: none;
       position: fixed;
@@ -193,6 +192,52 @@
       animation: fadein 0.3s;
     }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+
+    /* --- HARMONISATION DE LA FENÊTRE FLOTTANTE --- */
+    #blocker {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(20, 15, 10, 0.78);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #blocker-inner {
+      background: #231d1d;
+      border-radius: 14px;
+      box-shadow: 0 4px 24px #0008;
+      padding: 38px 28px 22px 28px;
+      text-align: center;
+      max-width: 400px;
+      width: 90vw;
+      color: #e0c185;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.18em;
+      border: 2px solid #e0c185;
+      animation: fadein 0.35s;
+    }
+    #blocker-msg strong {
+      color: #ffeecb;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.14em;
+    }
+    #blocker-btn {
+      margin-top: 22px;
+      background: #e0c185;
+      color: #231d1d;
+      border: none;
+      border-radius: 7px;
+      padding: 11px 38px;
+      font-size: 1.09em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #0002;
+      transition: background 0.2s;
+    }
+    #blocker-btn:hover {
+      background: #ffeecb;
+    }
   </style>
 </head>
 <body>
@@ -270,9 +315,9 @@
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="../JS/gameflow.js"></script>
-<script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="../JS/gameflow.js"></script>
+  <script>
 document.addEventListener('DOMContentLoaded', function() {
   // --- Initialisation Firebase AVANT toute utilisation ---
   const firebaseConfig = {
@@ -470,6 +515,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-</script>
+  </script>
 </body>
 </html>
