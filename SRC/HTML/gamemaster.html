@@ -68,7 +68,7 @@
     .download-btn { background: #e0c185; color: #473714; border: none; border-radius: 7px; padding: 4px 16px; font-size: 0.98em; cursor: pointer; margin-left: 7px; margin-top: 4px; transition: background 0.2s;}
     .download-btn:hover, .download-btn:focus { background: #ffeecb; color: #473714; outline: 2px solid #e0c185;}
     .chrono-value { color: #ffe07e; font-size: 0.98em; font-weight: bold; margin-left: 8px; letter-spacing: 1px; font-family: 'Roboto Mono', monospace;}
-    .nav-btn { background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #473714; border: 2px solid #e0c185; border-radius: 8px; font-size: 1.5em; font-family: 'Cinzel Decorative', serif; font-weight: bold; min-width: 54px; min-height: 54px; cursor: pointer; transition: background 0.2s;}
+    .nav-btn { background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #473714; border: 2px solid #e0c185; border-radius: 8px; font-size: 1.5em; font-family: 'Cinzel Decorative', serif; font-weight: bold; min-width: 46px; min-height: 46px; padding: 7px 12px; cursor: pointer; transition: background 0.2s, color 0.2s;}
     .nav-btn:hover, .nav-btn:focus { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588; outline: 2px solid #e0c185;}
     .msg-info { color: #c9b49a; font-style: italic; margin: 16px 0 0 0; text-align: center;}
     .gm-table { width: 100%; border-collapse: collapse; background: #200f0f; margin-bottom: 20px; border-radius: 8px; overflow: hidden;}
@@ -78,31 +78,31 @@
     .cross { color: #e06c6c; font-size: 1.23em; font-weight: bold; cursor: pointer; transition: color 0.15s;}
     .cross:hover { color: #ff2f0a;}
     .gm-tabs { display: flex; gap: 16px; margin-bottom: 18px; justify-content: center;}
-    .gm-tab-btn { background: #2c1b1b; color: #e0c185; border: 2px solid #e0c185; border-bottom: none; border-radius: 8px 8px 0 0; font-family: 'Cinzel Decorative', serif; padding: 7px 24px; font-size: 1.08em; font-weight: bold; cursor: pointer; margin-bottom: -2px;}
+    .gm-tab-btn { background: #2c1b1b; color: #e0c185; border: 2px solid #e0c185; border-bottom: none; border-radius: 8px 8px 0 0; font-family: 'Cinzel Decorative', serif; padding: 7px 24px; font-size: 1.13em; font-weight: bold; cursor: pointer; position: relative;}
     .gm-tab-btn.active { background: #e0c185; color: #2c1b1b;}
     .gm-section { margin: 22px 0 12px 0; text-align: center;}
     .gm-label { display: block; margin-bottom: 7px; color: #e0c185;}
-    .gm-input, .gm-btn { font-family: inherit; border-radius: 7px; border: 2px solid #e0c185; font-size: 1em; padding: 11px 16px; margin-bottom: 10px; background: #281813; color: #f4e4c1; transition: border 0.2s;}
+    .gm-input, .gm-btn { font-family: inherit; border-radius: 7px; border: 2px solid #e0c185; font-size: 1em; padding: 11px 16px; margin-bottom: 10px; background: #281813; color: #f4e4c1; transition: border 0.2s, color 0.2s, background 0.2s;}
     .gm-btn { cursor: pointer; background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #3d2b1f; font-family: 'Cinzel Decorative', cursive; font-size: 1.09em; font-weight: bold; min-width: 130px;}
     .gm-btn:hover { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588;}
     .gm-error { color: #ff9393; margin-top: 6px; min-height: 22px; text-align: center;}
     .miniature { max-width: 70px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003; cursor: pointer;}
     .miniature-video { max-width: 80px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003;}
     #retour-accueil-btn {
-  background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
-  color: #3d2b1f;
-  font-family: 'Cinzel Decorative', cursive;
-  font-size: 1.06em;
-  font-weight: bold;
-  border-radius: 14px;
-  border:2px solid #e0c185;
-  padding: 13px 38px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px #0007;
-  transition: background 0.2s, color 0.2s;
-  margin: 32px auto 0 auto;
-  display: block;
-}
+      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
+      color: #3d2b1f;
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.06em;
+      font-weight: bold;
+      border-radius: 14px;
+      border:2px solid #e0c185;
+      padding: 13px 38px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px #0007;
+      transition: background 0.2s, color 0.2s;
+      margin: 32px auto 0 auto;
+      display: block;
+    }
     #retour-accueil-btn:hover { background: #ffeecb; color: #1a1a1a; }
     #confirmRetourModal {
       display: none;
@@ -295,7 +295,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script>
-    // Cache sécurité : modales masquées au chargement
     document.addEventListener('DOMContentLoaded',function(){
       document.getElementById('nouvellePartieModal').style.display="none";
       document.getElementById('confirmRetourModal').style.display="none";
@@ -327,16 +326,24 @@
           document.getElementById('gm-auth-error').textContent = "Connexion échouée : " + e.message;
         });
     };
-    
-    firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    document.getElementById('auth-section').style.display = "none";
-    document.getElementById('gm-content').style.display = "block";
-    afficherSuivi();
-    document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
 
-    // AJOUT : Si aucune partie suivie, propose de suivre la dernière existante
-    if (!localStorage.getItem("salonCode")) {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('auth-section').style.display = "none";
+        document.getElementById('gm-content').style.display = "block";
+        afficherSuivi();
+        document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
+        if (!localStorage.getItem("salonCode")) {
+          proposeDernierePartie();
+        }
+      } else {
+        document.getElementById('auth-section').style.display = "block";
+        document.getElementById('gm-content').style.display = "none";
+        // NE PAS retirer salonCode ici
+      }
+    });
+
+    function proposeDernierePartie() {
       db.ref("parties").once("value").then(snap => {
         let lastPart = null;
         snap.forEach(child => { lastPart = child.key; });
@@ -345,20 +352,12 @@
         }
       });
     }
-  } else {
-    document.getElementById('auth-section').style.display = "block";
-    document.getElementById('gm-content').style.display = "none";
-    // Quand on se déconnecte, on retire la partie suivie = passe dans historique
-    localStorage.removeItem("salonCode");
-  }
-});
 
     function afficherSuivi() {
       document.getElementById('suivi-partie').style.display = 'block';
       document.getElementById('historique-parties').style.display = 'none';
       document.getElementById('btn-courante').classList.add('active');
       document.getElementById('btn-historique').classList.remove('active');
-      // Affiche bouton retour accueil si partie sélectionnée
       document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
     }
     function afficherHistorique() {
@@ -370,13 +369,12 @@
       chargerHistorique();
     }
 
-    // Salon courant
     let salonCode = null;
     let equipes = [];
     let nomsEquipes = {};
     let currentIndex = 0;
     let stepsTime = {};
-    let partieDataCache = {}; // Pour historique
+    let partieDataCache = {};
 
     let etapes = [
       { titre: "Épreuve 1" },
@@ -387,7 +385,6 @@
       { titre: "Épreuve 6" }
     ];
 
-    // Gestion safe des listeners
     let currentEquipeListener = null;
     let listenerRef = null;
 
@@ -616,7 +613,6 @@
 
     // Affiche partie en mode historique (comme une partie en cours)
     function chargerPartieHistorique(partieId) {
-      // Charge data d'une partie comme dans afficherSuivi
       db.ref(`parties/${partieId}/equipes`).once('value').then(snapEq=>{
         equipes = [];
         snapEq.forEach(child=>{
@@ -626,7 +622,6 @@
         });
         db.ref(`parties/${partieId}/nomsEquipes`).once('value').then(snapNoms=>{
           nomsEquipes = snapNoms.val() || {};
-          // stepsTime pour chaque équipe
           currentIndex = 0;
           salonCode = partieId;
           let promises = equipes.map(eq=>
@@ -643,7 +638,6 @@
     }
 
     function afficherEquipeHistorique(partieId) {
-      // Affiche interface identique à "en cours" mais lecture seule (pas de bouton retour, pas de nav)
       const carte = document.getElementById('carte-equipe');
       const equipe = equipes[currentIndex];
       const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
@@ -656,7 +650,6 @@
         <div id="timer" class="timer">Temps sur cette épreuve : 0:00</div>
         <div class='parcours-list'>
       `;
-      // stepsTime = equipe.stepsTime (en historique)
       const stepsTimeLocal = equipe.stepsTime || {};
       for (let i=0; i<etapes.length; i++) {
         let statut = "";
@@ -682,7 +675,6 @@
       for (let i=0; i<etapes.length; i++) {
         listerFichiersEquipeEtape(equipe.num, i);
       }
-      // Ajoute navigation par équipe
       document.getElementById('prev-team').onclick = function() {
         if (equipes.length) {
           currentIndex = (currentIndex - 1 + equipes.length) % equipes.length;
@@ -756,7 +748,11 @@
       snap.forEach(child => {
         nouvelleListe.push(child.key);
       });
-      if (ancienneListeParties.length > 0 && nouvelleListe.length > ancienneListeParties.length) {
+      if (
+        ancienneListeParties.length > 0 &&
+        nouvelleListe.length > ancienneListeParties.length &&
+        !localStorage.getItem("salonCode")
+      ) {
         const nouveaux = nouvelleListe.filter(x => !ancienneListeParties.includes(x));
         nouveaux.forEach(codeSalon => {
           showNouvellePartieModal(codeSalon);
