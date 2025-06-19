@@ -166,18 +166,28 @@
             <span>Boussole</span>
           </a>
         </div>
-        <!-- Appareil photo -->
+        <!-- Vidéo 1 -->
         <div class="icon-action side-icon">
-          <label for="photo-upload" aria-label="Télécharger une photo">
-            <svg id="icon-photo" viewBox="0 0 24 24" width="38" height="38" fill="currentColor">
-              <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+          <label for="video-upload-1" aria-label="Télécharger la vidéo 1">
+            <svg id="icon-video1" viewBox="0 0 24 24" width="38" height="38">
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
             </svg>
-            <span>Photo à envoyer</span>
-            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
+            <span>Vidéo 1 à envoyer</span>
+            <input id="video-upload-1" class="visually-hidden" type="file" accept="video/*">
+          </label>
+        </div>
+        <!-- Vidéo 2 -->
+        <div class="icon-action side-icon">
+          <label for="video-upload-2" aria-label="Télécharger la vidéo 2">
+            <svg id="icon-video2" viewBox="0 0 24 24" width="38" height="38">
+              <path d="M21 19V7a2 2 0 0 0-2-2h-3.17L15 3.42A2 2 0 0 0 13.42 2h-2.83A2 2 0 0 0 8.17 3.42L8.17 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zm-7 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
+            </svg>
+            <span>Vidéo 2 à envoyer</span>
+            <input id="video-upload-2" class="visually-hidden" type="file" accept="video/*">
           </label>
         </div>
       </div>
-      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+      <div id="video-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -208,7 +218,7 @@
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "murder-party-ba8d1.appspot.com",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
@@ -277,69 +287,89 @@
           goToStep(step);
         });
 
-      // GESTION UPLOAD photo
+      // GESTION UPLOAD double vidéo
       function setupUploadHandler() {
-        var input = document.getElementById('photo-upload');
-        var out = document.getElementById('photo-filename');
+        var input1 = document.getElementById('video-upload-1');
+        var input2 = document.getElementById('video-upload-2');
+        var out = document.getElementById('video-filename');
         var btn = document.getElementById('next-quest');
-        var icon = document.getElementById('icon-photo');
+        var icon1 = document.getElementById('icon-video1');
+        var icon2 = document.getElementById('icon-video2');
 
-        console.log("input =", input);
-
-        // Upload dans Storage + DB
-        if(input && out && icon) {
-          input.addEventListener('change', function() {
-            console.log("Changement détecté !");
+        // Upload vidéo 1
+        if(input1 && icon1) {
+          input1.addEventListener('change', function() {
+            console.log("Changement détecté sur vidéo 1 !");
             if(this.files && this.files[0]) {
               const file = this.files[0];
-              console.log("Fichier sélectionné :", file);
-              console.log("salonCode=", salonCode, "equipeNum=", equipeNum, "stepIndex=", stepIndex);
-              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
-              console.log("Chemin d'upload :", storagePath);
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/video1-${file.name}`;
+              console.log("Chemin d'upload vidéo 1 :", storagePath);
               storage.ref(storagePath).put(file).then(snapshot => {
-                console.log("Upload réussi :", snapshot);
-                // Enregistre le nom dans la DB pour la synchro UI
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
+                console.log("Upload vidéo 1 réussi :", snapshot);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/video1').set({
                   name: file.name,
                   uploadedAt: Date.now()
                 });
               }).catch(err => {
-                showToast("Erreur lors de l'upload : " + err.message);
-                console.error("Erreur upload :", err);
+                showToast("Erreur lors de l'upload vidéo 1 : " + err.message);
+                console.error("Erreur upload vidéo 1 :", err);
               });
             } else {
-              console.warn("Aucun fichier sélectionné !");
+              console.warn("Aucun fichier sélectionné pour vidéo 1 !");
             }
           });
-        } else {
-          console.error("input/out/icon manquant :", {input, out, icon});
+        }
+        // Upload vidéo 2
+        if(input2 && icon2) {
+          input2.addEventListener('change', function() {
+            console.log("Changement détecté sur vidéo 2 !");
+            if(this.files && this.files[0]) {
+              const file = this.files[0];
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/video2-${file.name}`;
+              console.log("Chemin d'upload vidéo 2 :", storagePath);
+              storage.ref(storagePath).put(file).then(snapshot => {
+                console.log("Upload vidéo 2 réussi :", snapshot);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/video2').set({
+                  name: file.name,
+                  uploadedAt: Date.now()
+                });
+              }).catch(err => {
+                showToast("Erreur lors de l'upload vidéo 2 : " + err.message);
+                console.error("Erreur upload vidéo 2 :", err);
+              });
+            } else {
+              console.warn("Aucun fichier sélectionné pour vidéo 2 !");
+            }
+          });
         }
 
-        // Synchro multi-device, affichage et bouton + grisé de l'icône
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo')
-          .on('value', function(snapshot) {
-            var input = document.getElementById('photo-upload');
-            var out = document.getElementById('photo-filename');
-            var btn = document.getElementById('next-quest');
-            var icon = document.getElementById('icon-photo');
-            const data = snapshot.val();
-            console.log("DB photo value reçu :", data);
-            if (out && btn && input && icon) {
-              if (data && data.name) {
-                out.textContent = "Photo sélectionnée : " + data.name;
-                btn.disabled = false;
-                btn.classList.add('enabled');
-                input.disabled = true;
-                icon.classList.add('grayed');
-              } else {
-                out.textContent = "";
-                btn.disabled = true;
-                btn.classList.remove('enabled');
-                input.disabled = false;
-                icon.classList.remove('grayed');
+        // Affichage synchro et bouton
+        function updateUI() {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex)
+            .once('value', function(snapshot) {
+              const data = snapshot.val() || {};
+              let txt = "";
+              if(data.video1 && data.video1.name) txt += "Vidéo 1 : " + data.video1.name + " ";
+              if(data.video2 && data.video2.name) txt += "Vidéo 2 : " + data.video2.name;
+              if(out) out.textContent = txt;
+              if(icon1) icon1.classList.toggle('grayed', !!(data.video1 && data.video1.name));
+              if(icon2) icon2.classList.toggle('grayed', !!(data.video2 && data.video2.name));
+              if(btn) {
+                if(data.video1 && data.video1.name && data.video2 && data.video2.name) {
+                  btn.disabled = false;
+                  btn.classList.add('enabled');
+                  if(input1) input1.disabled = true;
+                  if(input2) input2.disabled = true;
+                } else {
+                  btn.disabled = true;
+                  btn.classList.remove('enabled');
+                  if(input1) input1.disabled = false;
+                  if(input2) input2.disabled = false;
+                }
               }
-            }
-          });
+            });
+        }
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex).on('value', updateUI);
 
         // Navigation bouton
         if (btn) {
