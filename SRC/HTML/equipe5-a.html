@@ -397,18 +397,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Si refresh après chrono, réaffiche la fenêtre flottante !
-  if (window.name === "blocker-determination") {
-    blocker.style.display = "flex";
-    answerField.value = "détermination";
-    answerField.disabled = true;
-    nextBtn.disabled = false;
-    nextBtn.classList.add('enabled');
-} else {
-    blocker.style.display = "none";
-    answerField.disabled = false;
-    nextBtn.disabled = true;
-    nextBtn.classList.remove('enabled');
-}
+  blocker.style.display = "none";
+answerField.disabled = false;
+nextBtn.disabled = true;
+nextBtn.classList.remove('enabled');
 
   // Permet de refermer la fenêtre flottante
   blockerBtn.addEventListener('click', function() {
