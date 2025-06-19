@@ -83,7 +83,7 @@
       outline: 2px solid #e0c185;
       outline-offset: 3px;
     }
-    /* ----------- MOBILE ----------- */
+    /* ---------------------- MOBILE ---------------------- */
     @media (max-width: 650px) {
       html { font-size: 16px; }
       body { overflow-x: hidden; padding: 0; margin: 0; }
@@ -173,6 +173,7 @@
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
     });
+  
     // Affichage du pseudo dans le message de bienvenue
     document.addEventListener("DOMContentLoaded", function() {
       var pseudo = localStorage.getItem("pseudo");
@@ -182,6 +183,7 @@
         document.getElementById("pseudoAffiche").textContent = "invité";
       }
     });
+
     // Nettoyage code salon si existant
     localStorage.removeItem("salonCode");
   </script>
