@@ -403,10 +403,12 @@ document.addEventListener('DOMContentLoaded', function() {
     answerField.disabled = true;
     nextBtn.disabled = false;
     nextBtn.classList.add('enabled');
-  } else {
+} else {
     blocker.style.display = "none";
     answerField.disabled = false;
-  }
+    nextBtn.disabled = true;
+    nextBtn.classList.remove('enabled');
+}
 
   // Permet de refermer la fenêtre flottante
   blockerBtn.addEventListener('click', function() {
