@@ -9,16 +9,16 @@
   window.onpopstate = function () {
     if (blockBack) {
       history.pushState(null, null, location.href);
-      alert("Vous ne pouvez pas quitter la partie en utilisant le bouton retour. Merci d'utiliser les boutons du jeu.");
+      alert("Attention : Si vous retournez à l’accueil, le jeu va s’arrêter pour votre équipe !");
     }
   };
 
-  // Si tu veux aussi bloquer la fermeture/refresh, laisse ce bloc (optionnel) :
-  // window.onbeforeunload = function(e) {
-  //   if (blockBack) {
-  //     e.preventDefault();
-  //     e.returnValue = "Êtes-vous sûr de vouloir quitter la partie ? Vous risquez d’être déconnecté(e) du jeu.";
-  //     return "Êtes-vous sûr de vouloir quitter la partie ? Vous risquez d’être déconnecté(e) du jeu.";
-  //   }
-  // };
+  // Bloque la fermeture/refresh de la page avec une confirmation
+  window.onbeforeunload = function(e) {
+    if (blockBack) {
+      e.preventDefault();
+      e.returnValue = "Êtes-vous sûr de vouloir quitter la partie ? Le jeu va s'arrêter si vous retournez à l’accueil.";
+      return "Êtes-vous sûr de vouloir quitter la partie ? Le jeu va s'arrêter si vous retournez à l’accueil.";
+    }
+  };
 })();
