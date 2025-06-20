@@ -77,7 +77,6 @@ window.creerPartie = async function(formData) {
   localStorage.setItem("parametresPartie", JSON.stringify(parametresPartie));
   localStorage.setItem("salonCode", salonCode);
   localStorage.setItem("nombreJoueurs", nombreJoueurs);
-
-  if (window.disableBackProtection) window.disableBackProtection();
+  
   window.location.href = "salon.html";
 };
