@@ -510,17 +510,18 @@ body {
 
 .actions-row-horizontal {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: row;
+  justify-content: center;        /* centre les icônes horizontalement */
+  align-items: center;            /* centre verticalement */
+  gap: 24px;                      /* espace égal entre chaque icône */
   margin-top: 38px;
   margin-bottom: 10px;
-  gap: 24px;
 }
+
+/* Adaptation mobile si tu veux réduire l’écart sur petit écran */
 @media (max-width: 650px) {
   .actions-row-horizontal {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
+    gap: 14px;
   }
 }
 
@@ -528,8 +529,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 90px;
+  min-width: 70px;
+  max-width: 90px;
 }
+
 .icon-action a, .icon-action label {
   cursor: pointer;
   color: #e0c185;
