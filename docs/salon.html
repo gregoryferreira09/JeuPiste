@@ -121,6 +121,7 @@
     // Récupération centrale du code salon
     const salonCode = localStorage.getItem("salonCode");
     if (!salonCode) {
+      if (window.disableBackProtection) window.disableBackProtection();
       window.location.replace("creer-partie.html");
     }
   </script>
@@ -203,13 +204,15 @@
 
       // Quand le créateur clique sur "Démarrer"
       function demarrerPartie() {
+        if (window.disableBackProtection) window.disableBackProtection();
         db.ref('parties/' + salonCode + '/etat').set('lancement');
       }
 
       // Tous les joueurs écoutent l'état
       db.ref('parties/' + salonCode + '/etat').on('value', snap => {
         if (snap.val() === 'lancement' || snap.val() === 'en_cours') {
-          window.location.href = "Lancement-partie.html";
+          if (window.disableBackProtection) window.disableBackProtection();
+          window.location.href = "lancement-partie.html";
         }
       });
 
@@ -254,11 +257,11 @@
       confirmModalBtn.addEventListener("click", function() {
         if(currentAction === "cloture") {
           db.ref('parties/' + salonCode).remove().then(() => {
-            // Fin de partie : restauration pseudo
             localStorage.setItem("pseudo", pseudoOrigine);
             localStorage.removeItem("pseudoOrigine");
             localStorage.removeItem("salonCode");
             localStorage.removeItem("enCours");
+            if (window.disableBackProtection) window.disableBackProtection();
             window.location.href = "creer-partie.html";
           });
         } else if(currentAction === "quitter") {
@@ -270,11 +273,11 @@
             });
           });
           setTimeout(() => {
-            // Restaure pseudo à la sortie du salon
             localStorage.setItem("pseudo", pseudoOrigine);
             localStorage.removeItem("pseudoOrigine");
             localStorage.removeItem("salonCode");
             localStorage.removeItem("enCours");
+            if (window.disableBackProtection) window.disableBackProtection();
             window.location.href = "rejoindre-partie.html";
           }, 300);
         }
@@ -301,6 +304,7 @@
           localStorage.setItem("enCours", "1");
           localStorage.setItem("pseudo", pseudoOrigine);
           localStorage.removeItem("pseudoOrigine");
+          if (window.disableBackProtection) window.disableBackProtection();
           window.location.href = "lancement-partie.html";
           return;
         }
@@ -313,6 +317,7 @@
               localStorage.removeItem("pseudoOrigine");
               localStorage.removeItem("salonCode");
               localStorage.removeItem("enCours");
+              if (window.disableBackProtection) window.disableBackProtection();
               window.location.href = "rejoindre-partie.html";
             }, 2000);
           } else {
@@ -321,6 +326,7 @@
             localStorage.removeItem("pseudoOrigine");
             localStorage.removeItem("salonCode");
             localStorage.removeItem("enCours");
+            if (window.disableBackProtection) window.disableBackProtection();
             window.location.href = "rejoindre-partie.html";
           }
           return;
