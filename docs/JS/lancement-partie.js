@@ -1,21 +1,15 @@
-// SRC/JS/lancement-partie.js
-
-// Ici tu mets uniquement le JS utile à cette page, sans doublon HTML/CSS
-
-// Exemple d'activation du bouton "Démarrer" après 30s
 document.addEventListener("DOMContentLoaded", function() {
+  // Gestion du bouton "Démarrer"
   const demarrerBtn = document.getElementById("demarrerBtn");
   if (demarrerBtn) {
-    setTimeout(() => {
-      demarrerBtn.style.pointerEvents = "auto";
-      demarrerBtn.style.opacity = "1";
-      demarrerBtn.textContent = "Démarrer la partie";
-    }, 30000); // 30s
+    demarrerBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      if (window.disableBackProtection) window.disableBackProtection();
+      window.location.href = "personnages.html";
+    });
   }
-});
 
-// Gestion de la modale de retour accueil
-document.addEventListener("DOMContentLoaded", function() {
+  // Gestion de la modale de retour accueil
   const btnRetour = document.getElementById("btnRetourAccueil");
   const confirmation = document.getElementById("confirmationRetourAccueil");
   const btnConfirmer = document.getElementById("confirmerRetourAccueilBtn");
@@ -23,13 +17,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
   if (btnRetour && confirmation && btnConfirmer && btnAnnuler) {
     btnRetour.addEventListener("click", () => {
-      confirmation.style.display = "block";
+      confirmation.style.display = "flex";
+      btnConfirmer.focus();
     });
     btnConfirmer.addEventListener("click", () => {
+      if (window.disableBackProtection) window.disableBackProtection();
       window.location.href = "accueil.html";
     });
     btnAnnuler.addEventListener("click", () => {
       confirmation.style.display = "none";
+      btnRetour.focus();
     });
   }
 });
