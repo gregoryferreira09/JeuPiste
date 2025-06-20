@@ -9,6 +9,16 @@
   <link rel="stylesheet" href="styles/style.css">
   <style>
     body { background: #231d1d; color: #ffeecb; }
+    #video-filename { color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em; }
+    .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+    .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
+    .visually-hidden {
+      position: absolute !important;
+      height: 1px; width: 1px;
+      overflow: hidden;
+      clip: rect(1px,1px,1px,1px);
+      white-space: nowrap; border: 0; padding: 0; margin: -1px;
+    }
   </style>
 </head>
 <body>
@@ -72,7 +82,7 @@
           </label>
         </div>
       </div>
-      <div id="video-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+      <div id="video-filename"></div>
       <button id="next-quest" class="main-btn" disabled>Quête suivante</button>
     </main>
   </div>
@@ -87,8 +97,133 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="JS/gameflow.js"></script>
   <script>
-    // JS identique, inchangé pour la logique de validation/upload/navigation
-    // ...
+    // === INITIALISATION FIREBASE ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+    const storage = firebase.storage();
+
+    // === VIDÉO UPLOAD ===
+    const videoInputs = [
+      document.getElementById('video-upload-1'),
+      document.getElementById('video-upload-2')
+    ];
+    let uploadedUrls = ["", ""];
+    const videoFilename = document.getElementById('video-filename');
+    const nextQuestBtn = document.getElementById('next-quest');
+
+    videoInputs.forEach((input, idx) => {
+      input.addEventListener('change', async function() {
+        const file = this.files && this.files[0];
+        if (!file) return;
+        videoFilename.textContent = "Envoi de la vidéo "+(idx+1)+"...";
+        nextQuestBtn.disabled = true;
+        nextQuestBtn.classList.remove('enabled');
+        try {
+          const salonCode = localStorage.getItem("salonCode");
+          const equipeNum = localStorage.getItem("equipeNum");
+          if (!salonCode || equipeNum === null) throw Error("Session non valide.");
+          const videoPath = `parties/${salonCode}/equipes/${equipeNum}/epreuve2/video${idx+1}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
+          const snapshot = await storage.ref(videoPath).put(file);
+          uploadedUrls[idx] = await snapshot.ref.getDownloadURL();
+          videoFilename.textContent = `Vidéo ${idx+1} chargée !`;
+        } catch (e) {
+          videoFilename.textContent = `Erreur lors de l'envoi de la vidéo ${idx+1}.`;
+          showToast("Erreur lors de l'envoi de la vidéo !");
+        }
+        // Active le bouton si toutes les vidéos sont uploadées
+        if (uploadedUrls.every(url => url)) {
+          nextQuestBtn.disabled = false;
+          nextQuestBtn.classList.add('enabled');
+          showToast("Les vidéos sont envoyées !");
+        }
+      });
+    });
+
+    // === VALIDATION ET PASSAGE À L'ÉTAPE SUIVANTE ===
+
+    function showToast(msg) {
+      let toast = document.getElementById('toast-message');
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => { toast.classList.remove('visible'); }, 2200);
+    }
+
+    nextQuestBtn.addEventListener('click', function() {
+      if (this.disabled) return;
+      this.disabled = true;
+      this.classList.remove('enabled');
+      showToast("Validation en cours...");
+      const salonCode = localStorage.getItem("salonCode");
+      const equipeNum = Number(localStorage.getItem("equipeNum"));
+      if (!salonCode || isNaN(equipeNum)) {
+        window.location.href = "accueil.html";
+        return;
+      }
+      // Enregistre les URLs des vidéos
+      uploadedUrls.forEach((url, idx) => {
+        if (url) {
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuve2/videos/video${idx+1}`).set(url);
+        }
+      });
+      // Chrono/temps passé sur l’épreuve (optionnel)
+      const stepIndex = 1; // epreuve2
+      const now = Date.now();
+      db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
+        .once('value', function(snap) {
+          let sTime = snap.val();
+          if (!sTime) sTime = now;
+          const elapsed = Math.round((now - sTime) / 1000);
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${stepIndex}`).set(elapsed);
+          // Passage à l'étape suivante dans Gameflow
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
+            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+              if (!error && committed) {
+                getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+                  const step = snapshot.val();
+                  if (step < parcours.length) {
+                    const epreuveNum = parcours[step];
+                    if (epreuveNum === 6) {
+                      window.location.href = "epreuve6.html";
+                    } else if (epreuveNum === 7) {
+                      window.location.href = "révélation.html";
+                    } else {
+                      window.location.href = `equipe${epreuveNum}-a.html`;
+                    }
+                  } else {
+                    alert('Bravo, vous avez terminé !');
+                  }
+                });
+              } else {
+                showToast("Erreur lors de la validation...");
+                nextQuestBtn.disabled = false;
+                nextQuestBtn.classList.add('enabled');
+              }
+            });
+        });
+    });
+
+    // Sécurité session (anti-triche)
+    window.addEventListener('DOMContentLoaded', () => {
+      const salonCode = localStorage.getItem("salonCode");
+      const equipeNum = localStorage.getItem("equipeNum");
+      if (!salonCode || equipeNum === null) {
+        window.location.href = "accueil.html";
+      }
+    });
+    nextQuestBtn.disabled = true;
+    nextQuestBtn.classList.remove('enabled');
   </script>
 </body>
 </html>
