@@ -249,7 +249,6 @@ document.addEventListener('DOMContentLoaded', function() {
     nextBtn.disabled = false;
     nextBtn.classList.add('enabled');
     window.name = "blocker-determination";
-    // NE PAS appeler navigator.vibrate ici !
   }
 
   // Masquer la fenêtre flottante au chargement et après validation
@@ -261,6 +260,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Permet de refermer la fenêtre flottante + vibrer (OK car c'est une action utilisateur)
   blockerBtn.addEventListener('click', function() {
     blocker.style.display = "none";
+    answerField.disabled = false;
+    answerField.focus();
     if ("vibrate" in navigator) navigator.vibrate(200);
   });
 
