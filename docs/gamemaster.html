@@ -2,19 +2,19 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Gamemaster – Suivi des équipes</title>
+  <title>Accueil – Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { background: #1b1b1b; color: #f4e4c1; font-family: 'Cormorant Garamond', serif; margin: 0; }
+    body { background: #231d1d; color: #ffeecb; margin: 0; }
     .main-accueil {
-      max-width: 600px;
-      margin: 38px auto;
+      max-width: 540px;
+      margin: 48px auto 0 auto;
       background: #2c1b1b;
       border-radius: 18px;
       box-shadow: 0 4px 20px #0001;
-      padding: 32px 24px 72px 24px;
+      padding: 38px 24px 38px 24px;
       border: 2px solid #e0c185;
       color: #f4e4c1;
       font-family: 'Cormorant Garamond', serif;
@@ -27,822 +27,203 @@
     .main-accueil h1 {
       text-align: center;
       font-family: 'Cinzel Decorative', serif;
-      font-size: 2.15em;
-      margin-bottom: 18px;
+      font-size: 2.2em;
+      margin-bottom: 16px;
       color: #e0c185;
       margin-top: 0;
+      letter-spacing: 1px;
     }
-    .carousel {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      margin: 0 auto;
-    }
-    .carte-equipe {
-      background: #231d1d;
-      border: 2px solid #e0c185;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px #0002;
-      padding: 30px 18px 24px 18px;
-      min-width: 260px;
-      max-width: 410px;
-      flex: 1 1 0;
-      margin: 0 8px;
+    .accueil-intro {
+      margin-bottom: 22px;
+      text-align: center;
+      font-size: 1.16em;
       color: #ffeecb;
-      font-size: 1.05em;
+      line-height: 1.6;
+    }
+    .accueil-form {
       display: flex;
       flex-direction: column;
-      align-items: stretch;
+      gap: 16px;
+      margin: 26px 0 8px 0;
     }
-    .team-title { font-family: 'Cinzel Decorative', serif; color: #e0c185; font-size: 1.28em; text-align: center; margin-bottom: 8px; letter-spacing: 1px; }
-    .team-members { color: #ffeecb; font-size: 1.08em; text-align: center; margin-bottom: 10px; }
-    .etape-encours { color: #e9c78c; background: #291d10; border-radius: 7px; padding: 6px 0; font-weight: bold; margin: 10px 0 12px 0; text-align: center; font-size: 1.08em;}
-    .timer { color: #ffeecb; text-align: center; margin: 9px 0 16px 0; font-size: 1.04em; font-family: 'Roboto Mono', monospace; background: #241b14; border-radius: 7px; padding: 8px 0;}
-    .late { color: #ffadad !important; }
-    .parcours-list { margin-top: 8px; }
-    .epreuve { margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px dashed #e0c18544;}
-    .epreuve:last-child { border-bottom: none; }
-    .epreuve-titre { color: #e0c185; font-weight: bold; font-size: 1.06em; margin-bottom: 4px;}
-    .fichiers-epreuve { color: #b8b8b8; font-size: 0.96em; margin-bottom: 2px;}
-    .download-btn { background: #e0c185; color: #473714; border: none; border-radius: 7px; padding: 4px 16px; font-size: 0.98em; cursor: pointer; margin-left: 7px; margin-top: 4px; transition: background 0.2s;}
-    .download-btn:hover, .download-btn:focus { background: #ffeecb; color: #473714; outline: 2px solid #e0c185;}
-    .chrono-value { color: #ffe07e; font-size: 0.98em; font-weight: bold; margin-left: 8px; letter-spacing: 1px; font-family: 'Roboto Mono', monospace;}
-    .nav-btn { background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #473714; border: 2px solid #e0c185; border-radius: 8px; font-size: 1.5em; font-family: 'Cinzel Decorative', serif; font-weight: bold; min-width: 46px; min-height: 46px; padding: 7px 12px; cursor: pointer; transition: background 0.2s, color 0.2s;}
-    .nav-btn:hover, .nav-btn:focus { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588; outline: 2px solid #e0c185;}
-    .msg-info { color: #c9b49a; font-style: italic; margin: 16px 0 0 0; text-align: center;}
-    .gm-table { width: 100%; border-collapse: collapse; background: #200f0f; margin-bottom: 20px; border-radius: 8px; overflow: hidden;}
-    .gm-table th, .gm-table td { border: 1px solid #e0c18566; padding: 11px 8px; text-align: left; font-size: 1em;}
-    .gm-table th { background: #e0c185; color: #2c1b1b; font-weight: bold;}
-    .gm-table tr:nth-child(even) { background: #241313;}
-    .cross { color: #e06c6c; font-size: 1.23em; font-weight: bold; cursor: pointer; transition: color 0.15s;}
-    .cross:hover { color: #ff2f0a;}
-    .gm-tabs { display: flex; gap: 16px; margin-bottom: 18px; justify-content: center;}
-    .gm-tab-btn { background: #2c1b1b; color: #e0c185; border: 2px solid #e0c185; border-bottom: none; border-radius: 8px 8px 0 0; font-family: 'Cinzel Decorative', serif; padding: 7px 24px; font-size: 1.13em; font-weight: bold; cursor: pointer; position: relative;}
-    .gm-tab-btn.active { background: #e0c185; color: #2c1b1b;}
-    .gm-section { margin: 22px 0 12px 0; text-align: center;}
-    .gm-label { display: block; margin-bottom: 7px; color: #e0c185;}
-    .gm-input, .gm-btn { font-family: inherit; border-radius: 7px; border: 2px solid #e0c185; font-size: 1em; padding: 11px 16px; margin-bottom: 10px; background: #281813; color: #f4e4c1; transition: border 0.2s, color 0.2s, background 0.2s;}
-    .gm-btn { cursor: pointer; background: linear-gradient(90deg, #e9c78c, #e0c185 60%); color: #3d2b1f; font-family: 'Cinzel Decorative', cursive; font-size: 1.09em; font-weight: bold; min-width: 130px;}
-    .gm-btn:hover { background: #e0c185; color: #1a1a1a; box-shadow: 0 0 8px #e0c18588;}
-    .gm-error { color: #ff9393; margin-top: 6px; min-height: 22px; text-align: center;}
-    .miniature { max-width: 70px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003; cursor: pointer;}
-    .miniature-video { max-width: 80px; max-height: 70px; margin-right: 8px; vertical-align: middle; border-radius: 7px; box-shadow: 0 2px 8px #0003;}
-    #retour-accueil-btn, #clore-partie-btn {
-      background: linear-gradient(90deg, #e9c78c, #e0c185 60%);
-      color: #3d2b1f;
-      font-family: 'Cinzel Decorative', cursive;
-      font-size: 1.06em;
+    .input-label {
+      color: #e0c185;
+      font-size: 1.08em;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+    .accueil-input {
+      padding: 12px 14px;
+      font-size: 1.13em;
+      border-radius: 7px;
+      border: 1.5px solid #e0c185;
+      outline: none;
+      background: #2b2323;
+      color: #ffeecb;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 0;
+      transition: border 0.17s;
+      text-align: center;
+    }
+    .accueil-input:focus {
+      border: 2px solid #ffeecb;
+    }
+    .accueil-btn {
+      background: #e0c185;
+      color: #231d1d;
       font-weight: bold;
-      border-radius: 14px;
-      border:2px solid #e0c185;
-      padding: 13px 38px;
-      cursor: pointer;
-      box-shadow: 0 4px 14px #0007;
-      transition: background 0.2s, color 0.2s;
-      margin: 18px auto 0 auto;
-      display: block;
-    }
-    #retour-accueil-btn:hover, #clore-partie-btn:hover { background: #ffeecb; color: #1a1a1a; }
-    #clore-partie-btn { background: #e06c6c; color: #fff; border-color:#e06c6c; margin-top:12px;}
-    #clore-partie-btn:hover { background: #ff2f0a; color: #fff;}
-    #confirmRetourModal, #confirmCloreModal {
-      display: none;
-      position: fixed;
-      left: 0; top: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(24,18,18,0.7);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-    }
-    #confirmRetourModal .modal-content, #confirmCloreModal .modal-content {
-      background: #2c1b1b;
-      border: 2px solid #e0c185;
-      border-radius: 16px;
-      padding: 32px;
-      text-align: center;
-      color: #f4e4c1;
-      box-shadow: 0 8px 32px #0007;
-      min-width: 280px;
-      font-family: 'Cormorant Garamond', serif;
-    }
-    #confirmRetourModal .modal-actions, #confirmCloreModal .modal-actions {
-      margin-top: 24px;
-      display: flex;
-      justify-content: center;
-      gap: 18px;
-    }
-    #confirmRetourModal .gm-btn, #confirmCloreModal .gm-btn { min-width: 80px; }
-    /* Modal styles */
-    #nouvellePartieModal {
-      display: none;
-      position: fixed;
-      left: 0; top: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(24,18,18,0.7);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-    }
-    #nouvellePartieModal .modal-content {
-      background: #2c1b1b;
-      border: 2px solid #e0c185;
-      border-radius: 16px;
-      padding: 32px;
-      text-align: center;
-      color: #f4e4c1;
-      box-shadow: 0 8px 32px #0007;
-      min-width: 280px;
-      font-family: 'Cormorant Garamond', serif;
-    }
-    #nouvellePartieModal .modal-actions {
-      margin-top: 24px;
-      display: flex;
-      justify-content: center;
-      gap: 18px;
-    }
-    #nouvellePartieModal .gm-btn { min-width: 80px; }
-    #lightbox-modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(18,14,10,0.88);
-      justify-content: center;
-      align-items: center;
-      transition: opacity 0.2s;
-    }
-    #lightbox-modal.active { display: flex; }
-    #lightbox-content {
-      position: relative;
-      max-width: 96vw;
-      max-height: 93vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #lightbox-img {
-      max-width: 94vw;
-      max-height: 88vh;
-      border-radius: 14px;
-      box-shadow: 0 8px 32px #000b;
-      background: #fff;
-      object-fit: contain;
-    }
-    #lightbox-close {
-      position: absolute;
-      top: -16px; right: -16px;
-      background: #fff;
-      color: #2c1b1b;
+      font-size: 1.13em;
       border: none;
-      border-radius: 50%;
-      font-size: 2.2em;
-      font-weight: bold;
-      width: 40px; height: 40px;
+      border-radius: 8px;
+      padding: 13px 0;
+      margin-top: 6px;
       cursor: pointer;
-      box-shadow: 0 2px 12px #0006;
-      transition: background 0.18s, color 0.18s;
-      z-index: 10;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: 0 2px 8px #0002;
+      width: 100%;
+      letter-spacing: 0.5px;
     }
-    #lightbox-close:hover { background: #f4e4c1; color: #a22; }
-    @media (max-width: 750px) {
-      .main-accueil { max-width: 97vw; padding: 10px 1vw; }
-      .carte-equipe { min-width: 0; max-width: 99vw; padding: 20px 4vw; }
-      .carousel { flex-direction: column; gap: 12px; }
-      .nav-btn { min-width: 46px; min-height: 46px; font-size: 1.1em; padding: 7px 9px;}
-      .gm-table th, .gm-table td { padding: 7px 2px; font-size: 1em; }
-      .gm-tab-btn { padding: 7px 4vw; font-size: 1em; }
-      .gm-btn { padding: 12px 7px; font-size: 0.99em; }
-      #lightbox-img { max-width: 96vw; max-height: 70vh; }
-      #lightbox-content { max-width: 99vw; }
-      #retour-accueil-btn, #clore-partie-btn { padding: 13px 10vw; min-width: calc(99vw - 60px);}
+    .accueil-btn:disabled {
+      background: #aaa;
+      color: #fff;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .accueil-link-gm {
+      color: #e0c185;
+      font-size: 1.08em;
+      margin: 18px auto 0 auto;
+      text-align: center;
+      display: block;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .modal-toast {
+      display: none;
+      position: fixed;
+      left: 50%; top: 9%;
+      transform: translateX(-50%);
+      background: #231d1d;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-size: 1.13em;
+      z-index: 9999;
+      box-shadow: 0 4px 22px #0006;
+      text-align:center;
+      max-width: 90vw;
+    }
+    .modal-toast.visible {
+      display: block;
+      animation: fadein 0.3s;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+    @media (max-width: 700px) {
+      .main-accueil { max-width: 97vw; padding: 15px 2vw; }
+      .accueil-intro { font-size: 1em; }
+      .accueil-btn { font-size: 1em; padding: 11px 0; }
     }
   </style>
 </head>
 <body>
   <div class="center-wrapper">
-    <main class="main-accueil" role="main" id="mainContainer">
-      <h1>Gamemaster — Suivi des équipes</h1>
-      <div id="auth-section" class="gm-section">
-        <label class="gm-label" for="gm-email">Email du gamemaster</label>
-        <input type="email" id="gm-email" class="gm-input" autocomplete="username" required>
-        <label class="gm-label" for="gm-password">Mot de passe</label>
-        <input type="password" id="gm-password" class="gm-input" autocomplete="current-password" required>
-        <button id="gm-login" class="gm-btn">Connexion Gamemaster</button>
-        <div id="gm-auth-error" class="gm-error"></div>
+    <main class="main-accueil" role="main">
+      <h1>Jeu de piste</h1>
+      <div class="accueil-intro">
+        Bienvenue sur le jeu de piste !<br>
+        Pour rejoindre une partie, entrez le code d'accès fourni par le gamemaster.<br>
+        Si vous êtes gamemaster, cliquez sur le lien dédié.
       </div>
-      <div id="gm-content" style="display:none;">
-        <div class="gm-tabs">
-          <button class="gm-tab-btn active" id="btn-courante" onclick="afficherSuivi()">Partie en cours</button>
-          <button class="gm-tab-btn" id="btn-historique" onclick="afficherHistorique()">Historique</button>
-        </div>
-        <div id="suivi-partie">
-          <div class="carousel">
-            <button class="nav-btn" id="prev-team" aria-label="Équipe précédente">&#8592;</button>
-            <div class="carte-equipe" id="carte-equipe">
-              <div style="text-align:center;">Chargement…</div>
-            </div>
-            <button class="nav-btn" id="next-team" aria-label="Équipe suivante">&#8594;</button>
-          </div>
-        </div>
-        <div id="historique-parties" style="display:none;"></div>
-        <button id="retour-accueil-btn" style="display:none;">Retour à l'accueil</button>
-        <button id="clore-partie-btn" style="display:none;">Clore cette partie</button>
-      </div>
+      <form class="accueil-form" id="joinForm" autocomplete="off">
+        <label for="code-salon" class="input-label">Code de la partie</label>
+        <input id="code-salon" class="accueil-input" type="text" autocomplete="off" maxlength="32" placeholder="Ex : GRAAL2025" required>
+        <button id="btn-join" type="submit" class="accueil-btn">Rejoindre la partie</button>
+      </form>
+      <a id="lien-gamemaster" href="#" class="accueil-link-gm">Connexion Gamemaster</a>
     </main>
   </div>
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
-  <!-- Modale nouvelle partie -->
-  <div id="nouvellePartieModal">
-    <div class="modal-content">
-      <div>
-        Nouvelle partie détectée : <span id="codeNouvellePartie"></span><br>
-        Veux-tu suivre cette partie ?
-      </div>
-      <div class="modal-actions">
-        <button id="btnSuivrePartieOui" class="gm-btn">Oui</button>
-        <button id="btnSuivrePartieNon" class="gm-btn">Non</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modale retour accueil -->
-  <div id="confirmRetourModal">
-    <div class="modal-content">
-      <div>
-        <span style="font-size:1.1em;">Retourner à l'accueil ?</span><br>
-        <span style="color:#c9b49a; font-size:.98em;">Tu perdras le suivi en direct de cette partie.</span>
-      </div>
-      <div class="modal-actions">
-        <button id="btnConfirmRetourOui" class="gm-btn">Oui</button>
-        <button id="btnConfirmRetourNon" class="gm-btn">Non</button>
-      </div>
-    </div>
-  </div>
-  <!-- Modale clore partie -->
-  <div id="confirmCloreModal">
-    <div class="modal-content">
-      <div>
-        <span style="font-size:1.1em;">Clore définitivement cette partie ?</span><br>
-        <span style="color:#e06c6c; font-size:.98em;">Elle sera supprimée de la liste et ne pourra plus être rejointe.</span>
-      </div>
-      <div class="modal-actions">
-        <button id="btnConfirmCloreOui" class="gm-btn" style="background:#e06c6c;color:#fff;">Oui</button>
-        <button id="btnConfirmCloreNon" class="gm-btn">Non</button>
-      </div>
-    </div>
-  </div>
-  <!-- Lightbox modal pour affichage grand format -->
-  <div id="lightbox-modal">
-    <div id="lightbox-content">
-      <button id="lightbox-close" aria-label="Fermer">&times;</button>
-      <img id="lightbox-img" src="" alt="Agrandissement">
-    </div>
-  </div>
-
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded',function(){
-      document.getElementById('nouvellePartieModal').style.display="none";
-      document.getElementById('confirmRetourModal').style.display="none";
-      document.getElementById('confirmCloreModal').style.display="none";
-    });
-
+    // Initialisation Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
       databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      storageBucket: "murder-party-ba8d1.appspot.com",
       messagingSenderId: "20295055805",
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
     };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    const storage = firebase.storage();
 
-    // Maj activité GM toutes les 2min + action/focus
-    function majActivityGamemaster() {
-      const codeSalon = localStorage.getItem("salonCode");
-      if (!codeSalon) return;
-      db.ref("parties/" + codeSalon + "/gamemasterLastActive").set(Date.now());
+    // --- Toast harmonisé
+    function showToast(msg) {
+      const toast = document.getElementById('toast-message');
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('visible');
+        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
+      }
     }
-    setInterval(majActivityGamemaster, 120000);
-    window.addEventListener('focus', majActivityGamemaster);
-    window.addEventListener('mousemove', majActivityGamemaster);
-    window.addEventListener('keydown', majActivityGamemaster);
 
-    // AUTH
-    document.getElementById('gm-login').onclick = function() {
-      const email = document.getElementById('gm-email').value;
-      const pass = document.getElementById('gm-password').value;
-      firebase.auth().signInWithEmailAndPassword(email, pass)
-        .then(() => {
-          document.getElementById('gm-auth-error').textContent = "";
-        })
-        .catch(e => {
-          document.getElementById('gm-auth-error').textContent = "Connexion échouée : " + e.message;
-        });
+    // --- Lien Gamemaster
+    document.getElementById('lien-gamemaster').onclick = function(e) {
+      e.preventDefault();
+      window.location.href = "gamemaster.html";
     };
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('auth-section').style.display = "none";
-        document.getElementById('gm-content').style.display = "block";
-        afficherSuivi();
-        document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
-        document.getElementById('clore-partie-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
-        if (!localStorage.getItem("salonCode")) {
-          proposeDernierePartie();
-        }
-        majActivityGamemaster();
-      } else {
-        document.getElementById('auth-section').style.display = "block";
-        document.getElementById('gm-content').style.display = "none";
-      }
-    });
+    // --- Formulaire rejoindre partie
+    const joinForm = document.getElementById('joinForm');
+    const codeSalonInput = document.getElementById('code-salon');
+    const btnJoin = document.getElementById('btn-join');
 
-    function proposeDernierePartie() {
-      db.ref("parties").once("value").then(snap => {
-        let lastPart = null;
-        let lastTime = 0;
-        let now = Date.now();
-        snap.forEach(child => {
-          const partData = child.val();
-          // Ne propose PAS les parties clôturées
-          if (partData.cloturee) return;
-          // Vérifie la présence d'équipes et leur activité
-          let equipes = partData.equipes || {};
-          let joueurActif = Object.values(equipes).some(eq => eq && eq.connected);
-          let gmActif = partData.gamemasterLastActive && (now - partData.gamemasterLastActive < 300000);
-          // On ne prend que si au moins un joueur actif ET GM actif
-          if (joueurActif && gmActif && partData.timestamp && partData.timestamp > lastTime) {
-            lastTime = partData.timestamp;
-            lastPart = child.key;
-          }
-        });
-        if (lastPart) {
-          showNouvellePartieModal(lastPart);
-        }
-      });
-    }
-
-    function afficherSuivi() {
-      document.getElementById('suivi-partie').style.display = 'block';
-      document.getElementById('historique-parties').style.display = 'none';
-      document.getElementById('btn-courante').classList.add('active');
-      document.getElementById('btn-historique').classList.remove('active');
-      document.getElementById('retour-accueil-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
-      document.getElementById('clore-partie-btn').style.display = localStorage.getItem("salonCode") ? "block" : "none";
-    }
-    function afficherHistorique() {
-      document.getElementById('suivi-partie').style.display = 'none';
-      document.getElementById('historique-parties').style.display = 'block';
-      document.getElementById('btn-courante').classList.remove('active');
-      document.getElementById('btn-historique').classList.add('active');
-      document.getElementById('retour-accueil-btn').style.display = "none";
-      document.getElementById('clore-partie-btn').style.display = "none";
-      chargerHistorique();
-    }
-
-    let salonCode = null;
-    let equipes = [];
-    let nomsEquipes = {};
-    let currentIndex = 0;
-    let stepsTime = {};
-    let partieDataCache = {};
-
-    let etapes = [
-      { titre: "Épreuve 1" },
-      { titre: "Épreuve 2" },
-      { titre: "Épreuve 3" },
-      { titre: "Épreuve 4" },
-      { titre: "Épreuve 5" },
-      { titre: "Épreuve 6" }
-    ];
-
-    let currentEquipeListener = null;
-    let listenerRef = null;
-
-    function chargerSalonCodeEtLive() {
-      salonCode = localStorage.getItem("salonCode");
-      if (!salonCode) {
-        document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune partie sélectionnée</div>";
-        document.getElementById('retour-accueil-btn').style.display = "none";
-        document.getElementById('clore-partie-btn').style.display = "none";
+    joinForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      let code = (codeSalonInput.value || '').trim();
+      if (!code) {
+        showToast("Merci d'entrer un code de partie.");
         return;
       }
-      document.getElementById('retour-accueil-btn').style.display = "block";
-      document.getElementById('clore-partie-btn').style.display = "block";
-      if (listenerRef && currentEquipeListener) {
-        listenerRef.off('value', currentEquipeListener);
-      }
-      listenerRef = db.ref(`parties/${salonCode}/equipes`);
-      currentEquipeListener = function(snap) {
-        const data = snap.val() || {};
-        equipes = Object.entries(data).map(([num, eq]) => ({...eq, num}));
-        db.ref(`parties/${salonCode}/nomsEquipes`).once('value', snapNoms => {
-          nomsEquipes = snapNoms.val() || {};
-          chargerStepsTimeEtAfficher();
-        });
-      };
-      listenerRef.on('value', currentEquipeListener);
-    }
-
-    document.getElementById('prev-team').onclick = function() {
-      if (equipes.length) {
-        currentIndex = (currentIndex - 1 + equipes.length) % equipes.length;
-        chargerStepsTimeEtAfficher();
-      }
-    };
-    document.getElementById('next-team').onclick = function() {
-      if (equipes.length) {
-        currentIndex = (currentIndex + 1) % equipes.length;
-        chargerStepsTimeEtAfficher();
-      }
-    };
-
-    function chargerStepsTimeEtAfficher() {
-      if (equipes.length === 0) {
-        document.getElementById('carte-equipe').innerHTML = "<div style='text-align:center;'>Aucune équipe détectée<br><span style='color:#e0c185'>En attente d'une équipe...</span></div>";
-        return;
-      }
-      const equipe = equipes[currentIndex];
-      db.ref(`parties/${salonCode}/equipes/${equipe.num}/stepsTime`).once('value', snapStepsTime => {
-        stepsTime = snapStepsTime.val() || {};
-        afficherEquipe();
-      });
-    }
-
-    function afficherEquipe() {
-      const carte = document.getElementById('carte-equipe');
-      const equipe = equipes[currentIndex];
-      const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
-      const membres = equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—';
-      const step = equipe.currentStep ?? 0;
-      let html = `
-        <div class='team-title'>${nom}</div>
-        <div class='team-members'>${membres}</div>
-        <div class='etape-encours'>Étape actuelle : <span>${etapes[step]?.titre || 'Terminé'}</span></div>
-        <div id="timer" class="timer">Temps sur cette épreuve : 0:00</div>
-        <div class='parcours-list'>
-      `;
-
-      for (let i=0; i<etapes.length; i++) {
-        let statut = "";
-        let chrono = "";
-        if (i == step) {
-          statut = " <span style='color:#ffe07e;'>(en cours)</span>";
-        } else if (i < step) {
-          let t = stepsTime && (stepsTime[i] !== undefined && stepsTime[i] !== null) ? stepsTime[i] : null;
-          if (t !== null) {
-            let min = Math.floor(t/60), sec = t%60;
-            chrono = `<span class="chrono-value">(${min}:${sec.toString().padStart(2, '0')})</span>`;
-          }
-          statut = ` <span style='color:#a8ffb9;'>(réalisée)</span> ${chrono}`;
-        }
-        html += `<div class='epreuve'>
-          <div class='epreuve-titre'>${etapes[i].titre}${statut}</div>
-          <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
-        </div>`;
-      }
-      html += '</div>';
-      carte.innerHTML = html;
-      afficherTimer();
-      for (let i=0; i<etapes.length; i++) {
-        listerFichiersEquipeEtape(equipe.num, i);
-      }
-    }
-
-    let timerInterval = null;
-    function afficherTimer() {
-      if (timerInterval) clearInterval(timerInterval);
-      const timerDiv = document.getElementById('timer');
-      const equipe = equipes[currentIndex];
-      const step = equipe.currentStep ?? 0;
-
-      function maj() {
-        if (step >= etapes.length) {
-          timerDiv.textContent = "Temps sur cette épreuve : terminé";
-          timerDiv.classList.remove('late');
+      // Sécurité : majuscules, pas d'espace
+      code = code.replace(/\s+/g, '').toUpperCase();
+      btnJoin.disabled = true;
+      codeSalonInput.disabled = true;
+      showToast("Vérification du code...");
+      db.ref("parties/" + code).once('value').then(snap => {
+        if (!snap.exists() || snap.val().cloturee) {
+          showToast("Code inconnu ou partie clôturée !");
+          btnJoin.disabled = false;
+          codeSalonInput.disabled = false;
           return;
         }
-        db.ref(`parties/${salonCode}/equipes/${equipe.num}/epreuves/${step}/startTime`).once('value', snap => {
-          const startTime = snap.val();
-          if (!startTime) {
-            timerDiv.textContent = "Temps sur cette épreuve : —";
-            timerDiv.classList.remove('late');
-            return;
-          }
-          const chronoVal = stepsTime && (stepsTime[step] !== undefined && stepsTime[step] !== null) ? stepsTime[step] : null;
-          if (chronoVal !== null) {
-            let min = Math.floor(chronoVal/60), sec = chronoVal%60;
-            timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
-            timerDiv.classList.remove('late');
-            return;
-          }
-          const elapsed = Math.floor((Date.now() - startTime) / 1000);
-          const min = Math.floor(elapsed/60), sec = elapsed%60;
-          timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
-          if (elapsed >= 600) {
-            timerDiv.classList.add('late');
-            timerDiv.textContent += " ⏰";
-          } else {
-            timerDiv.classList.remove('late');
-          }
-        });
-      }
-      maj();
-      timerInterval = setInterval(maj, 1000);
-    }
-
-    // ----------- Affichage fichiers et lightbox ----------- //
-    function listerFichiersEquipeEtape(num, etapeIdx) {
-      const div = document.getElementById(`fichiers-eq${num}-etape${etapeIdx}`);
-      if (!div) return;
-      const basePath = `parties/${salonCode}/equipe${num}/etape${etapeIdx}/`;
-      storage.ref(basePath).listAll().then(res => {
-        if (res.items.length === 0) {
-          div.innerHTML = `<span style="color:#b8b8b8;">Aucun fichier envoyé</span>`;
-        } else {
-          div.innerHTML = '';
-          res.items.forEach(fichier => {
-            fichier.getDownloadURL().then(url => {
-              const ext = fichier.name.split('.').pop().toLowerCase();
-              let mini = '';
-              if(['jpg','jpeg','png','gif'].includes(ext)) {
-                mini = `<img src="${url}" class="miniature" alt="Photo" onclick="openLightbox('${url}')" />`;
-              } else if(['mp4','webm','ogg'].includes(ext)) {
-                mini = `<video src="${url}" class="miniature-video" muted preload="metadata" controls style="background:#181212;"></video>`;
-              }
-              div.innerHTML += `<div class="fichier-bloc">${mini}<span>${fichier.name}</span>
-                <button class="download-btn" onclick="downloadFile('${url}','${fichier.name}')">Télécharger</button></div>`;
-            });
-          });
-        }
-      }).catch(()=>{
-        div.innerHTML = "<span style='color:#b8b8b8;'>Erreur</span>";
+        localStorage.setItem("salonCode", code);
+        // On peut aller sur la page équipe (choix équipe, ou page d’accueil de la partie)
+        window.location.href = "choix-equipe.html";
+      }).catch(err => {
+        showToast("Erreur réseau, réessayez.");
+        btnJoin.disabled = false;
+        codeSalonInput.disabled = false;
       });
-    }
-
-    // Lightbox JS
-    function openLightbox(url) {
-      const modal = document.getElementById('lightbox-modal');
-      const img = document.getElementById('lightbox-img');
-      img.src = url;
-      modal.classList.add('active');
-      document.body.style.overflow = "hidden";
-    }
-    function closeLightbox() {
-      const modal = document.getElementById('lightbox-modal');
-      modal.classList.remove('active');
-      document.getElementById('lightbox-img').src = "";
-      document.body.style.overflow = "";
-    }
-    document.getElementById('lightbox-close').onclick = closeLightbox;
-    document.getElementById('lightbox-modal').onclick = function(e) {
-      if (e.target === this) closeLightbox();
-    }
-    document.addEventListener('keydown', function(e) {
-      if (e.key === "Escape") closeLightbox();
     });
 
-    window.downloadFile = function(url, fileName) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      a.target = '_blank';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => document.body.removeChild(a), 100);
-    };
-
-    function chargerHistorique() {
-      const div = document.getElementById('historique-parties');
-      div.innerHTML = "<div class='msg-info'>Chargement en cours...</div>";
-      db.ref("parties").once("value").then(snap => {
-        if (!snap.exists()) {
-          div.innerHTML = "<div class='msg-info'>Aucune partie enregistrée.</div>";
-          return;
-        }
-        let html = `<table class="gm-table"><tr><th>Partie</th><th>Supprimer</th></tr>`;
-        snap.forEach(partieSnap => {
-          let partieId = partieSnap.key;
-          html += `<tr id="ligne-${partieId}">
-            <td><a href="#" class="partie-lien" data-id="${partieId}" style="color:#e0c185;text-decoration:underline;cursor:pointer;">${partieId}</a></td>
-            <td><span class="cross" onclick="supprimerPartie('${partieId}')">❌</span></td>
-          </tr>`;
-        });
-        html += "</table>";
-        div.innerHTML = html;
-        Array.from(document.getElementsByClassName('partie-lien')).forEach(link=>{
-          link.onclick = function(e){
-            e.preventDefault();
-            chargerPartieHistorique(this.dataset.id);
-          }
-        });
-      }).catch(e => {
-        div.innerHTML = "<span style='color:#ff9393'>Erreur lors du chargement : " + e.message + "</span>";
-      });
-    }
-
-    function chargerPartieHistorique(partieId) {
-      db.ref(`parties/${partieId}/equipes`).once('value').then(snapEq=>{
-        equipes = [];
-        snapEq.forEach(child=>{
-          let eq = child.val();
-          eq.num = child.key;
-          equipes.push(eq);
-        });
-        db.ref(`parties/${partieId}/nomsEquipes`).once('value').then(snapNoms=>{
-          nomsEquipes = snapNoms.val() || {};
-          currentIndex = 0;
-          salonCode = partieId;
-          let promises = equipes.map(eq=>
-            db.ref(`parties/${partieId}/equipes/${eq.num}/stepsTime`).once('value').then(snapST=>{
-              eq.stepsTime = snapST.val() || {};
-            })
-          );
-          Promise.all(promises).then(()=>{
-            stepsTime = equipes[0]?.stepsTime || {};
-            afficherEquipeHistorique(partieId);
-          });
-        });
-      });
-    }
-
-    function afficherEquipeHistorique(partieId) {
-      const carte = document.getElementById('carte-equipe');
-      const equipe = equipes[currentIndex];
-      const nom = nomsEquipes[equipe.num] || `Équipe ${parseInt(equipe.num)+1}`;
-      const membres = equipe.membres ? Object.values(equipe.membres).map(m=>m.pseudo).join(', ') : '—';
-      const step = equipe.currentStep ?? 0;
-      let html = `
-        <div class='team-title'>${nom}</div>
-        <div class='team-members'>${membres}</div>
-        <div class='etape-encours'>Étape actuelle : <span>${etapes[step]?.titre || 'Terminé'}</span></div>
-        <div id="timer" class="timer">Temps sur cette épreuve : 0:00</div>
-        <div class='parcours-list'>
-      `;
-      const stepsTimeLocal = equipe.stepsTime || {};
-      for (let i=0; i<etapes.length; i++) {
-        let statut = "";
-        let chrono = "";
-        if (i == step) {
-          statut = " <span style='color:#ffe07e;'>(en cours)</span>";
-        } else if (i < step) {
-          let t = stepsTimeLocal && (stepsTimeLocal[i] !== undefined && stepsTimeLocal[i] !== null) ? stepsTimeLocal[i] : null;
-          if (t !== null) {
-            let min = Math.floor(t/60), sec = t%60;
-            chrono = `<span class="chrono-value">(${min}:${sec.toString().padStart(2, '0')})</span>`;
-          }
-          statut = ` <span style='color:#a8ffb9;'>(réalisée)</span> ${chrono}`;
-        }
-        html += `<div class='epreuve'>
-          <div class='epreuve-titre'>${etapes[i].titre}${statut}</div>
-          <div class='fichiers-epreuve' id='fichiers-eq${equipe.num}-etape${i}'><span style='color:#b8b8b8;'>Chargement fichiers…</span></div>
-        </div>`;
+    // --- Sécurité : si déjà connecté à une partie, redirige
+    document.addEventListener('DOMContentLoaded', function() {
+      const code = localStorage.getItem("salonCode");
+      if (code) {
+        window.location.href = "choix-equipe.html";
       }
-      html += '</div>';
-      carte.innerHTML = html;
-      afficherTimerHistorique(equipe, stepsTimeLocal);
-      for (let i=0; i<etapes.length; i++) {
-        listerFichiersEquipeEtape(equipe.num, i);
-      }
-      document.getElementById('prev-team').onclick = function() {
-        if (equipes.length) {
-          currentIndex = (currentIndex - 1 + equipes.length) % equipes.length;
-          afficherEquipeHistorique(partieId);
-        }
-      };
-      document.getElementById('next-team').onclick = function() {
-        if (equipes.length) {
-          currentIndex = (currentIndex + 1) % equipes.length;
-          afficherEquipeHistorique(partieId);
-        }
-      };
-    }
-
-    function afficherTimerHistorique(equipe, stepsTimeLocal) {
-      const timerDiv = document.getElementById('timer');
-      const step = equipe.currentStep ?? 0;
-      if (step >= etapes.length) {
-        timerDiv.textContent = "Temps sur cette épreuve : terminé";
-        timerDiv.classList.remove('late');
-        return;
-      }
-      const chronoVal = stepsTimeLocal && (stepsTimeLocal[step] !== undefined && stepsTimeLocal[step] !== null) ? stepsTimeLocal[step] : null;
-      if (chronoVal !== null) {
-        let min = Math.floor(chronoVal/60), sec = chronoVal%60;
-        timerDiv.textContent = `Temps sur cette épreuve : ${min}:${sec.toString().padStart(2,'0')}`;
-        timerDiv.classList.remove('late');
-        return;
-      }
-      timerDiv.textContent = "Temps sur cette épreuve : —";
-      timerDiv.classList.remove('late');
-    }
-
-    function supprimerPartie(partieId) {
-      if (confirm("Supprimer cette partie ?")) {
-        db.ref("parties/"+partieId).remove().then(() => {
-          const ligne = document.getElementById('ligne-'+partieId);
-          if (ligne) ligne.remove();
-        });
-      }
-    }
-    window.supprimerPartie = supprimerPartie;
-
-    // --- LOGIQUE MODALE & DÉTECTION NOUVEAU SALON ---
-    let ancienneListeParties = [];
-    db.ref("parties").once("value").then(snap => {
-      let initList = [];
-      snap.forEach(child => initList.push(child.key));
-      ancienneListeParties = initList;
     });
-
-    function showNouvellePartieModal(codeSalon) {
-      if (!codeSalon || localStorage.getItem("salonCode") === codeSalon) {
-        document.getElementById("nouvellePartieModal").style.display = "none";
-        return;
-      }
-      document.getElementById("codeNouvellePartie").textContent = codeSalon;
-      document.getElementById("nouvellePartieModal").style.display = "flex";
-      document.getElementById("btnSuivrePartieOui").onclick = function() {
-        localStorage.setItem("salonCode", codeSalon);
-        document.getElementById("nouvellePartieModal").style.display = "none";
-        chargerSalonCodeEtLive();
-        document.getElementById('retour-accueil-btn').style.display = "block";
-        document.getElementById('clore-partie-btn').style.display = "block";
-        majActivityGamemaster();
-      };
-      document.getElementById("btnSuivrePartieNon").onclick = function() {
-        document.getElementById("nouvellePartieModal").style.display = "none";
-      };
-    }
-    db.ref("parties").on("value", snap => {
-      let nouvelleListe = [];
-      snap.forEach(child => {
-        nouvelleListe.push(child.key);
-      });
-      if (
-        ancienneListeParties.length > 0 &&
-        nouvelleListe.length > ancienneListeParties.length &&
-        !localStorage.getItem("salonCode")
-      ) {
-        const nouveaux = nouvelleListe.filter(x => !ancienneListeParties.includes(x));
-        nouveaux.forEach(codeSalon => {
-          showNouvellePartieModal(codeSalon);
-        });
-      }
-      ancienneListeParties = nouvelleListe;
-    });
-
-    // MODALE RETOUR ACCUEIL ------------------------------------
-    document.getElementById('retour-accueil-btn').onclick = function() {
-      document.getElementById('confirmRetourModal').style.display = "flex";
-    };
-    document.getElementById('btnConfirmRetourNon').onclick = function() {
-      document.getElementById('confirmRetourModal').style.display = "none";
-    };
-    document.getElementById('btnConfirmRetourOui').onclick = function() {
-      // On retire la partie suivie, page reset et retour accueil.html
-      localStorage.removeItem("salonCode");
-      document.getElementById('confirmRetourModal').style.display = "none";
-      location.href = "accueil.html";
-    };
-
-    // MODALE CLORE PARTIE ------------------------------------
-    document.getElementById('clore-partie-btn').onclick = function() {
-      document.getElementById('confirmCloreModal').style.display = "flex";
-    };
-    document.getElementById('btnConfirmCloreNon').onclick = function() {
-      document.getElementById('confirmCloreModal').style.display = "none";
-    };
-    document.getElementById('btnConfirmCloreOui').onclick = function() {
-      // On marque la partie comme clôturée et on la supprime
-      const salon = localStorage.getItem("salonCode");
-      if (salon) {
-        db.ref("parties/"+salon).update({cloturee:true});
-        setTimeout(function(){
-          db.ref("parties/"+salon).remove().then(() => {
-            localStorage.removeItem("salonCode");
-            document.getElementById('confirmCloreModal').style.display = "none";
-            location.href = "accueil.html";
-          });
-        }, 400);
-      } else {
-        document.getElementById('confirmCloreModal').style.display = "none";
-      }
-    };
   </script>
 </body>
 </html>
