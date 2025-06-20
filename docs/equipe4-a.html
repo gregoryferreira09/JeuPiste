@@ -52,15 +52,16 @@
       </div>
 
       <!-- Bloc GPS obligatoire au début -->
-      <div id="localisation-block">
-        <div class="gps-instruction">
-          Rendez-vous à la position :
-          <br><strong>47.367167, -0.562611</strong>
-        </div>
-        <div class="actions-row-horizontal">
-          <div class="icon-action side-icon">
-            <a href="https://maps.google.com/?q=47.367167,-0.562611" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
-              <svg viewBox="0 0 24 24">
+      <!-- Bloc GPS obligatoire au début -->
+<div id="localisation-block">
+  <div class="gps-instruction">
+    Rendez-vous à la position :
+    <br><strong>47.504111, -0.587361</strong>
+  </div>
+  <div class="actions-row-horizontal">
+    <div class="icon-action side-icon">
+      <a href="https://maps.google.com/?q=47.504111,-0.587361" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+                <svg viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/>
               </svg>
               <span>Boussole</span>
@@ -128,9 +129,9 @@
     }
 
     // GPS obligatoire
-    const DEST_LAT = 47.367167;
-    const DEST_LON = -0.562611;
-    const TOLERANCE_METERS = 10;
+    const DEST_LAT = 47.504111;
+    const DEST_LON = -0.587361;
+    const TOLERANCE_METERS = 20;
 
     document.getElementById("check-gps").addEventListener("click", function() {
       const feedback = document.getElementById("gps-feedback");
