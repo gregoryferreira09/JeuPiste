@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles/style.css">
   <style>
     body { background: #231d1d; color: #ffeecb; }
-    #photo-filename { color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em; }
+    #photo-filename-1, #photo-filename-2, #photo-filename-3 { color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em; }
     .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
     .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
     .visually-hidden {
@@ -40,7 +40,7 @@
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
-            De l'Orcanie à l'Aquitaine en passant par la Carmélide, trois créatures veillent en silence sur le royaume de Logres. Chacune incarne une vertu oubliée&nbsp;: la patience, la vivacité et la sagesse.<br><br>
+            De l'Orcanie à l'Aquitaine en passant par la Carmélide, trois créatures veillent en silence sur le royaume de Logres. Chacune incarne une vertu oubliée&nbsp;: la patience, la vivacité[...]
             <strong>Défi&nbsp;:</strong><br>
             Pour espérer vous diriger vers la suite de votre aventure, il vous faudra trouver et capturer l’image de ces gardiennes&nbsp;:<br>
             🐢 la tortue<br>
@@ -188,152 +188,109 @@
           goToStep(step);
         });
 
-      
-      
-      
-      // --- GESTIONNAIRE UPLOAD avec gestion DOM prêt ---
-      function setupUploadHandler() {
-        var input = document.getElementById('photo-upload');
-        var out = document.getElementById('photo-filename');
+      // --- GESTIONNAIRE UPLOAD MULTI-PHOTO ---
+      function setupUploadHandler(index) {
+        var input = document.getElementById('photo-upload-' + index);
+        var out = document.getElementById('photo-filename-' + index);
         var btn = document.getElementById('next-quest');
-        var icon = document.getElementById('icon-photo');
+        var icon = document.getElementById('icon-photo' + index);
 
-        console.log("input =", input);
-
-        // Upload dans Storage + DB
         if(input && out && icon) {
           input.addEventListener('change', function() {
-            console.log("Changement détecté !");
             if(this.files && this.files[0]) {
               const file = this.files[0];
-              console.log("Fichier sélectionné :", file);
-              console.log("salonCode=", salonCode, "equipeNum=", equipeNum, "stepIndex=", stepIndex);
-              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
-              console.log("Chemin d'upload :", storagePath);
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo${index}_${file.name}`;
               storage.ref(storagePath).put(file).then(snapshot => {
-                console.log("Upload réussi :", snapshot);
-                // On enregistre le nom dans la DB pour la synchro UI
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + index).set({
                   name: file.name,
                   uploadedAt: Date.now()
                 });
               }).catch(err => {
                 showToast("Erreur lors de l'upload : " + err.message);
-                console.error("Erreur upload :", err);
               });
             } else {
-              console.warn("Aucun fichier sélectionné !");
+              showToast("Aucun fichier sélectionné !");
             }
           });
+
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + index)
+            .on('value', function(snapshot) {
+              const data = snapshot.val();
+              if (data && data.name) {
+                out.textContent = "Photo sélectionnée : " + data.name;
+                input.disabled = true;
+                icon.classList.add('grayed');
+              } else {
+                out.textContent = "";
+                input.disabled = false;
+                icon.classList.remove('grayed');
+              }
+              // Active le bouton uniquement si les 3 photos sont uploadées
+              Promise.all([1,2,3].map(i =>
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + i)
+                  .once('value')
+              )).then(snapshots => {
+                const allUploaded = snapshots.every(snap => snap.val() && snap.val().name);
+                btn.disabled = !allUploaded;
+                btn.classList.toggle('enabled', allUploaded);
+              });
+            });
         } else {
-          console.error("input/out/icon manquant :", {input, out, icon});
+          console.error("input/out/icon manquant pour l'index", index, {input, out, icon});
         }
+      }
 
-             // --- GESTIONNAIRE UPLOAD MULTI-PHOTO ---
-
-function setupUploadHandler(index) {
-  var input = document.getElementById('photo-upload-' + index);
-  var out = document.getElementById('photo-filename-' + index);
-  var btn = document.getElementById('next-quest');
-  var icon = document.getElementById('icon-photo' + index);
-
-  if(input && out && icon) {
-    input.addEventListener('change', function() {
-      if(this.files && this.files[0]) {
-        const file = this.files[0];
-        const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo${index}_${file.name}`;
-        storage.ref(storagePath).put(file).then(snapshot => {
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + index).set({
-            name: file.name,
-            uploadedAt: Date.now()
-          });
-        }).catch(err => {
-          showToast("Erreur lors de l'upload : " + err.message);
+      // Init gestionnaires upload pour les 3 photos
+      if (document.readyState === "loading") {
+        document.addEventListener('DOMContentLoaded', function() {
+          [1, 2, 3].forEach(setupUploadHandler);
         });
       } else {
-        showToast("Aucun fichier sélectionné !");
+        [1, 2, 3].forEach(setupUploadHandler);
       }
-    });
 
-    // Synchro multi-device, affichage et bouton + grisé de l'icône
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + index)
-      .on('value', function(snapshot) {
-        const data = snapshot.val();
-        if (data && data.name) {
-          out.textContent = "Photo sélectionnée : " + data.name;
-          input.disabled = true;
-          icon.classList.add('grayed');
-        } else {
-          out.textContent = "";
-          input.disabled = false;
-          icon.classList.remove('grayed');
-        }
-        // Active le bouton uniquement si les 3 photos sont uploadées
-        Promise.all([1,2,3].map(i =>
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + i)
-            .once('value')
-        )).then(snapshots => {
-          const allUploaded = snapshots.every(snap => snap.val() && snap.val().name);
-          btn.disabled = !allUploaded;
-          btn.classList.toggle('enabled', allUploaded);
+      // --- Navigation bouton « quête suivante » (inchangé) ---
+      var btn = document.getElementById('next-quest');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          if (btn.disabled) return;
+          btn.disabled = true;
+          btn.classList.remove('enabled');
+          showToast("Validation en cours...");
+          // === ENREGISTRE LE TEMPS PASSÉ ===
+          const now = Date.now();
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+            .once('value', function(snap) {
+              const sTime = snap.val();
+              if (sTime) {
+                const elapsed = Math.round((now - sTime) / 1000);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+              }
+              // Puis passage à l'étape suivante
+              db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+                .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+                  if (!error && committed) {
+                    showToast("Étape validée !");
+                  } else {
+                    showToast("Erreur lors de la validation...");
+                    btn.disabled = false;
+                    btn.classList.add('enabled');
+                  }
+                });
+            });
         });
-      });
-  } else {
-    console.error("input/out/icon manquant pour l'index", index, {input, out, icon});
-  }
-}
+      }
 
-// Init gestionnaires upload pour les 3 photos
-if (document.readyState === "loading") {
-  document.addEventListener('DOMContentLoaded', function() {
-    [1, 2, 3].forEach(setupUploadHandler);
-  });
-} else {
-  [1, 2, 3].forEach(setupUploadHandler);
-}
-
-// --- Navigation bouton « quête suivante » (inchangé) ---
-var btn = document.getElementById('next-quest');
-if (btn) {
-  btn.addEventListener('click', function() {
-    if (btn.disabled) return;
-    btn.disabled = true;
-    btn.classList.remove('enabled');
-    showToast("Validation en cours...");
-    // === ENREGISTRE LE TEMPS PASSÉ ===
-    const now = Date.now();
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-      .once('value', function(snap) {
-        const sTime = snap.val();
-        if (sTime) {
-          const elapsed = Math.round((now - sTime) / 1000);
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+      // --- Anti-retour arrière (inchangé) ---
+      window.addEventListener("pageshow", function(evt) {
+        if (evt.persisted) {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .once('value', function(snapshot) {
+              const step = snapshot.val() || 0;
+              goToStep(step);
+            });
         }
-        // Puis passage à l'étape suivante
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-            if (!error && committed) {
-              showToast("Étape validée !");
-            } else {
-              showToast("Erreur lors de la validation...");
-              btn.disabled = false;
-              btn.classList.add('enabled');
-            }
-          });
       });
-  });
-}
-
-// --- Anti-retour arrière (inchangé) ---
-window.addEventListener("pageshow", function(evt) {
-  if (evt.persisted) {
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-      .once('value', function(snapshot) {
-        const step = snapshot.val() || 0;
-        goToStep(step);
-      });
-  }
-});
     }
   </script>
 </body>
