@@ -506,3 +506,130 @@ body {
 .bandeau.show {
   display: block;
 }
+
+
+.actions-row-horizontal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 38px;
+  margin-bottom: 10px;
+  gap: 24px;
+}
+@media (max-width: 650px) {
+  .actions-row-horizontal {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+.icon-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+}
+.icon-action a, .icon-action label {
+  cursor: pointer;
+  color: #e0c185;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.icon-action a:hover, .icon-action label:hover {
+  color: #ffeecb;
+}
+.icon-action svg {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 6px;
+  fill: #e0c185;
+  transition: fill 0.2s;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.icon-action a:hover svg,
+.icon-action label:hover svg {
+  fill: #ffeecb;
+}
+.icon-action span {
+  font-size: 0.98em;
+  color: #e0c185;
+  margin-top: 2px;
+  text-align: center;
+}
+@media (max-width: 650px) {
+  .icon-action {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .icon-action span {
+    text-align: left;
+  }
+}
+
+.modal-toast {
+  display: none;
+  position: fixed;
+  left: 50%; top: 10%;
+  transform: translateX(-50%);
+  background: #231d1d;
+  color: #ffeecb;
+  border: 2px solid #e0c185;
+  border-radius: 8px;
+  padding: 16px 28px;
+  font-size: 1.14em;
+  z-index: 9999;
+  box-shadow: 0 4px 22px #0006;
+  text-align:center;
+  max-width: 90vw;
+}
+.modal-toast.visible {
+  display: block;
+  animation: fadein 0.3s;
+}
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+
+
+.grayed {
+  filter: grayscale(1) brightness(0.8);
+  opacity: 0.6;
+}
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+}
+
+
+/* Icônes d’action harmonisées */
+.icon-action svg,
+.icon-action img {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 6px;
+  fill: #e0c185;
+  transition: fill 0.2s, filter 0.2s;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.icon-action a:hover svg,
+.icon-action label:hover svg {
+  fill: #ffeecb;
+  filter: drop-shadow(0 0 4px #e0c18577);
+}
+.icon-action .grayed svg {
+  filter: grayscale(1) brightness(0.7);
+  fill: #b5a073;
+}
