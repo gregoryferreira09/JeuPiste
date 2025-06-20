@@ -92,7 +92,9 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
+
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
@@ -101,7 +103,7 @@
   <script>
     console.log("JS chargé");
 
-    // Sécurité session
+    // Sécurité et robustesse : vérification session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
     console.log("salonCode =", salonCode, "equipeNum =", equipeNum);
@@ -109,7 +111,7 @@
       window.location.href = "accueil.html";
     }
 
-    // Firebase config
+    // Initialisation Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -126,7 +128,7 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // Auth anonyme obligatoire
+    // Authentification anonyme obligatoire pour les accès Storage
     firebase.auth().signInAnonymously().then(function() {
       console.log("Authentification anonyme réussie");
       demarreJeuFirebase();
@@ -147,7 +149,7 @@
       }
 
       // Chrono/temps passé sur l’épreuve
-      const stepIndex = 2; // Numéro d'étape pour cette page
+      const stepIndex = 0; // Numéro d'étape pour cette page
       console.log("stepIndex =", stepIndex);
       let startTime = null;
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
@@ -184,118 +186,69 @@
           goToStep(step);
         });
 
-      // GESTION UPLOAD triple photo
+      // --- GESTIONNAIRE UPLOAD avec gestion DOM prêt ---
       function setupUploadHandler() {
-        var input1 = document.getElementById('photo-upload-1');
-        var input2 = document.getElementById('photo-upload-2');
-        var input3 = document.getElementById('photo-upload-3');
+        var input = document.getElementById('photo-upload');
         var out = document.getElementById('photo-filename');
         var btn = document.getElementById('next-quest');
-        var icon1 = document.getElementById('icon-photo1');
-        var icon2 = document.getElementById('icon-photo2');
-        var icon3 = document.getElementById('icon-photo3');
+        var icon = document.getElementById('icon-photo');
 
-        // Upload photo 1
-        if(input1 && icon1) {
-          input1.addEventListener('change', function() {
-            console.log("Changement détecté sur photo 1 !");
+        console.log("input =", input);
+
+        // Upload dans Storage + DB
+        if(input && out && icon) {
+          input.addEventListener('change', function() {
+            console.log("Changement détecté !");
             if(this.files && this.files[0]) {
               const file = this.files[0];
-              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo1-${file.name}`;
-              console.log("Chemin d'upload photo 1 :", storagePath);
+              console.log("Fichier sélectionné :", file);
+              console.log("salonCode=", salonCode, "equipeNum=", equipeNum, "stepIndex=", stepIndex);
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
+              console.log("Chemin d'upload :", storagePath);
               storage.ref(storagePath).put(file).then(snapshot => {
-                console.log("Upload photo 1 réussi :", snapshot);
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo1').set({
+                console.log("Upload réussi :", snapshot);
+                // On enregistre le nom dans la DB pour la synchro UI
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
                   name: file.name,
                   uploadedAt: Date.now()
                 });
               }).catch(err => {
-                showToast("Erreur lors de l'upload photo 1 : " + err.message);
-                console.error("Erreur upload photo 1 :", err);
+                showToast("Erreur lors de l'upload : " + err.message);
+                console.error("Erreur upload :", err);
               });
             } else {
-              console.warn("Aucun fichier sélectionné pour photo 1 !");
+              console.warn("Aucun fichier sélectionné !");
             }
           });
-        }
-        // Upload photo 2
-        if(input2 && icon2) {
-          input2.addEventListener('change', function() {
-            console.log("Changement détecté sur photo 2 !");
-            if(this.files && this.files[0]) {
-              const file = this.files[0];
-              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo2-${file.name}`;
-              console.log("Chemin d'upload photo 2 :", storagePath);
-              storage.ref(storagePath).put(file).then(snapshot => {
-                console.log("Upload photo 2 réussi :", snapshot);
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo2').set({
-                  name: file.name,
-                  uploadedAt: Date.now()
-                });
-              }).catch(err => {
-                showToast("Erreur lors de l'upload photo 2 : " + err.message);
-                console.error("Erreur upload photo 2 :", err);
-              });
-            } else {
-              console.warn("Aucun fichier sélectionné pour photo 2 !");
-            }
-          });
-        }
-        // Upload photo 3
-        if(input3 && icon3) {
-          input3.addEventListener('change', function() {
-            console.log("Changement détecté sur photo 3 !");
-            if(this.files && this.files[0]) {
-              const file = this.files[0];
-              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo3-${file.name}`;
-              console.log("Chemin d'upload photo 3 :", storagePath);
-              storage.ref(storagePath).put(file).then(snapshot => {
-                console.log("Upload photo 3 réussi :", snapshot);
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo3').set({
-                  name: file.name,
-                  uploadedAt: Date.now()
-                });
-              }).catch(err => {
-                showToast("Erreur lors de l'upload photo 3 : " + err.message);
-                console.error("Erreur upload photo 3 :", err);
-              });
-            } else {
-              console.warn("Aucun fichier sélectionné pour photo 3 !");
-            }
-          });
+        } else {
+          console.error("input/out/icon manquant :", {input, out, icon});
         }
 
-        // Affichage synchro et bouton
-        function updateUI() {
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex)
-            .once('value', function(snapshot) {
-              const data = snapshot.val() || {};
-              let txt = "";
-              if(data.photo1 && data.photo1.name) txt += "Tortue : " + data.photo1.name + " ";
-              if(data.photo2 && data.photo2.name) txt += "Chevreau : " + data.photo2.name + " ";
-              if(data.photo3 && data.photo3.name) txt += "Alpaga : " + data.photo3.name;
-              if(out) out.textContent = txt;
-              if(icon1) icon1.classList.toggle('grayed', !!(data.photo1 && data.photo1.name));
-              if(icon2) icon2.classList.toggle('grayed', !!(data.photo2 && data.photo2.name));
-              if(icon3) icon3.classList.toggle('grayed', !!(data.photo3 && data.photo3.name));
-              if(btn) {
-                if(data.photo1 && data.photo1.name && data.photo2 && data.photo2.name && data.photo3 && data.photo3.name) {
-                  btn.disabled = false;
-                  btn.classList.add('enabled');
-                  if(input1) input1.disabled = true;
-                  if(input2) input2.disabled = true;
-                  if(input3) input3.disabled = true;
-                } else {
-                  btn.disabled = true;
-                  btn.classList.remove('enabled');
-                  if(input1) input1.disabled = false;
-                  if(input2) input2.disabled = false;
-                  if(input3) input3.disabled = false;
-                }
+        // Synchro multi-device, affichage et bouton + grisé de l'icône
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo')
+          .on('value', function(snapshot) {
+            var input = document.getElementById('photo-upload');
+            var out = document.getElementById('photo-filename');
+            var btn = document.getElementById('next-quest');
+            var icon = document.getElementById('icon-photo');
+            const data = snapshot.val();
+            console.log("DB photo value reçu :", data);
+            if (out && btn && input && icon) {
+              if (data && data.name) {
+                out.textContent = "Photo sélectionnée : " + data.name;
+                btn.disabled = false;
+                btn.classList.add('enabled');
+                input.disabled = true;
+                icon.classList.add('grayed');
+              } else {
+                out.textContent = "";
+                btn.disabled = true;
+                btn.classList.remove('enabled');
+                input.disabled = false;
+                icon.classList.remove('grayed');
               }
-            });
-        }
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex).on('value', updateUI);
+            }
+          });
 
         // Navigation bouton
         if (btn) {
@@ -304,7 +257,7 @@
             btn.disabled = true;
             btn.classList.remove('enabled');
             showToast("Validation en cours...");
-            // ENREGISTRE LE TEMPS PASSÉ
+            // === ENREGISTRE LE TEMPS PASSÉ ===
             const now = Date.now();
             db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
               .once('value', function(snap) {
@@ -313,7 +266,7 @@
                   const elapsed = Math.round((now - sTime) / 1000);
                   db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
                 }
-                // Passage à l'étape suivante
+                // Puis passage à l'étape suivante
                 db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
                   .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
                     if (!error && committed) {
@@ -329,6 +282,7 @@
         }
       }
 
+      // Correction DOMContentLoaded
       if (document.readyState === "loading") {
         document.addEventListener('DOMContentLoaded', setupUploadHandler);
       } else {
