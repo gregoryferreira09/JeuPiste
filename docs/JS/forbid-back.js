@@ -1,12 +1,16 @@
+// forbid-back.js
 (function() {
-  // On pousse 2 états pour piéger le bouton retour
-  history.pushState({ page: 1 }, "", "");
-  history.pushState({ page: 2 }, "", "");
+  // Bloque le retour arrière du navigateur (retour flèche/swipe)
+  history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    history.pushState(null, null, location.href);
+    alert("Vous ne pouvez pas quitter la partie en utilisant le bouton retour. Merci d'utiliser les boutons du jeu.");
+  };
 
-  window.onpopstate = function(event) {
-    if (event.state && event.state.page === 1) {
-      history.pushState({ page: 2 }, "", "");
-      alert("La navigation avec le bouton retour est désactivée.\nMerci d'utiliser les boutons du site.");
-    }
+  // Bloque la fermeture ou le rafraîchissement de la page
+  window.onbeforeunload = function(e) {
+    e.preventDefault();
+    e.returnValue = "Êtes-vous sûr de vouloir quitter la partie ? Vous risquez d’être déconnecté(e) du jeu.";
+    return "Êtes-vous sûr de vouloir quitter la partie ? Vous risquez d’être déconnecté(e) du jeu.";
   };
 })();
