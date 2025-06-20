@@ -23,13 +23,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
   if (btnRetour && confirmation && btnConfirmer && btnAnnuler) {
     btnRetour.addEventListener("click", () => {
-      confirmation.style.display = "block";
-    });
-    btnConfirmer.addEventListener("click", () => {
-      window.location.href = "accueil.html";
-    });
-    btnAnnuler.addEventListener("click", () => {
-      confirmation.style.display = "none";
-    });
+  confirmation.classList.add("active");
+});
+btnConfirmer.addEventListener("click", () => {
+  window.location.href = "accueil.html";
+});
+btnAnnuler.addEventListener("click", () => {
+  confirmation.classList.remove("active");
+});
   }
 });
