@@ -7,17 +7,132 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
   <style>
-    body { background: #231d1d; color: #ffeecb; }
-    #photo-filename { color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em; }
-    .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
-    .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
+    .actions-row-horizontal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 38px;
+      margin-bottom: 10px;
+      gap: 24px;
+    }
+    .icon-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90px;
+    }
+    .icon-action label {
+      cursor: pointer;
+      color: #e0c185;
+      text-decoration: none;
+      transition: color 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .icon-action label:active,
+    .icon-action label[aria-disabled="true"] {
+      color: #9d8c62;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .icon-action svg {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 6px;
+      fill: #e0c185;
+      transition: fill 0.2s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .icon-action label:hover svg {
+      fill: #ffeecb;
+    }
+    .icon-action label[aria-disabled="true"] svg {
+      filter: grayscale(1);
+      fill: #9d8c62;
+    }
+    .icon-action span {
+      font-size: 0.98em;
+      color: #e0c185;
+      margin-top: 2px;
+      text-align: center;
+    }
+    .icon-action label[aria-disabled="true"] span {
+      color: #9d8c62;
+    }
+    .grayed {
+      filter: grayscale(1) brightness(0.8);
+      opacity: 0.6;
+    }
     .visually-hidden {
       position: absolute !important;
       height: 1px; width: 1px;
       overflow: hidden;
-      clip: rect(1px,1px,1px,1px);
-      white-space: nowrap; border: 0; padding: 0; margin: -1px;
+      clip: rect(1px, 1px, 1px, 1px);
+      white-space: nowrap;
+      border: 0;
+      padding: 0;
+      margin: -1px;
     }
+    #next-quest {
+      background: #aaa;
+      color: #fff;
+      font-size: 1.08em;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      margin: 28px auto 0 auto;
+      display: block;
+      opacity: 0.6;
+      cursor: not-allowed;
+      transition: background 0.2s, opacity 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    #next-quest.enabled {
+      background: #e0c185;
+      opacity: 1;
+      cursor: pointer;
+    }
+    @media (max-width: 650px) {
+      .actions-row-horizontal {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .icon-action {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .icon-action span {
+        text-align: left;
+      }
+    }
+    .modal-toast {
+      display: none;
+      position: fixed;
+      left: 50%; top: 10%;
+      transform: translateX(-50%);
+      background: #231d1d;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      padding: 16px 28px;
+      font-size: 1.14em;
+      z-index: 9999;
+      box-shadow: 0 4px 22px #0006;
+      text-align:center;
+      max-width: 90vw;
+    }
+    .modal-toast.visible {
+      display: block;
+      animation: fadein 0.3s;
+    }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
 </head>
 <body>
@@ -27,7 +142,7 @@
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <h2>Quête des bêtes mystiques</h2>
+      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête des bêtes mystiques</h2>
       <div class="presentation-jeu" style="margin-top: 24px;">
         <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7;">
           <em>
@@ -40,7 +155,7 @@
         <div class="objectif-course" style="margin-top: 24px;">
           <div class="objectif-label">Objectif</div>
           <div class="objectif-text" style="margin-top:18px;">
-            De l'Orcanie à l'Aquitaine en passant par la Carmélide, trois créatures veillent en silence sur le royaume de Logres. Chacune incarne une vertu oubliée&nbsp;: la patience, la vivacité et la sagesse.<br><br>
+            De l'Orcanie à l'Aquitaine en passant par la Carmélide, trois créatures veillent en silence sur le royaume de Logres. Chacune incarne une vertu oubliée&nbsp;: la patience, la vivacité et la douceur.<br>
             <strong>Défi&nbsp;:</strong><br>
             Pour espérer vous diriger vers la suite de votre aventure, il vous faudra trouver et capturer l’image de ces gardiennes&nbsp;:<br>
             🐢 la tortue<br>
@@ -83,8 +198,8 @@
           </label>
         </div>
       </div>
-      <div id="photo-filename"></div>
-      <button id="next-quest" class="main-btn" disabled>Quête suivante</button>
+      <div id="photo-filename" style="color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em;"></div>
+      <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
 
@@ -92,9 +207,7 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
-
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
@@ -103,7 +216,7 @@
   <script>
     console.log("JS chargé");
 
-    // Sécurité et robustesse : vérification session
+    // Sécurité session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
     console.log("salonCode =", salonCode, "equipeNum =", equipeNum);
@@ -111,7 +224,7 @@
       window.location.href = "accueil.html";
     }
 
-    // Initialisation Firebase
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -128,7 +241,7 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // Authentification anonyme obligatoire pour les accès Storage
+    // Auth anonyme obligatoire
     firebase.auth().signInAnonymously().then(function() {
       console.log("Authentification anonyme réussie");
       demarreJeuFirebase();
@@ -149,7 +262,7 @@
       }
 
       // Chrono/temps passé sur l’épreuve
-      const stepIndex = 0; // Numéro d'étape pour cette page
+      const stepIndex = 2; // Numéro d'étape pour cette page
       console.log("stepIndex =", stepIndex);
       let startTime = null;
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
@@ -186,69 +299,118 @@
           goToStep(step);
         });
 
-      // --- GESTIONNAIRE UPLOAD avec gestion DOM prêt ---
+      // GESTION UPLOAD triple photo
       function setupUploadHandler() {
-        var input = document.getElementById('photo-upload');
+        var input1 = document.getElementById('photo-upload-1');
+        var input2 = document.getElementById('photo-upload-2');
+        var input3 = document.getElementById('photo-upload-3');
         var out = document.getElementById('photo-filename');
         var btn = document.getElementById('next-quest');
-        var icon = document.getElementById('icon-photo');
+        var icon1 = document.getElementById('icon-photo1');
+        var icon2 = document.getElementById('icon-photo2');
+        var icon3 = document.getElementById('icon-photo3');
 
-        console.log("input =", input);
-
-        // Upload dans Storage + DB
-        if(input && out && icon) {
-          input.addEventListener('change', function() {
-            console.log("Changement détecté !");
+        // Upload photo 1
+        if(input1 && icon1) {
+          input1.addEventListener('change', function() {
+            console.log("Changement détecté sur photo 1 !");
             if(this.files && this.files[0]) {
               const file = this.files[0];
-              console.log("Fichier sélectionné :", file);
-              console.log("salonCode=", salonCode, "equipeNum=", equipeNum, "stepIndex=", stepIndex);
-              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/${file.name}`;
-              console.log("Chemin d'upload :", storagePath);
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo1-${file.name}`;
+              console.log("Chemin d'upload photo 1 :", storagePath);
               storage.ref(storagePath).put(file).then(snapshot => {
-                console.log("Upload réussi :", snapshot);
-                // On enregistre le nom dans la DB pour la synchro UI
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo').set({
+                console.log("Upload photo 1 réussi :", snapshot);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo1').set({
                   name: file.name,
                   uploadedAt: Date.now()
                 });
               }).catch(err => {
-                showToast("Erreur lors de l'upload : " + err.message);
-                console.error("Erreur upload :", err);
+                showToast("Erreur lors de l'upload photo 1 : " + err.message);
+                console.error("Erreur upload photo 1 :", err);
               });
             } else {
-              console.warn("Aucun fichier sélectionné !");
+              console.warn("Aucun fichier sélectionné pour photo 1 !");
             }
           });
-        } else {
-          console.error("input/out/icon manquant :", {input, out, icon});
+        }
+        // Upload photo 2
+        if(input2 && icon2) {
+          input2.addEventListener('change', function() {
+            console.log("Changement détecté sur photo 2 !");
+            if(this.files && this.files[0]) {
+              const file = this.files[0];
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo2-${file.name}`;
+              console.log("Chemin d'upload photo 2 :", storagePath);
+              storage.ref(storagePath).put(file).then(snapshot => {
+                console.log("Upload photo 2 réussi :", snapshot);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo2').set({
+                  name: file.name,
+                  uploadedAt: Date.now()
+                });
+              }).catch(err => {
+                showToast("Erreur lors de l'upload photo 2 : " + err.message);
+                console.error("Erreur upload photo 2 :", err);
+              });
+            } else {
+              console.warn("Aucun fichier sélectionné pour photo 2 !");
+            }
+          });
+        }
+        // Upload photo 3
+        if(input3 && icon3) {
+          input3.addEventListener('change', function() {
+            console.log("Changement détecté sur photo 3 !");
+            if(this.files && this.files[0]) {
+              const file = this.files[0];
+              const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo3-${file.name}`;
+              console.log("Chemin d'upload photo 3 :", storagePath);
+              storage.ref(storagePath).put(file).then(snapshot => {
+                console.log("Upload photo 3 réussi :", snapshot);
+                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo3').set({
+                  name: file.name,
+                  uploadedAt: Date.now()
+                });
+              }).catch(err => {
+                showToast("Erreur lors de l'upload photo 3 : " + err.message);
+                console.error("Erreur upload photo 3 :", err);
+              });
+            } else {
+              console.warn("Aucun fichier sélectionné pour photo 3 !");
+            }
+          });
         }
 
-        // Synchro multi-device, affichage et bouton + grisé de l'icône
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo')
-          .on('value', function(snapshot) {
-            var input = document.getElementById('photo-upload');
-            var out = document.getElementById('photo-filename');
-            var btn = document.getElementById('next-quest');
-            var icon = document.getElementById('icon-photo');
-            const data = snapshot.val();
-            console.log("DB photo value reçu :", data);
-            if (out && btn && input && icon) {
-              if (data && data.name) {
-                out.textContent = "Photo sélectionnée : " + data.name;
-                btn.disabled = false;
-                btn.classList.add('enabled');
-                input.disabled = true;
-                icon.classList.add('grayed');
-              } else {
-                out.textContent = "";
-                btn.disabled = true;
-                btn.classList.remove('enabled');
-                input.disabled = false;
-                icon.classList.remove('grayed');
+        // Affichage synchro et bouton
+        function updateUI() {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex)
+            .once('value', function(snapshot) {
+              const data = snapshot.val() || {};
+              let txt = "";
+              if(data.photo1 && data.photo1.name) txt += "Tortue : " + data.photo1.name + " ";
+              if(data.photo2 && data.photo2.name) txt += "Chevreau : " + data.photo2.name + " ";
+              if(data.photo3 && data.photo3.name) txt += "Alpaga : " + data.photo3.name;
+              if(out) out.textContent = txt;
+              if(icon1) icon1.classList.toggle('grayed', !!(data.photo1 && data.photo1.name));
+              if(icon2) icon2.classList.toggle('grayed', !!(data.photo2 && data.photo2.name));
+              if(icon3) icon3.classList.toggle('grayed', !!(data.photo3 && data.photo3.name));
+              if(btn) {
+                if(data.photo1 && data.photo1.name && data.photo2 && data.photo2.name && data.photo3 && data.photo3.name) {
+                  btn.disabled = false;
+                  btn.classList.add('enabled');
+                  if(input1) input1.disabled = true;
+                  if(input2) input2.disabled = true;
+                  if(input3) input3.disabled = true;
+                } else {
+                  btn.disabled = true;
+                  btn.classList.remove('enabled');
+                  if(input1) input1.disabled = false;
+                  if(input2) input2.disabled = false;
+                  if(input3) input3.disabled = false;
+                }
               }
-            }
-          });
+            });
+        }
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex).on('value', updateUI);
 
         // Navigation bouton
         if (btn) {
@@ -257,7 +419,7 @@
             btn.disabled = true;
             btn.classList.remove('enabled');
             showToast("Validation en cours...");
-            // === ENREGISTRE LE TEMPS PASSÉ ===
+            // ENREGISTRE LE TEMPS PASSÉ
             const now = Date.now();
             db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
               .once('value', function(snap) {
@@ -266,7 +428,7 @@
                   const elapsed = Math.round((now - sTime) / 1000);
                   db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
                 }
-                // Puis passage à l'étape suivante
+                // Passage à l'étape suivante
                 db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
                   .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
                     if (!error && committed) {
@@ -282,7 +444,6 @@
         }
       }
 
-      // Correction DOMContentLoaded
       if (document.readyState === "loading") {
         document.addEventListener('DOMContentLoaded', setupUploadHandler);
       } else {
