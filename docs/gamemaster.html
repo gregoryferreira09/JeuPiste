@@ -2,158 +2,43 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Accueil – Jeu de piste</title>
+  <title>Gamemaster – Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { background: #231d1d; color: #ffeecb; margin: 0; }
-    .main-accueil {
-      max-width: 540px;
-      margin: 48px auto 0 auto;
-      background: #2c1b1b;
-      border-radius: 18px;
-      box-shadow: 0 4px 20px #0001;
-      padding: 38px 24px 38px 24px;
-      border: 2px solid #e0c185;
-      color: #f4e4c1;
-      font-family: 'Cormorant Garamond', serif;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      min-width: 300px;
-      position: relative;
-    }
-    .main-accueil h1 {
-      text-align: center;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 2.2em;
-      margin-bottom: 16px;
-      color: #e0c185;
-      margin-top: 0;
-      letter-spacing: 1px;
-    }
-    .accueil-intro {
-      margin-bottom: 22px;
-      text-align: center;
-      font-size: 1.16em;
-      color: #ffeecb;
-      line-height: 1.6;
-    }
-    .accueil-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin: 26px 0 8px 0;
-    }
-    .input-label {
-      color: #e0c185;
-      font-size: 1.08em;
-      margin-bottom: 6px;
-      text-align: left;
-    }
-    .accueil-input {
-      padding: 12px 14px;
-      font-size: 1.13em;
-      border-radius: 7px;
-      border: 1.5px solid #e0c185;
-      outline: none;
-      background: #2b2323;
-      color: #ffeecb;
-      width: 100%;
-      box-sizing: border-box;
-      margin-bottom: 0;
-      transition: border 0.17s;
-      text-align: center;
-    }
-    .accueil-input:focus {
-      border: 2px solid #ffeecb;
-    }
-    .accueil-btn {
-      background: #e0c185;
-      color: #231d1d;
-      font-weight: bold;
-      font-size: 1.13em;
-      border: none;
-      border-radius: 8px;
-      padding: 13px 0;
-      margin-top: 6px;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      box-shadow: 0 2px 8px #0002;
-      width: 100%;
-      letter-spacing: 0.5px;
-    }
-    .accueil-btn:disabled {
-      background: #aaa;
-      color: #fff;
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .accueil-link-gm {
-      color: #e0c185;
-      font-size: 1.08em;
-      margin: 18px auto 0 auto;
-      text-align: center;
-      display: block;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    .modal-toast {
-      display: none;
-      position: fixed;
-      left: 50%; top: 9%;
-      transform: translateX(-50%);
-      background: #231d1d;
-      color: #ffeecb;
-      border: 2px solid #e0c185;
-      border-radius: 8px;
-      padding: 16px 28px;
-      font-size: 1.13em;
-      z-index: 9999;
-      box-shadow: 0 4px 22px #0006;
-      text-align:center;
-      max-width: 90vw;
-    }
-    .modal-toast.visible {
-      display: block;
-      animation: fadein 0.3s;
-    }
-    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    @media (max-width: 700px) {
-      .main-accueil { max-width: 97vw; padding: 15px 2vw; }
-      .accueil-intro { font-size: 1em; }
-      .accueil-btn { font-size: 1em; padding: 11px 0; }
-    }
+    body { background: #201a1a; color: #ffeecb; margin: 0; font-family: 'Cormorant Garamond', serif;}
+    .gm-main { max-width: 900px; margin: 40px auto; background: #2c1b1b; border-radius: 18px; box-shadow: 0 4px 20px #0003; padding: 30px; border: 2px solid #e0c185; }
+    h1, h2 { color: #e0c185; text-align: center; }
+    .parties-list, .dashboard { margin-top: 28px; }
+    .teams-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .teams-table th, .teams-table td { border: 1px solid #e0c185; padding: 8px 12px; text-align: center; }
+    .teams-table th { background: #3d2929; }
+    .teams-table td { background: #231d1d; }
+    .btn { background: #e0c185; color: #231d1d; border: none; border-radius: 5px; padding: 8px 16px; cursor: pointer; font-weight: bold; margin: 2px;}
+    .btn:disabled { background: #aaa; color: #fff;}
+    .notif { background: #463726; color: #ffeecb; padding: 12px 18px; margin: 10px 0; border-radius: 7px; text-align: center; border: 2px solid #e0c185;}
+    .messages { margin-top: 20px;}
+    .message-entry { display: flex; gap: 8px; align-items: center; margin-bottom: 6px;}
+    .msg-input { flex: 1; padding: 7px; border-radius: 5px; border: 1px solid #e0c185; background: #2b2323; color: #ffeecb;}
+    .msg-send { padding: 8px 12px; }
+    .stats { margin-top: 24px;}
+    .chrono { font-family: monospace; color: #e0c185; font-size: 1.15em;}
+    @media (max-width: 1000px) { .gm-main { max-width:98vw; padding: 8px; } }
   </style>
 </head>
 <body>
-  <div class="center-wrapper">
-    <main class="main-accueil" role="main">
-      <h1>Jeu de piste</h1>
-      <div class="accueil-intro">
-        Bienvenue sur le jeu de piste !<br>
-        Pour rejoindre une partie, entrez le code d'accès fourni par le gamemaster.<br>
-        Si vous êtes gamemaster, cliquez sur le lien dédié.
-      </div>
-      <form class="accueil-form" id="joinForm" autocomplete="off">
-        <label for="code-salon" class="input-label">Code de la partie</label>
-        <input id="code-salon" class="accueil-input" type="text" autocomplete="off" maxlength="32" placeholder="Ex : GRAAL2025" required>
-        <button id="btn-join" type="submit" class="accueil-btn">Rejoindre la partie</button>
-      </form>
-      <a id="lien-gamemaster" href="#" class="accueil-link-gm">Connexion Gamemaster</a>
-    </main>
+  <div class="gm-main">
+    <h1>Tableau de bord Gamemaster</h1>
+    <div id="notif-area"></div>
+    <div class="parties-list" id="parties-list"></div>
+    <div class="dashboard" id="dashboard"></div>
+    <div class="stats" id="stats"></div>
   </div>
-  <footer class="footer">
-    <p>© 2025 Jeu de piste. Tous droits réservés.</p>
-    <a href="mentions-legales.html">Mentions légales</a>
-  </footer>
-  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script>
-    // Initialisation Firebase
+    // Configuration Firebase (à adapter selon ta config)
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -167,63 +52,171 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // --- Toast harmonisé
-    function showToast(msg) {
-      const toast = document.getElementById('toast-message');
-      if (toast) {
-        toast.textContent = msg;
-        toast.classList.add('visible');
-        setTimeout(() => { toast.classList.remove('visible'); }, 2400);
-      }
+    // Variables globales
+    let gmSalon = null; // Code du salon où tu es gamemaster
+    let timers = {}; // Pour les chronos par équipe/épreuve
+
+    // --- Notif utilitaire
+    function notify(msg, acceptFn, refuseFn) {
+      const n = document.getElementById('notif-area');
+      n.innerHTML = `<div class="notif">${msg}
+        ${acceptFn ? `<button class="btn" id="btn-accept">Accepter</button>` : ''}
+        ${refuseFn ? `<button class="btn" id="btn-refuse">Refuser</button>` : ''}
+      </div>`;
+      if (acceptFn) document.getElementById('btn-accept').onclick = acceptFn;
+      if (refuseFn) document.getElementById('btn-refuse').onclick = refuseFn;
     }
+    function clearNotif() { document.getElementById('notif-area').innerHTML = ""; }
 
-    // --- Lien Gamemaster
-    document.getElementById('lien-gamemaster').onclick = function(e) {
-      e.preventDefault();
-      window.location.href = "gamemaster.html";
-    };
-
-    // --- Formulaire rejoindre partie
-    const joinForm = document.getElementById('joinForm');
-    const codeSalonInput = document.getElementById('code-salon');
-    const btnJoin = document.getElementById('btn-join');
-
-    joinForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      let code = (codeSalonInput.value || '').trim();
-      if (!code) {
-        showToast("Merci d'entrer un code de partie.");
-        return;
+    // --- 1. Surveiller la création ou l'existence des salons/parties
+    db.ref("parties").on("child_added", snap => {
+      const code = snap.key;
+      const partie = snap.val();
+      if (!partie.gamemaster) {
+        // Partie sans GM, proposer de devenir GM
+        notify(`La partie <b>${code}</b> a été créée, veux-tu en devenir le Gamemaster ?`, () => becomeGamemaster(code), clearNotif);
       }
-      // Sécurité : majuscules, pas d'espace
-      code = code.replace(/\s+/g, '').toUpperCase();
-      btnJoin.disabled = true;
-      codeSalonInput.disabled = true;
-      showToast("Vérification du code...");
-      db.ref("parties/" + code).once('value').then(snap => {
-        if (!snap.exists() || snap.val().cloturee) {
-          showToast("Code inconnu ou partie clôturée !");
-          btnJoin.disabled = false;
-          codeSalonInput.disabled = false;
+      afficherParties();
+    });
+
+    function afficherParties() {
+      db.ref("parties").once("value").then(snap => {
+        const list = document.getElementById("parties-list");
+        if (!snap.exists()) {
+          list.innerHTML = "<em>Aucune partie en cours.</em>";
           return;
         }
-        localStorage.setItem("salonCode", code);
-        // On peut aller sur la page équipe (choix équipe, ou page d’accueil de la partie)
-        window.location.href = "choix-equipe.html";
-      }).catch(err => {
-        showToast("Erreur réseau, réessayez.");
-        btnJoin.disabled = false;
-        codeSalonInput.disabled = false;
+        let html = "<h2>Parties actives</h2><ul>";
+        snap.forEach(child => {
+          const code = child.key;
+          const partie = child.val();
+          html += `<li>${code} ${partie.gamemaster ? '(GM : ' + partie.gamemaster + ')' : '<span style="color:#e0c185;">(Sans gamemaster)</span>'}</li>`;
+        });
+        html += "</ul>";
+        list.innerHTML = html;
       });
-    });
+    }
 
-    // --- Sécurité : si déjà connecté à une partie, redirige
-    document.addEventListener('DOMContentLoaded', function() {
-      const code = localStorage.getItem("salonCode");
-      if (code) {
-        window.location.href = "choix-equipe.html";
-      }
-    });
+    // --- 2. Devenir gamemaster d'une partie
+    function becomeGamemaster(code) {
+      firebase.auth().signInAnonymously().then(user => {
+        db.ref("parties/" + code + "/gamemaster").set("GM_" + Date.now());
+        gmSalon = code;
+        clearNotif();
+        showDashboard(code);
+      });
+    }
+
+    // --- 3. Dashboard gamemaster, suivi temps réel
+    function showDashboard(code) {
+      document.getElementById("dashboard").innerHTML = `<h2>Partie <span style="color:#ffeecb">${code}</span> – Suivi des équipes</h2>
+        <div id="teams"></div>
+        <div class="messages" id="messages"></div>`;
+      listenTeams(code);
+      listenMessages(code);
+      showStats(code);
+    }
+
+    // --- 4. Suivi équipes + chrono par épreuve
+    function listenTeams(code) {
+      db.ref("parties/" + code + "/equipes").on("value", snap => {
+        const teams = snap.val() || {};
+        let html = `<table class="teams-table"><tr><th>Équipe</th><th>Épreuve</th><th>Chrono</th><th>Statut</th><th>Message</th></tr>`;
+        Object.keys(teams).forEach(team => {
+          const equipe = teams[team];
+          const epreuve = equipe.etape || 'Départ';
+          const chrono = getChrono(code, team, epreuve);
+          const statut = equipe.terminee ? "Terminé" : (equipe.etape ? "En cours" : "En attente");
+          html += `<tr>
+            <td>${team}</td>
+            <td>${epreuve}</td>
+            <td class="chrono" id="chrono-${team}">${chrono}</td>
+            <td>${statut}</td>
+            <td>
+              <div class="message-entry">
+                <input class="msg-input" id="msg-${team}" type="text" placeholder="Message à cette équipe">
+                <button class="btn msg-send" onclick="sendMessage('${code}','${team}')">Envoyer</button>
+              </div>
+            </td>
+          </tr>`;
+        });
+        html += `</table>`;
+        document.getElementById("teams").innerHTML = html;
+        // Chronos live
+        Object.keys(teams).forEach(team => {
+          const equipe = teams[team];
+          if (!equipe.terminee && equipe.etape) startLiveChrono(code, team, equipe.etape, equipe.chronoStart);
+        });
+      });
+    }
+
+    // --- 5. Chrono live par équipe/épreuve
+    function getChrono(code, team, epreuve) {
+      const k = code + "-" + team + "-" + epreuve;
+      if (!timers[k] || !timers[k].start) return "00:00";
+      const elapsed = Math.floor((Date.now() - timers[k].start) / 1000);
+      return toMMSS(elapsed);
+    }
+    function toMMSS(s) { const m = Math.floor(s/60); s = s%60; return `${m<10?'0':''}${m}:${s<10?'0':''}${s}`; }
+    function startLiveChrono(code, team, epreuve, dbStart) {
+      const k = code + "-" + team + "-" + epreuve;
+      if (!timers[k]) timers[k] = {};
+      timers[k].start = dbStart || Date.now();
+      if (timers[k].interval) clearInterval(timers[k].interval);
+      timers[k].interval = setInterval(() => {
+        const chrono = getChrono(code, team, epreuve);
+        const chronoEl = document.getElementById("chrono-"+team);
+        if (chronoEl) chronoEl.textContent = chrono;
+      }, 1000);
+    }
+
+    // --- 6. Lorsque l'équipe change de page/valide une épreuve (à implémenter côté client équipe)
+    // Sur validation/changement d'épreuve, stocker un champ "chronoStart" = Date.now() pour chaque équipe
+
+    // --- 7. Envoi de message à une équipe (avec notif côté équipe à implémenter)
+    window.sendMessage = function(code, team) {
+      const msg = document.getElementById("msg-"+team).value;
+      if (!msg) return;
+      db.ref("parties/"+code+"/equipes/"+team+"/messages").push({from:"GM",text:msg,ts:Date.now()});
+      document.getElementById("msg-"+team).value = "";
+    };
+
+    // --- 8. Suivi des messages échangés
+    function listenMessages(code) {
+      db.ref("parties/"+code+"/equipes").on("value", snap => {
+        let html = "<h3>Historique des messages</h3>";
+        snap.forEach(teamSnap => {
+          const team = teamSnap.key;
+          const equipe = teamSnap.val();
+          if (equipe.messages) {
+            html += `<b>${team} :</b><ul>`;
+            Object.values(equipe.messages).forEach(msg => {
+              html += `<li>${msg.from} : ${msg.text} <span style="color:#888;">(${new Date(msg.ts).toLocaleTimeString()})</span></li>`;
+            });
+            html += "</ul>";
+          }
+        });
+        document.getElementById("messages").innerHTML = html;
+      });
+    }
+
+    // --- 9. Statistiques (temps total, étapes franchies, etc.)
+    function showStats(code) {
+      db.ref("parties/"+code+"/equipes").on("value", snap => {
+        let html = "<h2>Statistiques</h2><ul>";
+        snap.forEach(teamSnap => {
+          const team = teamSnap.key;
+          const equipe = teamSnap.val();
+          html += `<li><b>${team}</b> – Étapes franchies : ${equipe.etapesFranchies||0}, Temps total : ${toMMSS(equipe.tempsTotal||0)}</li>`;
+        });
+        html += "</ul>";
+        document.getElementById("stats").innerHTML = html;
+      });
+    }
+
+    // --- 10. Alertes auto, passation, etc. (à compléter selon besoins)
+
+    afficherParties();
   </script>
 </body>
 </html>
