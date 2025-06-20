@@ -370,6 +370,14 @@
           lancementAutomatiqueDemarre = false;
           if (countdownInterval) clearInterval(countdownInterval);
         }
+        
+        if (localStorage.getItem("salonCode")) { // Seulement si une partie est en cours
+  history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    history.pushState(null, null, location.href);
+    // Optionnel : afficher un message ou une modale
+  };
+}
       });
 
       // Suppression automatique si le créateur ferme l'onglet
