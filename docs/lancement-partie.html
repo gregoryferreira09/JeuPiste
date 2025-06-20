@@ -179,7 +179,7 @@
             </div>
             <div class="regles-course">
               <strong>Règles du jeu&nbsp;:</strong><br>
-              Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis des siècles. L'entraide, la ruse et la rapidité feront la différence.
+              Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depui[...]
             </div>
           </div>
           <div class="actions-bandeau">
@@ -197,12 +197,12 @@
   </footer>
 
   <!-- Fenêtre flottante confirmation retour accueil -->
-  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
+  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle" style="display: none;">
     <div class="modal-content">
       <div class="modal-question" id="confirmationTitle">
-  Voulez-vous vraiment quitter la partie et revenir à l’accueil ?<br>
-  <strong>Le jeu sera arrêté pour votre équipe.</strong>
-</div>
+        Voulez-vous vraiment quitter la partie et revenir à l’accueil ?<br>
+        <strong>Le jeu sera arrêté pour votre équipe.</strong>
+      </div>
       <div class="modal-actions">
         <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
         <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
@@ -276,24 +276,39 @@
       }
     });
 
-    // Gestion de la modale de retour accueil
+    // === TOUTE LA GESTION DU RETOUR (Bouton ou navigateur) ===
     document.addEventListener("DOMContentLoaded", function() {
+      // Pour la modale de confirmation
+      const confirmationRetourAccueil = document.getElementById("confirmationRetourAccueil");
+      const confirmerRetourAccueilBtn = document.getElementById("confirmerRetourAccueilBtn");
+      const annulerRetourAccueilBtn = document.getElementById("annulerRetourAccueilBtn");
       const btnRetour = document.getElementById("btnRetourAccueil");
-      const confirmation = document.getElementById("confirmationRetourAccueil");
-      const btnConfirmer = document.getElementById("confirmerRetourAccueilBtn");
-      const btnAnnuler = document.getElementById("annulerRetourAccueilBtn");
-      if (btnRetour && confirmation && btnConfirmer && btnAnnuler) {
-        btnRetour.addEventListener("click", () => {
-          confirmation.style.display = "flex";
-          document.getElementById('confirmerRetourAccueilBtn').focus();
+
+      // Fonction globale pour ouvrir la modale (aussi appelée par forbid-back.js)
+      window.showRetourAccueilModal = function() {
+        confirmationRetourAccueil.style.display = "flex";
+        confirmerRetourAccueilBtn.focus();
+      };
+
+      // Bouton "Retour accueil"
+      if (btnRetour) {
+        btnRetour.addEventListener("click", function(e) {
+          e.preventDefault();
+          window.showRetourAccueilModal();
         });
-        btnConfirmer.addEventListener("click", () => {
+      }
+
+      // Validation/Annulation de la modale
+      if (confirmerRetourAccueilBtn) {
+        confirmerRetourAccueilBtn.addEventListener("click", function() {
           if (window.disableBackProtection) window.disableBackProtection();
           window.location.href = "accueil.html";
         });
-        btnAnnuler.addEventListener("click", () => {
-          confirmation.style.display = "none";
-          btnRetour.focus();
+      }
+      if (annulerRetourAccueilBtn) {
+        annulerRetourAccueilBtn.addEventListener("click", function() {
+          confirmationRetourAccueil.style.display = "none";
+          if (btnRetour) btnRetour.focus();
         });
       }
     });
