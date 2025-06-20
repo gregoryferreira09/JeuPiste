@@ -8,38 +8,6 @@
   <link rel="stylesheet" href="styles/style.css">
   <style>
     /* ... (tes styles existants) ... */
-    /* Modale pour quitter la page */
-    #quitProfileModal {
-      display:none; position:fixed; left:0; top:0; width:100vw; height:100vh;
-      background:rgba(44,27,27,0.82); z-index:99999; justify-content:center; align-items:center;
-    }
-    #quitProfileModal.active { display: flex; }
-    #quitProfileModal .modal-content {
-      background:#2c1b1b; border-radius:16px; padding:32px 18px;
-      box-shadow:0 4px 24px #0009; border:2px solid #e0c185;
-      max-width:340px; margin:auto; text-align:center;
-    }
-    #quitProfileModal .modal-question {
-      font-family:'Cinzel Decorative',serif; color:#e0c185; font-size:1.18em; margin-bottom:24px;
-    }
-    #quitProfileModal .modal-sub {
-      font-size:0.93em;color:#ffeecb;margin-bottom:20px;
-    }
-    #quitProfileModal .modal-actions {
-      display:flex; gap:22px; justify-content:center;
-    }
-    #quitProfileYes {
-      background:#e06c6c; color:#fff; border-radius:8px; border:none;
-      padding:12px 32px; font-size:1.07em; font-family:'Cinzel Decorative',serif; cursor:pointer;
-    }
-    #quitProfileNo {
-      background:#e0c185; color:#3d2b1f; border-radius:8px; border:none;
-      padding:12px 32px; font-size:1.07em; font-family:'Cinzel Decorative',serif; cursor:pointer;
-    }
-    @media (max-width: 600px) {
-      /* ... (tes autres styles responsive) ... */
-      #quitProfileModal .modal-content { max-width:90vw; }
-    }
   </style>
 </head>
 <body>
@@ -50,20 +18,8 @@
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
       <h1>Mon profil</h1>
-      <!-- ... (le reste de ton HTML) ... -->
+      <!-- ... (le reste de ton HTML de profil, avatar, etc.) ... -->
       <button type="button" onclick="location.href='accueil.html'" class="main-btn" style="margin-top:30px;">Retour à l'accueil</button>
-      <!-- Modale Quitter le profil (custom) -->
-      <div id="quitProfileModal" tabindex="-1">
-        <div class="modal-content">
-          <div class="modal-question">Voulez-vous vraiment quitter votre profil ?</div>
-          <div class="modal-sub">Vous allez revenir à l'accueil.</div>
-          <div class="modal-actions">
-            <button id="quitProfileYes">Oui</button>
-            <button id="quitProfileNo">Non</button>
-          </div>
-        </div>
-      </div>
-      <!-- ... (fin de ton main) ... -->
     </main>
   </div>
 
@@ -74,58 +30,6 @@
 
   <script>
     // ... (tes scripts existants pour le profil, avatar, pseudo etc.) ...
-
-    // Protection retour arrière + modale quitter la page après 2 tentatives
-    document.addEventListener("DOMContentLoaded", function() {
-      // On bride le retour arrière seulement si le profil existe (pseudo stocké)
-      if (localStorage.getItem("pseudo")) {
-        let backCount = 0;
-        history.pushState(null, null, location.href);
-        window.onpopstate = function () {
-          backCount++;
-          if (backCount >= 2) {
-            showQuitProfileModal();
-            backCount = 0;
-          } else {
-            history.pushState(null, null, location.href);
-          }
-        };
-
-        function showQuitProfileModal() {
-          const modal = document.getElementById('quitProfileModal');
-          if (modal) {
-            modal.classList.add("active");
-            document.body.style.overflow = "hidden";
-            setTimeout(function() {
-              document.getElementById('quitProfileNo').focus();
-            }, 100);
-          }
-        }
-        function hideQuitProfileModal() {
-          const modal = document.getElementById('quitProfileModal');
-          if (modal) {
-            modal.classList.remove("active");
-            document.body.style.overflow = "";
-          }
-        }
-        document.getElementById('quitProfileYes').onclick = function() {
-          hideQuitProfileModal();
-          window.location.href = "accueil.html";
-        };
-        document.getElementById('quitProfileNo').onclick = function() {
-          hideQuitProfileModal();
-          history.pushState(null, null, location.href);
-          backCount = 0;
-        };
-        document.addEventListener("keydown", function(e) {
-          if (document.getElementById('quitProfileModal').classList.contains("active") && e.key === "Escape") {
-            hideQuitProfileModal();
-            history.pushState(null, null, location.href);
-            backCount = 0;
-          }
-        });
-      }
-    });
   </script>
 
   <script src="JS/security-enhance.js"></script>
@@ -136,5 +40,7 @@
       ⚠️ JavaScript est désactivé. Vous ne pourrez pas modifier votre avatar ou pseudo.
     </div>
   </noscript>
+  <!-- Protection anti-retour universelle -->
+  <script src="JS/forbid-back.js"></script>
 </body>
 </html>
