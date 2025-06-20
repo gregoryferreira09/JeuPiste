@@ -9,27 +9,41 @@
   <style>
     body { background: #231d1d; color: #ffeecb; }
     .gps-btn-block { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.07);}
+    #show-indice { background: #e0c185; color: #473714; font-size: 0.98em; border: none; border-radius: 7px; padding: 5px 16px; cursor: pointer; transition: background 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.10); }
     #show-indice:hover { background: #ffeecb; }
     #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
     #indice-modal.active { display: flex; }
     .modal-img-wrapper { position: relative; background: #fffbe0; padding: 24px 24px 12px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); max-width: 92vw; }
     .modal-img-wrapper img { display: block; max-width: 70vw; max-height: 60vh; margin: 0 auto; border-radius: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
-    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.18s; }
+    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.2s; }
     .close-modal:hover { color: #e0c185; }
     .input-password-wrapper { display: flex; flex-direction: column; align-items: center; margin: 38px 0 10px 0; }
     .input-password-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
-    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 98vw; }
+    .input-password-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 90vw; text-align: center; box-sizing: border-box; }
     .input-password-field:focus { border: 1.5px solid #ffeecb; }
     .enigme-block { margin-top: 24px; }
     .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
     .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
+    /* Styles pour le chrono */
+    #timer { color: #e0c185; font-size: 1.4em; margin: 0 10px; }
+    #chrono-message { color: #e0c185; font-size: 1.08em; }
   </style>
 </head>
 <body>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
+
+  <!-- Fenêtre flottante pour la détermination -->
+  <div id="blocker" style="display:none;">
+    <div id="blocker-inner">
+      <div id="blocker-msg">
+        Votre lutte acharnée durant ces longues minutes vous auront sûrement permis de découvrir une qualité certaine :<br><br>
+        <strong>la détermination.</strong>
+      </div>
+      <button id="blocker-btn" type="button">Continuer</button>
+    </div>
+  </div>
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
@@ -49,6 +63,12 @@
             Car sans la lumière de l’esprit, vous resterez dans l’ombre du chemin.<br><br>
           </div>
         </div>
+      </div>
+
+      <!-- Chrono -->
+      <div style="margin:20px 0;">
+        <span id="timer">07:00</span>
+        <span id="chrono-message">Vous disposez de 7 minutes pour résoudre cette énigme.</span>
       </div>
 
       <!-- Bloc GPS obligatoire au début -->
@@ -84,10 +104,10 @@
             </span>
           </div>
           <div class="input-password-wrapper">
-            <label for="password-field" class="input-password-label">
+            <label for="answer-field" class="input-password-label">
               Entrez le mot de passe pour valider votre progression :
             </label>
-            <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
+            <input type="text" id="answer-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
           </div>
           <button id="next-quest" class="main-btn" disabled>Quête suivante</button>
         </div>
@@ -119,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
     authDomain: "murder-party-ba8d1.firebaseapp.com",
     databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "murder-party-ba8d1",
-    storageBucket: "murder-party-ba8d1.firebasestorage.app",
+    storageBucket: "murder-party-ba8d1.appspot.com", // <-- CORRIGÉ
     messagingSenderId: "20295055805",
     appId: "1:20295055805:web:0963719c3f23ab7752fad4",
     measurementId: "G-KSBMBB7KMJ"
@@ -192,9 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Si refresh après chrono, réaffiche la fenêtre flottante !
   blocker.style.display = "none";
-answerField.disabled = false;
-nextBtn.disabled = true;
-nextBtn.classList.remove('enabled');
+  answerField.disabled = false;
+  nextBtn.disabled = true;
+  nextBtn.classList.remove('enabled');
 
   // Permet de refermer la fenêtre flottante
   blockerBtn.addEventListener('click', function() {
@@ -301,6 +321,51 @@ nextBtn.classList.remove('enabled');
           goToStep(step);
         });
     }
+  });
+
+  // --- Gestion GPS/Indice/Modal ---
+  document.getElementById("check-gps").addEventListener("click", function() {
+    const feedback = document.getElementById("gps-feedback");
+    feedback.textContent = "Recherche de votre position...";
+    if (!navigator.geolocation) {
+      feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
+      return;
+    }
+    const DEST_LAT = 47.367167;
+    const DEST_LON = -0.562611;
+    const TOLERANCE_METERS = 10;
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      function getDistanceMeters(lat1, lon1, lat2, lon2) {
+        const R = 6378137;
+        const dLat = (lat2-lat1)*Math.PI/180;
+        const dLon = (lon2-lon1)*Math.PI/180;
+        const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+      }
+      const dist = getDistanceMeters(lat, lon, DEST_LAT, DEST_LON);
+      if (dist < TOLERANCE_METERS) {
+        document.getElementById("localisation-block").style.display = "none";
+        document.getElementById("suite-block").style.display = "";
+        document.getElementById("timer").style.display = "";
+        document.getElementById("chrono-message").style.display = "";
+      } else {
+        feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
+      }
+    }, function(err) {
+      document.getElementById("gps-feedback").textContent = "Position non trouvée (" + err.message + ")";
+    });
+  });
+
+  document.getElementById('show-indice').addEventListener('click', function() {
+    document.getElementById('indice-modal').classList.add('active');
+  });
+  document.getElementById('close-indice').addEventListener('click', function() {
+    document.getElementById('indice-modal').classList.remove('active');
+    document.getElementById('enigme-zone').style.display = 'block';
+    document.getElementById('answer-field').focus();
   });
 });
   </script>
