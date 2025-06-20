@@ -7,39 +7,6 @@
   <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
-  <style>
-    /* Modale pour quitter la page */
-    #quitCreateModal {
-      display:none; position:fixed; left:0; top:0; width:100vw; height:100vh;
-      background:rgba(44,27,27,0.82); z-index:99999; justify-content:center; align-items:center;
-    }
-    #quitCreateModal.active { display: flex; }
-    #quitCreateModal .modal-content {
-      background:#2c1b1b; border-radius:16px; padding:32px 18px;
-      box-shadow:0 4px 24px #0009; border:2px solid #e0c185;
-      max-width:340px; margin:auto; text-align:center;
-    }
-    #quitCreateModal .modal-question {
-      font-family:'Cinzel Decorative',serif; color:#e0c185; font-size:1.18em; margin-bottom:24px;
-    }
-    #quitCreateModal .modal-sub {
-      font-size:0.93em;color:#ffeecb;margin-bottom:20px;
-    }
-    #quitCreateModal .modal-actions {
-      display:flex; gap:22px; justify-content:center;
-    }
-    #quitCreateYes {
-      background:#e06c6c; color:#fff; border-radius:8px; border:none;
-      padding:12px 32px; font-size:1.07em; font-family:'Cinzel Decorative',serif; cursor:pointer;
-    }
-    #quitCreateNo {
-      background:#e0c185; color:#3d2b1f; border-radius:8px; border:none;
-      padding:12px 32px; font-size:1.07em; font-family:'Cinzel Decorative',serif; cursor:pointer;
-    }
-    @media (max-width: 600px) {
-      #quitCreateModal .modal-content { max-width:90vw; }
-    }
-  </style>
   <script>
    // Ne reset le code salon que si on arrive sur cette page sans transition depuis salon.html
    if (!document.referrer.includes("salon.html")) {
@@ -81,17 +48,6 @@
       </div>
       <div class="message" id="message" role="alert" aria-live="polite"></div>
     </form>
-    <!-- Modale Quitter la page (custom) -->
-    <div id="quitCreateModal" tabindex="-1">
-      <div class="modal-content">
-        <div class="modal-question">Voulez-vous vraiment quitter la création de partie ?</div>
-        <div class="modal-sub">Vous allez revenir à l'accueil.</div>
-        <div class="modal-actions">
-          <button id="quitCreateYes">Oui</button>
-          <button id="quitCreateNo">Non</button>
-        </div>
-      </div>
-    </div>
   </main>
 </div>
 
@@ -134,63 +90,14 @@
     }
   });
 
-  // Empêche le retour arrière du navigateur de revenir dans le salon sans reset
+  // Empêche le retour arrière du navigateur de revenir dans le salon sans reset (cache navigateur)
   window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
       localStorage.removeItem("salonCode");
     }
   });
-
-  // Protection retour arrière + modale quitter la page après 2 tentatives
-  document.addEventListener("DOMContentLoaded", function() {
-    let backCount = 0;
-    history.pushState(null, null, location.href);
-    window.onpopstate = function () {
-      backCount++;
-      if (backCount >= 2) {
-        showQuitCreateModal();
-        backCount = 0;
-      } else {
-        history.pushState(null, null, location.href);
-      }
-    };
-
-    function showQuitCreateModal() {
-      const modal = document.getElementById('quitCreateModal');
-      if (modal) {
-        modal.classList.add("active");
-        document.body.style.overflow = "hidden";
-        setTimeout(function() {
-          document.getElementById('quitCreateNo').focus();
-        }, 100);
-      }
-    }
-    function hideQuitCreateModal() {
-      const modal = document.getElementById('quitCreateModal');
-      if (modal) {
-        modal.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-    }
-    document.getElementById('quitCreateYes').onclick = function() {
-      localStorage.removeItem("salonCode");
-      hideQuitCreateModal();
-      window.location.href = "accueil.html";
-    };
-    document.getElementById('quitCreateNo').onclick = function() {
-      hideQuitCreateModal();
-      history.pushState(null, null, location.href);
-      backCount = 0;
-    };
-    document.addEventListener("keydown", function(e) {
-      if (document.getElementById('quitCreateModal').classList.contains("active") && e.key === "Escape") {
-        hideQuitCreateModal();
-        history.pushState(null, null, location.href);
-        backCount = 0;
-      }
-    });
-  });
 </script>
+
 <noscript>
   <div style="color: #e0c185; text-align: center; margin-top: 20px;" role="alert">
     ⚠️ JavaScript est désactivé. Vous ne pourrez pas créer de partie.
@@ -200,5 +107,8 @@
 <script src="JS/security-enhance.js"></script>
 <script src="JS/ux-enhance.js"></script>
 <script src="JS/scalability.js"></script>
+
+<!-- PROTECTION ANTI-RETOUR UNIVERSELLE -->
+<script src="JS/forbid-back.js"></script>
 </body>
 </html>
