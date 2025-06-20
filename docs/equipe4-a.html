@@ -124,9 +124,14 @@
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
     };
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+// Auth anonyme obligatoire !
+firebase.auth().onAuthStateChanged(function(user) {
+  if (!user) {
+    firebase.auth().signInAnonymously();
+  }
+});
 
     // GPS obligatoire
     const DEST_LAT = 47.367167;
