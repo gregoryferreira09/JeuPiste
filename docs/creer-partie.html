@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../Public/styles/style.css">
+  <link rel="stylesheet" href="styles/style.css"><!-- Chemin corrigé -->
   <script>
    // Ne reset le code salon que si on arrive sur cette page sans transition depuis salon.html
    if (!document.referrer.includes("salon.html")) {
@@ -46,7 +46,7 @@
 
       <div class="boutons-actions">
         <button class="main-btn" type="submit" id="genererBtn">Créer la partie</button>
-        <a class="main-btn" href="./accueil.html" id="retourAccueilBtn">Retour</a>
+        <a class="main-btn" href="accueil.html" id="retourAccueilBtn">Retour</a><!-- Chemin corrigé -->
       </div>
       <div class="message" id="message" role="alert" aria-live="polite"></div>
     </form>
@@ -69,7 +69,7 @@
 <!-- Charger Firebase AVANT tout JS qui l'utilise -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="../JS/creer-partie.js"></script>
+<script src="JS/creer-partie.js"></script><!-- Chemin corrigé -->
 <script>
   // Gestion du submit sécurisé
   const form = document.getElementById('creerPartieForm');
@@ -105,9 +105,9 @@
   </div>
 </noscript>
 
-<script src="../JS/security-enhance.js"></script>
-<script src="../JS/ux-enhance.js"></script>
-<script src="../JS/scalability.js"></script>
+<script src="JS/security-enhance.js"></script><!-- Chemin corrigé -->
+<script src="JS/ux-enhance.js"></script><!-- Chemin corrigé -->
+<script src="JS/scalability.js"></script><!-- Chemin corrigé -->
   
 </body>
 </html>
