@@ -103,7 +103,7 @@
     </main>
   </div>
 
-   <footer class="footer">
+  <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
@@ -112,198 +112,197 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../JS/gameflow.js"></script>
   <script>
-    // === Initialisation Firebase ===
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+document.addEventListener('DOMContentLoaded', function() {
+  // --- Initialisation Firebase AVANT toute utilisation ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+    authDomain: "murder-party-ba8d1.firebaseapp.com",
+    databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "murder-party-ba8d1",
+    storageBucket: "murder-party-ba8d1.firebasestorage.app",
+    messagingSenderId: "20295055805",
+    appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+    measurementId: "G-KSBMBB7KMJ"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    const db = firebase.database();
+  // --- Sécurité session ---
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = Number(localStorage.getItem("equipeNum"));
+  const dureeEpreuve = 7 * 60; // 7 minutes chrono
+  const stepIndex = 4;
 
-    // GPS obligatoire
-    const DEST_LAT = 47.367167;
-    const DEST_LON = -0.562611;
-    const TOLERANCE_METERS = 10;
-    document.getElementById("check-gps").addEventListener("click", function() {
-      const feedback = document.getElementById("gps-feedback");
-      feedback.textContent = "Recherche de votre position...";
-      if (!navigator.geolocation) {
-        feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
+  if (!salonCode || isNaN(equipeNum) || equipeNum < 0 || equipeNum > 4) {
+    window.location.href = "accueil.html";
+    return;
+  }
+
+  // --- Sélecteurs principaux ---
+  const timer = document.getElementById('timer');
+  const chronoMsg = document.getElementById('chrono-message');
+  const answerField = document.getElementById('answer-field');
+  const nextBtn = document.getElementById('next-quest');
+  const blocker = document.getElementById('blocker');
+  const blockerBtn = document.getElementById('blocker-btn');
+
+  // --- Chrono synchronisé via Firebase ---
+  let chronoInterval = null;
+  db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
+    .on('value', snap => {
+      let startTime = snap.val();
+      if (!startTime) {
+        // Premier arrivé : écrit startTime UNE FOIS
+        startTime = Date.now();
+        db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`).set(startTime);
         return;
       }
-      navigator.geolocation.getCurrentPosition(function(pos) {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        function getDistanceMeters(lat1, lon1, lat2, lon2) {
-          const R = 6378137;
-          const dLat = (lat2-lat1)*Math.PI/180;
-          const dLon = (lon2-lon1)*Math.PI/180;
-          const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-          return R * c;
-        }
-        const dist = getDistanceMeters(lat, lon, DEST_LAT, DEST_LON);
-        if (dist < TOLERANCE_METERS) {
-          document.getElementById("localisation-block").style.display = "none";
-          document.getElementById("suite-block").style.display = "";
-        } else {
-          feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
-        }
-      }, function(err) {
-        document.getElementById("gps-feedback").textContent = "Position non trouvée (" + err.message + ")";
-      });
+      lancerChrono(startTime);
     });
 
-    // ----- Logique d'affichage progressive -----
-    document.getElementById('show-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.add('active');
-    });
-    document.getElementById('close-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.remove('active');
-      document.getElementById('enigme-zone').style.display = 'block';
-      document.getElementById('password-field').focus();
-    });
-
-    // ========== Firebase & Gameflow ==========
-
-    // Sécurité session
-    const salonCode = localStorage.getItem("salonCode");
-    const equipeNum = Number(localStorage.getItem("equipeNum"));
-    if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
-      window.location.href = "accueil.html";
-    }
-    // Chrono/temps passé sur l’épreuve
-    const stepIndex = 3;
-    let startTime = null;
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-      .once('value', function(snap) {
-        startTime = snap.val();
-        if (!startTime) {
-          startTime = Date.now();
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
-        }
-      });
-
-    function showToast(msg) {
-      let toast = document.getElementById('toast-message');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast-message';
-        toast.className = 'modal-toast';
-        toast.setAttribute('role', 'alert');
-        document.body.appendChild(toast);
+  function lancerChrono(startTime) {
+    if (chronoInterval) clearTimeout(chronoInterval);
+    function tick() {
+      const now = Date.now();
+      let secRestantes = Math.max(0, Math.round((startTime + dureeEpreuve * 1000 - now) / 1000));
+      let min = Math.floor(secRestantes / 60);
+      let sec = secRestantes % 60;
+      timer.textContent = (min < 10 ? "0":"") + min + ":" + (sec < 10 ? "0":"") + sec;
+      if (secRestantes > 0) {
+        chronoInterval = setTimeout(tick, 1000);
+      } else {
+        timer.classList.add('overtime');
+        chronoMsg.classList.add('overtime');
+        showBlockerPage();
       }
+    }
+    tick();
+  }
+
+  // --- Blocage après chrono ---
+  function showBlockerPage() {
+    blocker.style.display = "flex";
+    answerField.value = "détermination";
+    answerField.disabled = true;
+    nextBtn.disabled = false;
+    nextBtn.classList.add('enabled');
+    window.name = "blocker-determination";
+    if ("vibrate" in navigator) navigator.vibrate(200);
+  }
+
+  // Si refresh après chrono, réaffiche la fenêtre flottante !
+  blocker.style.display = "none";
+answerField.disabled = false;
+nextBtn.disabled = true;
+nextBtn.classList.remove('enabled');
+
+  // Permet de refermer la fenêtre flottante
+  blockerBtn.addEventListener('click', function() {
+    blocker.style.display = "none";
+  });
+
+  // --- Toast harmonisé ---
+  function showToast(msg) {
+    const toast = document.getElementById('toast-message');
+    if (toast) {
       toast.textContent = msg;
       toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 2200);
+      setTimeout(() => { toast.classList.remove('visible'); }, 2400);
     }
+  }
 
-    // Validation mot de passe très souple
-    function normalize(str) {
-      return str
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9 ]+/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
+  // --- Validation réponse ---
+  answerField.addEventListener('input', function() {
+    let value = this.value.trim().toLowerCase()
+      .replace(/’/g, "'")
+      .replace(/\s+/g, ' ')
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if ((value === "rien" || value === "determination") && !this.disabled) {
+      nextBtn.disabled = false;
+      nextBtn.classList.add('enabled');
+      if ("vibrate" in navigator) navigator.vibrate(70);
+    } else {
+      nextBtn.disabled = true;
+      nextBtn.classList.remove('enabled');
     }
-    const PASSWORD = normalize("j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?");
+  });
 
-    document.getElementById('password-field').addEventListener('input', function() {
-      let userValue = normalize(this.value);
-      const btn = document.getElementById('next-quest');
-      if (userValue === PASSWORD) {
-        btn.disabled = false;
-        btn.classList.add('enabled');
-      } else {
-        btn.disabled = true;
-        btn.classList.remove('enabled');
-      }
-    });
-
-    document.getElementById('next-quest').addEventListener('click', function() {
-      if (this.disabled) return;
-      this.disabled = true;
-      this.classList.remove('enabled');
-      showToast("Validation en cours...");
-      // === ENREGISTRE LE TEMPS PASSÉ ===
-      const now = Date.now();
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-        .once('value', function(snap) {
-          const sTime = snap.val();
-          if (sTime) {
-            const elapsed = Math.round((now - sTime) / 1000);
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
-          }
-          // Puis passage à l'étape suivante
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-              if (!error && committed) {
-                getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-                  const step = snapshot.val();
-                  if (step < parcours.length) {
-                    const epreuveNum = parcours[step];
-                    if (epreuveNum === 6) {
-                      window.location.href = "epreuve6.html";
-                    } else if (epreuveNum === 7) {
-                      window.location.href = "révélation.html";
-                    } else {
-                      window.location.href = `equipe${epreuveNum}-a.html`;
-                    }
-                  } else {
-                    alert('Bravo, vous avez terminé !');
-                  }
-                });
+  // --- Passage à la quête suivante (synchro binôme + navigation dynamique) ---
+  nextBtn.addEventListener('click', function() {
+    nextBtn.disabled = true;
+    nextBtn.classList.remove('enabled');
+    showToast("Validation en cours...");
+    // === ENREGISTRE LE TEMPS PASSÉ ===
+    const now = Date.now();
+    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
+      .once('value', function(snap) {
+        const sTime = snap.val();
+        if (sTime) {
+          const elapsed = Math.round((now - sTime) / 1000);
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+        }
+        // Puis passage à l'étape suivante
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+          if (!error && committed) {
+            getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+              const step = snapshot.val();
+              if (step < parcours.length) {
+                const epreuveNum = parcours[step];
+                if (epreuveNum === 6) {
+                  window.location.href = "epreuve6.html";
+                } else if (epreuveNum === 7) {
+                  window.location.href = "révélation.html";
+                } else {
+                  window.location.href = `equipe${epreuveNum}-a.html`;
+                }
               } else {
-                showToast("Erreur lors de la validation...");
-                const btn = document.getElementById('next-quest');
-                btn.disabled = false;
-                btn.classList.add('enabled');
+                alert('Bravo, vous avez terminé !');
               }
             });
+          } else {
+            showToast("Erreur lors de la validation...");
+            nextBtn.disabled = false;
+            nextBtn.classList.add('enabled');
+          }
+          window.name = ""; // reset pour ne pas réouvrir la fenêtre à la prochaine page
         });
-    });
+      });
+  });
 
-    // NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également)
-    function goToStep(stepIndex) {
-      getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
-        if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
-          showToast('Bravo, vous avez terminé !');
-          setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
-          return;
-        }
-        const epreuveNum = parcours[stepIndex];
-        let target = "";
-        if (epreuveNum === 6) target = "epreuve6.html";
-        else if (epreuveNum === 7) target = "révélation.html";
-        else target = `equipe${epreuveNum}-a.html`;
-        const current = window.location.pathname.split('/').pop();
-        if (current !== target) {
-          window.location.href = target;
-        }
-      });
-    }
-    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-      .on('value', function(snapshot) {
-        const step = snapshot.val() || 0;
-        goToStep(step);
-      });
-    window.addEventListener("pageshow", function(evt) {
-      if (evt.persisted) {
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-          .once('value', function(snapshot) {
-            const step = snapshot.val() || 0;
-            goToStep(step);
-          });
+  // --- NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également) ---
+  function goToStep(stepIndex) {
+    getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
+      if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
+        showToast('Bravo, vous avez terminé !');
+        setTimeout(() => { window.location.href = "accueil.html"; }, 2500);
+        return;
+      }
+      const epreuveNum = parcours[stepIndex];
+      let target = "";
+      if (epreuveNum === 6) target = "epreuve6.html";
+      else if (epreuveNum === 7) target = "révélation.html";
+      else target = `equipe${epreuveNum}-a.html`;
+      const current = window.location.pathname.split('/').pop();
+      if (current !== target) {
+        window.location.href = target;
       }
     });
+  }
+  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+    .on('value', function(snapshot) {
+      const step = snapshot.val() || 0;
+      goToStep(step);
+    });
+  window.addEventListener("pageshow", function(evt) {
+    if (evt.persisted) {
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+        .once('value', function(snapshot) {
+          const step = snapshot.val() || 0;
+          goToStep(step);
+        });
+    }
+  });
+});
   </script>
 </body>
 </html>
