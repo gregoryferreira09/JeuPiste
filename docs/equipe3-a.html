@@ -83,7 +83,9 @@
           </label>
         </div>
       </div>
-      <div id="photo-filename"></div>
+      <div id="photo-filename-1"></div>
+      <div id="photo-filename-2"></div>
+      <div id="photo-filename-3"></div>
       <button id="next-quest" class="main-btn" disabled>Quête suivante</button>
     </main>
   </div>
@@ -186,6 +188,9 @@
           goToStep(step);
         });
 
+      
+      
+      
       // --- GESTIONNAIRE UPLOAD avec gestion DOM prêt ---
       function setupUploadHandler() {
         var input = document.getElementById('photo-upload');
@@ -224,81 +229,111 @@
           console.error("input/out/icon manquant :", {input, out, icon});
         }
 
-        // Synchro multi-device, affichage et bouton + grisé de l'icône
-        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo')
-          .on('value', function(snapshot) {
-            var input = document.getElementById('photo-upload');
-            var out = document.getElementById('photo-filename');
-            var btn = document.getElementById('next-quest');
-            var icon = document.getElementById('icon-photo');
-            const data = snapshot.val();
-            console.log("DB photo value reçu :", data);
-            if (out && btn && input && icon) {
-              if (data && data.name) {
-                out.textContent = "Photo sélectionnée : " + data.name;
-                btn.disabled = false;
-                btn.classList.add('enabled');
-                input.disabled = true;
-                icon.classList.add('grayed');
-              } else {
-                out.textContent = "";
-                btn.disabled = true;
-                btn.classList.remove('enabled');
-                input.disabled = false;
-                icon.classList.remove('grayed');
-              }
+             // --- GESTIONNAIRE UPLOAD MULTI-PHOTO ---
+
+function setupUploadHandler(index) {
+  var input = document.getElementById('photo-upload-' + index);
+  var out = document.getElementById('photo-filename-' + index);
+  var btn = document.getElementById('next-quest');
+  var icon = document.getElementById('icon-photo' + index);
+
+  if(input && out && icon) {
+    input.addEventListener('change', function() {
+      if(this.files && this.files[0]) {
+        const file = this.files[0];
+        const storagePath = `parties/${salonCode}/equipe${equipeNum}/etape${stepIndex}/photo${index}_${file.name}`;
+        storage.ref(storagePath).put(file).then(snapshot => {
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + index).set({
+            name: file.name,
+            uploadedAt: Date.now()
+          });
+        }).catch(err => {
+          showToast("Erreur lors de l'upload : " + err.message);
+        });
+      } else {
+        showToast("Aucun fichier sélectionné !");
+      }
+    });
+
+    // Synchro multi-device, affichage et bouton + grisé de l'icône
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + index)
+      .on('value', function(snapshot) {
+        const data = snapshot.val();
+        if (data && data.name) {
+          out.textContent = "Photo sélectionnée : " + data.name;
+          input.disabled = true;
+          icon.classList.add('grayed');
+        } else {
+          out.textContent = "";
+          input.disabled = false;
+          icon.classList.remove('grayed');
+        }
+        // Active le bouton uniquement si les 3 photos sont uploadées
+        Promise.all([1,2,3].map(i =>
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/photo' + i)
+            .once('value')
+        )).then(snapshots => {
+          const allUploaded = snapshots.every(snap => snap.val() && snap.val().name);
+          btn.disabled = !allUploaded;
+          btn.classList.toggle('enabled', allUploaded);
+        });
+      });
+  } else {
+    console.error("input/out/icon manquant pour l'index", index, {input, out, icon});
+  }
+}
+
+// Init gestionnaires upload pour les 3 photos
+if (document.readyState === "loading") {
+  document.addEventListener('DOMContentLoaded', function() {
+    [1, 2, 3].forEach(setupUploadHandler);
+  });
+} else {
+  [1, 2, 3].forEach(setupUploadHandler);
+}
+
+// --- Navigation bouton « quête suivante » (inchangé) ---
+var btn = document.getElementById('next-quest');
+if (btn) {
+  btn.addEventListener('click', function() {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.classList.remove('enabled');
+    showToast("Validation en cours...");
+    // === ENREGISTRE LE TEMPS PASSÉ ===
+    const now = Date.now();
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+      .once('value', function(snap) {
+        const sTime = snap.val();
+        if (sTime) {
+          const elapsed = Math.round((now - sTime) / 1000);
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+        }
+        // Puis passage à l'étape suivante
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+            if (!error && committed) {
+              showToast("Étape validée !");
+            } else {
+              showToast("Erreur lors de la validation...");
+              btn.disabled = false;
+              btn.classList.add('enabled');
             }
           });
-
-        // Navigation bouton
-        if (btn) {
-          btn.addEventListener('click', function() {
-            if (btn.disabled) return;
-            btn.disabled = true;
-            btn.classList.remove('enabled');
-            showToast("Validation en cours...");
-            // === ENREGISTRE LE TEMPS PASSÉ ===
-            const now = Date.now();
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
-              .once('value', function(snap) {
-                const sTime = snap.val();
-                if (sTime) {
-                  const elapsed = Math.round((now - sTime) / 1000);
-                  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
-                }
-                // Puis passage à l'étape suivante
-                db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-                  .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-                    if (!error && committed) {
-                      showToast("Étape validée !");
-                    } else {
-                      showToast("Erreur lors de la validation...");
-                      btn.disabled = false;
-                      btn.classList.add('enabled');
-                    }
-                  });
-              });
-          });
-        }
-      }
-
-      // Correction DOMContentLoaded
-      if (document.readyState === "loading") {
-        document.addEventListener('DOMContentLoaded', setupUploadHandler);
-      } else {
-        setupUploadHandler();
-      }
-
-      // Anti-retour arrière
-      window.addEventListener("pageshow", function(evt) {
-        if (evt.persisted) {
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-            .once('value', function(snapshot) {
-              const step = snapshot.val() || 0;
-              goToStep(step);
-            });
-        }
       });
+  });
+}
+
+// --- Anti-retour arrière (inchangé) ---
+window.addEventListener("pageshow", function(evt) {
+  if (evt.persisted) {
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+      .once('value', function(snapshot) {
+        const step = snapshot.val() || 0;
+        goToStep(step);
+      });
+  }
+});
     }
   </script>
 </body>
