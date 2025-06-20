@@ -324,10 +324,19 @@ document.addEventListener('DOMContentLoaded', function() {
     messagingSenderId: "20295055805",
     appId: "1:20295055805:web:0963719c3f23ab7752fad4",
     measurementId: "G-KSBMBB7KMJ"
+ 
   };
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
+// Auth anonyme obligatoire !
+firebase.auth().onAuthStateChanged(function(user) {
+  if (!user) {
+    firebase.auth().signInAnonymously();
+  }
+});
   // --- Sécurité session ---
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
