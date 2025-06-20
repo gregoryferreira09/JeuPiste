@@ -95,7 +95,7 @@
       <div id="indice-modal">
         <div class="modal-img-wrapper">
           <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
-          <img src="/JeuPiste/Public/images/enigme.png" alt="Indice visuel alphabet">
+          <img src="images/enigme.png" alt="Indice visuel alphabet">
         </div>
       </div>
     </main>
@@ -147,13 +147,13 @@
 
     // ----- Logique d'affichage progressive -----
     document.getElementById('show-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.add('active');
-    });
-    document.getElementById('close-indice').addEventListener('click', function() {
-      document.getElementById('indice-modal').classList.remove('active');
-      document.getElementById('enigme-zone').style.display = 'block';
-      document.getElementById('password-field').focus();
-    });
+  document.getElementById('indice-modal').classList.add('active');
+});
+document.getElementById('close-indice').addEventListener('click', function() {
+  document.getElementById('indice-modal').classList.remove('active');
+  document.getElementById('enigme-zone').style.display = 'block';
+  document.getElementById('password-field').focus();
+});
 
     // ========== Firebase & Gameflow ==========
 
@@ -191,26 +191,26 @@
 
     // Validation mot de passe très souple
     function normalize(str) {
-      return str
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9 ]+/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-    const PASSWORD = normalize("j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?");
+  return str
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9 ]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+const PASSWORD = normalize("j'ai trop de temps libre, vous n'auriez pas une amie célibataire à me présenter ?");
 
-    document.getElementById('password-field').addEventListener('input', function() {
-      let userValue = normalize(this.value);
-      const btn = document.getElementById('next-quest');
-      if (userValue === PASSWORD) {
-        btn.disabled = false;
-        btn.classList.add('enabled');
-      } else {
-        btn.disabled = true;
-        btn.classList.remove('enabled');
-      }
-    });
+document.getElementById('password-field').addEventListener('input', function() {
+  let userValue = normalize(this.value);
+  const btn = document.getElementById('next-quest');
+  if (userValue === PASSWORD) {
+    btn.disabled = false;
+    btn.classList.add('enabled');
+  } else {
+    btn.disabled = true;
+    btn.classList.remove('enabled');
+  }
+});
 
     document.getElementById('next-quest').addEventListener('click', function() {
       if (this.disabled) return;
