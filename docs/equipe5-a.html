@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
   <style>
-    body { background: #231d1d; color: #ffeecb; }
     .chrono-block {
       display: flex;
       align-items: center;
@@ -194,7 +193,7 @@
     }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
 
-    /* --- FENÊTRE FLOTTANTE --- */
+    /* --- HARMONISATION DE LA FENÊTRE FLOTTANTE --- */
     #blocker {
       display: none;
       position: fixed;
@@ -246,7 +245,7 @@
     <h1 class="site-title">Jeu de piste</h1>
   </header>
 
-  <!-- Fenêtre flottante pour la détermination -->
+  <!-- Fenêtre flottante harmonisée, cachée par défaut -->
   <div id="blocker">
     <div id="blocker-inner">
       <div id="blocker-msg">
@@ -260,6 +259,7 @@
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
       <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">Quête émotionnelle</h2>
+      <!-- Chrono et message harmonisés -->
       <div class="chrono-block">
         <span class="chrono-timer" id="timer">07:00</span>
         <span class="chrono-message" id="chrono-message">
@@ -283,22 +283,28 @@
           </div>
         </div>
       </div>
+
+      <!-- Bloc boussole harmonisé -->
       <div class="actions-row-horizontal">
         <div class="icon-action side-icon">
-          <a href="https://maps.google.com/?q=47.50408765041595,-0.5873319650311483" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
+          <a href="https://maps.google.com/?q=47.477556,-0.578583" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"></path>
             </svg>
             <span>Boussole</span>
           </a>
         </div>
       </div>
+      <!-- Fin bloc boussole -->
+
+      <!-- Saisie de la réponse -->
       <div class="input-answer-wrapper">
         <label for="answer-field" class="input-answer-label">
           Inscrivez ici ce que vous avez trouvé :
         </label>
         <input type="text" id="answer-field" class="input-answer-field" autocomplete="off" placeholder="Tapez votre réponse…">
       </div>
+
       <button id="next-quest" disabled>Quête suivante</button>
     </main>
   </div>
@@ -310,11 +316,10 @@
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="JS/gameflow.js"></script>
   <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // --- Initialisation Firebase ---
+  // --- Initialisation Firebase AVANT toute utilisation ---
   const firebaseConfig = {
     apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
     authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -324,19 +329,10 @@ document.addEventListener('DOMContentLoaded', function() {
     messagingSenderId: "20295055805",
     appId: "1:20295055805:web:0963719c3f23ab7752fad4",
     measurementId: "G-KSBMBB7KMJ"
- 
   };
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
-};
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
-// Auth anonyme obligatoire !
-firebase.auth().onAuthStateChanged(function(user) {
-  if (!user) {
-    firebase.auth().signInAnonymously();
-  }
-});
   // --- Sécurité session ---
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
@@ -362,6 +358,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     .on('value', snap => {
       let startTime = snap.val();
       if (!startTime) {
+        // Premier arrivé : écrit startTime UNE FOIS
         startTime = Date.now();
         db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`).set(startTime);
         return;
@@ -399,11 +396,13 @@ firebase.auth().onAuthStateChanged(function(user) {
     if ("vibrate" in navigator) navigator.vibrate(200);
   }
 
+  // Si refresh après chrono, réaffiche la fenêtre flottante !
   blocker.style.display = "none";
-  answerField.disabled = false;
-  nextBtn.disabled = true;
-  nextBtn.classList.remove('enabled');
+answerField.disabled = false;
+nextBtn.disabled = true;
+nextBtn.classList.remove('enabled');
 
+  // Permet de refermer la fenêtre flottante
   blockerBtn.addEventListener('click', function() {
     blocker.style.display = "none";
   });
@@ -434,11 +433,12 @@ firebase.auth().onAuthStateChanged(function(user) {
     }
   });
 
-  // --- Passage à la quête suivante ---
+  // --- Passage à la quête suivante (synchro binôme + navigation dynamique) ---
   nextBtn.addEventListener('click', function() {
     nextBtn.disabled = true;
     nextBtn.classList.remove('enabled');
     showToast("Validation en cours...");
+    // === ENREGISTRE LE TEMPS PASSÉ ===
     const now = Date.now();
     db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
       .once('value', function(snap) {
@@ -447,6 +447,7 @@ firebase.auth().onAuthStateChanged(function(user) {
           const elapsed = Math.round((now - sTime) / 1000);
           db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
         }
+        // Puis passage à l'étape suivante
         db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
           if (!error && committed) {
             getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
@@ -469,12 +470,12 @@ firebase.auth().onAuthStateChanged(function(user) {
             nextBtn.disabled = false;
             nextBtn.classList.add('enabled');
           }
-          window.name = "";
+          window.name = ""; // reset pour ne pas réouvrir la fenêtre à la prochaine page
         });
       });
   });
 
-  // --- NAVIGATION GAMEFLOW SYNCHRO ---
+  // --- NAVIGATION GAMEFLOW SYNCHRO (anti-retour arrière également) ---
   function goToStep(stepIndex) {
     getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
       if (!parcours || !Array.isArray(parcours) || stepIndex >= parcours.length) {
