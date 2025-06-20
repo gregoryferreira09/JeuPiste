@@ -202,7 +202,9 @@ button:focus, a:focus, input:focus {
 
 /* === Bandeau principal (main-accueil) toujours présent === */
 .main-accueil {
-  max-width: 520px;
+  width: 520px;         /* largeur fixe */
+  max-width: 100vw;     /* pour éviter de dépasser l'écran en mobile */
+  min-width: 0;         /* sécurité */
   margin: 40px auto;
   background: #2c1b1b;
   border-radius: 18px;
