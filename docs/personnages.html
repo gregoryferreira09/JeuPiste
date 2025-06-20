@@ -407,25 +407,35 @@
       decompteTimeoutID = setTimeout(tick, 1000);
     }
 
-    // === Confirmation retour accueil ===
+    // === Confirmation retour accueil cohérente (bouton ET navigateur) ===
     document.addEventListener("DOMContentLoaded", function() {
-      const btnRetourAccueil = document.getElementById("btnRetourAccueil");
       const confirmationRetourAccueil = document.getElementById("confirmationRetourAccueil");
       const confirmerRetourAccueilBtn = document.getElementById("confirmerRetourAccueilBtn");
       const annulerRetourAccueilBtn = document.getElementById("annulerRetourAccueilBtn");
+      const btnRetourAccueil = document.getElementById("btnRetourAccueil");
 
+      // Fonction globale appelée aussi bien par le bouton que forbid-back.js
+      window.showRetourAccueilModal = function() {
+        confirmationRetourAccueil.style.display = "flex";
+        confirmerRetourAccueilBtn.focus();
+      };
+
+      // Bouton "Retour accueil"
       btnRetourAccueil?.addEventListener("click", function(e) {
         e.preventDefault();
-        confirmationRetourAccueil.style.display = "flex";
+        window.showRetourAccueilModal();
       });
 
+      // Confirmation de sortie
       confirmerRetourAccueilBtn?.addEventListener("click", function() {
-        confirmationRetourAccueil.style.display = "none";
+        if (window.disableBackProtection) window.disableBackProtection();
         window.location.href = "accueil.html";
       });
 
+      // Annulation sortie
       annulerRetourAccueilBtn?.addEventListener("click", function() {
         confirmationRetourAccueil.style.display = "none";
+        btnRetourAccueil?.focus();
       });
     });
   </script>
