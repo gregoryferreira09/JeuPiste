@@ -127,19 +127,6 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
-  <!-- Fenêtre flottante confirmation retour accueil -->
-  <div id="confirmationRetourAccueil">
-    <div class="modal-content">
-      <div class="modal-question">
-        Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
-      </div>
-      <div class="modal-actions">
-        <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
-        <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       var main = document.querySelector('.fadeIn');
@@ -407,39 +394,40 @@
       decompteTimeoutID = setTimeout(tick, 1000);
     }
 
-    // === Confirmation retour accueil cohérente (bouton ET navigateur) ===
+    // === Confirmation retour accueil ===
     document.addEventListener("DOMContentLoaded", function() {
+      const btnRetourAccueil = document.getElementById("btnRetourAccueil");
       const confirmationRetourAccueil = document.getElementById("confirmationRetourAccueil");
       const confirmerRetourAccueilBtn = document.getElementById("confirmerRetourAccueilBtn");
       const annulerRetourAccueilBtn = document.getElementById("annulerRetourAccueilBtn");
-      const btnRetourAccueil = document.getElementById("btnRetourAccueil");
 
-      // Fonction globale appelée aussi bien par le bouton que forbid-back.js
-      window.showRetourAccueilModal = function() {
-        confirmationRetourAccueil.style.display = "flex";
-        confirmerRetourAccueilBtn.focus();
-      };
-
-      // Bouton "Retour accueil"
       btnRetourAccueil?.addEventListener("click", function(e) {
         e.preventDefault();
-        window.showRetourAccueilModal();
+        confirmationRetourAccueil.style.display = "flex";
       });
 
-      // Confirmation de sortie
       confirmerRetourAccueilBtn?.addEventListener("click", function() {
-        if (window.disableBackProtection) window.disableBackProtection();
+        confirmationRetourAccueil.style.display = "none";
         window.location.href = "accueil.html";
       });
 
-      // Annulation sortie
       annulerRetourAccueilBtn?.addEventListener("click", function() {
         confirmationRetourAccueil.style.display = "none";
-        btnRetourAccueil?.focus();
       });
     });
   </script>
-  <!-- Protection anti-retour et anti-fermeture -->
-  <script src="JS/forbid-back.js"></script>
+
+  <!-- Fenêtre flottante confirmation retour accueil -->
+  <div id="confirmationRetourAccueil">
+    <div class="modal-content">
+      <div class="modal-question">
+        Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
+      </div>
+      <div class="modal-actions">
+        <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
+        <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
