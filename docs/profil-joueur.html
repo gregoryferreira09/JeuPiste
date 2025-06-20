@@ -7,7 +7,92 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/style.css">
   <style>
-    /* ... (tes styles existants) ... */
+    /* ... (tes styles existants pour le profil, avatar, etc.) ... */
+    .main-accueil {
+      max-width: 520px;
+      margin: 40px auto;
+      background: #2c1b1b;
+      border-radius: 18px;
+      box-shadow: 0 4px 20px #0001;
+      padding: 32px 28px;
+      border: 2px solid #e0c185;
+      color: #f4e4c1;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .main-accueil h1 {
+      text-align: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2.3em;
+      margin-bottom: 8px;
+      color: #e0c185;
+    }
+    .profil-section {
+      margin: 0 auto 30px auto;
+      max-width: 340px;
+      background: #332420;
+      border-radius: 13px;
+      box-shadow: 0 2px 12px #0003;
+      padding: 24px 18px;
+      text-align: center;
+    }
+    .avatar-preview {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      margin-bottom: 14px;
+      object-fit: cover;
+      border: 3px solid #e0c185;
+      background: #fff;
+    }
+    .profil-label {
+      font-weight: bold;
+      color: #e0c185;
+      font-family: 'Cinzel Decorative', serif;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .profil-input, .profil-select {
+      width: 80%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #e0c185;
+      margin-bottom: 12px;
+      font-size: 1.1em;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .main-btn {
+      background: #e0c185;
+      color: #3d2b1f;
+      border-radius: 8px;
+      border: none;
+      padding: 12px 32px;
+      font-size: 1.07em;
+      font-family: 'Cinzel Decorative', serif;
+      cursor: pointer;
+      margin: 6px 0;
+      transition: background .2s, color .2s, box-shadow .2s;
+      min-width: 120px;
+    }
+    .main-btn:hover, .main-btn:focus {
+      background: #ffeecb;
+      color: #2c1b1b;
+      box-shadow: 0 0 8px #e0c18588;
+      outline: none;
+    }
+    .profil-message {
+      color: #e06c6c;
+      font-size: 0.97em;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+    @media (max-width: 650px) {
+      .main-accueil {
+        max-width: 98vw;
+        padding: 12px 2vw;
+        border-radius: 12px;
+      }
+      .profil-section { max-width: 99vw; }
+    }
   </style>
 </head>
 <body>
@@ -18,7 +103,18 @@
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
       <h1>Mon profil</h1>
-      <!-- ... (le reste de ton HTML de profil, avatar, etc.) ... -->
+      <section class="profil-section">
+        <img id="avatarPreview" class="avatar-preview" src="images/avatar-default.png" alt="Votre avatar" />
+        <br>
+        <label class="profil-label" for="pseudoInput">Pseudo</label>
+        <input id="pseudoInput" class="profil-input" type="text" maxlength="30" autocomplete="off" />
+        <br>
+        <label class="profil-label" for="avatarInput">Choisir un avatar</label>
+        <input id="avatarInput" class="profil-input" type="file" accept="image/*" />
+        <br>
+        <button id="saveProfilBtn" class="main-btn" type="button">Enregistrer</button>
+        <div id="profilMessage" class="profil-message" aria-live="polite"></div>
+      </section>
       <button type="button" onclick="location.href='accueil.html'" class="main-btn" style="margin-top:30px;">Retour à l'accueil</button>
     </main>
   </div>
@@ -29,7 +125,60 @@
   </footer>
 
   <script>
-    // ... (tes scripts existants pour le profil, avatar, pseudo etc.) ...
+    // FadeIn
+    document.addEventListener("DOMContentLoaded", function() {
+      var main = document.querySelector('.fadeIn');
+      if (main) main.classList.add('visible');
+    });
+
+    // Chargement du pseudo et avatar
+    document.addEventListener("DOMContentLoaded", function() {
+      var pseudo = localStorage.getItem("pseudo") || "";
+      var pseudoInput = document.getElementById("pseudoInput");
+      var avatarPreview = document.getElementById("avatarPreview");
+      var avatarLS = localStorage.getItem("avatarDataURL");
+      if (pseudoInput) pseudoInput.value = pseudo;
+      if (avatarLS) avatarPreview.src = avatarLS;
+      else avatarPreview.src = "images/avatar-default.png";
+    });
+
+    // Sauvegarde du profil
+    document.getElementById("saveProfilBtn").addEventListener("click", function() {
+      var pseudo = document.getElementById("pseudoInput").value.trim().substring(0,30);
+      var avatarInput = document.getElementById("avatarInput");
+      var avatarPreview = document.getElementById("avatarPreview");
+      var messageDiv = document.getElementById("profilMessage");
+      if (!pseudo || /[<>\/\\'"`]/.test(pseudo)) {
+        messageDiv.textContent = "Pseudo invalide ou vide.";
+        return;
+      }
+      localStorage.setItem("pseudo", pseudo);
+
+      // Gestion avatar
+      if (avatarInput.files && avatarInput.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          localStorage.setItem("avatarDataURL", e.target.result);
+          avatarPreview.src = e.target.result;
+          messageDiv.textContent = "Profil mis à jour !";
+        };
+        reader.readAsDataURL(avatarInput.files[0]);
+      } else {
+        messageDiv.textContent = "Profil mis à jour !";
+      }
+    });
+
+    // Preview avatar dès sélection
+    document.getElementById("avatarInput").addEventListener("change", function(e) {
+      var avatarPreview = document.getElementById("avatarPreview");
+      if (e.target.files && e.target.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          avatarPreview.src = ev.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
   </script>
 
   <script src="JS/security-enhance.js"></script>
