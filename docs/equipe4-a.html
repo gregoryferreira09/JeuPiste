@@ -158,7 +158,7 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
-  <!-- Fenêtre flottante pour la détermination (toujours TOUT EN BAS !) -->
+  <!-- Fenêtre flottante pour la détermination (modale, tout en bas !) -->
   <div id="blocker" style="display:none;">
     <div id="blocker-inner">
       <div id="blocker-msg">
@@ -168,7 +168,6 @@
       <button id="blocker-btn" type="button">Continuer</button>
     </div>
   </div>
-  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
@@ -250,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
     nextBtn.disabled = false;
     nextBtn.classList.add('enabled');
     window.name = "blocker-determination";
-    if ("vibrate" in navigator) navigator.vibrate(200);
+    // NE PAS appeler navigator.vibrate ici !
   }
 
   // Masquer la fenêtre flottante au chargement et après validation
@@ -259,9 +258,10 @@ document.addEventListener('DOMContentLoaded', function() {
   nextBtn.disabled = true;
   nextBtn.classList.remove('enabled');
 
-  // Permet de refermer la fenêtre flottante
+  // Permet de refermer la fenêtre flottante + vibrer (OK car c'est une action utilisateur)
   blockerBtn.addEventListener('click', function() {
     blocker.style.display = "none";
+    if ("vibrate" in navigator) navigator.vibrate(200);
   });
 
   // --- Toast harmonisé ---
