@@ -119,6 +119,7 @@
     #confirmationRetourAccueil .main-btn {
       min-width: 80px;
     }
+    /* Loader */
     #loader {
       display: none;
       position: fixed;
@@ -179,11 +180,11 @@
             </div>
             <div class="regles-course">
               <strong>Règles du jeu&nbsp;:</strong><br>
-              Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depui[...]
+              Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis tant de siècles…
             </div>
           </div>
           <div class="actions-bandeau">
-            <a class="main-btn" id="demarrerBtn" href="#" style="pointer-events:none; opacity:0.6;">Disponible dans 30s</a>
+            <a class="main-btn" id="demarrerBtn" href="personnages.html" style="pointer-events:none; opacity:0.6;">Disponible dans 30s</a>
             <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
           </div>
           <div class="info" id="messageInfo"></div>
@@ -197,11 +198,10 @@
   </footer>
 
   <!-- Fenêtre flottante confirmation retour accueil -->
-  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle" style="display: none;">
+  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
     <div class="modal-content">
       <div class="modal-question" id="confirmationTitle">
-        Voulez-vous vraiment quitter la partie et revenir à l’accueil ?<br>
-        <strong>Le jeu sera arrêté pour votre équipe.</strong>
+        Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
       </div>
       <div class="modal-actions">
         <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
@@ -265,81 +265,65 @@
             demarrerBtn.style.pointerEvents = "auto";
             demarrerBtn.style.opacity = "1";
             demarrerBtn.textContent = "Démarrer la partie";
-            // Ajout: navigation propre, désactive la protection
-            demarrerBtn.addEventListener("click", function(e) {
-              e.preventDefault();
-              if (window.disableBackProtection) window.disableBackProtection();
-              window.location.href = "personnages.html";
-            });
           }
         }, 1000);
       }
     });
 
-    // === TOUTE LA GESTION DU RETOUR (Bouton ou navigateur) ===
+    // Gestion de la modale de retour accueil
     document.addEventListener("DOMContentLoaded", function() {
-      // Pour la modale de confirmation
-      const confirmationRetourAccueil = document.getElementById("confirmationRetourAccueil");
-      const confirmerRetourAccueilBtn = document.getElementById("confirmerRetourAccueilBtn");
-      const annulerRetourAccueilBtn = document.getElementById("annulerRetourAccueilBtn");
       const btnRetour = document.getElementById("btnRetourAccueil");
-
-      // Fonction globale pour ouvrir la modale (aussi appelée par forbid-back.js)
-      window.showRetourAccueilModal = function() {
-        confirmationRetourAccueil.style.display = "flex";
-        confirmerRetourAccueilBtn.focus();
-      };
-
-      // Bouton "Retour accueil"
-      if (btnRetour) {
-        btnRetour.addEventListener("click", function(e) {
-          e.preventDefault();
-          window.showRetourAccueilModal();
+      const confirmation = document.getElementById("confirmationRetourAccueil");
+      const btnConfirmer = document.getElementById("confirmerRetourAccueilBtn");
+      const btnAnnuler = document.getElementById("annulerRetourAccueilBtn");
+      if (btnRetour && confirmation && btnConfirmer && btnAnnuler) {
+        btnRetour.addEventListener("click", () => {
+          confirmation.style.display = "flex";
+          document.getElementById('confirmerRetourAccueilBtn').focus();
         });
-      }
-
-      // Validation/Annulation de la modale
-      if (confirmerRetourAccueilBtn) {
-        confirmerRetourAccueilBtn.addEventListener("click", function() {
-          if (window.disableBackProtection) window.disableBackProtection();
+        btnConfirmer.addEventListener("click", () => {
           window.location.href = "accueil.html";
         });
-      }
-      if (annulerRetourAccueilBtn) {
-        annulerRetourAccueilBtn.addEventListener("click", function() {
-          confirmationRetourAccueil.style.display = "none";
-          if (btnRetour) btnRetour.focus();
+        btnAnnuler.addEventListener("click", () => {
+          confirmation.style.display = "none";
+          btnRetour.focus();
         });
       }
     });
 
     // === VERROUILLAGE NAVIGATION/FORCING ===
+    // Cette page doit être accessible SEULEMENT si l'étape courante correspond à l'étape "lancement"
+    // Adapte le stepIndex cible selon ta logique (exemple ici: étape "lancement" = -1)
     document.addEventListener("DOMContentLoaded", function() {
       showLoader();
+      // Recup contexte session
       const salonCode = localStorage.getItem("salonCode");
       const equipeNum = Number(localStorage.getItem("equipeNum"));
       if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
         hideLoader();
-        if (window.disableBackProtection) window.disableBackProtection();
         window.location.href = "accueil.html";
         return;
       }
+      // On écoute currentStep en temps réel
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', function(snapshot) {
         hideLoader();
         const step = snapshot.val();
+        // Ici, tu adaptes la logique: si currentStep == -1, c'est le lancement, sinon on redirige
+        // Si ta page de lancement doit être accessible avec step == 0, adapte ci-dessous
         if (step !== undefined && step !== null && step > 0) {
+          // On va à la bonne épreuve selon le parcours
           db.ref('parties/' + salonCode + '/cheminsParEquipe/' + equipeNum).once('value', function(snapIdx) {
             const parcoursIdx = snapIdx.val();
             db.ref('parties/' + salonCode + '/parcoursEquipes/' + parcoursIdx).once('value', function(snapParcours) {
               const parcours = snapParcours.val() || [1,2,3,4,5];
               const target = parcours[step-1];
-              if (window.disableBackProtection) window.disableBackProtection();
               if (target === 6) window.location.href = "epreuve6.html";
               else if (target === 7) window.location.href = "révélation.html";
               else window.location.href = `equipe${target}-a.html`;
             });
           });
         }
+        // Si le step est bien "lancement" (ici step == 0), on reste sur la page, sinon redirige
       });
     });
 
@@ -350,7 +334,5 @@
       }
     });
   </script>
-  <!-- Protection anti-retour (retour navigateur/téléphone uniquement) -->
-  <script src="JS/forbid-back.js"></script>
 </body>
 </html>
