@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
+    /* ... (style CSS inchangé) ... */
     #confirmationModal {
       display: none;
       position: fixed;
@@ -16,96 +17,36 @@
       justify-content: center;
       align-items: center;
     }
-    #confirmationModal.active {
-      display: flex;
-    }
+    #confirmationModal.active { display: flex; }
     #confirmationModal .main-accueil {
-      max-width: 340px;
-      margin: auto;
-      text-align: center;
-      border: 2px solid #e0c185;
-      background: #2c1b1b;
-      border-radius: 18px;
-      box-shadow: 0 4px 20px #0008;
-      padding: 32px 28px;
+      max-width: 340px; margin: auto; text-align: center;
+      border: 2px solid #e0c185; background: #2c1b1b; border-radius: 18px;
+      box-shadow: 0 4px 20px #0008; padding: 32px 28px;
     }
     #confirmationModal .modal-question {
-      font-weight: bold;
-      margin-bottom: 22px;
-      color: #e0c185;
-      font-family: 'Cinzel Decorative',serif;
-      font-size: 1.1em;
+      font-weight: bold; margin-bottom: 22px; color: #e0c185;
+      font-family: 'Cinzel Decorative',serif; font-size: 1.1em;
     }
     #confirmationModal .boutons-actions {
-      display: flex;
-      flex-direction: row;
-      gap: 24px;
-      justify-content: center;
-      margin: 0;
+      display: flex; flex-direction: row; gap: 24px; justify-content: center; margin: 0;
     }
-    #confirmationModal .main-btn {
-      width: 130px;
-      margin-bottom: 0;
-    }
-    .boutons-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 14px;
-      margin-bottom: 14px;
-    }
-    .main-btn {
-      min-width: 120px;
-    }
-    #listeJoueurs {
-      margin: 18px auto 0 auto;
-      padding: 0;
-      list-style: none;
-      max-width: 320px;
-      text-align: left;
-    }
+    #confirmationModal .main-btn { width: 130px; margin-bottom: 0; }
+    .boutons-actions { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 14px; margin-bottom: 14px; }
+    .main-btn { min-width: 120px; }
+    #listeJoueurs { margin: 18px auto 0 auto; padding: 0; list-style: none; max-width: 320px; text-align: left; }
     #listeJoueurs li {
-      background: #3a2727;
-      color: #e0c185;
-      border-radius: 8px;
-      margin-bottom: 6px;
-      padding: 6px 14px;
-      font-family: 'Cormorant Garamond', serif;
-      letter-spacing: 1px;
-      font-size: 1.16em;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      background: #3a2727; color: #e0c185; border-radius: 8px;
+      margin-bottom: 6px; padding: 6px 14px; font-family: 'Cormorant Garamond', serif;
+      letter-spacing: 1px; font-size: 1.16em; display: flex; align-items: center; justify-content: space-between;
     }
-    #listeJoueurs .check-vert {
-      color: #4caf50;
-      font-size: 1.1em;
-      margin-left: 6px;
-    }
-    #etatSalon {
-      margin-top: 16px;
-      font-size: 1.1em;
-      color: #e0c185;
-      font-weight: bold;
-      text-align: center;
-    }
+    #listeJoueurs .check-vert { color: #4caf50; font-size: 1.1em; margin-left: 6px; }
+    #etatSalon { margin-top: 16px; font-size: 1.1em; color: #e0c185; font-weight: bold; text-align: center; }
     #codeSalon {
-      letter-spacing: 0.18em;
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #e0c185;
-      background: #392626;
-      border-radius: 10px;
-      padding: 8px 20px;
-      display: inline-block;
-      margin-bottom: 8px;
+      letter-spacing: 0.18em; font-size: 1.5em; font-weight: bold; color: #e0c185;
+      background: #392626; border-radius: 10px; padding: 8px 20px;
+      display: inline-block; margin-bottom: 8px;
     }
-    .bienvenue-message {
-      margin-bottom: 20px;
-      font-size: 1.2em;
-      color: #e0c185;
-    }
+    .bienvenue-message { margin-bottom: 20px; font-size: 1.2em; color: #e0c185; }
     @media (max-width: 570px) {
       #confirmationModal .main-accueil {max-width:90vw;}
       #listeJoueurs {max-width:96vw;}
@@ -212,7 +153,10 @@
       db.ref('parties/' + salonCode + '/etat').on('value', snap => {
         if (snap.val() === 'lancement' || snap.val() === 'en_cours') {
           if (window.disableBackProtection) window.disableBackProtection();
-          window.location.href = "lancement-partie.html";
+          // **Correction : ne redirige pas si on est déjà sur la page**
+          if (!window.location.pathname.endsWith("lancement-partie.html")) {
+            window.location.href = "lancement-partie.html";
+          }
         }
       });
 
@@ -305,7 +249,10 @@
           localStorage.setItem("pseudo", pseudoOrigine);
           localStorage.removeItem("pseudoOrigine");
           if (window.disableBackProtection) window.disableBackProtection();
-          window.location.href = "lancement-partie.html";
+          // **Correction : ne redirige pas si on est déjà sur la page**
+          if (!window.location.pathname.endsWith("lancement-partie.html")) {
+            window.location.href = "lancement-partie.html";
+          }
           return;
         }
         if (!snapshot.exists()) {
