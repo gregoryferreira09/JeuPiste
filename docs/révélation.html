@@ -7,68 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
   <style>
-    .actions-row-horizontal {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 38px;
-      margin-bottom: 10px;
-      gap: 24px;
-    }
-    .icon-action {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 90px;
-    }
-    .icon-action a {
-      cursor: pointer;
-      color: #e0c185;
-      text-decoration: none;
-      transition: color 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .icon-action a:hover {
-      color: #ffeecb;
-    }
-    .icon-action svg {
-      width: 38px;
-      height: 38px;
-      margin-bottom: 6px;
-      fill: #e0c185;
-      transition: fill 0.2s;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .icon-action a:hover svg {
-      fill: #ffeecb;
-    }
-    .icon-action span {
-      font-size: 0.98em;
-      color: #e0c185;
-      margin-top: 2px;
-      text-align: center;
-    }
-    @media (max-width: 650px) {
-      .actions-row-horizontal {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .icon-action {
-        width: 100%;
-        flex-direction: row;
-        justify-content: flex-start;
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-      .icon-action span {
-        text-align: left;
-      }
-    }
+    body { background: #231d1d; color: #ffeecb; }
   </style>
 </head>
 <body>
@@ -78,7 +17,7 @@
 
   <div class="center-wrapper">
     <main class="main-accueil" role="main">
-      <h2 style="color:#e0c185; font-family:'Cinzel Decorative',serif;">En quête pour le combat final</h2>
+      <h2>En quête pour le combat final</h2>
       <div class="presentation-jeu" style="margin-top: 24px;">
         <div class="texte-course" style="font-size:1.16em; color:#ffeecb; margin-bottom: 14px;">
           <em>
@@ -106,7 +45,7 @@
         <div class="icon-action side-icon">
           <a href="https://maps.google.com/?q=47.469417,-0.574556" target="_blank" rel="noopener" aria-label="Aller à l'emplacement GPS sur Google Maps">
             <svg viewBox="0 0 24 24">
-              <path d="M12 2C7.03 2 3 6.03 3 11c0 5.25 7.3 10.47 7.7 10.75a1.003 1.003 0 0 0 1.21 0C13.7 21.47 21 16.25 21 11c0-4.97-4.03-9-9-9zm0 18.3C9.14 18.08 5 14.39 5 11c0-3.87 3.13-7 7-7s7 3.13 7 7c0 3.39-4.14 7.08-7 9.3zM11 7h2v6h-2zm0 8h2v2h-2z"></path>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/>
             </svg>
             <span>Boussole</span>
           </a>
