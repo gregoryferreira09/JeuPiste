@@ -103,17 +103,16 @@
     </main>
   </div>
 
-  <footer class="footer">
+   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="JS/gameflow.js"></script>
+  <script src="../JS/gameflow.js"></script>
   <script>
-    // === INITIALISATION FIREBASE ===
+    // === Initialisation Firebase ===
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -124,20 +123,14 @@
       appId: "1:20295055805:web:0963719c3f23ab7752fad4",
       measurementId: "G-KSBMBB7KMJ"
     };
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
-// Auth anonyme obligatoire !
-firebase.auth().onAuthStateChanged(function(user) {
-  if (!user) {
-    firebase.auth().signInAnonymously();
-  }
-});
+    const db = firebase.database();
 
     // GPS obligatoire
     const DEST_LAT = 47.367167;
     const DEST_LON = -0.562611;
     const TOLERANCE_METERS = 10;
-
     document.getElementById("check-gps").addEventListener("click", function() {
       const feedback = document.getElementById("gps-feedback");
       feedback.textContent = "Recherche de votre position...";
@@ -161,14 +154,14 @@ firebase.auth().onAuthStateChanged(function(user) {
           document.getElementById("localisation-block").style.display = "none";
           document.getElementById("suite-block").style.display = "";
         } else {
-          feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
+          feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " mètres)";
         }
       }, function(err) {
         document.getElementById("gps-feedback").textContent = "Position non trouvée (" + err.message + ")";
       });
     });
 
-    // Ouverture et fermeture de la modale indice
+    // ----- Logique d'affichage progressive -----
     document.getElementById('show-indice').addEventListener('click', function() {
       document.getElementById('indice-modal').classList.add('active');
     });
@@ -178,20 +171,23 @@ firebase.auth().onAuthStateChanged(function(user) {
       document.getElementById('password-field').focus();
     });
 
-    // Sécurité session + gameflow
+    // ========== Firebase & Gameflow ==========
+
+    // Sécurité session
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
     if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
       window.location.href = "accueil.html";
     }
+    // Chrono/temps passé sur l’épreuve
     const stepIndex = 3;
     let startTime = null;
-    firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
       .once('value', function(snap) {
         startTime = snap.val();
         if (!startTime) {
           startTime = Date.now();
-          firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime').set(startTime);
         }
       });
 
@@ -209,7 +205,7 @@ firebase.auth().onAuthStateChanged(function(user) {
       setTimeout(() => { toast.classList.remove('visible'); }, 2200);
     }
 
-    // Validation mot de passe (souple)
+    // Validation mot de passe très souple
     function normalize(str) {
       return str
         .toLowerCase()
@@ -239,15 +235,15 @@ firebase.auth().onAuthStateChanged(function(user) {
       showToast("Validation en cours...");
       // === ENREGISTRE LE TEMPS PASSÉ ===
       const now = Date.now();
-      firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
+      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuves/' + stepIndex + '/startTime')
         .once('value', function(snap) {
           const sTime = snap.val();
           if (sTime) {
             const elapsed = Math.round((now - sTime) / 1000);
-            firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
           }
           // Puis passage à l'étape suivante
-          firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
             .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
               if (!error && committed) {
                 getParcoursEquipeCourante(firebase, salonCode, equipeNum, function(parcours) {
@@ -294,14 +290,14 @@ firebase.auth().onAuthStateChanged(function(user) {
         }
       });
     }
-    firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
       .on('value', function(snapshot) {
         const step = snapshot.val() || 0;
         goToStep(step);
       });
     window.addEventListener("pageshow", function(evt) {
       if (evt.persisted) {
-        firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+        db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
           .once('value', function(snapshot) {
             const step = snapshot.val() || 0;
             goToStep(step);
