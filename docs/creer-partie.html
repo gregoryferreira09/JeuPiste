@@ -13,6 +13,64 @@
      localStorage.removeItem("salonCode");
    }
   </script>
+  <style>
+    #confirmationRetourAccueil {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(44,27,27,0.72);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+    }
+    #confirmationRetourAccueil .modal-content {
+      max-width:340px;
+      margin:auto;
+      text-align:center;
+      border:2.5px solid #e0c185;
+      background:#2c1b1b;
+      border-radius:18px;
+      box-shadow:0 4px 20px #0009;
+      padding:32px 28px;
+    }
+    #confirmationRetourAccueil .modal-content .modal-question {
+      font-weight:bold;
+      margin-bottom:22px;
+      color:#e0c185;
+      font-family:'Cinzel Decorative',serif;
+      font-size:1.1em;
+    }
+    #confirmationRetourAccueil .modal-content .modal-actions {
+      display:flex;
+      flex-direction:row;
+      gap:24px;
+      justify-content:center;
+      margin:0;
+    }
+    #confirmerRetourAccueilBtn {
+      background:#e0c185;
+      color:#181212;
+      border:2px solid #e0c185;
+    }
+    #confirmerRetourAccueilBtn:hover {
+      background:#ffeecb;
+      color:#181212;
+      border:2px solid #e0c185;
+    }
+    #annulerRetourAccueilBtn {
+      background:transparent;
+      color:#ffeecb;
+      border:2px solid #e0c185;
+    }
+    #annulerRetourAccueilBtn:hover {
+      background:#e0c185;
+      color:#181212;
+      border:2px solid #e0c185;
+    }
+    @media (max-width: 700px) {
+      #confirmationRetourAccueil .modal-content {max-width:98vw;}
+    }
+  </style>
 </head>
 <body>
 <header>
@@ -44,7 +102,7 @@
       </select>
       <div class="boutons-actions">
         <button class="main-btn" type="submit" id="genererBtn">Créer la partie</button>
-        <a class="main-btn" href="accueil.html" id="retourAccueilBtn">Retour</a>
+        <button class="main-btn" type="button" id="retourAccueilBtn">Retour</button>
       </div>
       <div class="message" id="message" role="alert" aria-live="polite"></div>
     </form>
@@ -56,38 +114,48 @@
   <a href="mentions-legales.html">Mentions légales</a>
 </footer>
 
+<!-- Modale de confirmation retour accueil -->
+<div id="confirmationRetourAccueil">
+  <div class="modal-content">
+    <div class="modal-question">
+      Voulez-vous vraiment quitter la création et revenir à l’accueil ?
+    </div>
+    <div class="modal-actions">
+      <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
+      <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // Effet d'apparition fade-in sur la page principale
   document.addEventListener("DOMContentLoaded", function() {
     var main = document.querySelector('.fadeIn');
     if (main) main.classList.add('visible');
   });
-</script>
 
-<!-- Charger Firebase AVANT tout JS qui l'utilise -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="JS/creer-partie.js"></script>
-<script>
   // Gestion du submit sécurisé
-  const form = document.getElementById('creerPartieForm');
-  const message = document.getElementById('message');
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    message.textContent = "";
-    if (typeof creerPartie === "function") {
-      creerPartie(new FormData(form))
-        .then(() => {
-          message.textContent = "Partie créée avec succès !";
-          message.className = "message succes";
-        })
-        .catch(err => {
-          message.textContent = err && err.message ? err.message : "Erreur lors de la création.";
-          message.className = "message";
-        });
-    } else {
-      message.textContent = "Fonction de création absente.";
-    }
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById('creerPartieForm');
+    const message = document.getElementById('message');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (window.disableBackProtection) window.disableBackProtection();
+      message.textContent = "";
+      if (typeof creerPartie === "function") {
+        creerPartie(new FormData(form))
+          .then(() => {
+            message.textContent = "Partie créée avec succès !";
+            message.className = "message succes";
+          })
+          .catch(err => {
+            message.textContent = err && err.message ? err.message : "Erreur lors de la création.";
+            message.className = "message";
+          });
+      } else {
+        message.textContent = "Fonction de création absente.";
+      }
+    });
   });
 
   // Empêche le retour arrière du navigateur de revenir dans le salon sans reset (cache navigateur)
@@ -96,7 +164,44 @@
       localStorage.removeItem("salonCode");
     }
   });
+
+  // Gestion du bouton "Retour" + modale cohérente pour anti-back
+  document.addEventListener("DOMContentLoaded", function() {
+    const confirmationRetourAccueil = document.getElementById("confirmationRetourAccueil");
+    const confirmerRetourAccueilBtn = document.getElementById("confirmerRetourAccueilBtn");
+    const annulerRetourAccueilBtn = document.getElementById("annulerRetourAccueilBtn");
+    const btnRetourAccueil = document.getElementById("retourAccueilBtn");
+
+    // Fonction globale appelée aussi bien par le bouton que forbid-back.js
+    window.showRetourAccueilModal = function() {
+      confirmationRetourAccueil.style.display = "flex";
+      confirmerRetourAccueilBtn.focus();
+    };
+
+    // Bouton "Retour"
+    btnRetourAccueil?.addEventListener("click", function(e) {
+      e.preventDefault();
+      window.showRetourAccueilModal();
+    });
+
+    // Confirmation de sortie
+    confirmerRetourAccueilBtn?.addEventListener("click", function() {
+      if (window.disableBackProtection) window.disableBackProtection();
+      window.location.href = "accueil.html";
+    });
+
+    // Annulation sortie
+    annulerRetourAccueilBtn?.addEventListener("click", function() {
+      confirmationRetourAccueil.style.display = "none";
+      btnRetourAccueil?.focus();
+    });
+  });
 </script>
+
+<!-- Charger Firebase AVANT tout JS qui l'utilise -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="JS/creer-partie.js"></script>
 
 <noscript>
   <div style="color: #e0c185; text-align: center; margin-top: 20px;" role="alert">
@@ -107,7 +212,6 @@
 <script src="JS/security-enhance.js"></script>
 <script src="JS/ux-enhance.js"></script>
 <script src="JS/scalability.js"></script>
-
 <!-- PROTECTION ANTI-RETOUR UNIVERSELLE -->
 <script src="JS/forbid-back.js"></script>
 </body>
