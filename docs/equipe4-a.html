@@ -375,8 +375,8 @@ document.addEventListener('DOMContentLoaded', function() {
       feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
       return;
     }
-    const DEST_LAT = 47.367167;
-    const DEST_LON = -0.562611;
+    const DEST_LAT = 47.50408765041595;
+const DEST_LON = -0.5873319650311483;
     const TOLERANCE_METERS = 10;
     navigator.geolocation.getCurrentPosition(function(pos) {
       const lat = pos.coords.latitude;
