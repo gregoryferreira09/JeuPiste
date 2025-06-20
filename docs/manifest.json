@@ -5,6 +5,8 @@
   "display": "standalone",
   "background_color": "#1b1b1b",
   "theme_color": "#e0c185",
+  "scope": ".",
+  "description": "Jeu de piste en ligne",
   "icons": [
     {
       "src": "icon-192.png",
