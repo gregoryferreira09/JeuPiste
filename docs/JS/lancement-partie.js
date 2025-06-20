@@ -1,38 +1,35 @@
+// SRC/JS/lancement-partie.js
+
+// Ici tu mets uniquement le JS utile à cette page, sans doublon HTML/CSS
+
+// Exemple d'activation du bouton "Démarrer" après 30s
 document.addEventListener("DOMContentLoaded", function() {
-  // Gestion du bouton "Démarrer"
   const demarrerBtn = document.getElementById("demarrerBtn");
   if (demarrerBtn) {
-    demarrerBtn.addEventListener("click", function(e) {
-      e.preventDefault();
-      if (window.disableBackProtection) window.disableBackProtection();
-      window.location.href = "personnages.html";
-    });
+    setTimeout(() => {
+      demarrerBtn.style.pointerEvents = "auto";
+      demarrerBtn.style.opacity = "1";
+      demarrerBtn.textContent = "Démarrer la partie";
+    }, 30000); // 30s
   }
+});
 
-  // Gestion de la modale de retour accueil
+// Gestion de la modale de retour accueil
+document.addEventListener("DOMContentLoaded", function() {
   const btnRetour = document.getElementById("btnRetourAccueil");
   const confirmation = document.getElementById("confirmationRetourAccueil");
   const btnConfirmer = document.getElementById("confirmerRetourAccueilBtn");
   const btnAnnuler = document.getElementById("annulerRetourAccueilBtn");
 
-  // Fonction globale pour ouvrir la modale (appelée aussi par forbid-back.js)
-  window.showRetourAccueilModal = function() {
-    confirmation.style.display = "flex";
-    btnConfirmer.focus();
-  };
-
   if (btnRetour && confirmation && btnConfirmer && btnAnnuler) {
-    btnRetour.addEventListener("click", function(e) {
-      e.preventDefault();
-      window.showRetourAccueilModal();
+    btnRetour.addEventListener("click", () => {
+      confirmation.style.display = "block";
     });
-    btnConfirmer.addEventListener("click", function() {
-      if (window.disableBackProtection) window.disableBackProtection();
+    btnConfirmer.addEventListener("click", () => {
       window.location.href = "accueil.html";
     });
-    btnAnnuler.addEventListener("click", function() {
+    btnAnnuler.addEventListener("click", () => {
       confirmation.style.display = "none";
-      btnRetour.focus();
     });
   }
 });
