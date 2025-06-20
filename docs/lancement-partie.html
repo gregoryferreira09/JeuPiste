@@ -4,161 +4,10 @@
   <meta charset="UTF-8">
   <title>Lancement de la Partie - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Polices -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <!-- CSS global harmonisé -->
   <link rel="stylesheet" href="styles/style.css">
-  <style>
-    body {
-      background: #181212;
-      color: #f4e4c1;
-      font-family: 'Cormorant Garamond', serif;
-    }
-    header h1 {
-      text-align: center;
-      margin-top: 1.4em;
-      font-family: 'Cinzel Decorative', serif;
-      color: #e0c185;
-    }
-    .page-lancement {
-      max-width: 600px;
-      margin: 40px auto 24px auto;
-    }
-    .bandeau-principal {
-      background: #2c1b1b;
-      border-radius: 18px;
-      box-shadow: 0 4px 20px #0002;
-      padding: 32px 28px 20px 28px;
-      border: 2px solid #e0c185;
-      color: #f4e4c1;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.13em;
-      margin-bottom: 40px;
-      position: relative;
-    }
-    .bandeau-principal h2 {
-      font-family: 'Cinzel Decorative', serif;
-      color: #e9c78c;
-      margin-bottom: 16px;
-      font-size: 1.33em;
-      text-align: center;
-    }
-    .actions-bandeau {
-      display: flex;
-      gap: 18px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 28px;
-      margin-bottom: 8px;
-    }
-    .main-btn {
-      background: #181212;
-      color: #e0c185;
-      border: 2px solid #e0c185;
-      border-radius: 12px;
-      margin: 0 auto;
-      padding: 14px 22px;
-      font-family: 'Cormorant Garamond', serif;
-      box-shadow: 0 2px 20px #0004;
-      font-size: 1.13em;
-      transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.11s;
-      cursor: pointer;
-      font-weight: 600;
-      outline: none;
-    }
-    .main-btn:focus, .main-btn:hover {
-      background: #e0c185;
-      color: #181212;
-      box-shadow: 0 0 8px #e0c185a8;
-      outline: 2px solid #e0c185;
-      outline-offset: 3px;
-      transform: scale(1.04);
-    }
-    .main-btn[disabled], .main-btn[style*="pointer-events: none"] {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-    .info {
-      font-size: .99em;
-      color: #c9b49a;
-      text-align: center;
-      margin-top: 18px;
-      margin-bottom: 4px;
-    }
-    @media (max-width: 700px) {
-      .page-lancement, .bandeau-principal {
-        max-width: 97vw; padding: 12px 2vw; border-radius: 12px; font-size: 1em;
-      }
-      .main-btn { width: 100%; min-width: 0; max-width: 99vw; font-size: 1em;}
-      .actions-bandeau { flex-direction: column; gap: 10px;}
-    }
-    #confirmationRetourAccueil {
-      display: none;
-      position: fixed;
-      left: 0; top: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(24,18,18,0.7);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-    }
-    #confirmationRetourAccueil .modal-content {
-      background: #2c1b1b;
-      border: 2px solid #e0c185;
-      border-radius: 16px;
-      padding: 32px;
-      text-align: center;
-      color: #f4e4c1;
-      box-shadow: 0 8px 32px #0007;
-      min-width: 280px;
-    }
-    #confirmationRetourAccueil .modal-actions {
-      margin-top: 24px;
-      display: flex;
-      justify-content: center;
-      gap: 18px;
-    }
-    #confirmationRetourAccueil .main-btn {
-      min-width: 80px;
-    }
-    /* Loader */
-    #loader {
-      display: none;
-      position: fixed;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(24,18,18,0.35);
-      z-index: 99999;
-      justify-content: center;
-      align-items: center;
-    }
-    .spinner {
-      border: 4px solid #eee;
-      border-top: 4px solid #e0c185;
-      border-radius: 50%;
-      width: 40px; height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .modal-toast {
-      display: none;
-      position: fixed;
-      left: 50%; top: 12%;
-      transform: translateX(-50%);
-      background: #231d1d;
-      color: #ffeecb;
-      border: 2px solid #e0c185;
-      border-radius: 8px;
-      padding: 16px 28px;
-      font-size: 1.14em;
-      z-index: 99999;
-      box-shadow: 0 4px 22px #0006;
-      text-align:center;
-      max-width: 90vw;
-    }
-    .modal-toast.visible {
-      display: block;
-      animation: fadein 0.3s;
-    }
-    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-  </style>
 </head>
 <body>
   <header>
@@ -166,29 +15,27 @@
   </header>
   <div class="center-wrapper">
     <main>
-      <section class="page-lancement fadeIn" role="main" aria-live="polite">
-        <div class="bandeau-principal">
-          <div class="presentation-jeu">
-            <div class="titre-course">Avalon</div>
-            <div class="texte-course">
-              Moi, Merlin l'Enchanteur, vous convoque pour la plus noble des aventures : la quête du Saint-Graal.<br>
-              Les temps sont sombres, et seul les plus dignes des chevaliers parmi vous pourrez retrouver le Graal sacré, source de sagesse et de paix pour le royaume.
-            </div>
-            <div class="objectif-course">
-              <span class="objectif-label">Objectif&nbsp;:</span>
-              <span class="objectif-text">Rassemblez votre équipe, serrez les rangs… et courez, car les vents de la destinée soufflent sur votre route.</span>
-            </div>
-            <div class="regles-course">
-              <strong>Règles du jeu&nbsp;:</strong><br>
-              Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis tant de siècles…
-            </div>
+      <section class="main-accueil fadeIn" role="main" aria-live="polite">
+        <div class="presentation-jeu">
+          <div class="titre-course">Avalon</div>
+          <div class="texte-course">
+            Moi, Merlin l'Enchanteur, vous convoque pour la plus noble des aventures : la quête du Saint-Graal.<br>
+            Les temps sont sombres, et seul les plus dignes des chevaliers parmi vous pourrez retrouver le Graal sacré, source de sagesse et de paix pour le royaume.
           </div>
-          <div class="actions-bandeau">
-            <a class="main-btn" id="demarrerBtn" href="personnages.html" style="pointer-events:none; opacity:0.6;">Disponible dans 30s</a>
-            <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
+          <div class="objectif-course">
+            <span class="objectif-label">Objectif&nbsp;:</span>
+            <span class="objectif-text">Rassemblez votre équipe, serrez les rangs… et courez, car les vents de la destinée soufflent sur votre route.</span>
           </div>
-          <div class="info" id="messageInfo"></div>
+          <div class="regles-course">
+            <strong>Règles du jeu&nbsp;:</strong><br>
+            Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis des siècles…
+          </div>
         </div>
+        <div class="boutons-actions actions-bandeau">
+          <a class="main-btn" id="demarrerBtn" href="personnages.html" style="pointer-events:none; opacity:0.6;">Disponible dans 30s</a>
+          <button class="main-btn" id="btnRetourAccueil">Retour accueil</button>
+        </div>
+        <div class="info message" id="messageInfo"></div>
       </section>
     </main>
   </div>
@@ -198,12 +45,12 @@
   </footer>
 
   <!-- Fenêtre flottante confirmation retour accueil -->
-  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
+  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle" style="display:none;">
     <div class="modal-content">
       <div class="modal-question" id="confirmationTitle">
         Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
       </div>
-      <div class="modal-actions">
+      <div class="modal-actions boutons-actions">
         <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
         <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
       </div>
@@ -211,11 +58,13 @@
   </div>
 
   <!-- Loader visuel -->
-  <div id="loader" aria-live="polite"><div class="spinner"></div></div>
+  <div id="loader" aria-live="polite" style="display:none;">
+    <div class="spinner"></div>
+  </div>
   <!-- Toast feedback -->
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
 
-  <!-- Firebase SDK (moderne) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
@@ -292,11 +141,8 @@
     });
 
     // === VERROUILLAGE NAVIGATION/FORCING ===
-    // Cette page doit être accessible SEULEMENT si l'étape courante correspond à l'étape "lancement"
-    // Adapte le stepIndex cible selon ta logique (exemple ici: étape "lancement" = -1)
     document.addEventListener("DOMContentLoaded", function() {
       showLoader();
-      // Recup contexte session
       const salonCode = localStorage.getItem("salonCode");
       const equipeNum = Number(localStorage.getItem("equipeNum"));
       if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
@@ -304,14 +150,10 @@
         window.location.href = "accueil.html";
         return;
       }
-      // On écoute currentStep en temps réel
       db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', function(snapshot) {
         hideLoader();
         const step = snapshot.val();
-        // Ici, tu adaptes la logique: si currentStep == -1, c'est le lancement, sinon on redirige
-        // Si ta page de lancement doit être accessible avec step == 0, adapte ci-dessous
         if (step !== undefined && step !== null && step > 0) {
-          // On va à la bonne épreuve selon le parcours
           db.ref('parties/' + salonCode + '/cheminsParEquipe/' + equipeNum).once('value', function(snapIdx) {
             const parcoursIdx = snapIdx.val();
             db.ref('parties/' + salonCode + '/parcoursEquipes/' + parcoursIdx).once('value', function(snapParcours) {
@@ -323,7 +165,6 @@
             });
           });
         }
-        // Si le step est bien "lancement" (ici step == 0), on reste sur la page, sinon redirige
       });
     });
 
