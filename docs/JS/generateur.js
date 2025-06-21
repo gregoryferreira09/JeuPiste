@@ -1,3 +1,68 @@
+// === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES AVEC CONSIGNES INDIVIDUELLES ===
+let scenario = [];
+
+function ajouterEtapeAuScenario(etape) {
+  scenario.push(etape);
+  afficherScenario();
+}
+
+function afficherScenario() {
+  const container = document.getElementById('scenarioContainer');
+  if (!container) return;
+  if (scenario.length === 0) {
+    container.innerHTML = "<p>Aucune étape ajoutée.</p>";
+    return;
+  }
+  container.innerHTML = "<h4>Scénario en cours :</h4>" +
+    scenario.map((etape, idx) => {
+      const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
+      let resume = quest ? quest.nom : etape.type;
+      return `
+      <div class="step-list-item">
+        <strong>${idx + 1}. ${resume}</strong>
+        <div style="font-size:0.98em;margin-top:2px;">
+          ${Object.entries(etape.params).map(([k, v]) =>
+            `<span><em>${k}</em> : ${Array.isArray(v) ? v.join(" | ") : typeof v === 'string' ? v : '[objet]'}</span>`
+          ).join(' | ')}
+        </div>
+        <div class="step-actions">
+          <button onclick="supprimerEtape(${idx})">Supprimer</button>
+          ${idx > 0 ? `<button onclick="monterEtape(${idx})">Monter</button>` : ''}
+          ${idx < scenario.length - 1 ? `<button onclick="descendreEtape(${idx})">Descendre</button>` : ''}
+        </div>
+      </div>`;
+    }).join("");
+}
+
+function supprimerEtape(idx) {
+  scenario.splice(idx, 1);
+  afficherScenario();
+}
+function monterEtape(idx) {
+  if (idx <= 0) return;
+  [scenario[idx-1], scenario[idx]] = [scenario[idx], scenario[idx-1]];
+  afficherScenario();
+}
+function descendreEtape(idx) {
+  if (idx >= scenario.length-1) return;
+  [scenario[idx], scenario[idx+1]] = [scenario[idx+1], scenario[idx]];
+  afficherScenario();
+}
+
+function exporterScenario() {
+  const data = JSON.stringify(scenario, null, 2);
+  const blob = new Blob([data], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "scenario.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===================
+// Formulaire dynamique
+// ===================
 function generateQuestForm(questTypeId, containerId, values = {}) {
   const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
   if (!quest) return;
@@ -9,15 +74,12 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   let form = document.createElement('form');
   form.className = 'quest-form';
 
-  // Détection : on applique ce comportement spécial uniquement à photo, photo_inconnus, video, collecte_objet
-  // Tu peux l'élargir à d'autres types si besoin
+  // Détection : comportement spécial (photos, vidéos, etc.)
   if (
     (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet")
     && quest.parametres.some(p => p.type === "number")
   ) {
-    // Param quantité
     const qtyParam = quest.parametres.find(p => p.type === "number");
-    // Param consigne (ou critere, ou objet)
     const consigneParam = quest.parametres.find(p => p.key === "consigne" || p.key === "critere" || p.key === "objet");
 
     let fieldWrapper = document.createElement('div');
@@ -60,7 +122,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     function updateConsignes() {
       consignesZone.innerHTML = '';
       let nombre = parseInt(inputQty.value, 10) || 1;
-      // On fait des lignes de deux (grid responsive)
       let row;
       for (let i = 0; i < nombre; i++) {
         if (i % 2 === 0) {
@@ -74,13 +135,11 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
         field.style.display = 'flex';
         field.style.alignItems = 'center';
         field.style.gap = '6px';
-        // Label à gauche
         let lab = document.createElement('span');
         lab.textContent = (quest.id.startsWith("photo") ? "Photo" : quest.id === "video" ? "Vidéo" : "Objet") + ` ${i+1} :`;
         lab.style.fontSize = "1em";
         lab.style.minWidth = "56px";
         field.appendChild(lab);
-        // Champ input
         let champ = document.createElement('input');
         champ.type = 'text';
         champ.name = `consigne_${i}`;
@@ -98,67 +157,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     inputQty.oninput = updateConsignes;
     updateConsignes();
   }
-
-  let currentCoordTarget = null;
-
-// Ajout d'un mini-carte OSM avec leaflet (léger et sans clef API)
-function openMapPicker(targetInput) {
-  currentCoordTarget = targetInput;
-  document.getElementById('mapModal').style.display = 'flex';
-
-  // Init carte (si pas déjà fait)
-  if (!window.leafletLoaded) {
-    let link = document.createElement('link');
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(link);
-
-    let script = document.createElement('script');
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.onload = initLeafletMap;
-    document.body.appendChild(script);
-    window.leafletLoaded = true;
-  } else {
-    initLeafletMap();
-  }
-}
-
-function initLeafletMap() {
-  if (window.map) {
-    window.map.off();
-    window.map.remove();
-  }
-  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13); // Paris par défaut
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-  }).addTo(window.map);
-
-  let marker = null;
-
-  window.map.on('click', function(e) {
-    let lat = e.latlng.lat.toFixed(6);
-    let lng = e.latlng.lng.toFixed(6);
-    if (marker) marker.setLatLng(e.latlng);
-    else marker = L.marker(e.latlng).addTo(window.map);
-    if (currentCoordTarget) currentCoordTarget.value = lat + ", " + lng;
-    document.getElementById('mapModal').style.display = 'none';
-    window.map.off();
-    setTimeout(()=>window.map.remove(),300); // nettoyage pour éviter bugs si réouverture
-  });
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById('coordStart').addEventListener('click', function() {
-    openMapPicker(this);
-  });
-  document.getElementById('coordEnd').addEventListener('click', function() {
-    openMapPicker(this);
-  });
-  document.getElementById('closeMapBtn').addEventListener('click', function() {
-    document.getElementById('mapModal').style.display = 'none';
-    if (window.map) setTimeout(()=>window.map.remove(),300);
-  });
-});
 
   // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
   quest.parametres.forEach(param => {
