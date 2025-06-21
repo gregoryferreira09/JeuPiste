@@ -199,7 +199,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
   quest.parametres.forEach(param => {
-    if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "crite[...]
+    if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet"))
       return;
 
     let fieldWrapper = document.createElement('div');
@@ -292,7 +292,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
     // Les autres champs
     quest.parametres.forEach(param => {
-      if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "cri[...]
+      if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet"))
         return;
       if (param.type === 'file') {
         data[param.key] = form.elements[param.key].files[0] || null;
@@ -356,10 +356,6 @@ function initLeafletMap(targetInput) {
 
   // 2. Puis reset le container (remplacer le div #mapContainer par un neuf)
   resetMapContainer();
-
-  // 3. Crée la nouvelle carte sur le container tout neuf
-  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
-}
 
   // 3. Crée la nouvelle carte sur le container tout neuf
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
