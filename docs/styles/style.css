@@ -761,3 +761,21 @@ body {
   align-items: center;
   position: relative;
 }
+
+#mapContainer {
+  width: 420px;
+  height: 340px;
+  max-width: 90vw;
+  max-height: 60vh;
+  margin: 16px 0 18px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eee;
+}
+@media (max-width: 600px) {
+  #mapContainer {
+    width: 90vw;
+    height: 45vw;
+    min-height: 200px;
+  }
+}
