@@ -3,96 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Générateur de quêtes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles/style.css">
-  <style>
-    /* --- Ajout ou modification pour coordonnées --- */
-    #coords-row {
-      display: flex;
-      gap: 32px; /* plus d'espace entre les deux champs */
-      margin-bottom: 18px;
-    }
-    .coord-input-coord {
-      max-width: 120px;
-      min-width: 70px;
-      width: 100%;
-      font-size: 1em;
-      padding: 6px 10px;
-      border-radius: 7px;
-      border: 2px solid #e0c185;
-      background-color: #fff;
-      color: #2c1b1b;
-      cursor: pointer;
-      transition: border .18s, background .18s, color .18s;
-      box-sizing: border-box;
-      display: inline-block;
-    }
-    .coord-input-coord:focus {
-      border: 2px solid #d4af37;
-      background: #fff;
-      color: #2c1b1b;
-    }
-    @media (max-width: 700px) {
-      #coords-row { flex-direction: column; gap: 10px; }
-      .coord-input-coord { max-width: 100vw; }
-    }
-    /* --- Fin ajouts pour coordonnées --- */
-
-    .quest-form { margin-top: 18px; }
-    .form-field { margin-bottom: 14px; }
-    label { font-weight: bold; display: block; margin-bottom: 4px; }
-    input, textarea, select { width: 100%; font-size: 1em; padding: 6px; border-radius: 5px; border: 1px solid #ccc; }
-    button { margin-top: 12px; }
-    .succes { color: green; margin-top: 18px; }
-    .step-list { margin-top: 28px; margin-bottom: 18px; }
-    .step-list-item { background: #2c1b1b; border: 1.5px solid #e0c185; border-radius: 8px; padding: 10px 18px; margin-bottom: 10px; color: #ffeecb; }
-    .step-list-item strong { color: #e0c185; }
-    .step-actions button { margin-right: 10px; }
-    .main-accueil { margin-top: 40px; margin-bottom: 40px; }
-    #mapModal {
-      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: #000a; z-index: 9999; align-items: center; justify-content: center;
-    }
-    #mapModal .modal-content {
-      background: #fff; padding: 18px 18px 12px 18px; border-radius: 13px;
-      max-width: 95vw; max-height: 95vh; box-shadow: 0 0 24px #0007;
-      display: flex; flex-direction: column; align-items: center;
-    }
-    #mapSearchBar {
-      width: 90%;
-      margin-bottom: 10px;
-      padding: 6px 8px;
-      border: 1.5px solid #e0c185;
-      border-radius: 8px;
-      font-size: 1em;
-    }
-    #mapContainer { width: 340px; height: 280px; border: 1.5px solid #e0c185; border-radius: 10px; overflow: hidden; }
-    @media (max-width: 540px) {
-      #mapContainer { width: 90vw; height: 220px; }
-    }
-    #mapSearchResults {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      max-height: 110px;
-      overflow-y: auto;
-      margin-bottom: 8px;
-      width: 90%;
-      position: absolute;
-      top: 60px;
-      left: 5%;
-      z-index: 99999;
-    }
-    #mapSearchResults div {
-      padding: 6px 8px;
-      cursor: pointer;
-    }
-    #mapSearchResults div:hover {
-      background: #ffeecb;
-    }
-    .modal-content {
-      position: relative;
-    }
-  </style>
 </head>
 <body>
   <header>
@@ -102,11 +14,11 @@
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
       <div id="coords-row">
-        <div style="flex:1;">
+        <div>
           <label for="coordStart">Coordonnées du départ :</label>
           <input type="text" id="coordStart" name="coordStart" class="coord-input-coord" placeholder="Clique pour choisir" readonly>
         </div>
-        <div style="flex:1;">
+        <div>
           <label for="coordEnd">Coordonnées d'arrivée :</label>
           <input type="text" id="coordEnd" name="coordEnd" class="coord-input-coord" placeholder="Clique pour choisir" readonly>
         </div>
@@ -117,19 +29,19 @@
       </select>
       <div id="formContainer"></div>
       <div id="scenarioContainer" class="step-list"></div>
-      <button class="main-btn" onclick="exporterScenario()" style="margin-top:18px;">📦 Exporter le scénario</button>
-      <button class="main-btn" onclick="window.location.href='accueil.html'" style="margin-top:8px;">⬅️ Retour accueil</button>
+      <button class="main-btn" onclick="exporterScenario()">📦 Exporter le scénario</button>
+      <button class="main-btn" onclick="window.location.href='accueil.html'">⬅️ Retour accueil</button>
     </main>
   </div>
 
   <!-- Modal carte -->
   <div id="mapModal">
     <div class="modal-content">
-      <h3 style="margin-bottom:12px;font-size:1.18em;">Clique sur la carte pour choisir une position</h3>
+      <h3>Clique sur la carte pour choisir une position</h3>
       <input type="text" id="mapSearchBar" placeholder="🔍 Rechercher une adresse ou un lieu..." autocomplete="off">
-      <div id="mapSearchResults" style="display:none;"></div>
+      <div id="mapSearchResults"></div>
       <div id="mapContainer"></div>
-      <button id="closeMapBtn" style="margin-top:16px;">Annuler</button>
+      <button id="closeMapBtn">Annuler</button>
     </div>
   </div>
 
