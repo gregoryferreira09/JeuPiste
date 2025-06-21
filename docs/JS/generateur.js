@@ -359,7 +359,6 @@ function initLeafletMap(targetInput) {
 
   // 3. Crée la nouvelle carte sur le container tout neuf
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
-  ...
 }
 
   // 3. Crée la nouvelle carte sur le container tout neuf
