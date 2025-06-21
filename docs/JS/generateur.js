@@ -347,12 +347,17 @@ function openMapPicker(targetInput) {
 
 // Passe la cible à chaque nouvelle carte
 function initLeafletMap(targetInput) {
+  // 1. Supprime d’abord la carte si elle existe (AVANT de manipuler le DOM !)
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
+
+  // 2. Puis reset le container (remplacer le div #mapContainer par un neuf)
   resetMapContainer();
+
+  // 3. Crée la nouvelle carte sur le container tout neuf
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
@@ -365,7 +370,6 @@ function initLeafletMap(targetInput) {
     let lng = e.latlng.lng.toFixed(6);
     if (searchMarker) searchMarker.setLatLng(e.latlng);
     else searchMarker = L.marker(e.latlng).addTo(window.map);
-    // On fige la cible du champ à remplir
     targetInput.value = lat + ", " + lng;
     document.getElementById('mapModal').style.display = 'none';
     window.map.off();
