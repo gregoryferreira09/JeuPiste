@@ -1,45 +1,6 @@
 // === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES AVEC CONSIGNES INDIVIDUELLES ===
 let scenario = [];
 
-// === INITIALISATION PAGE ===
-document.addEventListener("DOMContentLoaded", function() {
-  const select = document.getElementById('questTypeSelect');
-  if (select && typeof QUESTS_CATALOGUE !== "undefined") {
-    QUESTS_CATALOGUE.forEach(quest => {
-      let opt = document.createElement('option');
-      opt.value = quest.id;
-      opt.textContent = quest.nom;
-      select.appendChild(opt);
-    });
-
-    select.onchange = function() {
-      if (this.value) generateQuestForm(this.value, 'formContainer');
-      else document.getElementById('formContainer').innerHTML = '';
-    };
-  }
-
-  // Effet fadeIn harmonisé
-  var main = document.querySelector('.fadeIn');
-  if (main) main.classList.add('visible');
-  
-  // Champs coordonnées
-  const coordStart = document.getElementById('coordStart');
-  const coordEnd = document.getElementById('coordEnd');
-  if (coordStart) coordStart.addEventListener('click', function() { openMapPicker(this); });
-  if (coordEnd) coordEnd.addEventListener('click', function() { openMapPicker(this); });
-
-  // Fermeture carte
-  const closeBtn = document.getElementById('closeMapBtn');
-  if (closeBtn) closeBtn.addEventListener('click', function() {
-    document.getElementById('mapModal').style.display = 'none';
-    if (window.map) setTimeout(()=>window.map.remove(),300);
-  });
-
-  // Recherche adresse
-  const mapSearchBar = document.getElementById('mapSearchBar');
-  if (mapSearchBar) mapSearchBar.addEventListener('input', handleMapSearch);
-});
-
 function ajouterEtapeAuScenario(etape) {
   scenario.push(etape);
   afficherScenario();
@@ -199,10 +160,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
   quest.parametres.forEach(param => {
-    if (
-      (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
-      (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
-    )
+    if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet"))
       return;
 
     let fieldWrapper = document.createElement('div');
@@ -282,10 +240,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     const data = {};
 
     // Pour les types avec quantité/consignes multiples
-    if (
-      (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
-      quest.parametres.some(p => p.type === "number")
-    ) {
+    if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && quest.parametres.some(p => p.type === "number")) {
       const qtyParam = quest.parametres.find(p => p.type === "number");
       let nombre = parseInt(form.elements[qtyParam.key].value, 10) || 1;
       data[qtyParam.key] = nombre;
@@ -298,47 +253,41 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
     // Les autres champs
     quest.parametres.forEach(param => {
-      if (
-        (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
-        (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
-      )
+      if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet"))
         return;
       if (param.type === 'file') {
         data[param.key] = form.elements[param.key].files[0] || null;
       } else if (!(param.key in data)) {
         data[param.key] = form.elements[param.key].value;
       }
-    }); // <-- CORRECTION PRINCIPALE : parenthèse fermante + point-virgule ici
+    });
 
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type de quête ci-dessus.</div>`;
-  }; // <-- FIN DE la fonction onsubmit
+  };
 }
 
 // === Carte Leaflet pour sélection GPS + recherche adresse ===
+let currentCoordTarget = null;
 let mapSearchTimeout = null;
 let searchMarker = null;
 
-// Réinitialise proprement le conteneur de la carte
 function resetMapContainer() {
-  const oldContainer = document.getElementById('mapContainer');
-  if (oldContainer) {
-    const newContainer = oldContainer.cloneNode(false);
-    oldContainer.parentNode.replaceChild(newContainer, oldContainer);
+  const container = document.getElementById('mapContainer');
+  if (container) {
+    container.innerHTML = '';
+    if (container._leaflet_id) {
+      delete container._leaflet_id;
+    }
   }
 }
 
-// Ouvre la carte pour choisir une coordonnée et fige la cible dans la closure
 function openMapPicker(targetInput) {
+  currentCoordTarget = targetInput;
   document.getElementById('mapModal').style.display = 'flex';
   document.getElementById('mapSearchBar').value = '';
   document.getElementById('mapSearchResults').style.display = 'none';
-
-  function afterLeafletLoaded() {
-    initLeafletMap(targetInput);
-  }
-
   if (!window.leafletLoaded) {
     let link = document.createElement('link');
     link.rel = "stylesheet";
@@ -346,28 +295,21 @@ function openMapPicker(targetInput) {
     document.head.appendChild(link);
     let script = document.createElement('script');
     script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.onload = afterLeafletLoaded;
+    script.onload = initLeafletMap;
     document.body.appendChild(script);
     window.leafletLoaded = true;
   } else {
-    afterLeafletLoaded();
+    initLeafletMap();
   }
 }
 
-// Passe la cible à chaque nouvelle carte
-function initLeafletMap(targetInput) {
-  // 1. Supprime d’abord la carte si elle existe (AVANT de manipuler le DOM !)
+function initLeafletMap() {
   if (window.map) {
     window.map.off();
     window.map.remove();
-    window.map = null;
   }
-
-  // 2. Puis reset le container (remplacer le div #mapContainer par un neuf)
   resetMapContainer();
-
-  // 3. Crée la nouvelle carte sur le container tout neuf
-  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
+  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13); // Paris par défaut
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
   }).addTo(window.map);
@@ -379,7 +321,7 @@ function initLeafletMap(targetInput) {
     let lng = e.latlng.lng.toFixed(6);
     if (searchMarker) searchMarker.setLatLng(e.latlng);
     else searchMarker = L.marker(e.latlng).addTo(window.map);
-    targetInput.value = lat + ", " + lng;
+    if (currentCoordTarget) currentCoordTarget.value = lat + ", " + lng;
     document.getElementById('mapModal').style.display = 'none';
     window.map.off();
     setTimeout(()=>window.map.remove(),300);
@@ -396,6 +338,7 @@ function handleMapSearch() {
     resultsDiv.innerHTML = '';
     return;
   }
+  // Débouncing
   if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
   mapSearchTimeout = setTimeout(() => {
     resultsDiv.innerHTML = '<div>Recherche...</div>';
@@ -412,11 +355,13 @@ function handleMapSearch() {
             ${place.display_name}
           </div>`
         ).join('');
+        // Ajout évènement sur chaque résultat
         Array.from(resultsDiv.children).forEach(child => {
           child.onclick = function() {
             const lat = parseFloat(this.getAttribute('data-lat'));
             const lon = parseFloat(this.getAttribute('data-lon'));
             if (window.map) window.map.setView([lat, lon], 16);
+            // Place aussi le marker sur le résultat
             if (searchMarker) searchMarker.setLatLng([lat, lon]);
             else searchMarker = L.marker([lat, lon]).addTo(window.map);
             resultsDiv.style.display = 'none';
@@ -428,3 +373,25 @@ function handleMapSearch() {
       });
   }, 350);
 }
+
+// Bindings à faire dans un DOMContentLoaded ou à la fin du body
+document.addEventListener("DOMContentLoaded", function() {
+  // Champs coordonnées
+  if (document.getElementById('coordStart'))
+    document.getElementById('coordStart').addEventListener('click', function() {
+      openMapPicker(this);
+    });
+  if (document.getElementById('coordEnd'))
+    document.getElementById('coordEnd').addEventListener('click', function() {
+      openMapPicker(this);
+    });
+  // Fermeture carte
+  if (document.getElementById('closeMapBtn'))
+    document.getElementById('closeMapBtn').addEventListener('click', function() {
+      document.getElementById('mapModal').style.display = 'none';
+      if (window.map) setTimeout(()=>window.map.remove(),300);
+    });
+  // Recherche adresse
+  if (document.getElementById('mapSearchBar'))
+    document.getElementById('mapSearchBar').addEventListener('input', handleMapSearch);
+});
