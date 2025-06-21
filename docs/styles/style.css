@@ -867,3 +867,28 @@ body {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 500;
 }
+
+.gold-btn,
+.form-container .gold-btn {
+  background: #e0c185;
+  color: #231d1d;
+  border: 2px solid #e0c185;
+  border-radius: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15em;
+  padding: 14px 30px;
+  cursor: pointer;
+  font-weight: bold;
+  box-sizing: border-box;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.gold-btn:hover,
+.form-container .gold-btn:hover,
+.gold-btn:focus,
+.form-container .gold-btn:focus {
+  background: #ffeecb;
+  color: #473714;
+  box-shadow: 0 0 8px #e0c18588;
+  outline: 2px solid #e0c185;
+  outline-offset: 4px;
+}
