@@ -115,9 +115,10 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   // Détection : comportement spécial (photos, vidéos, etc.)
   if (
-    (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet")
-    && quest.parametres.some(p => p.type === "number")
-  ) {
+  (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
+  (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
+)
+  return;
     const qtyParam = quest.parametres.find(p => p.type === "number");
     const consigneParam = quest.parametres.find(p => p.key === "consigne" || p.key === "critere" || p.key === "objet");
 
