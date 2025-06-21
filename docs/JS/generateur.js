@@ -38,6 +38,9 @@ document.addEventListener("DOMContentLoaded", function() {
   // Recherche adresse
   const mapSearchBar = document.getElementById('mapSearchBar');
   if (mapSearchBar) mapSearchBar.addEventListener('input', handleMapSearch);
+
+  // Première mise à jour de la liste des épreuves
+  afficherScenario();
 });
 
 function ajouterEtapeAuScenario(etape) {
@@ -46,31 +49,32 @@ function ajouterEtapeAuScenario(etape) {
 }
 
 function afficherScenario() {
-  const container = document.getElementById('scenarioContainer');
-  if (!container) return;
+  const listDiv = document.getElementById('scenarioList');
+  if (!listDiv) return;
   if (scenario.length === 0) {
-    container.innerHTML = "<p>Aucune étape ajoutée.</p>";
+    listDiv.innerHTML = "<p>Aucune épreuve ajoutée.</p>";
+    afficherBoutonSalon(); // cache le bouton si besoin
     return;
   }
-  container.innerHTML = "<h4>Scénario en cours :</h4>" +
-    scenario.map((etape, idx) => {
-      const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
-      let resume = quest ? quest.nom : etape.type;
-      return `
-      <div class="step-list-item">
-        <strong>${idx + 1}. ${resume}</strong>
+  listDiv.innerHTML = scenario.map((etape, idx) => {
+    const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
+    let resume = quest ? quest.nom : etape.type;
+    return `
+      <div class="epreuve-ligne">
+        <strong>${idx + 1} - ${resume}</strong>
         <div style="font-size:0.98em;margin-top:2px;">
           ${Object.entries(etape.params).map(([k, v]) =>
             `<span><em>${k}</em> : ${Array.isArray(v) ? v.join(" | ") : typeof v === 'string' ? v : '[objet]'}</span>`
           ).join(' | ')}
         </div>
         <div class="step-actions">
-          <button onclick="supprimerEtape(${idx})">Supprimer</button>
-          ${idx > 0 ? `<button onclick="monterEtape(${idx})">Monter</button>` : ''}
-          ${idx < scenario.length - 1 ? `<button onclick="descendreEtape(${idx})">Descendre</button>` : ''}
+          <button type="button" onclick="supprimerEtape(${idx})">Supprimer</button>
+          ${idx > 0 ? `<button type="button" onclick="monterEtape(${idx})">Monter</button>` : ''}
+          ${idx < scenario.length - 1 ? `<button type="button" onclick="descendreEtape(${idx})">Descendre</button>` : ''}
         </div>
       </div>`;
-    }).join("");
+  }).join('');
+  afficherBoutonSalon();
 }
 
 function supprimerEtape(idx) {
@@ -97,6 +101,58 @@ function exporterScenario() {
   a.download = "scenario.json";
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// === Affichage/Bouton Générer un code salon ===
+function afficherBoutonSalon() {
+  let btnSalon = document.getElementById('boutonSalon');
+  if (scenario.length >= 4) {
+    if (!btnSalon) {
+      btnSalon = document.createElement('button');
+      btnSalon.type = 'button';
+      btnSalon.id = 'boutonSalon';
+      btnSalon.className = 'main-btn';
+      btnSalon.textContent = 'Générer un code salon';
+      btnSalon.style.marginLeft = "12px";
+      btnSalon.onclick = genererSalon;
+      // Ajoute à côté du bouton valider cette étape (dans le form)
+      let formContainer = document.getElementById('formContainer');
+      if (formContainer && formContainer.parentNode.querySelector('form')) {
+        formContainer.parentNode.querySelector('form').appendChild(btnSalon);
+      } else {
+        // Sinon, ajoute à la div de boutons principale
+        let groupBtns = document.querySelector('.group-btns');
+        if (groupBtns) groupBtns.insertBefore(btnSalon, groupBtns.firstChild);
+      }
+    }
+    btnSalon.style.display = 'inline-block';
+  } else if (btnSalon) {
+    btnSalon.style.display = 'none';
+  }
+}
+
+// === Sauvegarde du scénario et génération d'un code de salon ===
+function genererSalon() {
+  // Stocke coordonnées + scenario dans la base ou localStorage (ici demo localStorage)
+  const coordStart = document.getElementById('coordStart').value;
+  const coordEnd = document.getElementById('coordEnd').value;
+  if (!coordStart || !coordEnd) {
+    alert("Veuillez renseigner les coordonnées de départ et d'arrivée !");
+    return;
+  }
+  if (scenario.length < 4) {
+    alert("Il faut au moins 4 épreuves pour générer un code salon !");
+    return;
+  }
+  // Générer un code unique (ex: 6 lettres/chiffres)
+  const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
+  // Stockage local/demo. Remplace par l'appel à Firebase ou BDD
+  localStorage.setItem('salon_' + codeSalon, JSON.stringify({
+    coordStart,
+    coordEnd,
+    scenario
+  }));
+  alert("Code de salon généré : " + codeSalon + "\nTu peux le partager pour rejouer ce scénario !");
 }
 
 // ===================
@@ -312,7 +368,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
-    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type de quête ci-dessus.</div>`;
+    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
   }; // <-- FIN DE la fonction onsubmit
 }
 
@@ -320,7 +376,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 let mapSearchTimeout = null;
 let searchMarker = null;
 
-// Réinitialise proprement le conteneur de la carte
 function resetMapContainer() {
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
@@ -329,7 +384,6 @@ function resetMapContainer() {
   }
 }
 
-// Ouvre la carte pour choisir une coordonnée et fige la cible dans la closure
 function openMapPicker(targetInput) {
   document.getElementById('mapModal').style.display = 'flex';
   document.getElementById('mapSearchBar').value = '';
@@ -354,22 +408,17 @@ function openMapPicker(targetInput) {
   }
 }
 
-// Passe la cible à chaque nouvelle carte
 function initLeafletMap(targetInput) {
-  // 1. Supprime d’abord la carte si elle existe (AVANT de manipuler le DOM !)
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
-
-  // 2. Puis reset le container (remplacer le div #mapContainer par un neuf)
   resetMapContainer();
 
-    const container = document.getElementById('mapContainer');
+  const container = document.getElementById('mapContainer');
   if (container && container._leaflet_id) { delete container._leaflet_id; }
-  
-  // 3. Crée la nouvelle carte sur le container tout neuf
+
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
@@ -389,7 +438,6 @@ function initLeafletMap(targetInput) {
   });
 }
 
-// --- Recherche d'adresse ---
 function handleMapSearch() {
   const searchBar = document.getElementById('mapSearchBar');
   const resultsDiv = document.getElementById('mapSearchResults');
