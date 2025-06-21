@@ -282,7 +282,10 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     const data = {};
 
     // Pour les types avec quantité/consignes multiples
-    if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && quest.parametres.some(p => p.type === "number")) {
+    if (
+      (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
+      quest.parametres.some(p => p.type === "number")
+    ) {
       const qtyParam = quest.parametres.find(p => p.type === "number");
       let nombre = parseInt(form.elements[qtyParam.key].value, 10) || 1;
       data[qtyParam.key] = nombre;
@@ -305,12 +308,13 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       } else if (!(param.key in data)) {
         data[param.key] = form.elements[param.key].value;
       }
-    })
+    }); // <-- CORRECTION PRINCIPALE : parenthèse fermante + point-virgule ici
 
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type de quête ci-dessus.</div>`;
-    });
+  }; // <-- FIN DE la fonction onsubmit
+}
 
 // === Carte Leaflet pour sélection GPS + recherche adresse ===
 let mapSearchTimeout = null;
