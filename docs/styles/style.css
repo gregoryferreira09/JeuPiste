@@ -826,3 +826,44 @@ body {
   min-width: 30px;
   text-align: right;
 }
+
+/* Harmonisation complète des listes déroulantes du générateur */
+.form-container select,
+.form-container option {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15em;
+  color: #2c1b1b;
+  background: #fff;
+}
+
+.form-container select {
+  border: 2px solid #e0c185;
+  border-radius: 7px;
+  padding: 10px 8px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='goldenrod' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 98%;
+  background-position-y: 50%;
+  background-size: 22px;
+  font-weight: 500;
+}
+
+.form-container select:focus {
+  border: 2px solid #d4af37;
+  background: #fff;
+  color: #2c1b1b;
+}
+
+.form-container select option {
+  background: #fff;
+  color: #2c1b1b;
+  font-size: 1.15em;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+}
