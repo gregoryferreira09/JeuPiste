@@ -1,5 +1,6 @@
 // === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES AVEC CONSIGNES INDIVIDUELLES ===
 let scenario = [];
+let dragSrcIdx = null;
 
 // === INITIALISATION PAGE ===
 document.addEventListener("DOMContentLoaded", function() {
@@ -43,11 +44,13 @@ document.addEventListener("DOMContentLoaded", function() {
   afficherScenario();
 });
 
+// Ajouter une étape au scénario
 function ajouterEtapeAuScenario(etape) {
   scenario.push(etape);
   afficherScenario();
 }
 
+// Affichage de la liste des épreuves
 function afficherScenario() {
   const listDiv = document.getElementById('scenarioList');
   if (!listDiv) return;
@@ -59,33 +62,87 @@ function afficherScenario() {
   listDiv.innerHTML = scenario.map((etape, idx) => {
     const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
     let label = quest ? quest.nom : etape.type;
-    // Si c'est une photo/vidéo/collecte, affiche le détail consigne
-    if (etape.params && Array.isArray(etape.params.consignes)) {
-      return etape.params.consignes.map((c, i) =>
-        `<div><strong>${idx + 1}${etape.params.consignes.length > 1 ? '.' + (i+1) : ''} - ${label}${c ? ' : ' + c : ''}</strong></div>`
-      ).join('');
-    } else {
-      return `<div><strong>${idx + 1} - ${label}</strong></div>`;
+    let consignesHtml = '';
+    if (etape.params && Array.isArray(etape.params.consignes) && etape.params.consignes.length > 0) {
+      consignesHtml = etape.params.consignes.map(c => c ? ` : ${c}` : '').join('');
     }
+    return `
+      <div class="epreuve-ligne" draggable="true" data-idx="${idx}">
+        <span class="epreuve-delete" title="Supprimer" onclick="supprimerEtape(${idx})">❌</span>
+        <span class="epreuve-num">${idx + 1} -</span>
+        <span class="epreuve-label">${label}${consignesHtml}</span>
+        <span class="epreuve-edit" title="Éditer" onclick="editerEtape(${idx})">✏️</span>
+      </div>
+    `;
   }).join('');
   afficherBoutonSalon();
+  // Drag & drop listeners
+  Array.from(listDiv.querySelectorAll('.epreuve-ligne')).forEach(ligne => {
+    ligne.addEventListener('dragstart', handleDragStart);
+    ligne.addEventListener('dragover', handleDragOver);
+    ligne.addEventListener('drop', handleDrop);
+    ligne.addEventListener('dragend', handleDragEnd);
+
+    // Mobile long press for drag
+    let timer = null;
+    ligne.addEventListener('touchstart', function(e) {
+      timer = setTimeout(() => {
+        ligne.draggable = true;
+        ligne.classList.add('dragging-touch');
+      }, 400);
+    });
+    ligne.addEventListener('touchend', function(e) {
+      clearTimeout(timer);
+      ligne.draggable = false;
+      ligne.classList.remove('dragging-touch');
+    });
+  });
 }
 
+// Supprimer une étape
 function supprimerEtape(idx) {
   scenario.splice(idx, 1);
   afficherScenario();
 }
-function monterEtape(idx) {
-  if (idx <= 0) return;
-  [scenario[idx-1], scenario[idx]] = [scenario[idx], scenario[idx-1]];
-  afficherScenario();
-}
-function descendreEtape(idx) {
-  if (idx >= scenario.length-1) return;
-  [scenario[idx], scenario[idx+1]] = [scenario[idx+1], scenario[idx]];
+
+// Éditer une étape
+function editerEtape(idx) {
+  const etape = scenario[idx];
+  // Recharge le formulaire avec les valeurs de cette étape
+  document.getElementById('questTypeSelect').value = etape.type;
+  generateQuestForm(etape.type, 'formContainer', etape.params);
+  // Supprime temporairement l’étape pour la ré-enregistrer à la validation
+  scenario.splice(idx, 1);
   afficherScenario();
 }
 
+// Drag & drop handlers
+function handleDragStart(e) {
+  dragSrcIdx = +this.dataset.idx;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function handleDragOver(e) {
+  e.preventDefault();
+  this.classList.add('dragover');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  this.classList.remove('dragover');
+  const dropIdx = +this.dataset.idx;
+  if (dragSrcIdx !== null && dropIdx !== dragSrcIdx) {
+    const [item] = scenario.splice(dragSrcIdx, 1);
+    scenario.splice(dropIdx, 0, item);
+    afficherScenario();
+  }
+  dragSrcIdx = null;
+}
+function handleDragEnd(e) {
+  Array.from(document.querySelectorAll('.epreuve-ligne')).forEach(l => l.classList.remove('dragging', 'dragover', 'dragging-touch'));
+  dragSrcIdx = null;
+}
+
+// Exporter le scénario
 function exporterScenario() {
   const data = JSON.stringify(scenario, null, 2);
   const blob = new Blob([data], {type: "application/json"});
@@ -97,7 +154,7 @@ function exporterScenario() {
   URL.revokeObjectURL(url);
 }
 
-// === Affichage/Bouton Générer un code salon ===
+// Affichage/Bouton Générer un code salon
 function afficherBoutonSalon() {
   let btnSalon = document.getElementById('boutonSalon');
   if (scenario.length >= 4) {
@@ -125,9 +182,8 @@ function afficherBoutonSalon() {
   }
 }
 
-// === Sauvegarde du scénario et génération d'un code de salon ===
+// Sauvegarde du scénario et génération d'un code de salon
 function genererSalon() {
-  // Stocke coordonnées + scenario dans la base ou localStorage (ici demo localStorage)
   const coordStart = document.getElementById('coordStart').value;
   const coordEnd = document.getElementById('coordEnd').value;
   if (!coordStart || !coordEnd) {
@@ -138,9 +194,7 @@ function genererSalon() {
     alert("Il faut au moins 4 épreuves pour générer un code salon !");
     return;
   }
-  // Générer un code unique (ex: 6 lettres/chiffres)
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
-  // Stockage local/demo. Remplace par l'appel à Firebase ou BDD
   localStorage.setItem('salon_' + codeSalon, JSON.stringify({
     coordStart,
     coordEnd,
@@ -358,12 +412,12 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       } else if (!(param.key in data)) {
         data[param.key] = form.elements[param.key].value;
       }
-    }); // <-- CORRECTION PRINCIPALE : parenthèse fermante + point-virgule ici
+    });
 
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-  }; // <-- FIN DE la fonction onsubmit
+  };
 }
 
 // === Carte Leaflet pour sélection GPS + recherche adresse ===
