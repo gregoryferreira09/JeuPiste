@@ -18,10 +18,10 @@ const QUESTS_CATALOGUE = [
   {
     id: "photo_inconnus",
     nom: "Photo avec des inconnus",
-    description: "Prendre une photo avec X personnes différentes, ou répondant à un critère donné.",
+    description: "Prendre une ou plusieurs photos avec des personnes différentes ou répondant à un critère.",
     parametres: [
-      { key: "nbPersonnes", type: "number", label: "Nombre de personnes", default: 1, min: 1, max: 10 },
-      { key: "critere", type: "text", label: "Critère des personnes", placeholder: "Ex: quelqu’un qui porte un chapeau" }
+      { key: "nbPersonnes", type: "number", label: "Nombre de personnes/photos", default: 1, min: 1, max: 10 },
+      { key: "critere", type: "text", label: "Critère ou consigne", placeholder: "Ex: quelqu’un qui porte un chapeau" }
     ],
     combinable: ["gps", "chrono"],
     preview: "photo"
@@ -31,13 +31,26 @@ const QUESTS_CATALOGUE = [
   {
     id: "video",
     nom: "Vidéo à tourner",
-    description: "Se filmer en train de réaliser une action précise.",
+    description: "Se filmer en train de réaliser une action précise, une ou plusieurs fois.",
     parametres: [
       { key: "nbVideos", type: "number", label: "Nombre de vidéos", default: 1, min: 1, max: 5 },
       { key: "consigne", type: "text", label: "Consigne vidéo", placeholder: "Ex: filme-toi en train de faire 3 tractions" }
     ],
     combinable: ["gps", "chrono"],
     preview: "video"
+  },
+
+  // === COLLECTE OBJET ===
+  {
+    id: "collecte_objet",
+    nom: "Collecte d’objet",
+    description: "Ramener un ou plusieurs objets physiques (ex : feuille, caillou, papier, etc.).",
+    parametres: [
+      { key: "nbObjets", type: "number", label: "Nombre d’objets", default: 1, min: 1, max: 15 },
+      { key: "objet", type: "text", label: "Consigne ou type d’objet", placeholder: "Ex: une feuille d’érable" }
+    ],
+    combinable: ["chrono"],
+    preview: "objet"
   },
 
   // === AUDIO ===
@@ -50,18 +63,6 @@ const QUESTS_CATALOGUE = [
     ],
     combinable: ["chrono"],
     preview: "audio"
-  },
-
-  // === COLLECTE OBJET ===
-  {
-    id: "collecte_objet",
-    nom: "Collecte d’objet",
-    description: "Ramener un objet physique (ex : feuille d’un arbre, caillou, papier, etc.).",
-    parametres: [
-      { key: "objet", type: "text", label: "Objet à ramener", placeholder: "Ex: une feuille d’érable" }
-    ],
-    combinable: ["chrono"],
-    preview: "objet"
   },
 
   // === GPS (1 ou plusieurs points) ===
@@ -187,7 +188,7 @@ const QUESTS_CATALOGUE = [
     parametres: [
       { key: "duree", type: "number", label: "Temps imparti (secondes)", default: 60, min: 10, max: 3600 }
     ],
-    combinable: [] // se combine avec toutes les autres comme « option »
+    combinable: []
   },
 
   // === DEFI EN DUEL ===
