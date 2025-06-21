@@ -366,6 +366,9 @@ function initLeafletMap(targetInput) {
   // 2. Puis reset le container (remplacer le div #mapContainer par un neuf)
   resetMapContainer();
 
+    const container = document.getElementById('mapContainer');
+  if (container && container._leaflet_id) { delete container._leaflet_id; }
+  
   // 3. Crée la nouvelle carte sur le container tout neuf
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
