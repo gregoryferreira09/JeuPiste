@@ -13,27 +13,30 @@
 
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <!-- Liste des épreuves ajoutées -->
-      <div id="scenarioList" style="margin-bottom: 28px;"></div>
-
-      <!-- Formulaire principal -->
       <form class="form-container" id="epreuveForm" autocomplete="off">
-  <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
-    <!-- coordonnées ... -->
-  </div>
-  <!-- Ici ta liste des épreuves -->
-  <div id="scenarioList" style="margin-bottom:18px;"></div>
-  <!-- puis le reste du formulaire -->
-  <div class="form-field">
-    <label for="questTypeSelect">Type d'épreuve :</label>
-    <select id="questTypeSelect" ...>
-      ...
-    </select>
-  </div>
-  <div id="formContainer"></div>
-</form>
+        <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
+          <div style="flex:1; min-width:180px;">
+            <label for="coordStart">Coordonnées du départ :</label>
+            <input type="text" id="coordStart" name="coordStart" placeholder="Clique pour choisir" readonly>
+          </div>
+          <div style="flex:1; min-width:180px;">
+            <label for="coordEnd">Coordonnées d'arrivée :</label>
+            <input type="text" id="coordEnd" name="coordEnd" placeholder="Clique pour choisir" readonly>
+          </div>
+        </div>
 
-      <!-- Boutons principaux -->
+        <!-- Liste des épreuves ajoutées, juste sous les coordonnées -->
+        <div id="scenarioList" style="margin-bottom:18px;"></div>
+
+        <div class="form-field">
+          <label for="questTypeSelect">Type d'épreuve :</label>
+          <select id="questTypeSelect" name="questTypeSelect" required>
+            <option value="">-- Choisissez un type d'épreuve --</option>
+          </select>
+        </div>
+        <div id="formContainer"></div>
+      </form>
+
       <div class="group-btns">
         <button class="main-btn" type="button" onclick="exporterScenario()">📦 Exporter le scénario</button>
         <button class="main-btn" type="button" onclick="window.location.href='accueil.html'">⬅️ Retour accueil</button>
