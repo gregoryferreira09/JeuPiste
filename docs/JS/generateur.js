@@ -354,22 +354,23 @@ function openMapPicker(targetInput) {
   }
 }
 
-// Passe la cible à chaque nouvelle carte
+
 function initLeafletMap(targetInput) {
-  // 1. Supprime d’abord la carte si elle existe (AVANT de manipuler le DOM !)
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
-
-  // 2. Puis reset le container (remplacer le div #mapContainer par un neuf)
   resetMapContainer();
 
-    const container = document.getElementById('mapContainer');
-  if (container && container._leaflet_id) { delete container._leaflet_id; }
-  
-  // 3. Crée la nouvelle carte sur le container tout neuf
+  // SÉCURITÉ MAX : nettoyage de toutes les traces internes
+  const container = document.getElementById('mapContainer');
+  for (let key in container) {
+    if (key.startsWith('_leaflet')) {
+      try { delete container[key]; } catch(e){}
+    }
+  }
+
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
