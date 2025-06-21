@@ -123,6 +123,18 @@
 
     // === Carte Leaflet pour sélection GPS ===
     let currentCoordTarget = null;
+
+    // Ajout de la fonction pour réinitialiser proprement le conteneur Leaflet
+    function resetMapContainer() {
+      const container = document.getElementById('mapContainer');
+      if (container) {
+        container.innerHTML = '';
+        if (container._leaflet_id) {
+          delete container._leaflet_id;
+        }
+      }
+    }
+
     function openMapPicker(targetInput) {
       currentCoordTarget = targetInput;
       document.getElementById('mapModal').style.display = 'flex';
@@ -140,11 +152,13 @@
         initLeafletMap();
       }
     }
+
     function initLeafletMap() {
       if (window.map) {
         window.map.off();
         window.map.remove();
       }
+      resetMapContainer(); // <-- Ajouté pour éviter le bug Leaflet
       window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13); // Paris par défaut
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
