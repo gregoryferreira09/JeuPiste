@@ -3,7 +3,6 @@ let scenario = [];
 
 // === INITIALISATION PAGE ===
 document.addEventListener("DOMContentLoaded", function() {
-  // Remplit le menu déroulant avec les types de quêtes depuis QUESTS_CATALOGUE
   const select = document.getElementById('questTypeSelect');
   if (select && typeof QUESTS_CATALOGUE !== "undefined") {
     QUESTS_CATALOGUE.forEach(quest => {
@@ -19,10 +18,10 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   }
 
-  // FadeIn effet
+  // Effet fadeIn harmonisé
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
-
+  
   // Champs coordonnées
   const coordStart = document.getElementById('coordStart');
   const coordEnd = document.getElementById('coordEnd');
@@ -39,8 +38,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Recherche adresse
   const mapSearchBar = document.getElementById('mapSearchBar');
   if (mapSearchBar) mapSearchBar.addEventListener('input', handleMapSearch);
-
-  afficherScenario();
 });
 
 function ajouterEtapeAuScenario(etape) {
@@ -116,7 +113,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   let form = document.createElement('form');
   form.className = 'quest-form';
 
-  // Cas spécial pour photo/video/collecte_objet
+  // Détection : comportement spécial (photos, vidéos, etc.)
   if (
     (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet")
     && quest.parametres.some(p => p.type === "number")
@@ -138,7 +135,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     labelQty.style.marginRight = "8px";
     fieldWrapper.appendChild(labelQty);
 
-    // Input quantité
+    // Input quantité minuscule
     let inputQty = document.createElement('input');
     inputQty.type = 'number';
     inputQty.id = qtyParam.key;
@@ -160,6 +157,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     consignesZone.style.marginTop = "14px";
     form.appendChild(consignesZone);
 
+    // Fonction d'update dynamique
     function updateConsignes() {
       consignesZone.innerHTML = '';
       let nombre = parseInt(inputQty.value, 10) || 1;
@@ -199,12 +197,13 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     updateConsignes();
   }
 
-  // Ajoute le reste des champs standards
+  // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
   quest.parametres.forEach(param => {
     if (
       (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
       (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
-    ) return;
+    )
+      return;
 
     let fieldWrapper = document.createElement('div');
     fieldWrapper.className = 'form-field';
@@ -302,24 +301,26 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       if (
         (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
         (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
-      ) return;
+      )
+        return;
       if (param.type === 'file') {
         data[param.key] = form.elements[param.key].files[0] || null;
       } else if (!(param.key in data)) {
         data[param.key] = form.elements[param.key].value;
       }
-    });
+    }); // <-- CORRECTION PRINCIPALE : parenthèse fermante + point-virgule ici
 
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type de quête ci-dessus.</div>`;
-  };
+  }; // <-- FIN DE la fonction onsubmit
 }
 
 // === Carte Leaflet pour sélection GPS + recherche adresse ===
 let mapSearchTimeout = null;
 let searchMarker = null;
 
+// Réinitialise proprement le conteneur de la carte
 function resetMapContainer() {
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
@@ -328,6 +329,7 @@ function resetMapContainer() {
   }
 }
 
+// Ouvre la carte pour choisir une coordonnée et fige la cible dans la closure
 function openMapPicker(targetInput) {
   document.getElementById('mapModal').style.display = 'flex';
   document.getElementById('mapSearchBar').value = '';
@@ -352,13 +354,19 @@ function openMapPicker(targetInput) {
   }
 }
 
+// Passe la cible à chaque nouvelle carte
 function initLeafletMap(targetInput) {
+  // 1. Supprime d’abord la carte si elle existe (AVANT de manipuler le DOM !)
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
+
+  // 2. Puis reset le container (remplacer le div #mapContainer par un neuf)
   resetMapContainer();
+
+  // 3. Crée la nouvelle carte sur le container tout neuf
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
