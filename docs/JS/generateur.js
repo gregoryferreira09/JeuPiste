@@ -374,10 +374,11 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   });
 
   // Bouton de validation
-  let submit = document.createElement('button');
-  submit.type = 'submit';
-  submit.textContent = 'Valider cette étape';
-  form.appendChild(submit);
+ let submit = document.createElement('button');
+submit.type = 'submit';
+submit.textContent = 'Valider cette étape';
+submit.className = 'main-btn';
+form.appendChild(submit);
 
   container.appendChild(form);
 
