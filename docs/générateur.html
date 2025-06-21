@@ -18,25 +18,20 @@
 
       <!-- Formulaire principal -->
       <form class="form-container" id="epreuveForm" autocomplete="off">
-        <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
-          <div style="flex:1; min-width:180px;">
-            <label for="coordStart">Coordonnées du départ :</label>
-            <input type="text" id="coordStart" name="coordStart" placeholder="Clique pour choisir" readonly>
-          </div>
-          <div style="flex:1; min-width:180px;">
-            <label for="coordEnd">Coordonnées d'arrivée :</label>
-            <input type="text" id="coordEnd" name="coordEnd" placeholder="Clique pour choisir" readonly>
-          </div>
-        </div>
-        <div class="form-field">
-          <label for="questTypeSelect">Type d'épreuve :</label>
-          <select id="questTypeSelect" name="questTypeSelect" required>
-            <option value="">-- Choisissez un type d'épreuve --</option>
-          </select>
-        </div>
-        <!-- Le formulaire dynamique d'épreuve sera injecté ici -->
-        <div id="formContainer"></div>
-      </form>
+  <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
+    <!-- coordonnées ... -->
+  </div>
+  <!-- Ici ta liste des épreuves -->
+  <div id="scenarioList" style="margin-bottom:18px;"></div>
+  <!-- puis le reste du formulaire -->
+  <div class="form-field">
+    <label for="questTypeSelect">Type d'épreuve :</label>
+    <select id="questTypeSelect" ...>
+      ...
+    </select>
+  </div>
+  <div id="formContainer"></div>
+</form>
 
       <!-- Boutons principaux -->
       <div class="group-btns">
