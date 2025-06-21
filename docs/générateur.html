@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Générateur de quêtes</title>
+  <link rel="stylesheet" href="styles/style.css">
+  <style>
+    .quest-form { margin-top: 18px; }
+    .form-field { margin-bottom: 14px; }
+    label { font-weight: bold; display: block; margin-bottom: 4px; }
+    input, textarea, select { width: 100%; font-size: 1em; padding: 6px; border-radius: 5px; border: 1px solid #ccc; }
+    button { margin-top: 12px; }
+    .succes { color: green; margin-top: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Création d'une étape de quête</h1>
+  
+  <label for="questTypeSelect">Type de quête :</label>
+  <select id="questTypeSelect">
+    <option value="">-- Choisissez un type de quête --</option>
+    <!-- Les options seront générées en JS -->
+  </select>
+  
+  <div id="formContainer"></div>
+  
+  <script src="JS/catalogue.js"></script>
+  <script src="JS/form-generator.js"></script>
+  <script>
+    // Remplir la liste déroulante avec les types du catalogue
+    document.addEventListener("DOMContentLoaded", function() {
+      const select = document.getElementById('questTypeSelect');
+      QUESTS_CATALOGUE.forEach(quest => {
+        let opt = document.createElement('option');
+        opt.value = quest.id;
+        opt.textContent = quest.nom;
+        select.appendChild(opt);
+      });
+
+      select.onchange = function() {
+        if (this.value) generateQuestForm(this.value, 'formContainer');
+        else document.getElementById('formContainer').innerHTML = '';
+      };
+    });
+  </script>
+</body>
+</html>
