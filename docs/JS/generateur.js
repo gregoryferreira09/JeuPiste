@@ -305,7 +305,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       } else if (!(param.key in data)) {
         data[param.key] = form.elements[param.key].value;
       }
-    });
+    };
 
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
