@@ -11,19 +11,35 @@
     input, textarea, select { width: 100%; font-size: 1em; padding: 6px; border-radius: 5px; border: 1px solid #ccc; }
     button { margin-top: 12px; }
     .succes { color: green; margin-top: 18px; }
+    /* Harmonisation du cadre principal */
+    .main-accueil {
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
   </style>
 </head>
 <body>
-  <h1>Création d'une étape de quête</h1>
-  
-  <label for="questTypeSelect">Type de quête :</label>
-  <select id="questTypeSelect">
-    <option value="">-- Choisissez un type de quête --</option>
-    <!-- Les options seront générées en JS -->
-  </select>
-  
-  <div id="formContainer"></div>
-  
+  <header>
+    <h1 class="site-title">Jeu de piste</h1>
+  </header>
+
+  <div class="center-wrapper">
+    <main class="main-accueil fadeIn" role="main">
+      <h2>Générateur de quêtes</h2>
+      <label for="questTypeSelect">Type de quête :</label>
+      <select id="questTypeSelect">
+        <option value="">-- Choisissez un type de quête --</option>
+        <!-- Les options seront générées en JS -->
+      </select>
+      <div id="formContainer"></div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 Jeu de piste. Tous droits réservés.</p>
+    <a href="mentions-legales.html">Mentions légales</a>
+  </footer>
+
   <script src="JS/catalogue.js"></script>
   <script src="JS/form-generator.js"></script>
   <script>
@@ -41,6 +57,10 @@
         if (this.value) generateQuestForm(this.value, 'formContainer');
         else document.getElementById('formContainer').innerHTML = '';
       };
+
+      // Effet fadeIn harmonisé
+      var main = document.querySelector('.fadeIn');
+      if (main) main.classList.add('visible');
     });
   </script>
 </body>
