@@ -680,3 +680,16 @@ body {
 @media (max-width: 570px) {
   #confirmationRetourAccueil .main-accueil {max-width:90vw;}
 }
+
+#consignesZone input[type="text"] {
+  width: 66%;
+  max-width: 8.5em;
+  min-width: 70px;
+  display: inline-block;
+}
+#consignesZone {
+  margin-bottom: 12px;
+}
+#consignesZone div {
+  margin-bottom: 0;
+}
