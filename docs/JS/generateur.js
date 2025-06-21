@@ -99,6 +99,67 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     updateConsignes();
   }
 
+  let currentCoordTarget = null;
+
+// Ajout d'un mini-carte OSM avec leaflet (léger et sans clef API)
+function openMapPicker(targetInput) {
+  currentCoordTarget = targetInput;
+  document.getElementById('mapModal').style.display = 'flex';
+
+  // Init carte (si pas déjà fait)
+  if (!window.leafletLoaded) {
+    let link = document.createElement('link');
+    link.rel = "stylesheet";
+    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(link);
+
+    let script = document.createElement('script');
+    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    script.onload = initLeafletMap;
+    document.body.appendChild(script);
+    window.leafletLoaded = true;
+  } else {
+    initLeafletMap();
+  }
+}
+
+function initLeafletMap() {
+  if (window.map) {
+    window.map.off();
+    window.map.remove();
+  }
+  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13); // Paris par défaut
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(window.map);
+
+  let marker = null;
+
+  window.map.on('click', function(e) {
+    let lat = e.latlng.lat.toFixed(6);
+    let lng = e.latlng.lng.toFixed(6);
+    if (marker) marker.setLatLng(e.latlng);
+    else marker = L.marker(e.latlng).addTo(window.map);
+    if (currentCoordTarget) currentCoordTarget.value = lat + ", " + lng;
+    document.getElementById('mapModal').style.display = 'none';
+    window.map.off();
+    setTimeout(()=>window.map.remove(),300); // nettoyage pour éviter bugs si réouverture
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById('coordStart').addEventListener('click', function() {
+    openMapPicker(this);
+  });
+  document.getElementById('coordEnd').addEventListener('click', function() {
+    openMapPicker(this);
+  });
+  document.getElementById('closeMapBtn').addEventListener('click', function() {
+    document.getElementById('mapModal').style.display = 'none';
+    if (window.map) setTimeout(()=>window.map.remove(),300);
+  });
+});
+
   // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
   quest.parametres.forEach(param => {
     if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet"))
