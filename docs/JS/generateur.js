@@ -267,3 +267,131 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type de quête ci-dessus.</div>`;
   };
 }
+
+// === Carte Leaflet pour sélection GPS + recherche adresse ===
+let currentCoordTarget = null;
+let mapSearchTimeout = null;
+let searchMarker = null;
+
+function resetMapContainer() {
+  const container = document.getElementById('mapContainer');
+  if (container) {
+    container.innerHTML = '';
+    if (container._leaflet_id) {
+      delete container._leaflet_id;
+    }
+  }
+}
+
+function openMapPicker(targetInput) {
+  currentCoordTarget = targetInput;
+  document.getElementById('mapModal').style.display = 'flex';
+  document.getElementById('mapSearchBar').value = '';
+  document.getElementById('mapSearchResults').style.display = 'none';
+  if (!window.leafletLoaded) {
+    let link = document.createElement('link');
+    link.rel = "stylesheet";
+    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(link);
+    let script = document.createElement('script');
+    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    script.onload = initLeafletMap;
+    document.body.appendChild(script);
+    window.leafletLoaded = true;
+  } else {
+    initLeafletMap();
+  }
+}
+
+function initLeafletMap() {
+  if (window.map) {
+    window.map.off();
+    window.map.remove();
+  }
+  resetMapContainer();
+  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13); // Paris par défaut
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(window.map);
+
+  searchMarker = null;
+
+  window.map.on('click', function(e) {
+    let lat = e.latlng.lat.toFixed(6);
+    let lng = e.latlng.lng.toFixed(6);
+    if (searchMarker) searchMarker.setLatLng(e.latlng);
+    else searchMarker = L.marker(e.latlng).addTo(window.map);
+    if (currentCoordTarget) currentCoordTarget.value = lat + ", " + lng;
+    document.getElementById('mapModal').style.display = 'none';
+    window.map.off();
+    setTimeout(()=>window.map.remove(),300);
+  });
+}
+
+// --- Recherche d'adresse ---
+function handleMapSearch() {
+  const searchBar = document.getElementById('mapSearchBar');
+  const resultsDiv = document.getElementById('mapSearchResults');
+  const query = searchBar.value.trim();
+  if (!query) {
+    resultsDiv.style.display = 'none';
+    resultsDiv.innerHTML = '';
+    return;
+  }
+  // Débouncing
+  if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
+  mapSearchTimeout = setTimeout(() => {
+    resultsDiv.innerHTML = '<div>Recherche...</div>';
+    resultsDiv.style.display = 'block';
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=10`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.length === 0) {
+          resultsDiv.innerHTML = '<div>Aucun résultat</div>';
+          return;
+        }
+        resultsDiv.innerHTML = data.map(place =>
+          `<div data-lat="${place.lat}" data-lon="${place.lon}">
+            ${place.display_name}
+          </div>`
+        ).join('');
+        // Ajout évènement sur chaque résultat
+        Array.from(resultsDiv.children).forEach(child => {
+          child.onclick = function() {
+            const lat = parseFloat(this.getAttribute('data-lat'));
+            const lon = parseFloat(this.getAttribute('data-lon'));
+            if (window.map) window.map.setView([lat, lon], 16);
+            // Place aussi le marker sur le résultat
+            if (searchMarker) searchMarker.setLatLng([lat, lon]);
+            else searchMarker = L.marker([lat, lon]).addTo(window.map);
+            resultsDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
+          }
+        });
+      }).catch(() => {
+        resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
+      });
+  }, 350);
+}
+
+// Bindings à faire dans un DOMContentLoaded ou à la fin du body
+document.addEventListener("DOMContentLoaded", function() {
+  // Champs coordonnées
+  if (document.getElementById('coordStart'))
+    document.getElementById('coordStart').addEventListener('click', function() {
+      openMapPicker(this);
+    });
+  if (document.getElementById('coordEnd'))
+    document.getElementById('coordEnd').addEventListener('click', function() {
+      openMapPicker(this);
+    });
+  // Fermeture carte
+  if (document.getElementById('closeMapBtn'))
+    document.getElementById('closeMapBtn').addEventListener('click', function() {
+      document.getElementById('mapModal').style.display = 'none';
+      if (window.map) setTimeout(()=>window.map.remove(),300);
+    });
+  // Recherche adresse
+  if (document.getElementById('mapSearchBar'))
+    document.getElementById('mapSearchBar').addEventListener('input', handleMapSearch);
+});
