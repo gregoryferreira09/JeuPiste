@@ -109,3 +109,46 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     container.innerHTML = `<div class="succes">Étape ajoutée !</div>`;
   };
 }
+
+let scenario = [];
+
+function ajouterEtapeAuScenario(etape) {
+  scenario.push(etape);
+  afficherScenario();
+}
+
+function afficherScenario() {
+  const container = document.getElementById('scenarioContainer');
+  if (!container) return;
+  if (scenario.length === 0) {
+    container.innerHTML = "<p>Aucune étape ajoutée.</p>";
+    return;
+  }
+  container.innerHTML = "<h4>Scénario en cours :</h4>" + scenario.map((etape, idx) =>
+    `<div style="margin-bottom:8px;">
+      <strong>${idx+1}. ${etape.type}</strong>
+      <button onclick="supprimerEtape(${idx})" style="margin-left:12px;">Supprimer</button>
+    </div>`
+  ).join("");
+}
+
+function supprimerEtape(idx) {
+  scenario.splice(idx, 1);
+  afficherScenario();
+}
+
+// Modifie form.onsubmit pour :
+form.onsubmit = function(e) {
+  e.preventDefault();
+  const data = {};
+  quest.parametres.forEach(param => {
+    if (param.type === 'file') {
+      data[param.key] = form.elements[param.key].files[0] || null;
+    } else {
+      data[param.key] = form.elements[param.key].value;
+    }
+  });
+  ajouterEtapeAuScenario({ type: questTypeId, params: data });
+  form.reset();
+  // (optionnel) Re-générer le formulaire pour une nouvelle étape, ou afficher un message
+};
