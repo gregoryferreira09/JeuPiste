@@ -310,8 +310,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type de quête ci-dessus.</div>`;
-  };
-}
+    });
 
 // === Carte Leaflet pour sélection GPS + recherche adresse ===
 let mapSearchTimeout = null;
