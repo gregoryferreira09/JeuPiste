@@ -13,40 +13,43 @@
 
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-     <div id="coords-row">
-  <div>
-    <label for="coordStart">Coordonnées du départ :</label>
-    <input type="text" id="coordStart" name="coordStart" class="coord-input-coord" placeholder="Clique pour choisir" readonly>
-  </div>
-  <div>
-    <label for="coordEnd">Coordonnées d'arrivée :</label>
-    <input type="text" id="coordEnd" name="coordEnd" class="coord-input-coord" placeholder="Clique pour choisir" readonly>
-  </div>
-</div>
       <form class="form-container">
-  <label for="questTypeSelect">Type d'épreuve :</label>
-  <select id="questTypeSelect" name="questTypeSelect" required>
-    <option value="">-- Choisissez un type d'épreuve --</option>
-  </select>
-      <div id="formContainer"></div>
+        <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
+          <div style="flex:1; min-width:180px;">
+            <label for="coordStart">Coordonnées du départ :</label>
+            <input type="text" id="coordStart" name="coordStart" placeholder="Clique pour choisir" readonly>
+          </div>
+          <div style="flex:1; min-width:180px;">
+            <label for="coordEnd">Coordonnées d'arrivée :</label>
+            <input type="text" id="coordEnd" name="coordEnd" placeholder="Clique pour choisir" readonly>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="questTypeSelect">Type d'épreuve :</label>
+          <select id="questTypeSelect" name="questTypeSelect" required>
+            <option value="">-- Choisissez un type d'épreuve --</option>
+          </select>
+        </div>
+        <div id="formContainer"></div>
+      </form>
       <div id="scenarioContainer" class="step-list"></div>
       <div class="group-btns">
-        <button class="main-btn" onclick="exporterScenario()">📦 Exporter le scénario</button>
-        <button class="main-btn" onclick="window.location.href='accueil.html'">⬅️ Retour accueil</button>
+        <button class="main-btn" type="button" onclick="exporterScenario()">📦 Exporter le scénario</button>
+        <button class="main-btn" type="button" onclick="window.location.href='accueil.html'">⬅️ Retour accueil</button>
       </div>
     </main>
   </div>
 
   <!-- Modal carte -->
-<div id="mapModal" style="display:none;">
-  <div class="modal-content">
-    <h3>Clique sur la carte pour choisir une position</h3>
-    <input type="text" id="mapSearchBar" placeholder="🔍 Rechercher une adresse ou un lieu..." autocomplete="off">
-    <div id="mapSearchResults"></div>
-    <div id="mapContainer"></div>
-    <button id="closeMapBtn">Annuler</button>
+  <div id="mapModal" style="display:none;">
+    <div class="modal-content">
+      <h3>Clique sur la carte pour choisir une position</h3>
+      <input type="text" id="mapSearchBar" placeholder="🔍 Rechercher une adresse ou un lieu..." autocomplete="off">
+      <div id="mapSearchResults"></div>
+      <div id="mapContainer"></div>
+      <button id="closeMapBtn">Annuler</button>
+    </div>
   </div>
-</div>
 
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
