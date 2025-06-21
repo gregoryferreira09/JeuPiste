@@ -1,6 +1,45 @@
 // === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES AVEC CONSIGNES INDIVIDUELLES ===
 let scenario = [];
 
+// === INITIALISATION PAGE ===
+document.addEventListener("DOMContentLoaded", function() {
+  const select = document.getElementById('questTypeSelect');
+  if (select && typeof QUESTS_CATALOGUE !== "undefined") {
+    QUESTS_CATALOGUE.forEach(quest => {
+      let opt = document.createElement('option');
+      opt.value = quest.id;
+      opt.textContent = quest.nom;
+      select.appendChild(opt);
+    });
+
+    select.onchange = function() {
+      if (this.value) generateQuestForm(this.value, 'formContainer');
+      else document.getElementById('formContainer').innerHTML = '';
+    };
+  }
+
+  // Effet fadeIn harmonisé
+  var main = document.querySelector('.fadeIn');
+  if (main) main.classList.add('visible');
+  
+  // Champs coordonnées
+  const coordStart = document.getElementById('coordStart');
+  const coordEnd = document.getElementById('coordEnd');
+  if (coordStart) coordStart.addEventListener('click', function() { openMapPicker(this); });
+  if (coordEnd) coordEnd.addEventListener('click', function() { openMapPicker(this); });
+
+  // Fermeture carte
+  const closeBtn = document.getElementById('closeMapBtn');
+  if (closeBtn) closeBtn.addEventListener('click', function() {
+    document.getElementById('mapModal').style.display = 'none';
+    if (window.map) setTimeout(()=>window.map.remove(),300);
+  });
+
+  // Recherche adresse
+  const mapSearchBar = document.getElementById('mapSearchBar');
+  if (mapSearchBar) mapSearchBar.addEventListener('input', handleMapSearch);
+});
+
 function ajouterEtapeAuScenario(etape) {
   scenario.push(etape);
   afficherScenario();
@@ -274,12 +313,11 @@ let mapSearchTimeout = null;
 let searchMarker = null;
 
 function resetMapContainer() {
-  const container = document.getElementById('mapContainer');
-  if (container) {
-    container.innerHTML = '';
-    if (container._leaflet_id) {
-      delete container._leaflet_id;
-    }
+  // Méthode robuste : on remplace carrément le div par un nouveau
+  const oldContainer = document.getElementById('mapContainer');
+  if (oldContainer) {
+    const newContainer = oldContainer.cloneNode(false);
+    oldContainer.parentNode.replaceChild(newContainer, oldContainer);
   }
 }
 
@@ -338,7 +376,6 @@ function handleMapSearch() {
     resultsDiv.innerHTML = '';
     return;
   }
-  // Débouncing
   if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
   mapSearchTimeout = setTimeout(() => {
     resultsDiv.innerHTML = '<div>Recherche...</div>';
@@ -355,13 +392,11 @@ function handleMapSearch() {
             ${place.display_name}
           </div>`
         ).join('');
-        // Ajout évènement sur chaque résultat
         Array.from(resultsDiv.children).forEach(child => {
           child.onclick = function() {
             const lat = parseFloat(this.getAttribute('data-lat'));
             const lon = parseFloat(this.getAttribute('data-lon'));
             if (window.map) window.map.setView([lat, lon], 16);
-            // Place aussi le marker sur le résultat
             if (searchMarker) searchMarker.setLatLng([lat, lon]);
             else searchMarker = L.marker([lat, lon]).addTo(window.map);
             resultsDiv.style.display = 'none';
@@ -373,25 +408,3 @@ function handleMapSearch() {
       });
   }, 350);
 }
-
-// Bindings à faire dans un DOMContentLoaded ou à la fin du body
-document.addEventListener("DOMContentLoaded", function() {
-  // Champs coordonnées
-  if (document.getElementById('coordStart'))
-    document.getElementById('coordStart').addEventListener('click', function() {
-      openMapPicker(this);
-    });
-  if (document.getElementById('coordEnd'))
-    document.getElementById('coordEnd').addEventListener('click', function() {
-      openMapPicker(this);
-    });
-  // Fermeture carte
-  if (document.getElementById('closeMapBtn'))
-    document.getElementById('closeMapBtn').addEventListener('click', function() {
-      document.getElementById('mapModal').style.display = 'none';
-      if (window.map) setTimeout(()=>window.map.remove(),300);
-    });
-  // Recherche adresse
-  if (document.getElementById('mapSearchBar'))
-    document.getElementById('mapSearchBar').addEventListener('input', handleMapSearch);
-});
