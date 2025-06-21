@@ -29,13 +29,15 @@
       </select>
       <div id="formContainer"></div>
       <div id="scenarioContainer" class="step-list"></div>
-      <button class="main-btn" onclick="exporterScenario()">📦 Exporter le scénario</button>
-      <button class="main-btn" onclick="window.location.href='accueil.html'">⬅️ Retour accueil</button>
+      <div class="group-btns">
+        <button class="main-btn" onclick="exporterScenario()">📦 Exporter le scénario</button>
+        <button class="main-btn" onclick="window.location.href='accueil.html'">⬅️ Retour accueil</button>
+      </div>
     </main>
   </div>
 
   <!-- Modal carte -->
-  <div id="mapModal">
+  <div id="mapModal" style="display:none;">
     <div class="modal-content">
       <h3>Clique sur la carte pour choisir une position</h3>
       <input type="text" id="mapSearchBar" placeholder="🔍 Rechercher une adresse ou un lieu..." autocomplete="off">
