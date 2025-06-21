@@ -779,3 +779,50 @@ body {
     min-height: 200px;
   }
 }
+
+.epreuve-ligne {
+  display: flex;
+  align-items: center;
+  background: #291e17;
+  border-radius: 7px;
+  margin-bottom: 7px;
+  padding: 7px 10px;
+  position: relative;
+  box-shadow: 0 1px 4px #0002;
+  cursor: grab;
+  transition: background 0.2s;
+  user-select: none;
+}
+.epreuve-ligne.dragover,
+.epreuve-ligne.dragging,
+.epreuve-ligne.dragging-touch {
+  background: #4c3b2a;
+  opacity: 0.8;
+}
+.epreuve-delete {
+  cursor: pointer;
+  margin-right: 14px;
+  color: #c00;
+  font-size: 1.3em;
+  user-select: none;
+  transition: color 0.2s;
+}
+.epreuve-delete:hover { color: #ff3838; }
+.epreuve-edit {
+  cursor: pointer;
+  margin-left: auto;
+  font-size: 1.1em;
+  color: #e0c185;
+  user-select: none;
+  transition: color 0.2s;
+}
+.epreuve-edit:hover { color: #ffeecb; }
+.epreuve-label {
+  margin-left: 7px;
+  flex: 1;
+}
+.epreuve-num {
+  font-weight: bold;
+  min-width: 30px;
+  text-align: right;
+}
