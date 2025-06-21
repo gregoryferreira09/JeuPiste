@@ -1,3 +1,68 @@
+// === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES ===
+let scenario = [];
+
+function ajouterEtapeAuScenario(etape) {
+  scenario.push(etape);
+  afficherScenario();
+}
+
+function afficherScenario() {
+  const container = document.getElementById('scenarioContainer');
+  if (!container) return;
+  if (scenario.length === 0) {
+    container.innerHTML = "<p>Aucune étape ajoutée.</p>";
+    return;
+  }
+  container.innerHTML = "<h4>Scénario en cours :</h4>" +
+    scenario.map((etape, idx) => {
+      const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
+      let resume = quest ? quest.nom : etape.type;
+      return `
+      <div class="step-list-item">
+        <strong>${idx + 1}. ${resume}</strong>
+        <div style="font-size:0.98em;margin-top:2px;">
+          ${Object.entries(etape.params).map(([k, v]) =>
+            `<span><em>${k}</em> : ${typeof v === 'string' ? v : '[objet]'}</span>`
+          ).join(' | ')}
+        </div>
+        <div class="step-actions">
+          <button onclick="supprimerEtape(${idx})">Supprimer</button>
+          ${idx > 0 ? `<button onclick="monterEtape(${idx})">Monter</button>` : ''}
+          ${idx < scenario.length - 1 ? `<button onclick="descendreEtape(${idx})">Descendre</button>` : ''}
+        </div>
+      </div>`;
+    }).join("");
+}
+
+function supprimerEtape(idx) {
+  scenario.splice(idx, 1);
+  afficherScenario();
+}
+function monterEtape(idx) {
+  if (idx <= 0) return;
+  [scenario[idx-1], scenario[idx]] = [scenario[idx], scenario[idx-1]];
+  afficherScenario();
+}
+function descendreEtape(idx) {
+  if (idx >= scenario.length-1) return;
+  [scenario[idx], scenario[idx+1]] = [scenario[idx+1], scenario[idx]];
+  afficherScenario();
+}
+
+function exporterScenario() {
+  const data = JSON.stringify(scenario, null, 2);
+  const blob = new Blob([data], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "scenario.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===================
+// Formulaire dynamique
+// ===================
 function generateQuestForm(questTypeId, containerId, values = {}) {
   // Trouve la quête dans le catalogue
   const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
@@ -6,7 +71,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  // Vide le container
   container.innerHTML = `<h3>${quest.nom}</h3><p>${quest.description}</p>`;
 
   let form = document.createElement('form');
@@ -87,13 +151,10 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   submit.textContent = 'Valider cette étape';
   form.appendChild(submit);
 
-  // Ajoute le formulaire à la page
   container.appendChild(form);
 
-  // Gestion de la soumission (à adapter selon ta logique de sauvegarde)
   form.onsubmit = function(e) {
     e.preventDefault();
-    // Récupère les valeurs
     const data = {};
     quest.parametres.forEach(param => {
       if (param.type === 'file') {
@@ -102,53 +163,9 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
         data[param.key] = form.elements[param.key].value;
       }
     });
-    // Ici tu ajoutes l’étape paramétrée à ton scénario côté JS ou en base
-    console.log("Nouvelle étape :", questTypeId, data);
-    // Par exemple : ajouterEtapeAuScenario({ type: questTypeId, params: data });
-    // Puis vider ou afficher un message
-    container.innerHTML = `<div class="succes">Étape ajoutée !</div>`;
+    ajouterEtapeAuScenario({ type: questTypeId, params: data });
+    form.reset();
+    // On peut regénérer un formulaire vide ou laisser l'utilisateur choisir la prochaine quête
+    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type de quête ci-dessus.</div>`;
   };
 }
-
-let scenario = [];
-
-function ajouterEtapeAuScenario(etape) {
-  scenario.push(etape);
-  afficherScenario();
-}
-
-function afficherScenario() {
-  const container = document.getElementById('scenarioContainer');
-  if (!container) return;
-  if (scenario.length === 0) {
-    container.innerHTML = "<p>Aucune étape ajoutée.</p>";
-    return;
-  }
-  container.innerHTML = "<h4>Scénario en cours :</h4>" + scenario.map((etape, idx) =>
-    `<div style="margin-bottom:8px;">
-      <strong>${idx+1}. ${etape.type}</strong>
-      <button onclick="supprimerEtape(${idx})" style="margin-left:12px;">Supprimer</button>
-    </div>`
-  ).join("");
-}
-
-function supprimerEtape(idx) {
-  scenario.splice(idx, 1);
-  afficherScenario();
-}
-
-// Modifie form.onsubmit pour :
-form.onsubmit = function(e) {
-  e.preventDefault();
-  const data = {};
-  quest.parametres.forEach(param => {
-    if (param.type === 'file') {
-      data[param.key] = form.elements[param.key].files[0] || null;
-    } else {
-      data[param.key] = form.elements[param.key].value;
-    }
-  });
-  ajouterEtapeAuScenario({ type: questTypeId, params: data });
-  form.reset();
-  // (optionnel) Re-générer le formulaire pour une nouvelle étape, ou afficher un message
-};
