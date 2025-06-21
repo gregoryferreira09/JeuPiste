@@ -199,7 +199,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
   quest.parametres.forEach(param => {
-    if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet"))
+    if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "crite[...]
       return;
 
     let fieldWrapper = document.createElement('div');
@@ -292,7 +292,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
     // Les autres champs
     quest.parametres.forEach(param => {
-      if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet"))
+      if ((quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") && (param.type === "number" || param.key === "consigne" || param.key === "cri[...]
         return;
       if (param.type === 'file') {
         data[param.key] = form.elements[param.key].files[0] || null;
@@ -308,7 +308,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 }
 
 // === Carte Leaflet pour sélection GPS + recherche adresse ===
-let currentCoordTarget = null;
 let mapSearchTimeout = null;
 let searchMarker = null;
 
@@ -321,11 +320,16 @@ function resetMapContainer() {
   }
 }
 
+// Ouvre la carte pour choisir une coordonnée et fige la cible dans la closure
 function openMapPicker(targetInput) {
-  currentCoordTarget = targetInput;
   document.getElementById('mapModal').style.display = 'flex';
   document.getElementById('mapSearchBar').value = '';
   document.getElementById('mapSearchResults').style.display = 'none';
+
+  function afterLeafletLoaded() {
+    initLeafletMap(targetInput);
+  }
+
   if (!window.leafletLoaded) {
     let link = document.createElement('link');
     link.rel = "stylesheet";
@@ -333,26 +337,22 @@ function openMapPicker(targetInput) {
     document.head.appendChild(link);
     let script = document.createElement('script');
     script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.onload = initLeafletMap;
+    script.onload = afterLeafletLoaded;
     document.body.appendChild(script);
     window.leafletLoaded = true;
   } else {
-    initLeafletMap();
+    afterLeafletLoaded();
   }
 }
 
-function initLeafletMap() {
-  // 1. D'abord reset le container (remplace le div)
-  resetMapContainer();
-
-  // 2. Ensuite, supprime la carte si elle existe
+// Passe la cible à chaque nouvelle carte
+function initLeafletMap(targetInput) {
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
-
-  // 3. Crée la nouvelle carte
+  resetMapContainer();
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
@@ -365,7 +365,8 @@ function initLeafletMap() {
     let lng = e.latlng.lng.toFixed(6);
     if (searchMarker) searchMarker.setLatLng(e.latlng);
     else searchMarker = L.marker(e.latlng).addTo(window.map);
-    if (currentCoordTarget) currentCoordTarget.value = lat + ", " + lng;
+    // On fige la cible du champ à remplir
+    targetInput.value = lat + ", " + lng;
     document.getElementById('mapModal').style.display = 'none';
     window.map.off();
     setTimeout(()=>window.map.remove(),300);
