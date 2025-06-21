@@ -342,14 +342,17 @@ function openMapPicker(targetInput) {
 }
 
 function initLeafletMap() {
-  resetMapContainer(); // 1. Reset du container AVANT le remove
+  // 1. D'abord reset le container (remplace le div)
+  resetMapContainer();
 
+  // 2. Ensuite, supprime la carte si elle existe
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
 
+  // 3. Crée la nouvelle carte
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
