@@ -312,8 +312,8 @@ let currentCoordTarget = null;
 let mapSearchTimeout = null;
 let searchMarker = null;
 
+// Réinitialise proprement le conteneur de la carte
 function resetMapContainer() {
-  // Remplace le container par un neuf, sans toucher à window.map ici
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
     const newContainer = oldContainer.cloneNode(false);
@@ -342,16 +342,16 @@ function openMapPicker(targetInput) {
 }
 
 function initLeafletMap() {
-  // 1. On supprime proprement l'ancienne carte si elle existe
+  // 1. Supprime proprement l’ancienne carte AVANT de toucher au container
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
-  // 2. On remplace le container par un neuf
+  // 2. Remplace le container
   resetMapContainer();
-  // 3. On crée la carte sur ce nouveau container
-  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13); // Paris par défaut
+  // 3. Crée la nouvelle carte
+  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
   }).addTo(window.map);
