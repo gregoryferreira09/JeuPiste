@@ -13,7 +13,11 @@
 
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <form class="form-container">
+      <!-- Liste des épreuves ajoutées -->
+      <div id="scenarioList" style="margin-bottom: 28px;"></div>
+
+      <!-- Formulaire principal -->
+      <form class="form-container" id="epreuveForm" autocomplete="off">
         <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
           <div style="flex:1; min-width:180px;">
             <label for="coordStart">Coordonnées du départ :</label>
@@ -30,9 +34,11 @@
             <option value="">-- Choisissez un type d'épreuve --</option>
           </select>
         </div>
+        <!-- Le formulaire dynamique d'épreuve sera injecté ici -->
         <div id="formContainer"></div>
       </form>
-      <div id="scenarioContainer" class="step-list"></div>
+
+      <!-- Boutons principaux -->
       <div class="group-btns">
         <button class="main-btn" type="button" onclick="exporterScenario()">📦 Exporter le scénario</button>
         <button class="main-btn" type="button" onclick="window.location.href='accueil.html'">⬅️ Retour accueil</button>
