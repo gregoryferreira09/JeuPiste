@@ -53,26 +53,20 @@ function afficherScenario() {
   if (!listDiv) return;
   if (scenario.length === 0) {
     listDiv.innerHTML = "<p>Aucune épreuve ajoutée.</p>";
-    afficherBoutonSalon(); // cache le bouton si besoin
+    afficherBoutonSalon();
     return;
   }
   listDiv.innerHTML = scenario.map((etape, idx) => {
     const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
-    let resume = quest ? quest.nom : etape.type;
-    return `
-      <div class="epreuve-ligne">
-        <strong>${idx + 1} - ${resume}</strong>
-        <div style="font-size:0.98em;margin-top:2px;">
-          ${Object.entries(etape.params).map(([k, v]) =>
-            `<span><em>${k}</em> : ${Array.isArray(v) ? v.join(" | ") : typeof v === 'string' ? v : '[objet]'}</span>`
-          ).join(' | ')}
-        </div>
-        <div class="step-actions">
-          <button type="button" onclick="supprimerEtape(${idx})">Supprimer</button>
-          ${idx > 0 ? `<button type="button" onclick="monterEtape(${idx})">Monter</button>` : ''}
-          ${idx < scenario.length - 1 ? `<button type="button" onclick="descendreEtape(${idx})">Descendre</button>` : ''}
-        </div>
-      </div>`;
+    let label = quest ? quest.nom : etape.type;
+    // Si c'est une photo/vidéo/collecte, affiche le détail consigne
+    if (etape.params && Array.isArray(etape.params.consignes)) {
+      return etape.params.consignes.map((c, i) =>
+        `<div><strong>${idx + 1}${etape.params.consignes.length > 1 ? '.' + (i+1) : ''} - ${label}${c ? ' : ' + c : ''}</strong></div>`
+      ).join('');
+    } else {
+      return `<div><strong>${idx + 1} - ${label}</strong></div>`;
+    }
   }).join('');
   afficherBoutonSalon();
 }
