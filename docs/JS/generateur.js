@@ -342,21 +342,16 @@ function openMapPicker(targetInput) {
 }
 
 function initLeafletMap() {
-  // 1. Nettoyage
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
-  // 2. Reset du container (facultatif mais conseillé)
   resetMapContainer();
-  // 3. Nouvelle carte
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
   }).addTo(window.map);
-  // ... (le reste de ton code de gestion d'événements Leaflet)
-}
 
   searchMarker = null;
 
