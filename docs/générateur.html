@@ -5,6 +5,38 @@
   <title>Générateur de quêtes</title>
   <link rel="stylesheet" href="styles/style.css">
   <style>
+    /* --- Ajout ou modification pour coordonnées --- */
+    #coords-row {
+      display: flex;
+      gap: 32px; /* plus d'espace entre les deux champs */
+      margin-bottom: 18px;
+    }
+    .coord-input-coord {
+      max-width: 120px;
+      min-width: 70px;
+      width: 100%;
+      font-size: 1em;
+      padding: 6px 10px;
+      border-radius: 7px;
+      border: 2px solid #e0c185;
+      background-color: #fff;
+      color: #2c1b1b;
+      cursor: pointer;
+      transition: border .18s, background .18s, color .18s;
+      box-sizing: border-box;
+      display: inline-block;
+    }
+    .coord-input-coord:focus {
+      border: 2px solid #d4af37;
+      background: #fff;
+      color: #2c1b1b;
+    }
+    @media (max-width: 700px) {
+      #coords-row { flex-direction: column; gap: 10px; }
+      .coord-input-coord { max-width: 100vw; }
+    }
+    /* --- Fin ajouts pour coordonnées --- */
+
     .quest-form { margin-top: 18px; }
     .form-field { margin-bottom: 14px; }
     label { font-weight: bold; display: block; margin-bottom: 4px; }
@@ -16,31 +48,6 @@
     .step-list-item strong { color: #e0c185; }
     .step-actions button { margin-right: 10px; }
     .main-accueil { margin-top: 40px; margin-bottom: 40px; }
-
-    #coords-row { display: flex; gap: 18px; margin-bottom: 18px; }
-    #coords-row label { margin-bottom: 4px; }
-    #coords-row input[type="text"] {
-      width: 100%;
-      min-width: 0;
-      max-width: 220px;
-      font-size: 1em;
-      padding: 6px 10px;
-      border-radius: 7px;
-      border: 2px solid #e0c185;
-      background-color: #fff;
-      color: #2c1b1b;
-      cursor: pointer;
-      transition: border .18s, background .18s, color .18s;
-    }
-    #coords-row input[type="text"]:focus {
-      border: 2px solid #d4af37;
-      background: #fff;
-      color: #2c1b1b;
-    }
-    @media (max-width: 700px) {
-      #coords-row { flex-direction: column; gap: 10px; }
-      #coords-row input[type="text"] { max-width: 100vw; }
-    }
     #mapModal {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #000a; z-index: 9999; align-items: center; justify-content: center;
@@ -97,11 +104,11 @@
       <div id="coords-row">
         <div style="flex:1;">
           <label for="coordStart">Coordonnées du départ :</label>
-          <input type="text" id="coordStart" name="coordStart" placeholder="Clique pour choisir" readonly>
+          <input type="text" id="coordStart" name="coordStart" class="coord-input-coord" placeholder="Clique pour choisir" readonly>
         </div>
         <div style="flex:1;">
           <label for="coordEnd">Coordonnées d'arrivée :</label>
-          <input type="text" id="coordEnd" name="coordEnd" placeholder="Clique pour choisir" readonly>
+          <input type="text" id="coordEnd" name="coordEnd" class="coord-input-coord" placeholder="Clique pour choisir" readonly>
         </div>
       </div>
       <label for="questTypeSelect">Type de quête :</label>
