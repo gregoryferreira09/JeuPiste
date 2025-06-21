@@ -342,12 +342,14 @@ function openMapPicker(targetInput) {
 }
 
 function initLeafletMap() {
+  resetMapContainer(); // 1. Reset du container AVANT le remove
+
   if (window.map) {
     window.map.off();
     window.map.remove();
     window.map = null;
   }
-  resetMapContainer();
+
   window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
