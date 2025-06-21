@@ -50,9 +50,40 @@
       max-width: 95vw; max-height: 95vh; box-shadow: 0 0 24px #0007;
       display: flex; flex-direction: column; align-items: center;
     }
+    #mapSearchBar {
+      width: 90%;
+      margin-bottom: 10px;
+      padding: 6px 8px;
+      border: 1.5px solid #e0c185;
+      border-radius: 8px;
+      font-size: 1em;
+    }
     #mapContainer { width: 340px; height: 280px; border: 1.5px solid #e0c185; border-radius: 10px; overflow: hidden; }
     @media (max-width: 540px) {
       #mapContainer { width: 90vw; height: 220px; }
+    }
+    #mapSearchResults {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      max-height: 110px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+      width: 90%;
+      position: absolute;
+      top: 60px;
+      left: 5%;
+      z-index: 99999;
+    }
+    #mapSearchResults div {
+      padding: 6px 8px;
+      cursor: pointer;
+    }
+    #mapSearchResults div:hover {
+      background: #ffeecb;
+    }
+    .modal-content {
+      position: relative;
     }
   </style>
 </head>
@@ -88,6 +119,8 @@
   <div id="mapModal">
     <div class="modal-content">
       <h3 style="margin-bottom:12px;font-size:1.18em;">Clique sur la carte pour choisir une position</h3>
+      <input type="text" id="mapSearchBar" placeholder="🔍 Rechercher une adresse ou un lieu..." autocomplete="off">
+      <div id="mapSearchResults" style="display:none;"></div>
       <div id="mapContainer"></div>
       <button id="closeMapBtn" style="margin-top:16px;">Annuler</button>
     </div>
@@ -121,10 +154,10 @@
       if (main) main.classList.add('visible');
     });
 
-    // === Carte Leaflet pour sélection GPS ===
+    // === Carte Leaflet pour sélection GPS + recherche adresse ===
     let currentCoordTarget = null;
+    let mapSearchTimeout = null;
 
-    // Ajout de la fonction pour réinitialiser proprement le conteneur Leaflet
     function resetMapContainer() {
       const container = document.getElementById('mapContainer');
       if (container) {
@@ -138,6 +171,8 @@
     function openMapPicker(targetInput) {
       currentCoordTarget = targetInput;
       document.getElementById('mapModal').style.display = 'flex';
+      document.getElementById('mapSearchBar').value = '';
+      document.getElementById('mapSearchResults').style.display = 'none';
       if (!window.leafletLoaded) {
         let link = document.createElement('link');
         link.rel = "stylesheet";
@@ -158,7 +193,7 @@
         window.map.off();
         window.map.remove();
       }
-      resetMapContainer(); // <-- Ajouté pour éviter le bug Leaflet
+      resetMapContainer();
       window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13); // Paris par défaut
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
@@ -175,6 +210,50 @@
         setTimeout(()=>window.map.remove(),300);
       });
     }
+
+    // --- Recherche d'adresse ---
+    function handleMapSearch() {
+      const searchBar = document.getElementById('mapSearchBar');
+      const resultsDiv = document.getElementById('mapSearchResults');
+      const query = searchBar.value.trim();
+      if (!query) {
+        resultsDiv.style.display = 'none';
+        resultsDiv.innerHTML = '';
+        return;
+      }
+      // Débouncing
+      if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
+      mapSearchTimeout = setTimeout(() => {
+        resultsDiv.innerHTML = '<div>Recherche...</div>';
+        resultsDiv.style.display = 'block';
+        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=10`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.length === 0) {
+              resultsDiv.innerHTML = '<div>Aucun résultat</div>';
+              return;
+            }
+            resultsDiv.innerHTML = data.map(place =>
+              `<div data-lat="${place.lat}" data-lon="${place.lon}">
+                ${place.display_name}
+              </div>`
+            ).join('');
+            // Ajout évènement sur chaque résultat
+            Array.from(resultsDiv.children).forEach(child => {
+              child.onclick = function() {
+                const lat = parseFloat(this.getAttribute('data-lat'));
+                const lon = parseFloat(this.getAttribute('data-lon'));
+                if (window.map) window.map.setView([lat, lon], 16);
+                resultsDiv.style.display = 'none';
+                resultsDiv.innerHTML = '';
+              }
+            });
+          }).catch(() => {
+            resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
+          });
+      }, 350);
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
       document.getElementById('coordStart').addEventListener('click', function() {
         openMapPicker(this);
@@ -186,6 +265,7 @@
         document.getElementById('mapModal').style.display = 'none';
         if (window.map) setTimeout(()=>window.map.remove(),300);
       });
+      document.getElementById('mapSearchBar').addEventListener('input', handleMapSearch);
     });
   </script>
 </body>
