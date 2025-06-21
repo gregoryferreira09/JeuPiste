@@ -725,3 +725,11 @@ body {
   #coords-row { flex-direction: column; gap: 10px; }
   .coord-input-coord { max-width: 100vw; }
 }
+
+.group-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 18px;
+}
