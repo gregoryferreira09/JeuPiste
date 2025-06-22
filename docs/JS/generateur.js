@@ -16,6 +16,21 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
+if (typeof firebase === "undefined") {
+  alert("Firebase non chargé ! Vérifiez que les scripts Firebase sont inclus AVANT ce fichier.");
+}
+const firebaseConfig = {
+  // ... ta config ...
+};
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+// === AJOUTE CETTE LIGNE POUR L'AUTH ANONYME ===
+firebase.auth().signInAnonymously().catch(function(error) {
+  alert("Erreur d'authentification Firebase : " + (error.message || error));
+});
+
 // === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES AVEC CONSIGNES INDIVIDUELLES ===
 let scenario = [];
 let dragSrcIdx = null;
