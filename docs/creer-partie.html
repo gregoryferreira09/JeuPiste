@@ -62,9 +62,16 @@
 <script>
   // Effet d'apparition fade-in sur la page principale
   document.addEventListener("DOMContentLoaded", function() {
-    var main = document.querySelector('.fadeIn');
-    if (main) main.classList.add('visible');
-  });
+  const select = document.getElementById('scenarioSelect');
+  // ... (chargement de la liste des scénarios) ...
+  
+  // Après avoir rempli la liste...
+  const dernier = localStorage.getItem("dernierScenarioCree");
+  if (dernier) {
+    select.value = dernier;
+    localStorage.removeItem("dernierScenarioCree"); // Optionnel, pour ne le pré-sélectionner qu'une fois
+  }
+});
 </script>
 
 <!-- Charger Firebase AVANT tout JS qui l'utilise -->
