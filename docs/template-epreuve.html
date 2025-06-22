@@ -2,26 +2,126 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>__TITRE_QUEST__ - Jeu de piste</title>
+  <title id="page-title">Quête - Jeu de piste</title>
   <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
-  <main>
-    <h2 id="titre-quete">__TITRE_QUEST__</h2>
-    <div id="objectif-quete">__OBJECTIF__</div>
+  <main id="main-content">
+    <h2 id="titre-quete"></h2>
+    <div id="objectif-quete"></div>
+
     <div id="bloc-gps" style="display:none;">
-      <a href="https://maps.google.com/?q=__GPS__" target="_blank">Boussole</a>
+      <a id="boussole-link" href="#" target="_blank">Boussole</a>
     </div>
-    <div id="bloc-indice" style="display:none;">Indice: __INDICE__</div>
+
+    <div id="bloc-indice" style="display:none;">
+      <b>Indice : </b><span id="val-indice"></span>
+    </div>
+
     <div id="bloc-photo" style="display:none;">
-      <input type="file" accept="image/*">
+      <label for="photo-upload">Envoie une photo :</label>
+      <input type="file" id="photo-upload" accept="image/*">
+      <div id="photo-filename"></div>
     </div>
-    <button id="suivant">Quête suivante</button>
+
+    <div id="bloc-video" style="display:none;">
+      <label for="video-upload">Envoie une vidéo :</label>
+      <input type="file" id="video-upload" accept="video/*">
+      <div id="video-filename"></div>
+    </div>
+
+    <div id="bloc-audio" style="display:none;">
+      <label for="audio-upload">Envoie un audio :</label>
+      <input type="file" id="audio-upload" accept="audio/*">
+      <div id="audio-filename"></div>
+    </div>
+
+    <!-- Ajouter d'autres blocs selon tes besoins -->
+
+    <button id="suivant" style="margin-top:2em;">Quête suivante</button>
   </main>
-  <footer>…</footer>
-  <script src="…"></script>
+  <footer>
+    <p>© 2025 Jeu de piste. Tous droits réservés.</p>
+    <a href="mentions-legales.html">Mentions légales</a>
+  </footer>
+
+  <!-- Exemple de script dynamique pour remplir la page -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script>
+    // === Initialisation Firebase (adapte config si besoin) ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // --- LOGIQUE DYNAMIQUE ---
+    const codeSalon = localStorage.getItem("salonCode");
+    const equipeNum = localStorage.getItem("equipeNum") || 0;
+    let currentStep = Number(localStorage.getItem("currentStep")) || 0;
+
+    function chargerScenarioEtape() {
+      db.ref(`parties/${codeSalon}/scenario/scenario`).once('value').then(snap => {
+        const scenario = snap.val();
+        if (!scenario || !scenario[currentStep]) {
+          document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
+          return;
+        }
+        const etape = scenario[currentStep];
+        afficherEtape(etape);
+      });
+    }
+
+    function afficherEtape(etape) {
+      document.getElementById('titre-quete').textContent = etape.titre || etape.type || "";
+      document.getElementById('objectif-quete').textContent = etape.params.consigne || etape.params.objectif || etape.params.enigme || "";
+      document.title = (etape.titre || etape.type || "Quête") + " - Jeu de piste";
+
+      // GPS
+      if (etape.params.gps || etape.params.coord || etape.params.coordonnees) {
+        document.getElementById('bloc-gps').style.display = '';
+        document.getElementById('boussole-link').href = "https://maps.google.com/?q=" + (etape.params.gps || etape.params.coord || etape.params.coordonnees);
+      } else {
+        document.getElementById('bloc-gps').style.display = 'none';
+      }
+
+      // Indice
+      if (etape.params.indice) {
+        document.getElementById('bloc-indice').style.display = '';
+        document.getElementById('val-indice').textContent = etape.params.indice;
+      } else {
+        document.getElementById('bloc-indice').style.display = 'none';
+      }
+
+      // Photo
+      document.getElementById('bloc-photo').style.display = (etape.type === "photo" || etape.type === "photo_inconnus" || etape.type === "defi_collectif" && etape.params.preuve === "photo") ? '' : 'none';
+      // Vidéo
+      document.getElementById('bloc-video').style.display = (etape.type === "video" || etape.type === "defi_collectif" && etape.params.preuve === "video") ? '' : 'none';
+      // Audio
+      document.getElementById('bloc-audio').style.display = (etape.type === "audio" || etape.type === "defi_collectif" && etape.params.preuve === "audio") ? '' : 'none';
+    }
+
+    document.getElementById('suivant').addEventListener('click', function() {
+      currentStep++;
+      localStorage.setItem("currentStep", currentStep);
+      chargerScenarioEtape();
+    });
+
+    // Si tu veux gérer l'envoi de fichiers, ajoute ici la logique d'upload (Firebase Storage, etc.)
+
+    // Appel initial
+    chargerScenarioEtape();
+  </script>
 </body>
 </html>
