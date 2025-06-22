@@ -22,9 +22,6 @@ if (typeof firebase === "undefined") {
 const firebaseConfig = {
   // ... ta config ...
 };
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
 
 // === AJOUTE CETTE LIGNE POUR L'AUTH ANONYME ===
 firebase.auth().signInAnonymously().catch(function(error) {
