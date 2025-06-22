@@ -157,33 +157,21 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <script>
-   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Récupération centrale du code salon (ICI et PAS EN HAUT)
-  const salonCode = localStorage.getItem("salonCode");
-  if (!salonCode) {
-    window.location.replace("creer-partie.html");
-    return;
-  }
+
+  <!-- Firebase scripts AVANT ton script personnalisé -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById("codeSalon").textContent = salonCode || "------";
-      const pseudoAffiche = document.getElementById("pseudoAffiche");
-      const etatSalon = document.getElementById("etatSalon");
-      const joueursDiv = document.getElementById("listeJoueurs");
-      const cloturerSalonBtn = document.getElementById("cloturerSalonBtn");
-      const quitterSalonBtn = document.getElementById("quitterSalonBtn");
-      const confirmationModal = document.getElementById("confirmationModal");
-      const modalQuestion = document.getElementById("modalQuestion");
-      const confirmModalBtn = document.getElementById("confirmModalBtn");
-      const cancelModalBtn = document.getElementById("cancelModalBtn");
-      const alertSalonSupprime = document.getElementById("alertSalonSupprime");
+      // 1. Récupération du code salon
+      const salonCode = localStorage.getItem("salonCode");
+      if (!salonCode) {
+        window.location.replace("creer-partie.html");
+        return;
+      }
 
-      // Firebase config
+      // 2. Initialisation Firebase
       const firebaseConfig = {
         apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
         authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -199,26 +187,37 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       const db = firebase.database();
 
-      // Quand le créateur clique sur "Démarrer"
-      function demarrerPartie() {
-        db.ref('parties/' + salonCode + '/etat').set('lancement');
-      }
+      // Effet fade-in sur le bloc principal au chargement
+      var main = document.querySelector('.fadeIn');
+      if (main) main.classList.add('visible');
 
-          // Afficher le nom du scénario dans le salon
-db.ref('parties/' + salonCode + '/parametres/scenarioCode').once('value', snap => {
-  const scenarioCode = snap.val();
-  if (scenarioCode) {
-    db.ref('scenariosList/' + scenarioCode).once('value', snap2 => {
-      if (snap2.exists()) {
-        const nomScenario = snap2.val().nom || scenarioCode;
-        document.getElementById('nomScenarioSalon').textContent = "Scénario : " + nomScenario;
-      }
-    });
-  } else {
-    document.getElementById('nomScenarioSalon').textContent = "Scénario : Parc Saint Nicolas";
-  }
-});
-      
+      document.getElementById("codeSalon").textContent = salonCode || "------";
+      const pseudoAffiche = document.getElementById("pseudoAffiche");
+      const etatSalon = document.getElementById("etatSalon");
+      const joueursDiv = document.getElementById("listeJoueurs");
+      const cloturerSalonBtn = document.getElementById("cloturerSalonBtn");
+      const quitterSalonBtn = document.getElementById("quitterSalonBtn");
+      const confirmationModal = document.getElementById("confirmationModal");
+      const modalQuestion = document.getElementById("modalQuestion");
+      const confirmModalBtn = document.getElementById("confirmModalBtn");
+      const cancelModalBtn = document.getElementById("cancelModalBtn");
+      const alertSalonSupprime = document.getElementById("alertSalonSupprime");
+
+      // Afficher le nom du scénario dans le salon
+      db.ref('parties/' + salonCode + '/parametres/scenarioCode').once('value', snap => {
+        const scenarioCode = snap.val();
+        if (scenarioCode) {
+          db.ref('scenariosList/' + scenarioCode).once('value', snap2 => {
+            if (snap2.exists()) {
+              const nomScenario = snap2.val().nom || scenarioCode;
+              document.getElementById('nomScenarioSalon').textContent = "Scénario : " + nomScenario;
+            }
+          });
+        } else {
+          document.getElementById('nomScenarioSalon').textContent = "Scénario : Parc Saint Nicolas";
+        }
+      });
+
       // Tous les joueurs écoutent l'état
       db.ref('parties/' + salonCode + '/etat').on('value', snap => {
         if (snap.val() === 'lancement' || snap.val() === 'en_cours') {
@@ -310,13 +309,13 @@ db.ref('parties/' + salonCode + '/parametres/scenarioCode').once('value', snap =
 
       db.ref('parties/' + salonCode).on('value', snapshot => {
         const etatPartie = snapshot.child('etat').val();
-       if (etatPartie === 'en_cours') {
-  localStorage.setItem("enCours", "1");
-  localStorage.setItem("pseudo", pseudoOrigine);
-  localStorage.removeItem("pseudoOrigine");
-  window.location.href = "lancement-partie.html";
-  return;
-}
+        if (etatPartie === 'en_cours') {
+          localStorage.setItem("enCours", "1");
+          localStorage.setItem("pseudo", pseudoOrigine);
+          localStorage.removeItem("pseudoOrigine");
+          window.location.href = "lancement-partie.html";
+          return;
+        }
         if (!snapshot.exists()) {
           // Si la partie n’était PAS en cours, on affiche le message d’erreur
           if (localStorage.getItem("enCours") !== "1") {
@@ -400,8 +399,7 @@ db.ref('parties/' + salonCode + '/parametres/scenarioCode').once('value', snap =
   </script>
 
   <script src="JS/security-enhance.js"></script>
-<script src="JS/ux-enhance.js"></script>
-<script src="JS/scalability.js"></script>
-  
+  <script src="JS/ux-enhance.js"></script>
+  <script src="JS/scalability.js"></script>
 </body>
 </html>
