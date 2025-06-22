@@ -2,6 +2,7 @@
 let scenario = [];
 let dragSrcIdx = null;
 let mapTargetInput = null;
+
 // === INITIALISATION PAGE ===
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('questTypeSelect');
@@ -12,7 +13,6 @@ document.addEventListener("DOMContentLoaded", function() {
       opt.textContent = quest.nom;
       select.appendChild(opt);
     });
-
     select.onchange = function() {
       if (this.value) generateQuestForm(this.value, 'formContainer');
       else document.getElementById('formContainer').innerHTML = '';
@@ -22,12 +22,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Effet fadeIn harmonisé
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
-  
-  // Champs coordonnées
-  const coordStart = document.getElementById('coordStart');
-  const coordEnd = document.getElementById('coordEnd');
-  if (coordStart) coordStart.addEventListener('click', function() { openMapPicker(this); });
-  if (coordEnd) coordEnd.addEventListener('click', function() { openMapPicker(this); });
 
   // Fermeture carte
   const closeBtn = document.getElementById('closeMapBtn');
@@ -84,13 +78,12 @@ function afficherScenario() {
     ligne.addEventListener('dragend', handleDragEnd);
 
     // Mobile long press for drag
-   ligne.addEventListener('touchstart', function(e) {
-  timer = setTimeout(() => {
-    ligne.draggable = true;
-    ligne.classList.add('dragging-touch');
-  }, 400);
-}, { passive: true });
-    
+    ligne.addEventListener('touchstart', function(e) {
+      timer = setTimeout(() => {
+        ligne.draggable = true;
+        ligne.classList.add('dragging-touch');
+      }, 400);
+    }, { passive: true });
     ligne.addEventListener('touchend', function(e) {
       clearTimeout(timer);
       ligne.draggable = false;
@@ -108,10 +101,8 @@ function supprimerEtape(idx) {
 // Éditer une étape
 function editerEtape(idx) {
   const etape = scenario[idx];
-  // Recharge le formulaire avec les valeurs de cette étape
   document.getElementById('questTypeSelect').value = etape.type;
   generateQuestForm(etape.type, 'formContainer', etape.params);
-  // Supprime temporairement l’étape pour la ré-enregistrer à la validation
   scenario.splice(idx, 1);
   afficherScenario();
 }
@@ -144,25 +135,15 @@ function handleDragEnd(e) {
 
 // Exporter le scénario
 function exporterScenario() {
-  // Demande éventuellement un nom ou un code spécifique à l'utilisateur ici
-  const coordStart = document.getElementById('coordStart').value;
-  const coordEnd = document.getElementById('coordEnd').value;
-  if (!coordStart || !coordEnd) {
-    alert("Veuillez renseigner les coordonnées de départ et d'arrivée !");
-    return;
-  }
   if (scenario.length < 1) {
     alert("Il faut au moins 1 épreuve pour générer un scénario !");
     return;
   }
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
   firebase.database().ref('scenarios/' + codeSalon).set({
-    coordStart,
-    coordEnd,
     scenario
   }).then(() => {
     alert("Scénario sauvegardé sur le serveur !\nCode de scénario à utiliser lors de la création de partie : " + codeSalon);
-    // Optionnel : copier automatiquement dans le presse-papier
     navigator.clipboard && navigator.clipboard.writeText(codeSalon);
   });
 }
@@ -179,12 +160,10 @@ function afficherBoutonSalon() {
       btnSalon.textContent = 'Générer un code salon';
       btnSalon.style.marginLeft = "12px";
       btnSalon.onclick = genererSalon;
-      // Ajoute à côté du bouton valider cette étape (dans le form)
       let formContainer = document.getElementById('formContainer');
       if (formContainer && formContainer.parentNode.querySelector('form')) {
         formContainer.parentNode.querySelector('form').appendChild(btnSalon);
       } else {
-        // Sinon, ajoute à la div de boutons principale
         let groupBtns = document.querySelector('.group-btns');
         if (groupBtns) groupBtns.insertBefore(btnSalon, groupBtns.firstChild);
       }
@@ -197,25 +176,16 @@ function afficherBoutonSalon() {
 
 // Sauvegarde du scénario et génération d'un code de salon
 function genererSalon() {
-  const coordStart = document.getElementById('coordStart').value;
-  const coordEnd = document.getElementById('coordEnd').value;
-  if (!coordStart || !coordEnd) {
-    alert("Veuillez renseigner les coordonnées de départ et d'arrivée !");
-    return;
-  }
   if (scenario.length < 4) {
     alert("Il faut au moins 4 épreuves pour générer un code salon !");
     return;
   }
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
-  // Écris dans Firebase plutôt que localStorage uniquement
   firebase.database().ref('scenarios/' + codeSalon).set({
-    coordStart,
-    coordEnd,
     scenario
   }).then(() => {
     alert("Code de salon généré : " + codeSalon + "\nTu peux le partager pour rejouer ce scénario !");
-    // Tu peux aussi copier le code dans le presse-papier automatiquement
+    navigator.clipboard && navigator.clipboard.writeText(codeSalon);
   });
 }
 
@@ -232,6 +202,52 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   let form = document.createElement('form');
   form.className = 'quest-form';
+
+  // Bloc pour gérer plusieurs points GPS (pour TOUTES les épreuves)
+  let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
+  let gpsZone = document.createElement('div');
+  gpsZone.className = 'form-field';
+  gpsZone.innerHTML = `
+    <label>Points GPS pour cette épreuve :</label>
+    <div id="gpsPointsList"></div>
+    <button type="button" id="addGpsPointBtn" class="main-btn" style="margin-top:8px;">Ajouter un point GPS</button>
+  `;
+  form.appendChild(gpsZone);
+
+  function renderGpsPoints() {
+    const list = gpsZone.querySelector("#gpsPointsList");
+    list.innerHTML = '';
+    gpsPoints.forEach((pt, idx) => {
+      const item = document.createElement("div");
+      item.style = "margin-bottom:6px;display:flex;align-items:center;gap:8px;";
+      item.innerHTML = `
+        <input type="text" value="${pt}" readonly style="width:170px;">
+        <button type="button" data-idx="${idx}" class="remove-gps-btn" style="font-size:1.2em;">❌</button>
+      `;
+      list.appendChild(item);
+    });
+    list.querySelectorAll(".remove-gps-btn").forEach(btn => {
+      btn.onclick = (e) => {
+        const idx = Number(btn.dataset.idx);
+        gpsPoints.splice(idx, 1);
+        renderGpsPoints();
+      };
+    });
+  }
+  renderGpsPoints();
+
+  gpsZone.querySelector("#addGpsPointBtn").onclick = function() {
+    // Ouvre le map picker et ajoute le point choisi
+    openMapPicker({
+      value: "",
+      set value(val) {
+        if(val) {
+          gpsPoints.push(val);
+          renderGpsPoints();
+        }
+      }
+    });
+  };
 
   // Détection : comportement spécial (photos, vidéos, etc.)
   if (
@@ -277,7 +293,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     consignesZone.style.marginTop = "14px";
     form.appendChild(consignesZone);
 
-    // Fonction d'update dynamique
     function updateConsignes() {
       consignesZone.innerHTML = '';
       let nombre = parseInt(inputQty.value, 10) || 1;
@@ -390,11 +405,11 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   });
 
   // Bouton de validation
-let submit = document.createElement('button');
-submit.type = 'submit';
-submit.textContent = 'Valider cette quête';
-submit.className = 'gold-btn';
-form.appendChild(submit);
+  let submit = document.createElement('button');
+  submit.type = 'submit';
+  submit.textContent = 'Valider cette quête';
+  submit.className = 'gold-btn';
+  form.appendChild(submit);
 
   container.appendChild(form);
 
@@ -431,6 +446,9 @@ form.appendChild(submit);
       }
     });
 
+    // Ajoute la liste de points GPS à l'étape
+    data.points = [...gpsPoints];
+
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
@@ -444,7 +462,6 @@ let searchMarker = null;
 function resetMapContainer() {
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
-    // Supprime tout le contenu DOM et réinitialise le conteneur proprement
     oldContainer.innerHTML = '';
     if (oldContainer._leaflet_id) {
       delete oldContainer._leaflet_id;
@@ -453,7 +470,7 @@ function resetMapContainer() {
 }
 
 function openMapPicker(targetInput) {
-  mapTargetInput = targetInput; // Ajout
+  mapTargetInput = targetInput;
   document.getElementById('mapModal').style.display = 'flex';
   document.getElementById('mapSearchBar').value = '';
   document.getElementById('mapSearchResults').style.display = 'none';
@@ -541,6 +558,7 @@ function handleMapSearch() {
             else searchMarker = L.marker([lat, lon]).addTo(window.map);
             resultsDiv.style.display = 'none';
             resultsDiv.innerHTML = '';
+            if (mapTargetInput) mapTargetInput.value = lat + ", " + lon;
           }
         });
       }).catch(() => {
