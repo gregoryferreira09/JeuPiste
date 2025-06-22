@@ -84,6 +84,9 @@ window.creerPartie = async function(formData) {
   // Enregistre les paramètres dans Firebase
   await db.ref('parties/' + salonCode + '/parametres').set(parametresPartie);
 
+  console.log("scenarioCode sélectionné :", scenarioCode);
+  console.log("Chargement du scénario personnalisé :", scenarioCode);
+  
   // --- Gestion du SCÉNARIO ---
   let scenarioToUse = null;
 
