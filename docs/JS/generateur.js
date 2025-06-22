@@ -444,12 +444,16 @@ let searchMarker = null;
 function resetMapContainer() {
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
-    const newContainer = oldContainer.cloneNode(false);
-    oldContainer.parentNode.replaceChild(newContainer, oldContainer);
+    // Supprime tout le contenu DOM et réinitialise le conteneur proprement
+    oldContainer.innerHTML = '';
+    if (oldContainer._leaflet_id) {
+      delete oldContainer._leaflet_id;
+    }
   }
 }
 
 function openMapPicker(targetInput) {
+  mapTargetInput = targetInput; // Ajout
   document.getElementById('mapModal').style.display = 'flex';
   document.getElementById('mapSearchBar').value = '';
   document.getElementById('mapSearchResults').style.display = 'none';
