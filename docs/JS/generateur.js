@@ -477,7 +477,7 @@ function openMapPicker(targetInput) {
   }
 }
 
-function initLeafletMap(targetInput) {
+function initLeafletMap() {
   if (window.map) {
     window.map.off();
     window.map.remove();
