@@ -62,7 +62,7 @@ window.creerPartie = async function(formData) {
     return;
   }
 
-  // <<< AJOUTE CE BLOC >>>
+  // >>> AJOUTE CE BLOC ICI <<<
   let uuid = localStorage.getItem("uuid");
   if (!uuid) {
     uuid = generateUUID();
@@ -70,12 +70,13 @@ window.creerPartie = async function(formData) {
   }
   let pseudo = localStorage.getItem("pseudo") || "Anonyme";
   pseudo = pseudo.replace(/[<>\/\\'"`]/g, "").trim().substring(0, 30);
-  // <<< FIN BLOC >>>
+  // >>> FIN BLOC À AJOUTER <<<
 
   const parametresPartie = {
     nombreJoueurs,
     createur: uuid
   };
+
 
    // Génère un code salon unique pour la partie (toujours nouveau)
   const salonCode = (Math.random().toString(36).substr(2, 6)).toUpperCase();
