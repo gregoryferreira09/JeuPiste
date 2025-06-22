@@ -170,12 +170,23 @@ function exporterScenario() {
     return;
   }
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
+
+  // Ajoute un nom par défaut ou demande à l'utilisateur
+  const nomScenario = prompt("Donne un nom à ce scénario :", "Scénario " + codeSalon) || ("Scénario " + codeSalon);
+
   firebase.database().ref('scenarios/' + codeSalon).set({
     coordEnd,
     scenario
   }).then(() => {
-    alert("Scénario sauvegardé sur le serveur !\nCode de scénario à utiliser lors de la création de partie : " + codeSalon);
-    navigator.clipboard && navigator.clipboard.writeText(codeSalon);
+    // Ajoute dans la liste globale des scénarios
+    firebase.database().ref('scenariosList/' + codeSalon).set({
+      nom: nomScenario,
+      code: codeSalon,
+      date: Date.now()
+    }).then(() => {
+      alert("Scénario sauvegardé et ajouté à la liste !\nIl sera proposé dans la création de partie.");
+      navigator.clipboard && navigator.clipboard.writeText(codeSalon);
+    });
   });
 }
 
