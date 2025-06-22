@@ -202,9 +202,9 @@ const QUESTS_CATALOGUE = [
     ],
     combinable: [],
     preview: "duel"
-  }
+  },
 
-{
+   {
   id: "pendu",
   titre: "Le Jeu du Pendu",
   description: "Rendez-vous à l’endroit précis indiqué pour activer le jeu du pendu. Une fois sur place, vous aurez un temps limité pour deviner un mot français de 8 lettres.",
