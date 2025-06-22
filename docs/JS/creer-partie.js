@@ -58,6 +58,11 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+  var main = document.querySelector('.fadeIn');
+  if (main) main.classList.add('visible');
+});
+
 // Fonction globale accessible depuis l'extérieur
 window.creerPartie = async function(formData) {
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
