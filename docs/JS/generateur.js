@@ -144,14 +144,27 @@ function handleDragEnd(e) {
 
 // Exporter le scénario
 function exporterScenario() {
-  const data = JSON.stringify(scenario, null, 2);
-  const blob = new Blob([data], {type: "application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "scenario.json";
-  a.click();
-  URL.revokeObjectURL(url);
+  // Demande éventuellement un nom ou un code spécifique à l'utilisateur ici
+  const coordStart = document.getElementById('coordStart').value;
+  const coordEnd = document.getElementById('coordEnd').value;
+  if (!coordStart || !coordEnd) {
+    alert("Veuillez renseigner les coordonnées de départ et d'arrivée !");
+    return;
+  }
+  if (scenario.length < 1) {
+    alert("Il faut au moins 1 épreuve pour générer un scénario !");
+    return;
+  }
+  const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
+  firebase.database().ref('scenarios/' + codeSalon).set({
+    coordStart,
+    coordEnd,
+    scenario
+  }).then(() => {
+    alert("Scénario sauvegardé sur le serveur !\nCode de scénario à utiliser lors de la création de partie : " + codeSalon);
+    // Optionnel : copier automatiquement dans le presse-papier
+    navigator.clipboard && navigator.clipboard.writeText(codeSalon);
+  });
 }
 
 // Affichage/Bouton Générer un code salon
