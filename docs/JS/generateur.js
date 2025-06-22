@@ -201,7 +201,6 @@ firebase.database().ref('scenariosList/' + codeSalon).set({
   // Rediriger vers la page de création de partie
   window.location.href = "creer-partie.html";
 });
-}
 
 // Affichage/Bouton Générer un code salon
 function afficherBoutonSalon() {
