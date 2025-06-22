@@ -117,14 +117,7 @@
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
-  <script>
-    // Récupération centrale du code salon
-    const salonCode = localStorage.getItem("salonCode");
-    if (!salonCode) {
-      window.location.replace("creer-partie.html");
-    }
-
-  </script>
+ 
   <div id="nomScenarioSalon"></div>
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
@@ -165,14 +158,17 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <script>
-    // Effet fade-in sur le bloc principal au chargement
-    document.addEventListener("DOMContentLoaded", function() {
-      var main = document.querySelector('.fadeIn');
-      if (main) main.classList.add('visible');
-    });
-  </script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Récupération centrale du code salon (ICI et PAS EN HAUT)
+  const salonCode = localStorage.getItem("salonCode");
+  if (!salonCode) {
+    window.location.replace("creer-partie.html");
+    return;
+  }
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById("codeSalon").textContent = salonCode || "------";
