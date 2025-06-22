@@ -55,19 +55,29 @@ document.addEventListener("DOMContentLoaded", function() {
 // Fonction globale accessible depuis l'extérieur
 window.creerPartie = async function(formData) {
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
-const scenarioCode = formData.get("scenarioSelect");
+  const scenarioCode = formData.get("scenarioSelect");
 
-if (isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12) {
-  alert("Veuillez remplir tous les champs correctement.");
-  return;
-}
+  if (isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12) {
+    alert("Veuillez remplir tous les champs correctement.");
+    return;
+  }
 
-const parametresPartie = {
-  nombreJoueurs,
-  createur: uuid
-};
+  // <<< AJOUTE CE BLOC >>>
+  let uuid = localStorage.getItem("uuid");
+  if (!uuid) {
+    uuid = generateUUID();
+    localStorage.setItem("uuid", uuid);
+  }
+  let pseudo = localStorage.getItem("pseudo") || "Anonyme";
+  pseudo = pseudo.replace(/[<>\/\\'"`]/g, "").trim().substring(0, 30);
+  // <<< FIN BLOC >>>
 
-  // Génère un code salon unique pour la partie (toujours nouveau)
+  const parametresPartie = {
+    nombreJoueurs,
+    createur: uuid
+  };
+
+   // Génère un code salon unique pour la partie (toujours nouveau)
   const salonCode = (Math.random().toString(36).substr(2, 6)).toUpperCase();
 
   // Enregistre les paramètres dans Firebase
