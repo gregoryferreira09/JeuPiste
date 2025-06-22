@@ -14,13 +14,7 @@ const firebaseConfig = {
 };
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
-}
 
-if (typeof firebase === "undefined") {
-  alert("Firebase non chargé ! Vérifiez que les scripts Firebase sont inclus AVANT ce fichier.");
-}
-const firebaseConfig = {
-  // ... ta config ...
 };
 
 // === AJOUTE CETTE LIGNE POUR L'AUTH ANONYME ===
