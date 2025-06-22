@@ -204,3 +204,29 @@ const QUESTS_CATALOGUE = [
     preview: "duel"
   }
 ];
+
+{
+  id: "pendu",
+  titre: "Le Jeu du Pendu",
+  description: "Rendez-vous à l’endroit précis indiqué pour activer le jeu du pendu. Une fois sur place, vous aurez un temps limité pour deviner un mot français de 8 lettres.",
+  lieu: "À définir", // Remplace par l’identifiant ou la description du lieu précis
+  type: "mini-jeu",
+  tempsLimite: 120, // en secondes, à ajuster selon la difficulté souhaitée
+  genererMot: function() {
+    // À remplacer par une vraie liste de mots français de 8 lettres, chargée dynamiquement ou en JSON
+    const mots = ["fromages", "lunettes", "chiffres", "parcours", "bouchons", "dessiner"];
+    return mots[Math.floor(Math.random() * mots.length)];
+  },
+  boutonAleatoire: {
+    label: "Nouveau mot",
+    action: function() {
+      // Action pour générer un nouveau mot de 8 lettres
+      // Cette fonction doit rafraîchir le mot affiché et réinitialiser le jeu
+    }
+  },
+  visuel: function(container) {
+    // Génère le visuel du jeu du pendu dans l’élément container
+    // À compléter avec du code JS pour afficher les lettres, les essais, le dessin du pendu, etc.
+  },
+  instructions: "Devinez le mot de 8 lettres en proposant des lettres une par une. Attention au temps limité !",
+},
