@@ -32,6 +32,7 @@ function getRandomElements(arr, n) {
 window.creerPartie = async function(formData) {
   const mode = formData.get("mode");
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
+  const codeSalonCustom = (formData.get("salonCode") || "").toUpperCase().trim();
 
   if (!mode || isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12) {
     alert("Veuillez remplir tous les champs correctement.");
@@ -53,15 +54,37 @@ window.creerPartie = async function(formData) {
     createur: uuid
   };
 
-  // Génère un code salon unique
+  // Génère un code salon unique pour la partie (toujours nouveau)
   const salonCode = (Math.random().toString(36).substr(2, 6)).toUpperCase();
 
   // Enregistre les paramètres dans Firebase
   await db.ref('parties/' + salonCode + '/parametres').set(parametresPartie);
 
-  // GÉNÉRATION À ADAPTER POUR « Parc Saint Nicolas »
+  // --- Gestion du SCÉNARIO ---
+  let scenarioToUse = null;
+
+  if (codeSalonCustom) {
+    // L'utilisateur souhaite charger un scénario personnalisé
+    const snap = await db.ref('scenarios/' + codeSalonCustom).once('value');
+    if (!snap.exists()) {
+      alert("Code de salon (scénario) inconnu ou inexistant.");
+      return;
+    }
+    scenarioToUse = snap.val();
+  } else {
+    // Scénario par défaut (Parc Saint Nicolas)
+    if (typeof SCENARIO_PAR_DEFAUT === "undefined") {
+      alert("Scénario par défaut manquant. Contactez l'administrateur.");
+      return;
+    }
+    scenarioToUse = SCENARIO_PAR_DEFAUT;
+  }
+
+  // Stocke le scénario dans la partie
+  await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
+
+  // GÉNÉRATION DES PERSONNAGES (exemple simple)
   let persosObj = {};
-  // Exemple simple : crée des personnages vides à personnaliser ensuite
   for (let i = 0; i < nombreJoueurs; i++) {
     persosObj['perso' + i] = {};
   }
@@ -77,6 +100,6 @@ window.creerPartie = async function(formData) {
   localStorage.setItem("parametresPartie", JSON.stringify(parametresPartie));
   localStorage.setItem("salonCode", salonCode);
   localStorage.setItem("nombreJoueurs", nombreJoueurs);
-  
+
   window.location.href = "salon.html";
 };
