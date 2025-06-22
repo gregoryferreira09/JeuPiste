@@ -195,12 +195,15 @@ function genererSalon() {
     return;
   }
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
-  localStorage.setItem('salon_' + codeSalon, JSON.stringify({
+  // Écris dans Firebase plutôt que localStorage uniquement
+  firebase.database().ref('scenarios/' + codeSalon).set({
     coordStart,
     coordEnd,
     scenario
-  }));
-  alert("Code de salon généré : " + codeSalon + "\nTu peux le partager pour rejouer ce scénario !");
+  }).then(() => {
+    alert("Code de salon généré : " + codeSalon + "\nTu peux le partager pour rejouer ce scénario !");
+    // Tu peux aussi copier le code dans le presse-papier automatiquement
+  });
 }
 
 // ===================
