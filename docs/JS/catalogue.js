@@ -31,7 +31,7 @@ const QUESTS_CATALOGUE = [
   {
     id: "video",
     nom: "Vidéo à tourner",
-    description: "Se filmer en train de réaliser une action précise, une ou plusieurs fois.",
+    description: "Se filmer en train de réaliser une action précise, une ou plusieurs fois. (vidéo de moins de 20 secondes pour être bien uploadée)",
     parametres: [
       { key: "nbVideos", type: "number", label: "Nombre de vidéos", default: 1, min: 1, max: 5 },
       { key: "consigne", type: "text", label: "Consigne vidéo", placeholder: "ex : fais une roulade" }
