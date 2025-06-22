@@ -123,7 +123,24 @@
     if (!salonCode) {
       window.location.replace("creer-partie.html");
     }
+
+    // Afficher le nom du scénario dans le salon
+db.ref('parties/' + salonCode + '/parametres/scenarioCode').once('value', snap => {
+  const scenarioCode = snap.val();
+  if (scenarioCode) {
+    db.ref('scenariosList/' + scenarioCode).once('value', snap2 => {
+      if (snap2.exists()) {
+        const nomScenario = snap2.val().nom || scenarioCode;
+        document.getElementById('nomScenarioSalon').textContent = "Scénario : " + nomScenario;
+      }
+    });
+  } else {
+    document.getElementById('nomScenarioSalon').textContent = "Scénario : Parc Saint Nicolas";
+  }
+});
+    
   </script>
+  <div id="nomScenarioSalon"></div>
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
       <h1>Salon de la partie</h1>
