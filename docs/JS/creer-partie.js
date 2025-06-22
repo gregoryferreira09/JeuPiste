@@ -49,6 +49,12 @@ document.addEventListener("DOMContentLoaded", function() {
         select.appendChild(opt);
       });
     }
+    // === AJOUTE ICI la pré-sélection du dernier scénario créé ===
+    const dernier = localStorage.getItem("dernierScenarioCree");
+    if (dernier) {
+      select.value = dernier;
+      localStorage.removeItem("dernierScenarioCree");
+    }
   });
 });
 
