@@ -196,12 +196,6 @@ function exporterScenario() {
     window.location.href = "creer-partie.html";
   });
 }
-  
-  // Sauvegarder le code du scénario fraîchement créé
-  localStorage.setItem("dernierScenarioCree", codeSalon);
-  // Rediriger vers la page de création de partie
-  window.location.href = "creer-partie.html";
-});
 
 // Affichage/Bouton Générer un code salon
 function afficherBoutonSalon() {
@@ -300,7 +294,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       row.style = "display: flex; align-items: center; gap: 12px; margin-bottom: 4px;";
       // Icône boussole SVG harmonisée (comme sur les pages épreuves)
       let logo = document.createElement('span');
-      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5 2.5-7 7-2.5-2.5 7z"/></svg>`;
+      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]`
       logo.title = "Choisir/modifier ce point GPS";
       logo.style.cursor = "pointer";
       logo.onclick = function() {
