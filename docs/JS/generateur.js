@@ -183,11 +183,17 @@ firebase.database().ref('scenariosList/' + codeSalon).set({
   nom: nomScenario,
   code: codeSalon,
   date: Date.now()
-}).then(() => {
-
-  firebase.database().ref('scenarios/' + codeSalon).set({
-  coordEnd,
-  scenario
+})
+.then(() => {
+  // Retourne la promesse !
+  return firebase.database().ref('scenarios/' + codeSalon).set({
+    coordEnd,
+    scenario
+  });
+})
+.then(() => {
+  localStorage.setItem("dernierScenarioCree", codeSalon);
+  window.location.href = "creer-partie.html";
 });
   
   // Sauvegarder le code du scénario fraîchement créé
