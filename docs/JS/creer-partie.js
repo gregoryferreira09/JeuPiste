@@ -72,10 +72,11 @@ window.creerPartie = async function(formData) {
   pseudo = pseudo.replace(/[<>\/\\'"`]/g, "").trim().substring(0, 30);
   // >>> FIN BLOC À AJOUTER <<<
 
-  const parametresPartie = {
-    nombreJoueurs,
-    createur: uuid
-  };
+const parametresPartie = {
+  nombreJoueurs,
+  createur: uuid,
+  scenarioCode: scenarioCode || ""
+};
 
 
    // Génère un code salon unique pour la partie (toujours nouveau)
