@@ -376,7 +376,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   // Bouton de validation
 let submit = document.createElement('button');
 submit.type = 'submit';
-submit.textContent = 'Valider cette étape';
+submit.textContent = 'Valider cette quête';
 submit.className = 'gold-btn';
 form.appendChild(submit);
 
