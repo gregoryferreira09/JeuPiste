@@ -194,7 +194,7 @@ function exporterScenario() {
   .then(() => {
     localStorage.setItem("dernierScenarioCree", codeSalon);
     window.location.href = "creer-partie.html";
-  });
+  }
   
   // Sauvegarder le code du scénario fraîchement créé
   localStorage.setItem("dernierScenarioCree", codeSalon);
