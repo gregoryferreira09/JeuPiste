@@ -179,22 +179,23 @@ function exporterScenario() {
   // Ajoute un nom par défaut ou demande à l'utilisateur
   const nomScenario = prompt("Donne un nom à ce scénario :", "Scénario " + codeSalon) || ("Scénario " + codeSalon);
 
-firebase.database().ref('scenariosList/' + codeSalon).set({
-  nom: nomScenario,
-  code: codeSalon,
-  date: Date.now()
-})
-.then(() => {
-  // Retourne la promesse !
-  return firebase.database().ref('scenarios/' + codeSalon).set({
-    coordEnd,
-    scenario
+  firebase.database().ref('scenariosList/' + codeSalon).set({
+    nom: nomScenario,
+    code: codeSalon,
+    date: Date.now()
+  })
+  .then(() => {
+    // Retourne la promesse !
+    return firebase.database().ref('scenarios/' + codeSalon).set({
+      coordEnd,
+      scenario
+    });
+  })
+  .then(() => {
+    localStorage.setItem("dernierScenarioCree", codeSalon);
+    window.location.href = "creer-partie.html";
   });
-})
-.then(() => {
-  localStorage.setItem("dernierScenarioCree", codeSalon);
-  window.location.href = "creer-partie.html";
-});
+}
   
   // Sauvegarder le code du scénario fraîchement créé
   localStorage.setItem("dernierScenarioCree", codeSalon);
