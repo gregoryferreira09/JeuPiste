@@ -184,6 +184,12 @@ firebase.database().ref('scenariosList/' + codeSalon).set({
   code: codeSalon,
   date: Date.now()
 }).then(() => {
+
+  firebase.database().ref('scenarios/' + codeSalon).set({
+  coordEnd,
+  scenario
+});
+  
   // Sauvegarder le code du scénario fraîchement créé
   localStorage.setItem("dernierScenarioCree", codeSalon);
   // Rediriger vers la page de création de partie
