@@ -14,8 +14,7 @@ const firebaseConfig = {
 };
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
-
-};
+}
 
 // === AJOUTE CETTE LIGNE POUR L'AUTH ANONYME ===
 firebase.auth().signInAnonymously().catch(function(error) {
