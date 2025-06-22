@@ -23,6 +23,16 @@ document.addEventListener("DOMContentLoaded", function() {
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
 
+  // Champ coordonnée d'arrivée (centré, réduit, harmonisé)
+  const coordEnd = document.getElementById('coordEnd');
+  if (coordEnd) {
+    coordEnd.style.textAlign = "center";
+    coordEnd.style.width = "200px";
+    coordEnd.style.margin = "0 auto";
+    coordEnd.readOnly = true;
+    coordEnd.addEventListener('click', function() { openMapPicker(this); });
+  }
+
   // Fermeture carte
   const closeBtn = document.getElementById('closeMapBtn');
   if (closeBtn) closeBtn.addEventListener('click', function() {
@@ -70,14 +80,11 @@ function afficherScenario() {
     `;
   }).join('');
   afficherBoutonSalon();
-  // Drag & drop listeners
   Array.from(listDiv.querySelectorAll('.epreuve-ligne')).forEach(ligne => {
     ligne.addEventListener('dragstart', handleDragStart);
     ligne.addEventListener('dragover', handleDragOver);
     ligne.addEventListener('drop', handleDrop);
     ligne.addEventListener('dragend', handleDragEnd);
-
-    // Mobile long press for drag
     ligne.addEventListener('touchstart', function(e) {
       timer = setTimeout(() => {
         ligne.draggable = true;
@@ -135,12 +142,18 @@ function handleDragEnd(e) {
 
 // Exporter le scénario
 function exporterScenario() {
+  const coordEnd = document.getElementById('coordEnd') ? document.getElementById('coordEnd').value : "";
+  if (!coordEnd) {
+    alert("Veuillez renseigner la ou les coordonnées d'arrivée !");
+    return;
+  }
   if (scenario.length < 1) {
     alert("Il faut au moins 1 épreuve pour générer un scénario !");
     return;
   }
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
   firebase.database().ref('scenarios/' + codeSalon).set({
+    coordEnd,
     scenario
   }).then(() => {
     alert("Scénario sauvegardé sur le serveur !\nCode de scénario à utiliser lors de la création de partie : " + codeSalon);
@@ -176,12 +189,18 @@ function afficherBoutonSalon() {
 
 // Sauvegarde du scénario et génération d'un code de salon
 function genererSalon() {
+  const coordEnd = document.getElementById('coordEnd') ? document.getElementById('coordEnd').value : "";
+  if (!coordEnd) {
+    alert("Veuillez renseigner la ou les coordonnées d'arrivée !");
+    return;
+  }
   if (scenario.length < 4) {
     alert("Il faut au moins 4 épreuves pour générer un code salon !");
     return;
   }
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
   firebase.database().ref('scenarios/' + codeSalon).set({
+    coordEnd,
     scenario
   }).then(() => {
     alert("Code de salon généré : " + codeSalon + "\nTu peux le partager pour rejouer ce scénario !");
@@ -203,41 +222,83 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   let form = document.createElement('form');
   form.className = 'quest-form';
 
-  // Bloc pour gérer plusieurs points GPS (pour TOUTES les épreuves)
+  // Bloc multi-points GPS façon boussole harmonisée + bouton ajouter
   let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
   let gpsZone = document.createElement('div');
   gpsZone.className = 'form-field';
-  gpsZone.innerHTML = `
-    <label>Points GPS pour cette épreuve :</label>
-    <div id="gpsPointsList"></div>
-    <button type="button" id="addGpsPointBtn" class="main-btn" style="margin-top:8px;">Ajouter un point GPS</button>
-  `;
+  gpsZone.style.display = "flex";
+  gpsZone.style.flexDirection = "column";
+  gpsZone.style.gap = "8px";
+  gpsZone.style.marginBottom = "20px";
+
+  let gpsListDiv = document.createElement('div');
+  gpsListDiv.id = "gpsPointsList";
+  gpsZone.appendChild(gpsListDiv);
+
+  let actionsRow = document.createElement('div');
+  actionsRow.style.display = "flex";
+  actionsRow.style.alignItems = "center";
+  actionsRow.style.gap = "16px";
+  actionsRow.style.marginTop = "4px";
+
+  let addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.className = 'main-btn';
+  addBtn.textContent = 'Ajouter';
+  addBtn.style.marginLeft = "2px";
+  actionsRow.appendChild(addBtn);
+
+  gpsZone.appendChild(actionsRow);
   form.appendChild(gpsZone);
 
   function renderGpsPoints() {
-    const list = gpsZone.querySelector("#gpsPointsList");
-    list.innerHTML = '';
+    gpsListDiv.innerHTML = '';
     gpsPoints.forEach((pt, idx) => {
-      const item = document.createElement("div");
-      item.style = "margin-bottom:6px;display:flex;align-items:center;gap:8px;";
-      item.innerHTML = `
-        <input type="text" value="${pt}" readonly style="width:170px;">
-        <button type="button" data-idx="${idx}" class="remove-gps-btn" style="font-size:1.2em;">❌</button>
-      `;
-      list.appendChild(item);
-    });
-    list.querySelectorAll(".remove-gps-btn").forEach(btn => {
-      btn.onclick = (e) => {
-        const idx = Number(btn.dataset.idx);
+      let row = document.createElement('div');
+      row.style = "display: flex; align-items: center; gap: 12px; margin-bottom: 4px;";
+      // Icône boussole SVG harmonisée (comme sur les pages épreuves)
+      let logo = document.createElement('span');
+      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5 2.5-7 7-2.5-2.5 7z"/></svg>`;
+      logo.title = "Choisir/modifier ce point GPS";
+      logo.style.cursor = "pointer";
+      logo.onclick = function() {
+        openMapPicker({
+          value: pt,
+          set value(val) {
+            if(val) {
+              gpsPoints[idx] = val;
+              renderGpsPoints();
+            }
+          }
+        });
+      };
+      row.appendChild(logo);
+
+      let input = document.createElement('input');
+      input.type = "text";
+      input.value = pt;
+      input.style.width = "150px";
+      input.style.textAlign = "center";
+      input.readOnly = true;
+      row.appendChild(input);
+
+      let delBtn = document.createElement('button');
+      delBtn.type = "button";
+      delBtn.className = "main-btn";
+      delBtn.textContent = "❌";
+      delBtn.style.padding = "0 10px";
+      delBtn.onclick = function() {
         gpsPoints.splice(idx, 1);
         renderGpsPoints();
       };
+      row.appendChild(delBtn);
+
+      gpsListDiv.appendChild(row);
     });
   }
   renderGpsPoints();
 
-  gpsZone.querySelector("#addGpsPointBtn").onclick = function() {
-    // Ouvre le map picker et ajoute le point choisi
+  addBtn.onclick = function() {
     openMapPicker({
       value: "",
       set value(val) {
@@ -446,9 +507,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       }
     });
 
-    // Ajoute la liste de points GPS à l'étape
     data.points = [...gpsPoints];
-
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
