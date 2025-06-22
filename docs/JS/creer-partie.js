@@ -28,11 +28,31 @@ function getRandomElements(arr, n) {
   return shuffled.slice(0, n);
 }
 
+// Charge dynamiquement la liste des scénarios dans le sélecteur
+document.addEventListener("DOMContentLoaded", function() {
+  const select = document.getElementById('scenarioSelect');
+  // Ajoute "Parc Saint Nicolas" par défaut (valeur vide)
+  select.innerHTML = '<option value="">Parc Saint Nicolas (scénario de base)</option>';
+
+  // Charge les scénarios personnalisés depuis Firebase
+  db.ref('scenariosList').once('value').then(snap => {
+    if (snap.exists()) {
+      snap.forEach(child => {
+        const data = child.val();
+        const opt = document.createElement('option');
+        opt.value = data.code;
+        opt.textContent = data.nom ? data.nom + " (" + data.code + ")" : data.code;
+        select.appendChild(opt);
+      });
+    }
+  });
+});
+
 // Fonction globale accessible depuis l'extérieur
 window.creerPartie = async function(formData) {
   const mode = formData.get("mode");
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
-  const codeSalonCustom = (formData.get("salonCode") || "").toUpperCase().trim();
+  const scenarioCode = formData.get("scenarioSelect");
 
   if (!mode || isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12) {
     alert("Veuillez remplir tous les champs correctement.");
@@ -63,11 +83,11 @@ window.creerPartie = async function(formData) {
   // --- Gestion du SCÉNARIO ---
   let scenarioToUse = null;
 
-  if (codeSalonCustom) {
-    // L'utilisateur souhaite charger un scénario personnalisé
-    const snap = await db.ref('scenarios/' + codeSalonCustom).once('value');
+  if (scenarioCode) {
+    // L'utilisateur choisit un scénario personnalisé
+    const snap = await db.ref('scenarios/' + scenarioCode).once('value');
     if (!snap.exists()) {
-      alert("Code de salon (scénario) inconnu ou inexistant.");
+      alert("Scénario sélectionné introuvable.");
       return;
     }
     scenarioToUse = snap.val();
