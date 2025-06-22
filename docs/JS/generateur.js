@@ -1,7 +1,7 @@
 // === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES AVEC CONSIGNES INDIVIDUELLES ===
 let scenario = [];
 let dragSrcIdx = null;
-
+let mapTargetInput = null;
 // === INITIALISATION PAGE ===
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('questTypeSelect');
@@ -500,7 +500,7 @@ function initLeafletMap(targetInput) {
     let lng = e.latlng.lng.toFixed(6);
     if (searchMarker) searchMarker.setLatLng(e.latlng);
     else searchMarker = L.marker(e.latlng).addTo(window.map);
-    targetInput.value = lat + ", " + lng;
+    if (mapTargetInput) mapTargetInput.value = lat + ", " + lng;
     document.getElementById('mapModal').style.display = 'none';
     window.map.off();
     setTimeout(()=>window.map.remove(),300);
