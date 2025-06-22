@@ -3,125 +3,341 @@
 <head>
   <meta charset="UTF-8">
   <title id="page-title">Quête - Jeu de piste</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Polices et styles communs -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
+  <style>
+    /* Styles essentiels repris de tes pages */
+    body { background: #231d1d; color: #ffeecb; }
+    .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+    .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
+    .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px,1px,1px,1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
+    .icon-action svg { width: 38px; height: 38px; margin-bottom: 6px; fill: #e0c185; }
+    .icon-action span { font-size: 0.98em; color: #e0c185; margin-top: 2px; text-align: center; }
+    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 9999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw;}
+    .modal-toast.visible { display: block; animation: fadein 0.3s; }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+    /* Ajoute plus de styles si besoin */
+  </style>
 </head>
 <body>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
   </header>
-  <main id="main-content">
-    <h2 id="titre-quete"></h2>
-    <div id="objectif-quete"></div>
+  <div class="center-wrapper">
+    <main class="main-accueil" id="main-content" role="main">
+      <h2 id="titre-quete"></h2>
+      <div class="objectif-course" id="objectif-block">
+        <div class="objectif-label" id="objectif-label"></div>
+        <div class="objectif-text" id="objectif-text"></div>
+      </div>
 
-    <div id="bloc-gps" style="display:none;">
-      <a id="boussole-link" href="#" target="_blank">Boussole</a>
-    </div>
+      <!-- Bloc GPS -->
+      <div class="actions-row-horizontal" id="bloc-gps" style="display:none;">
+        <div class="icon-action side-icon">
+          <a id="gps-link" href="#" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/></svg>
+            <span>Boussole</span>
+          </a>
+        </div>
+        <div style="flex:1;text-align:center;">
+          <button id="check-gps" class="main-btn" style="margin-top:10px;">Je suis arrivé !</button>
+          <div id="gps-feedback"></div>
+        </div>
+      </div>
 
-    <div id="bloc-indice" style="display:none;">
-      <b>Indice : </b><span id="val-indice"></span>
-    </div>
+      <!-- Bloc indice (option visuel ou texte) -->
+      <div id="bloc-indice" style="display:none; margin:18px 0;">
+        <button id="show-indice" class="main-btn" type="button">Voir l’indice</button>
+        <div id="indice-modal" style="display:none;">
+          <div class="modal-img-wrapper">
+            <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
+            <img id="indice-img" src="" alt="Indice visuel" style="max-width:70vw;max-height:60vh;">
+            <div id="indice-text"></div>
+          </div>
+        </div>
+      </div>
 
-    <div id="bloc-photo" style="display:none;">
-      <label for="photo-upload">Envoie une photo :</label>
-      <input type="file" id="photo-upload" accept="image/*">
-      <div id="photo-filename"></div>
-    </div>
+      <!-- Bloc multi-upload photo/vidéo/audio -->
+      <div id="bloc-uploads" style="display:none;">
+        <div id="bloc-uploads-inner"></div>
+        <div id="uploads-feedback"></div>
+      </div>
 
-    <div id="bloc-video" style="display:none;">
-      <label for="video-upload">Envoie une vidéo :</label>
-      <input type="file" id="video-upload" accept="video/*">
-      <div id="video-filename"></div>
-    </div>
+      <!-- Bloc mot de passe/énigme -->
+      <div id="bloc-password" style="display:none;">
+        <label for="password-field" class="input-password-label">Entrez le mot de passe :</label>
+        <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
+      </div>
 
-    <div id="bloc-audio" style="display:none;">
-      <label for="audio-upload">Envoie un audio :</label>
-      <input type="file" id="audio-upload" accept="audio/*">
-      <div id="audio-filename"></div>
-    </div>
+      <!-- Bloc saisie réponse libre -->
+      <div id="bloc-answer" style="display:none;">
+        <label for="answer-field" class="input-answer-label">Votre réponse :</label>
+        <input type="text" id="answer-field" class="input-answer-field" autocomplete="off" placeholder="Tapez votre réponse…">
+      </div>
 
-    <!-- Ajouter d'autres blocs selon tes besoins -->
-
-    <button id="suivant" style="margin-top:2em;">Quête suivante</button>
-  </main>
-  <footer>
+      <button id="next-quest" class="main-btn" style="margin-top:2em;" disabled>Quête suivante</button>
+    </main>
+  </div>
+  <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-
-  <!-- Exemple de script dynamique pour remplir la page -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
+  <!-- Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <!-- Script de logique dynamique -->
   <script>
-    // === Initialisation Firebase (adapte config si besoin) ===
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+  // === CONFIG FIREBASE ===
+  const firebaseConfig = {
+    apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+    authDomain: "murder-party-ba8d1.firebaseapp.com",
+    databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "murder-party-ba8d1",
+    storageBucket: "murder-party-ba8d1.firebasestorage.app",
+    messagingSenderId: "20295055805",
+    appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+    measurementId: "G-KSBMBB7KMJ"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const storage = firebase.storage();
 
-    // --- LOGIQUE DYNAMIQUE ---
-    const codeSalon = localStorage.getItem("salonCode");
-    const equipeNum = localStorage.getItem("equipeNum") || 0;
-    let currentStep = Number(localStorage.getItem("currentStep")) || 0;
+  // --- Sécurité session ---
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = Number(localStorage.getItem("equipeNum"));
+  if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+    window.location.href = "accueil.html";
+  }
 
-    function chargerScenarioEtape() {
-      db.ref(`parties/${codeSalon}/scenario/scenario`).once('value').then(snap => {
-        const scenario = snap.val();
-        if (!scenario || !scenario[currentStep]) {
+  // --- Auth anonyme obligatoire Storage ---
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) firebase.auth().signInAnonymously();
+    else chargerEtapeDynamique();
+  });
+
+  // --- Récupère l'étape courante et injecte dynamiquement ---
+  function chargerEtapeDynamique() {
+    db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
+      const step = snapStep.val() || 0;
+      db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
+        const etape = snapEpreuve.val();
+        if (!etape) {
           document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
           return;
         }
-        const etape = scenario[currentStep];
-        afficherEtape(etape);
+        afficherEtape(etape, step);
       });
+    });
+  }
+
+  // --- Affiche dynamiquement l'étape selon le type ---
+  function afficherEtape(etape, stepIndex) {
+    // Titre et objectif
+    document.title = (etape.titre || etape.type || "Quête") + " - Jeu de piste";
+    document.getElementById('titre-quete').textContent = etape.titre || etape.type || "";
+    document.getElementById('objectif-label').textContent = "Objectif";
+    document.getElementById('objectif-text').textContent = etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || "";
+
+    // GPS (si présent)
+    if (etape.params?.gps || etape.params?.coord || etape.params?.coordonnees) {
+      document.getElementById('bloc-gps').style.display = '';
+      const gps = etape.params.gps || etape.params.coord || etape.params.coordonnees;
+      document.getElementById('gps-link').href = "https://maps.google.com/?q=" + gps;
+      document.getElementById('check-gps').onclick = function() {
+        const feedback = document.getElementById("gps-feedback");
+        feedback.textContent = "Recherche de votre position...";
+        if (!navigator.geolocation) {
+          feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
+          return;
+        }
+        const [destLat, destLon] = gps.split(',').map(Number);
+        const TOLERANCE_METERS = 30;
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          function getDistanceMeters(lat1, lon1, lat2, lon2) {
+            const R = 6378137;
+            const dLat = (lat2-lat1)*Math.PI/180;
+            const dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+          }
+          const dist = getDistanceMeters(lat, lon, destLat, destLon);
+          if (dist < TOLERANCE_METERS) {
+            document.getElementById("bloc-gps").style.display = "none";
+            showToast("Tu es bien arrivé !");
+          } else {
+            feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " m)";
+          }
+        }, function(err) {
+          feedback.textContent = "Position non trouvée (" + err.message + ")";
+        });
+      };
+    } else { document.getElementById('bloc-gps').style.display = 'none'; }
+
+    // Indice (texte ou image)
+    if (etape.params?.indice || etape.params?.indiceImg) {
+      document.getElementById('bloc-indice').style.display = '';
+      document.getElementById('show-indice').onclick = function() {
+        document.getElementById('indice-modal').style.display = 'block';
+        if (etape.params.indiceImg) {
+          document.getElementById('indice-img').src = etape.params.indiceImg;
+          document.getElementById('indice-img').style.display = '';
+        } else {
+          document.getElementById('indice-img').style.display = 'none';
+        }
+        if (etape.params.indice) {
+          document.getElementById('indice-text').textContent = etape.params.indice;
+        }
+      };
+      document.getElementById('close-indice').onclick = function() {
+        document.getElementById('indice-modal').style.display = 'none';
+      };
+    } else {
+      document.getElementById('bloc-indice').style.display = 'none';
     }
 
-    function afficherEtape(etape) {
-      document.getElementById('titre-quete').textContent = etape.titre || etape.type || "";
-      document.getElementById('objectif-quete').textContent = etape.params.consigne || etape.params.objectif || etape.params.enigme || "";
-      document.title = (etape.titre || etape.type || "Quête") + " - Jeu de piste";
+    // Multi-upload (photos, vidéos, audio selon type)
+    const blocUploads = document.getElementById('bloc-uploads');
+    const uploadsInner = document.getElementById('bloc-uploads-inner');
+    blocUploads.style.display = 'none';
+    uploadsInner.innerHTML = "";
+    if (etape.type === "photo" || etape.type === "photo_inconnus" || etape.type === "video" || etape.type === "audio" || etape.type === "collecte_objet" || (etape.type === "defi_collectif" && etape.params.preuve)) {
+      blocUploads.style.display = '';
+      let nb = Number(etape.params.nbPhotos || etape.params.nbPersonnes || etape.params.nbVideos || etape.params.nbObjets || 1);
+      let type = etape.type === "video" || etape.params.preuve === "video" ? "video"
+               : etape.type === "audio" || etape.params.preuve === "audio" ? "audio"
+               : "image";
+      for (let i = 1; i <= nb; i++) {
+        let label = document.createElement('label');
+        label.textContent = (type === "image" ? "Photo " : type.charAt(0).toUpperCase() + type.slice(1) + " ") + i;
+        label.setAttribute('for', `upload-file-${i}`);
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = (type === "video" ? "video/*" : type === "audio" ? "audio/*" : "image/*");
+        input.id = `upload-file-${i}`;
+        input.className = 'visually-hidden';
+        let span = document.createElement('span');
+        span.textContent = label.textContent;
+        let div = document.createElement('div');
+        div.className = 'icon-action side-icon';
+        div.appendChild(label);
+        div.appendChild(input);
+        div.appendChild(span);
+        let fileNameDiv = document.createElement('div');
+        fileNameDiv.id = `filename-${i}`;
+        fileNameDiv.style = "color:#e0c185;font-size:0.98em;text-align:right;min-height:1.3em;";
+        div.appendChild(fileNameDiv);
+        uploadsInner.appendChild(div);
 
-      // GPS
-      if (etape.params.gps || etape.params.coord || etape.params.coordonnees) {
-        document.getElementById('bloc-gps').style.display = '';
-        document.getElementById('boussole-link').href = "https://maps.google.com/?q=" + (etape.params.gps || etape.params.coord || etape.params.coordonnees);
-      } else {
-        document.getElementById('bloc-gps').style.display = 'none';
+        input.addEventListener('change', async function() {
+          if (!this.files || !this.files[0]) return;
+          fileNameDiv.textContent = "Chargement...";
+          let file = this.files[0];
+          let storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${type}${i}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
+          try {
+            const snapshot = await storage.ref(storagePath).put(file);
+            const url = await snapshot.ref.getDownloadURL();
+            fileNameDiv.textContent = type.charAt(0).toUpperCase() + type.slice(1) + " envoyée !";
+            db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${i}`).set(url);
+          } catch (e) {
+            fileNameDiv.textContent = "Erreur lors de l'envoi.";
+          }
+        });
       }
-
-      // Indice
-      if (etape.params.indice) {
-        document.getElementById('bloc-indice').style.display = '';
-        document.getElementById('val-indice').textContent = etape.params.indice;
-      } else {
-        document.getElementById('bloc-indice').style.display = 'none';
-      }
-
-      // Photo
-      document.getElementById('bloc-photo').style.display = (etape.type === "photo" || etape.type === "photo_inconnus" || etape.type === "defi_collectif" && etape.params.preuve === "photo") ? '' : 'none';
-      // Vidéo
-      document.getElementById('bloc-video').style.display = (etape.type === "video" || etape.type === "defi_collectif" && etape.params.preuve === "video") ? '' : 'none';
-      // Audio
-      document.getElementById('bloc-audio').style.display = (etape.type === "audio" || etape.type === "defi_collectif" && etape.params.preuve === "audio") ? '' : 'none';
     }
 
-    document.getElementById('suivant').addEventListener('click', function() {
-      currentStep++;
-      localStorage.setItem("currentStep", currentStep);
-      chargerScenarioEtape();
+    // Mot de passe/énigme
+    if (etape.type === "mot_de_passe" || etape.type === "anagramme") {
+      document.getElementById('bloc-password').style.display = '';
+      const passwordField = document.getElementById('password-field');
+      passwordField.value = "";
+      passwordField.oninput = function() {
+        let value = this.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let good = value === (etape.params.solution || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        document.getElementById('next-quest').disabled = !good;
+        document.getElementById('next-quest').classList.toggle('enabled', good);
+      };
+    } else {
+      document.getElementById('bloc-password').style.display = 'none';
+    }
+
+    // Réponse libre
+    if (etape.type === "observation" || etape.type === "chasse_tresor") {
+      document.getElementById('bloc-answer').style.display = '';
+      document.getElementById('answer-field').value = "";
+      document.getElementById('answer-field').oninput = function() {
+        let value = this.value.trim().toLowerCase();
+        let solution = (etape.params.solution || "").trim().toLowerCase();
+        let ok = value === solution && !!solution;
+        document.getElementById('next-quest').disabled = !ok;
+        document.getElementById('next-quest').classList.toggle('enabled', ok);
+      };
+    } else {
+      document.getElementById('bloc-answer').style.display = 'none';
+    }
+
+    // Gestion du bouton « quête suivante »
+    const nextBtn = document.getElementById('next-quest');
+    nextBtn.disabled = true;
+    nextBtn.classList.remove('enabled');
+    nextBtn.onclick = function() {
+      nextBtn.disabled = true;
+      nextBtn.classList.remove('enabled');
+      showToast("Validation en cours...");
+      // Chrono/temps passé sur l’épreuve
+      const now = Date.now();
+      db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
+        .once('value', function(snap) {
+          const sTime = snap.val();
+          if (sTime) {
+            const elapsed = Math.round((now - sTime) / 1000);
+            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+          }
+          // Puis passage à l'étape suivante
+          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+              if (!error && committed) {
+                showToast("Étape validée !");
+                setTimeout(() => { window.location.reload(); }, 800);
+              } else {
+                showToast("Erreur lors de la validation...");
+                nextBtn.disabled = false;
+                nextBtn.classList.add('enabled');
+              }
+            });
+        });
+    };
+  }
+
+  // --- Toast harmonisé ---
+  function showToast(msg) {
+    const toast = document.getElementById('toast-message');
+    if (toast) {
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => { toast.classList.remove('visible'); }, 2200);
+    }
+  }
+
+  // --- Anti-retour arrière et navigation auto ---
+  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+    .on('value', function(snapshot) {
+      chargerEtapeDynamique();
     });
 
-    // Si tu veux gérer l'envoi de fichiers, ajoute ici la logique d'upload (Firebase Storage, etc.)
-
-    // Appel initial
-    chargerScenarioEtape();
+  window.addEventListener("pageshow", function(evt) {
+    if (evt.persisted) {
+      chargerEtapeDynamique();
+    }
+  });
   </script>
 </body>
 </html>
