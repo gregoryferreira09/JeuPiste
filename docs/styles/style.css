@@ -892,3 +892,26 @@ body {
   outline: 2px solid #e0c185;
   outline-offset: 4px;
 }
+
+.quest-form textarea {
+  font-family: inherit;
+  font-size: 1em;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 48px; /* ou ajuste la hauteur selon tes besoins */
+}
+
+.quest-form input[type="text"],
+.quest-form input[type="number"] {
+  font-family: inherit;
+  font-size: 1em;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
