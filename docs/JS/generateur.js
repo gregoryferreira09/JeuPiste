@@ -84,13 +84,13 @@ function afficherScenario() {
     ligne.addEventListener('dragend', handleDragEnd);
 
     // Mobile long press for drag
-    let timer = null;
-    ligne.addEventListener('touchstart', function(e) {
-      timer = setTimeout(() => {
-        ligne.draggable = true;
-        ligne.classList.add('dragging-touch');
-      }, 400);
-    });
+   ligne.addEventListener('touchstart', function(e) {
+  timer = setTimeout(() => {
+    ligne.draggable = true;
+    ligne.classList.add('dragging-touch');
+  }, 400);
+}, { passive: true });
+    
     ligne.addEventListener('touchend', function(e) {
       clearTimeout(timer);
       ligne.draggable = false;
