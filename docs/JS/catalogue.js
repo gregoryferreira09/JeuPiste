@@ -203,7 +203,6 @@ const QUESTS_CATALOGUE = [
     combinable: [],
     preview: "duel"
   }
-];
 
 {
   id: "pendu",
@@ -230,3 +229,4 @@ const QUESTS_CATALOGUE = [
   },
   instructions: "Devinez le mot de 8 lettres en proposant des lettres une par une. Attention au temps limité !",
 },
+];
