@@ -1,3 +1,21 @@
+// === INITIALISATION FIREBASE (doit être tout en haut du fichier) ===
+if (typeof firebase === "undefined") {
+  alert("Firebase non chargé ! Vérifiez que les scripts Firebase sont inclus AVANT ce fichier.");
+}
+const firebaseConfig = {
+  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+  authDomain: "murder-party-ba8d1.firebaseapp.com",
+  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "murder-party-ba8d1",
+  storageBucket: "murder-party-ba8d1.appspot.com",
+  messagingSenderId: "20295055805",
+  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+  measurementId: "G-KSBMBB7KMJ"
+};
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
 // === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES AVEC CONSIGNES INDIVIDUELLES ===
 let scenario = [];
 let dragSrcIdx = null;
