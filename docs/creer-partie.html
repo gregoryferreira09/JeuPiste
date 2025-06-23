@@ -49,9 +49,10 @@ localStorage.removeItem('parametresPartie');
     <form id="creerPartieForm" class="form-container" autocomplete="off" spellcheck="false">
 
       <label for="scenarioSelect">Choisissez le scénario :</label>
-      <select id="scenarioSelect" name="scenarioSelect">
-        <option value="">Parc Saint Nicolas</option>
-      </select>
+      <select id="scenarioSelect" name="scenarioSelect" required>
+  <option value="">-- Choisissez un scénario --</option>
+  <option value="parc_saint_nicolas">Parc Saint Nicolas</option>
+</select>
 
       <label for="nombreJoueurs">Nombre de joueurs :</label>
       <select id="nombreJoueurs" name="nombreJoueurs" required>
