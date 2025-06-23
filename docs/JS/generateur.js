@@ -543,23 +543,29 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       }
     });
 
+    data.points = [...gpsPoints];
+ajouterEtapeAuScenario({ type: questTypeId, params: data });
+form.reset();
+container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
+    
 // --- PATCH UNIVERSEL POUR TOUS LES CAS ---
-// 1. Pour collecte_objet/photo... force les champs attendus dans params
 if (
   quest.id === "collecte_objet" ||
   quest.id === "photo" ||
   quest.id === "photo_inconnus" ||
   quest.id === "video"
 ) {
-  // Trouve le vrai nom du champ de quantité dans le catalogue
-  let champQuantite = "nbObjets";
-  if (quest.parametres.some(p => p.key === "nombre")) champQuantite = "nombre";
-  if (typeof data[champQuantite] === "undefined") data[champQuantite] = 1;
+  // Trouve dynamiquement le champ quantité dans le catalogue
+  const champQuantite = (quest.parametres.find(p => p.type === "number") || {}).key;
+  if (champQuantite && typeof data[champQuantite] === "undefined") data[champQuantite] = 1;
+
+  // Consignes : TOUJOURS tableau (pour compatibilité)
   if (!Array.isArray(data.consignes)) data.consignes = [];
-  if (typeof data.objet === "undefined" && typeof data.critere === "undefined") {
-    if (quest.parametres.some(p => p.key === "objet")) data.objet = "";
-    if (quest.parametres.some(p => p.key === "critere")) data.critere = "";
-  }
+
+  // Ajoute objet OU critere OU consigne selon le catalogue
+  if (quest.parametres.some(p => p.key === "objet") && typeof data.objet === "undefined") data.objet = "";
+  if (quest.parametres.some(p => p.key === "critere") && typeof data.critere === "undefined") data.critere = "";
+  if (quest.parametres.some(p => p.key === "consigne") && typeof data.consigne === "undefined") data.consigne = "";
 }
 // 2. Retire le champ "type" de params s'il existe (nettoyage)
 if ("type" in data) delete data.type;
