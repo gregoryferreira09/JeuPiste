@@ -1,5 +1,3 @@
-// SRC/JS/rejoindre-partie.js
-
 // --- Configuration Firebase ---
 const firebaseConfig = {
   apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
@@ -15,6 +13,24 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.database();
+
+// Connexion anonyme si besoin
+if (!firebase.auth().currentUser) {
+  firebase.auth().signInAnonymously();
+}
+// Attendre que l'utilisateur soit authentifié avant d'écrire
+function attendreAuthFirebase() {
+  return new Promise((resolve, reject) => {
+    if (firebase.auth().currentUser) return resolve(firebase.auth().currentUser);
+    const unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        unsubscribe();
+        resolve(user);
+      }
+    });
+    setTimeout(() => reject(new Error("Timeout Auth Firebase")), 10000);
+  });
+}
 
 // Génère un UUID v4
 function generateUUID() {
@@ -78,8 +94,8 @@ async function rejoindreSalon() {
     const paramSnap = await db.ref('parties/' + codeEntre + '/parametres').get();
     const maxJoueurs = paramSnap.exists() ? parseInt(paramSnap.val().nombreJoueurs) : 1;
     if (paramSnap.exists() && paramSnap.val().nombreJoueurs) {
-  localStorage.setItem("nombreJoueurs", paramSnap.val().nombreJoueurs);
-}
+      localStorage.setItem("nombreJoueurs", paramSnap.val().nombreJoueurs);
+    }
     if (pseudosExistants.length >= maxJoueurs) {
       loader.style.display = "none";
       validerBtn.disabled = false;
@@ -126,8 +142,9 @@ async function rejoindreSalon() {
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById("joinForm");
     if(form) {
-        form.addEventListener("submit", function(e) {
+        form.addEventListener("submit", async function(e) {
             e.preventDefault();
+            await attendreAuthFirebase(); // On attend que l'utilisateur soit bien authentifié avant de rejoindre
             rejoindreSalon();
         });
     } else {
