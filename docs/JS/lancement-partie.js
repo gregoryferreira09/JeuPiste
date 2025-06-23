@@ -10,6 +10,21 @@ document.addEventListener("DOMContentLoaded", function () {
       "Bienvenue dans l'aventure ! Préparez-vous pour des épreuves épiques.";
     const presentation = document.getElementById("textePresentation");
     if (presentation) presentation.innerHTML = texteAleatoire;
+
+    // Fallback pour objectif et règles
+    if (typeof OBJECTIF_TEXTE !== "undefined") {
+      const objectifs = OBJECTIF_TEXTE["arthurien"];
+      const objectifAleatoire = objectifs[Math.floor(Math.random() * objectifs.length)];
+      const objectifElem = document.getElementById("objectifText");
+      if (objectifElem) objectifElem.textContent = objectifAleatoire;
+    }
+    if (typeof REGLES_TEXTE !== "undefined") {
+      const regles = REGLES_TEXTE["arthurien"];
+      let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
+      regleAleatoire = regleAleatoire.replace('{N}', 6); // Valeur par défaut
+      const reglesElem = document.getElementById("reglesCourse");
+      if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
+    }
     return;
   }
 
@@ -26,20 +41,54 @@ document.addEventListener("DOMContentLoaded", function () {
     // Sinon on va chercher le mode du scénario et on injecte le texte dynamique
     firebase.database().ref('scenarios/' + scenarioCode + '/mode').once('value').then(snap => {
       const mode = snap.val() || 'arthurien';
-      // Si jamais "avalon" est utilisé ailleurs, tu peux adapter ici
+
+      // Texte de lancement dynamique
       const textes = LANCEMENT_TEXTE[mode] || LANCEMENT_TEXTE['arthurien'];
       const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
       const presentation = document.getElementById("textePresentation");
       if (presentation) presentation.innerHTML = texteAleatoire;
-      // Met à jour le titre aussi
+
+      // Titre dynamique
       const titre = document.getElementById("titreCourse");
       if (titre) titre.textContent = mode.charAt(0).toUpperCase() + mode.slice(1).replace(/_/g, " ");
+
+      // Objectif dynamique
+      if (typeof OBJECTIF_TEXTE !== "undefined") {
+        const objectifs = OBJECTIF_TEXTE[mode] || OBJECTIF_TEXTE['arthurien'];
+        const objectifAleatoire = objectifs[Math.floor(Math.random() * objectifs.length)];
+        const objectifElem = document.getElementById("objectifText");
+        if (objectifElem) objectifElem.textContent = objectifAleatoire;
+      }
+
+      // Règles dynamiques (avec {N} = nombre de quêtes)
+      if (typeof REGLES_TEXTE !== "undefined") {
+        const nbQuetes = params.nbQuetes || 6; // valeur par défaut si non trouvée
+        const regles = REGLES_TEXTE[mode] || REGLES_TEXTE['arthurien'];
+        let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
+        regleAleatoire = regleAleatoire.replace('{N}', nbQuetes);
+        const reglesElem = document.getElementById("reglesCourse");
+        if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
+      }
     }).catch(() => {
       // Fallback si erreur
       const textes = LANCEMENT_TEXTE['arthurien'];
       const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
       const presentation = document.getElementById("textePresentation");
       if (presentation) presentation.innerHTML = texteAleatoire;
+
+      if (typeof OBJECTIF_TEXTE !== "undefined") {
+        const objectifs = OBJECTIF_TEXTE["arthurien"];
+        const objectifAleatoire = objectifs[Math.floor(Math.random() * objectifs.length)];
+        const objectifElem = document.getElementById("objectifText");
+        if (objectifElem) objectifElem.textContent = objectifAleatoire;
+      }
+      if (typeof REGLES_TEXTE !== "undefined") {
+        const regles = REGLES_TEXTE["arthurien"];
+        let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
+        regleAleatoire = regleAleatoire.replace('{N}', 6);
+        const reglesElem = document.getElementById("reglesCourse");
+        if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
+      }
     });
   });
 });
