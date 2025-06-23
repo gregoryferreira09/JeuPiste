@@ -271,8 +271,9 @@ const QUESTS_CATALOGUE = [
      ] 
   }
 ,
-        
-  {
+
+  // === Photo inconnus ===  
+{
   id: "photo_inconnus",
   nom: "Photo avec des inconnus",
 description: "Prendre une ou plusieurs photos avec des personnes différentes ou répondant à un critère déterminé. (Qui porte des lunettes ; qui a plus de 50 ans ; qui porte une chemise blanche, etc.).",
