@@ -2483,7 +2483,7 @@ const QUESTS_CATALOGUE = [
   {
     id: "combo",
     nom: "Combinaison d’actions",
-    description: "Réaliser plusieurs actions à la suite ou en même temps (photo + GPS + mot de passe…).",
+    description: "Réaliser plusieurs actions à la suite ou en même temps (photo + GPS + mot de passe, etc.).",
     parametres: [
       { key: "actions", type: "list", label: "Liste d’actions à combiner", itemType: "reference_autre_quete" }
     ],
@@ -2776,7 +2776,7 @@ const QUESTS_CATALOGUE = [
   nom: "Duel",
   description: "Affronter un/e ou plusieurs adversaires sur un défi physique, intellectuel, artistique ou ludique.",
   parametres: [
-    { key: "type_duel", type: "text", label: "Type de duel (ex : mime, bagarre, quiz…)", placeholder: "ex : mime, quiz, course..." }
+    { key: "type_duel", type: "text", label: "Type de duel (ex : mime, bagarre, quiz,, etc.)", placeholder: "ex : mime, quiz, course, etc." }
   ],
   combinable: ["chrono", "photo", "audio"],
   preview: "duel",
