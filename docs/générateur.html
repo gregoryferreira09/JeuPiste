@@ -15,39 +15,44 @@
 
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <form class="form-container" id="epreuveForm" autocomplete="off">
+
+      <!-- Bloc pour coordonnées et univers -->
+      <form class="form-container" id="epreuveForm" autocomplete="off" onsubmit="return false;">
         <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
-            <div style="flex:1; min-width:180px;">
+          <div style="flex:1; min-width:180px;">
             <label for="coordEnd">Coordonnées d'arrivée :</label>
             <input type="text" id="coordEnd" name="coordEnd" placeholder="Clique pour choisir" readonly>
           </div>
         </div>
 
         <div class="form-field">
-  <label for="modeScenarioSelect">Univers du scénario :</label>
-  <select id="modeScenarioSelect" name="modeScenarioSelect" required>
-    <option value="arthurien">Arthurien</option>
-    <option value="pirate">Pirate</option>
-    <option value="prison">Prison</option>
-    <option value="sorcier">Sorcier</option>
-    <option value="super_heros">Super-héros</option>
-    <option value="zombie">Zombie</option>
-    <option value="archeologue">Archéologue</option>
-    <!-- Ajoute d’autres modes ici -->
-  </select>
-</div>
-        
-        <!-- Liste des épreuves ajoutées, sous les coordonnées -->
-        <div id="scenarioList" style="margin-bottom:18px;"></div>
-
-        <div class="form-field">
-          <label for="questTypeSelect">Type d'épreuve :</label>
-          <select id="questTypeSelect" name="questTypeSelect" required>
-            <option value="">-- Choisissez un type d'épreuve --</option>
+          <label for="modeScenarioSelect">Univers du scénario :</label>
+          <select id="modeScenarioSelect" name="modeScenarioSelect" required>
+            <option value="arthurien">Arthurien</option>
+            <option value="pirate">Pirate</option>
+            <option value="prison">Prison</option>
+            <option value="sorcier">Sorcier</option>
+            <option value="super_heros">Super-héros</option>
+            <option value="zombie">Zombie</option>
+            <option value="archeologue">Archéologue</option>
+            <!-- Ajoute d’autres modes ici -->
           </select>
         </div>
-        <div id="formContainer"></div>
       </form>
+
+      <!-- Liste des épreuves ajoutées -->
+      <div id="scenarioList" style="margin-bottom:18px;"></div>
+
+      <!-- Sélection du type d'épreuve -->
+      <div class="form-field">
+        <label for="questTypeSelect">Type d'épreuve :</label>
+        <select id="questTypeSelect" name="questTypeSelect" required>
+          <option value="">-- Choisissez un type d'épreuve --</option>
+        </select>
+      </div>
+
+      <!-- Formulaire dynamique pour l'épreuve sélectionnée -->
+      <div id="formContainer"></div>
 
       <div class="group-btns">
         <button class="main-btn" type="button" onclick="exporterScenario()">📦 Générer le scénario</button>
