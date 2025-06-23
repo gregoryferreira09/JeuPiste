@@ -8,18 +8,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
   <style>
-    /* Styles essentiels repris de tes pages */
     body { background: #231d1d; color: #ffeecb; }
+    .main-accueil { max-width: 670px; margin: 32px auto 0 auto; background: #291e1e; border-radius: 14px; padding: 30px 15px 40px 15px; box-shadow: 0 4px 32px #0005; }
+    .main-btn { background: #e0c185; color: #231d1d; border: none; border-radius: 7px; padding: 12px 28px; font-size: 1.13em; font-family: 'Cormorant Garamond', serif; margin-top: 22px; cursor: pointer; transition: background 0.2s; }
     .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
-    .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
+    .main-btn.enabled { background: #ffeecb; color: #231d1d; font-weight: bold; }
+    .objectif-course { background: #281e1e; border-radius: 9px; margin: 20px auto 22px auto; max-width: 94vw; }
+    .objectif-label { color: #e0c185; margin-bottom: 8px; font-weight: bold; font-size: 1.13em; }
+    .objectif-text { color: #ffeecb; font-size: 1.13em; margin-bottom: 11px; line-height: 1.5; }
+    .actions-row-horizontal { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin: 24px 0 12px 0; }
+    .icon-action { display: flex; flex-direction: column; align-items: center; width: 108px; }
+    .icon-action svg { width: 44px; height: 44px; margin-bottom: 6px; fill: #e0c185; }
+    .icon-action span { font-size: 1.03em; color: #e0c185; margin-top: 4px; text-align: center; }
     .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px,1px,1px,1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
-    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
-    .icon-action svg { width: 38px; height: 38px; margin-bottom: 6px; fill: #e0c185; }
-    .icon-action span { font-size: 0.98em; color: #e0c185; margin-top: 2px; text-align: center; }
-    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 9999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw;}
+    #photo-filename, #video-filename, #audio-filename { color:#e0c185; font-size:0.98em; text-align:right; min-height:1.3em; }
+    #gps-feedback { color: #ffb74d; font-size: 1em; margin-top: 5px; }
+    #indice-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; right: 0; bottom: 0; background: rgba(20,16,8,0.85); justify-content: center; align-items: center; }
+    #indice-modal.active { display: flex; }
+    .modal-img-wrapper { position: relative; background: #fffbe0; padding: 24px 24px 12px 24px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); max-width: 92vw; }
+    .modal-img-wrapper img { display: block; max-width: 70vw; max-height: 60vh; margin: 0 auto; border-radius: 7px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+    .close-modal { position: absolute; top: 4px; right: 12px; font-size: 2.2em; color: #a8832b; cursor: pointer; font-weight: bold; background: transparent; border: none; z-index: 10; transition: color 0.18s; }
+    .close-modal:hover { color: #e0c185; }
+    .input-password-label, .input-answer-label { color: #e0c185; font-size: 1.06em; margin-bottom: 8px; text-align: center; }
+    .input-password-field, .input-answer-field { padding: 10px 16px; font-size: 1.11em; border-radius: 7px; border: 1px solid #e0c185; outline: none; margin-bottom: 0; background: #2b2323; color: #ffeecb; width: 320px; max-width: 92vw; }
+    .input-password-field:focus, .input-answer-field:focus { border: 1.5px solid #ffeecb; }
+    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 24px; font-size: 1.1em; z-index: 1100; }
     .modal-toast.visible { display: block; animation: fadein 0.3s; }
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    /* Ajoute plus de styles si besoin */
+    @media (max-width: 650px) {
+      .main-accueil { padding: 12px 2vw; }
+      .icon-action { width: 100%; }
+      .objectif-course { padding: 10px 2vw; }
+    }
   </style>
 </head>
 <body>
@@ -33,8 +53,7 @@
         <div class="objectif-label" id="objectif-label"></div>
         <div class="objectif-text" id="objectif-text"></div>
       </div>
-
-      <!-- Bloc GPS -->
+      <!-- Blocs dynamiques -->
       <div class="actions-row-horizontal" id="bloc-gps" style="display:none;">
         <div class="icon-action side-icon">
           <a id="gps-link" href="#" target="_blank" rel="noopener">
@@ -47,37 +66,28 @@
           <div id="gps-feedback"></div>
         </div>
       </div>
-
-      <!-- Bloc indice (option visuel ou texte) -->
       <div id="bloc-indice" style="display:none; margin:18px 0;">
         <button id="show-indice" class="main-btn" type="button">Voir l’indice</button>
-        <div id="indice-modal" style="display:none;">
+        <div id="indice-modal">
           <div class="modal-img-wrapper">
             <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
-            <img id="indice-img" src="" alt="Indice visuel" style="max-width:70vw;max-height:60vh;">
+            <img id="indice-img" src="" alt="Indice visuel" style="max-width:70vw;max-height:60vh; display:none;">
             <div id="indice-text"></div>
           </div>
         </div>
       </div>
-
-      <!-- Bloc multi-upload photo/vidéo/audio -->
       <div id="bloc-uploads" style="display:none;">
-        <div id="bloc-uploads-inner"></div>
+        <div class="actions-row-horizontal" id="bloc-uploads-inner"></div>
         <div id="uploads-feedback"></div>
       </div>
-
-      <!-- Bloc mot de passe/énigme -->
       <div id="bloc-password" style="display:none;">
         <label for="password-field" class="input-password-label">Entrez le mot de passe :</label>
         <input type="text" id="password-field" class="input-password-field" autocomplete="off" placeholder="Tapez ici le mot de passe…">
       </div>
-
-      <!-- Bloc saisie réponse libre -->
       <div id="bloc-answer" style="display:none;">
         <label for="answer-field" class="input-answer-label">Votre réponse :</label>
         <input type="text" id="answer-field" class="input-answer-field" autocomplete="off" placeholder="Tapez votre réponse…">
       </div>
-
       <button id="next-quest" class="main-btn" style="margin-top:2em;" disabled>Quête suivante</button>
     </main>
   </div>
@@ -87,11 +97,10 @@
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <!-- Firebase scripts -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-  <!-- Script de logique dynamique -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <script>
   // === CONFIG FIREBASE ===
   const firebaseConfig = {
@@ -115,7 +124,7 @@
     window.location.href = "accueil.html";
   }
 
-  // --- Auth anonyme obligatoire Storage ---
+  // Auth anonyme obligatoire
   firebase.auth().onAuthStateChanged(function(user) {
     if (!user) firebase.auth().signInAnonymously();
     else chargerEtapeDynamique();
@@ -138,13 +147,18 @@
 
   // --- Affiche dynamiquement l'étape selon le type ---
   function afficherEtape(etape, stepIndex) {
+    // Reset tous les blocs
+    ['bloc-gps','bloc-indice','bloc-uploads','bloc-password','bloc-answer'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
     // Titre et objectif
-    document.title = (etape.titre || etape.type || "Quête") + " - Jeu de piste";
-    document.getElementById('titre-quete').textContent = etape.titre || etape.type || "";
+    document.title = (etape.titre || etape.nom || etape.type || "Quête") + " - Jeu de piste";
+    document.getElementById('titre-quete').textContent = etape.titre || etape.nom || etape.type || "";
     document.getElementById('objectif-label').textContent = "Objectif";
-    document.getElementById('objectif-text').textContent = etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || "";
+    document.getElementById('objectif-text').textContent =
+      (etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "");
 
-    // GPS (si présent)
+    // Bloc GPS
     if (etape.params?.gps || etape.params?.coord || etape.params?.coordonnees) {
       document.getElementById('bloc-gps').style.display = '';
       const gps = etape.params.gps || etape.params.coord || etape.params.coordonnees;
@@ -180,13 +194,13 @@
           feedback.textContent = "Position non trouvée (" + err.message + ")";
         });
       };
-    } else { document.getElementById('bloc-gps').style.display = 'none'; }
+    }
 
-    // Indice (texte ou image)
+    // Bloc indice (texte ou image)
     if (etape.params?.indice || etape.params?.indiceImg) {
       document.getElementById('bloc-indice').style.display = '';
       document.getElementById('show-indice').onclick = function() {
-        document.getElementById('indice-modal').style.display = 'block';
+        document.getElementById('indice-modal').classList.add('active');
         if (etape.params.indiceImg) {
           document.getElementById('indice-img').src = etape.params.indiceImg;
           document.getElementById('indice-img').style.display = '';
@@ -198,111 +212,130 @@
         }
       };
       document.getElementById('close-indice').onclick = function() {
-        document.getElementById('indice-modal').style.display = 'none';
+        document.getElementById('indice-modal').classList.remove('active');
       };
-    } else {
-      document.getElementById('bloc-indice').style.display = 'none';
     }
 
-    // Multi-upload (photos, vidéos, audio selon type)
+    // Bloc upload (photo, vidéo, audio, collecte_objet, defi_collectif)
     const blocUploads = document.getElementById('bloc-uploads');
     const uploadsInner = document.getElementById('bloc-uploads-inner');
     blocUploads.style.display = 'none';
     uploadsInner.innerHTML = "";
-    if (etape.type === "photo" || etape.type === "photo_inconnus" || etape.type === "video" || etape.type === "audio" || etape.type === "collecte_objet" || (etape.type === "defi_collectif" && etape.params.preuve)) {
+    let uploadType = null;
+    let nbUpload = 1;
+    if (["photo","photo_inconnus"].includes(etape.type)) {
+      uploadType = "image";
+      nbUpload = Number(etape.params.nbPhotos || etape.params.nbPersonnes || 1);
+    }
+    if (etape.type === "video") {
+      uploadType = "video"; nbUpload = Number(etape.params.nbVideos || 1);
+    }
+    if (etape.type === "audio") {
+      uploadType = "audio"; nbUpload = 1;
+    }
+    if (etape.type === "collecte_objet") {
+      uploadType = "image"; nbUpload = Number(etape.params.nbObjets || 1);
+    }
+    if (etape.type === "defi_collectif") {
+      uploadType = etape.params.preuve || "photo"; nbUpload = 1;
+    }
+    if (uploadType) {
       blocUploads.style.display = '';
-      let nb = Number(etape.params.nbPhotos || etape.params.nbPersonnes || etape.params.nbVideos || etape.params.nbObjets || 1);
-      let type = etape.type === "video" || etape.params.preuve === "video" ? "video"
-               : etape.type === "audio" || etape.params.preuve === "audio" ? "audio"
-               : "image";
-      for (let i = 1; i <= nb; i++) {
+      for (let i = 1; i <= nbUpload; i++) {
         let label = document.createElement('label');
-        label.textContent = (type === "image" ? "Photo " : type.charAt(0).toUpperCase() + type.slice(1) + " ") + i;
         label.setAttribute('for', `upload-file-${i}`);
+        let svg = `<svg viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
+        label.innerHTML = svg + `<span>${uploadType === "image" ? "Photo" : uploadType.charAt(0).toUpperCase() + uploadType.slice(1)} ${i}</span>`;
         let input = document.createElement('input');
-        input.type = 'file';
-        input.accept = (type === "video" ? "video/*" : type === "audio" ? "audio/*" : "image/*");
+        input.type = "file";
+        input.accept = uploadType === "video" ? "video/*" : uploadType === "audio" ? "audio/*" : "image/*";
         input.id = `upload-file-${i}`;
         input.className = 'visually-hidden';
-        let span = document.createElement('span');
-        span.textContent = label.textContent;
         let div = document.createElement('div');
         div.className = 'icon-action side-icon';
         div.appendChild(label);
         div.appendChild(input);
-        div.appendChild(span);
-        let fileNameDiv = document.createElement('div');
-        fileNameDiv.id = `filename-${i}`;
-        fileNameDiv.style = "color:#e0c185;font-size:0.98em;text-align:right;min-height:1.3em;";
-        div.appendChild(fileNameDiv);
         uploadsInner.appendChild(div);
 
+        // Ajoute gestionnaire upload
         input.addEventListener('change', async function() {
           if (!this.files || !this.files[0]) return;
-          fileNameDiv.textContent = "Chargement...";
           let file = this.files[0];
-          let storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${type}${i}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
+          let storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${uploadType}${i}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
           try {
-            const snapshot = await storage.ref(storagePath).put(file);
-            const url = await snapshot.ref.getDownloadURL();
-            fileNameDiv.textContent = type.charAt(0).toUpperCase() + type.slice(1) + " envoyée !";
-            db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${i}`).set(url);
+            let snapshot = await storage.ref(storagePath).put(file);
+            let url = await snapshot.ref.getDownloadURL();
+            let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${uploadType}${i}`);
+            await ref.set(url);
+            showToast((uploadType === "image" ? "Photo" : uploadType.charAt(0).toUpperCase() + uploadType.slice(1)) + " envoyée !");
+            checkUploadsCompleted();
           } catch (e) {
-            fileNameDiv.textContent = "Erreur lors de l'envoi.";
+            showToast("Erreur upload !")
           }
         });
       }
     }
 
-    // Mot de passe/énigme
-    if (etape.type === "mot_de_passe" || etape.type === "anagramme") {
+    // Mot de passe/énigme/anagramme
+    if (["mot_de_passe","anagramme"].includes(etape.type)) {
       document.getElementById('bloc-password').style.display = '';
       const passwordField = document.getElementById('password-field');
       passwordField.value = "";
       passwordField.oninput = function() {
-        let value = this.value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        let good = value === (etape.params.solution || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        document.getElementById('next-quest').disabled = !good;
-        document.getElementById('next-quest').classList.toggle('enabled', good);
+        let value = normalize(passwordField.value);
+        let good = value === normalize(etape.params.solution || "");
+        nextBtn.disabled = !good;
+        nextBtn.classList.toggle('enabled', good);
       };
-    } else {
-      document.getElementById('bloc-password').style.display = 'none';
     }
 
-    // Réponse libre
-    if (etape.type === "observation" || etape.type === "chasse_tresor") {
+    // Réponse libre (observation, puzzle_visuel, signature_inconnu, chasse_tresor)
+    if (["observation","puzzle_visuel","signature_inconnu","chasse_tresor"].includes(etape.type)) {
       document.getElementById('bloc-answer').style.display = '';
       document.getElementById('answer-field').value = "";
       document.getElementById('answer-field').oninput = function() {
-        let value = this.value.trim().toLowerCase();
-        let solution = (etape.params.solution || "").trim().toLowerCase();
+        let value = normalize(this.value);
+        let solution = normalize(etape.params.solution || "");
         let ok = value === solution && !!solution;
-        document.getElementById('next-quest').disabled = !ok;
-        document.getElementById('next-quest').classList.toggle('enabled', ok);
+        nextBtn.disabled = !ok;
+        nextBtn.classList.toggle('enabled', ok);
       };
-    } else {
-      document.getElementById('bloc-answer').style.display = 'none';
     }
 
     // Gestion du bouton « quête suivante »
     const nextBtn = document.getElementById('next-quest');
     nextBtn.disabled = true;
     nextBtn.classList.remove('enabled');
+
+    // Activation du bouton si tous les fichiers sont uploadés
+    async function checkUploadsCompleted() {
+      let ok = true;
+      for (let i = 1; i <= nbUpload; i++) {
+        let snap = await db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${uploadType}${i}`).once('value');
+        if (!snap.val()) ok = false;
+      }
+      nextBtn.disabled = !ok;
+      nextBtn.classList.toggle('enabled', ok);
+    }
+
+    // Pour les uploads, activer le bouton si déjà tout envoyé
+    if (uploadType) checkUploadsCompleted();
+
+    // Validation & passage à l'étape suivante
     nextBtn.onclick = function() {
-      nextBtn.disabled = true;
-      nextBtn.classList.remove('enabled');
+      if (this.disabled) return;
+      this.disabled = true;
+      this.classList.remove('enabled');
       showToast("Validation en cours...");
-      // Chrono/temps passé sur l’épreuve
       const now = Date.now();
       db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
         .once('value', function(snap) {
           const sTime = snap.val();
           if (sTime) {
             const elapsed = Math.round((now - sTime) / 1000);
-            db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/stepsTime/' + stepIndex).set(elapsed);
+            db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${stepIndex}`).set(elapsed);
           }
-          // Puis passage à l'étape suivante
-          db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
             .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
               if (!error && committed) {
                 showToast("Étape validée !");
@@ -326,13 +359,15 @@
       setTimeout(() => { toast.classList.remove('visible'); }, 2200);
     }
   }
+  function normalize(str) {
+    return (str||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]+/g, "").replace(/\s+/g, " ").trim();
+  }
 
   // --- Anti-retour arrière et navigation auto ---
   db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
     .on('value', function(snapshot) {
       chargerEtapeDynamique();
     });
-
   window.addEventListener("pageshow", function(evt) {
     if (evt.persisted) {
       chargerEtapeDynamique();
