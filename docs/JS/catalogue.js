@@ -275,7 +275,7 @@ const QUESTS_CATALOGUE = [
   {
   id: "photo_inconnus",
   nom: "Photo avec des inconnus",
-description: "Prendre une ou plusieurs photos avec des personnes différentes ou répondant à un critère déterminé. (Qui porte des lunettes ; qui a plus de 50 ans ; qui porte une chemise blanche)",
+description: "Prendre une ou plusieurs photos avec des personnes différentes ou répondant à un critère déterminé. (Qui porte des lunettes ; qui a plus de 50 ans ; qui porte une chemise blanche, etc.).",
 parametres: [
     { key: "nbPersonnes", type: "number", label: "Nombre de personnes/photos", default: 1, min: 1, max: 10 },
     { key: "critere", type: "text", label: "Critère ou consigne", placeholder: "ex : Personne qui porte un chapeau" }
