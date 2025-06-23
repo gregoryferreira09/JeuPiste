@@ -1,11 +1,10 @@
 // docs/JS/lancement-partie.js
 
-// === Affichage aléatoire du texte de lancement selon le scénario ===
+// === Affichage du texte de lancement (statique pour Avalon, dynamique sinon) ===
 document.addEventListener("DOMContentLoaded", function () {
-  // Suppose que le code salon est stocké en localStorage (créé au lancement de la partie)
   const salonCode = localStorage.getItem("salonCode");
   if (!salonCode || typeof firebase === "undefined" || typeof LANCEMENT_TEXTE === "undefined") {
-    // Fallback : texte arthurien par défaut
+    // Fallback si pas de code, pas de Firebase ou pas de catalogue
     const textes = (typeof LANCEMENT_TEXTE !== "undefined" ? LANCEMENT_TEXTE["arthurien"] : []);
     const texteAleatoire = textes.length ? textes[Math.floor(Math.random() * textes.length)] :
       "Bienvenue dans l'aventure ! Préparez-vous pour des épreuves épiques.";
@@ -17,10 +16,16 @@ document.addEventListener("DOMContentLoaded", function () {
   // Récupération du mode de scénario via Firebase
   firebase.database().ref('scenarios/' + salonCode + '/mode').once('value').then(snap => {
     const mode = snap.val() || 'arthurien';
+    // Si c'est Avalon (scénario spécial), NE TOUCHE PAS au HTML statique
+    if (mode === "avalon") return;
+    // Sinon, injecte le texte de lancement dynamique
     const textes = LANCEMENT_TEXTE[mode] || LANCEMENT_TEXTE['arthurien'];
     const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
     const presentation = document.getElementById("textePresentation");
     if (presentation) presentation.innerHTML = texteAleatoire;
+    // Optionnel : pour supprimer le titre "Avalon" si présent pour d'autres modes
+    const titre = document.getElementById("titreCourse");
+    if (titre) titre.textContent = mode.charAt(0).toUpperCase() + mode.slice(1).replace(/_/g, " ");
   }).catch(() => {
     // Fallback si erreur
     const textes = LANCEMENT_TEXTE['arthurien'];
