@@ -298,8 +298,6 @@ const QUESTS_CATALOGUE = {
       type: "photo"
     }
   ],
-};
-
 
 photo_inconnus: {
   arthurien: [
@@ -595,10 +593,7 @@ photo_inconnus: {
       gps: "47.511900,-0.611800",
       type: "photo_inconnus"
     }
-  ]
-};
-
-
+  ],
 
 video: {
   arthurien: [
@@ -894,9 +889,7 @@ video: {
       gps: "47.500400,-0.600400",
       type: "video"
     }
-  ]
-};
-
+  ],
 
 collecte_objet: {
   arthurien: [
@@ -1192,8 +1185,7 @@ collecte_objet: {
       gps: "47.501900,-0.603900",
       type: "collecte_objet"
     }
-  ]
-};
+  ],
 
 
 audio : {
@@ -1490,9 +1482,7 @@ audio : {
       gps: "47.501900,-0.603900",
       type: "audio"
     }
-  ]
-};
-
+  ],
 
 
 gps : {
@@ -1789,8 +1779,8 @@ gps : {
       gps: "47.508300,-0.610300",
       type: "gps"
     }
-  ]
-};
+  ],
+
 
 
 mot_de_passe : {
@@ -2087,8 +2077,8 @@ mot_de_passe : {
       gps: "47.498700,-0.600700",
       type: "mot_de_passe"
     }
-  ]
-};
+  ],
+
 
 
 anagramme : {                            
@@ -2385,8 +2375,8 @@ anagramme : {
       gps: "47.502600,-0.604600",
       type: "anagramme"
     }
-  ]
-};
+  ],
+
 
 
 puzzle_visuel : {
@@ -2683,8 +2673,8 @@ puzzle_visuel : {
       gps: "47.498700,-0.600700",
       type: "puzzle_visuel"
     }
-  ]
-};
+  ],
+
 
 
 defi_collectif : {
@@ -2981,8 +2971,8 @@ defi_collectif : {
       gps: "47.501900,-0.603900",
       type: "defi_collectif"
     }
-  ]
-};
+  ],
+
 
 
  chasse_au_tresor : {
@@ -3279,8 +3269,8 @@ defi_collectif : {
       gps: "47.505800,-0.606800",
       type: "chasse_au_tresor"
     }
-  ]
-};
+  ],
+
 
 
 chrono : {
@@ -3577,8 +3567,8 @@ chrono : {
       gps: "47.501900,-0.603900",
       type: "chrono"
     }
-  ]
-};
+  ],
+
 
 duel : {
   arthurien: [
@@ -3874,8 +3864,7 @@ duel : {
       gps: "47.501900,-0.603900",
       type: "duel"
     }
-  ]
-};
+  ],
 
 
 
