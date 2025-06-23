@@ -3316,4 +3316,4 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+}
