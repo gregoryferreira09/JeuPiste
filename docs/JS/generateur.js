@@ -258,7 +258,8 @@ function genererSalon() {
     return;
   }
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
-  firebase.database().ref('scenarios/' + codeSalon).set({
+    firebase.database().ref('scenarios/' + codeSalon).set({
+    mode: currentGameMode, // <-- Ajoute cette ligne !
     coordEnd,
     scenario
   }).then(() => {
