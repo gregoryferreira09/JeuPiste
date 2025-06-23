@@ -48,7 +48,6 @@ function getRandomElements(arr, n) {
 // Charge dynamiquement la liste des scénarios dans le sélecteur
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('scenarioSelect');
-  // Ajoute "Parc Saint Nicolas" par défaut (valeur vide)
   select.innerHTML = '<option value="">-- Choisissez un scénario --</option><option value="parc_saint_nicolas">Parc Saint Nicolas</option>';
 
   // Charge les scénarios personnalisés depuis Firebase
@@ -80,6 +79,19 @@ document.addEventListener("DOMContentLoaded", function() {
   if (main) main.classList.add('visible');
 });
 
+// ======= SCENARIO PARC SAINT NICOLAS EN LOCAL =======
+window.SCENARIO_PAR_DEFAUT = {
+  scenario: [
+    { type: "gps", params: { consigne: "Va à l'entrée du parc", gps: "47.4712,-0.5523" } },
+    { type: "photo", params: { consigne: "Prends une photo de la statue" } },
+    { type: "enigme", params: { consigne: "Résous cette énigme : Je suis grand quand je suis jeune et petit quand je suis vieux. Qui suis-je ?", solution: "une bougie" } },
+    { type: "observation", params: { consigne: "Note le nombre de bancs autour du grand arbre", solution: "4" } },
+    { type: "mot_de_passe", params: { consigne: "Trouve le mot de passe caché sur le panneau", solution: "parc" } },
+    { type: "gps", params: { consigne: "Rends-toi au kiosque", gps: "47.4713,-0.5530" } },
+    { type: "revelation", params: { consigne: "Bravo, tu as terminé le parcours !" } }
+  ]
+};
+// ====================================================
 
 window.creerPartie = async function(formData) {
   await attendreAuthFirebase();
@@ -97,7 +109,7 @@ window.creerPartie = async function(formData) {
     return;
   }
 
-  // GESTION DU JOUEUR (inchangé)
+  // GESTION DU JOUEUR
   let uuid = localStorage.getItem("uuid");
   if (!uuid) {
     uuid = generateUUID();
@@ -114,6 +126,9 @@ window.creerPartie = async function(formData) {
 
   // Génère un code salon unique pour la partie (toujours nouveau)
   const salonCode = scenarioCode || (Math.random().toString(36).substr(2, 6)).toUpperCase();
+
+  // *** SUPPRESSION DE L'ANCIEN SALON SI EXISTANT ***
+  await db.ref('parties/' + salonCode).remove();
 
   // Enregistre les paramètres dans Firebase
   await db.ref('parties/' + salonCode + '/parametres').set(parametresPartie);
@@ -148,7 +163,7 @@ window.creerPartie = async function(formData) {
   // Stocke le scénario dans la partie
   await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
 
-  // ... suite inchangée ...
+  // GÉNÉRATION DES PERSONNAGES (exemple simple)
   let persosObj = {};
   for (let i = 0; i < nombreJoueurs; i++) {
     persosObj['perso' + i] = {};
