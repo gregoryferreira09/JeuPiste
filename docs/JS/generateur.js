@@ -163,7 +163,7 @@ function supprimerEtape(idx) {
 function editerEtape(idx) {
   const etape = scenario[idx];
   document.getElementById('questTypeSelect').value = etape.type;
-  generateQuestForm(etape.type, 'formContainer', etape.params);
+ generateQuestForm(etape, 'formContainer', etape.params);
   scenario.splice(idx, 1);
   afficherScenario();
 }
