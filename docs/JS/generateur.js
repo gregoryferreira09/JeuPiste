@@ -543,11 +543,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       }
     });
 
-    data.points = [...gpsPoints];
-ajouterEtapeAuScenario({ type: questTypeId, params: data });
-form.reset();
-container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-    
 // --- PATCH UNIVERSEL POUR TOUS LES CAS ---
 if (
   quest.id === "collecte_objet" ||
@@ -571,10 +566,11 @@ if (
 if ("type" in data) delete data.type;
 
 data.points = [...gpsPoints];
+console.log("DEBUG étape ajoutée :", { type: questTypeId, params: data });
 ajouterEtapeAuScenario({ type: questTypeId, params: data });
 form.reset();
 container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-
+    
 // === Carte Leaflet pour sélection GPS + recherche adresse ===
 let mapSearchTimeout = null;
 let searchMarker = null;
