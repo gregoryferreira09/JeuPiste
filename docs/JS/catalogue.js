@@ -2,7 +2,6 @@
 
 const QUESTS_CATALOGUE = [
 
-const PHOTO_QUESTS = {
   arthurien: [
     {
       titre: "L'épreuve du Vaillant",
@@ -45,6 +44,7 @@ const PHOTO_QUESTS = {
       type: "photo"
     }
   ],
+  
   pirate: [
     {
       titre: "Le Trésor Enfoui",
@@ -301,9 +301,6 @@ const PHOTO_QUESTS = {
 
 
 
-// === PHOTO AVEC INCONNU/CRITÈRE ===
-
-const PHOTO_INCONNUS_QUESTS = {
   arthurien: [
     {
       titre: "La Fraternité des Chevaliers",
@@ -602,9 +599,7 @@ const PHOTO_INCONNUS_QUESTS = {
 
 
 
-// === VIDEO ===
 
-const VIDEO_QUESTS = {
   arthurien: [
     {
       titre: "Force du Chevalier",
@@ -903,9 +898,6 @@ const VIDEO_QUESTS = {
 
 
 
-// === COLLECTE OBJET ===
-
-const COLLECTE_OBJET_QUESTS = {
   arthurien: [
     {
       titre: "L'Herbier de Merlin",
@@ -1204,9 +1196,6 @@ const COLLECTE_OBJET_QUESTS = {
 
 
 
-// === AUDIO ===
-
-const AUDIO_QUESTS = {
   arthurien: [
     {
       titre: "Le Chant des Chevaliers",
@@ -1506,9 +1495,6 @@ const AUDIO_QUESTS = {
 
 
 
-// === GPS ===
-
-const GPS_QUESTS = {
   arthurien: [
     {
       titre: "Le Sentier d'Avalon",
@@ -1807,9 +1793,6 @@ const GPS_QUESTS = {
 
 
 
-// === MOT DE PASSE / ENIGME ===
-
-const MOTDEPASSE_QUESTS = {
   arthurien: [
     {
       titre: "L'Énigme de Merlin",
@@ -2108,9 +2091,6 @@ const MOTDEPASSE_QUESTS = {
 
 
 
-// === ANAGRAMME / CRYPTAGE ===
-
-const ANAGRAMME_QUESTS = {
   arthurien: [
     {
       titre: "Le Sort de Confusion",
@@ -2409,9 +2389,6 @@ const ANAGRAMME_QUESTS = {
 
 
 
-// === PUZZLE VISUEL ===
-
-const PUZZLE_VISUEL_QUESTS = {
   arthurien: [
     {
       titre: "Le Blason Mystérieux",
@@ -2710,9 +2687,6 @@ const PUZZLE_VISUEL_QUESTS = {
 
 
 
-// === DEFI COLLECTIF ===
-
-const DEFI_COLLECTIF_QUESTS = {
   arthurien: [
     {
       titre: "Le Pont Humain",
@@ -3011,9 +2985,6 @@ const DEFI_COLLECTIF_QUESTS = {
 
 
  
-// === CHASSE AU TRESOR ===
-
-const CHASSE_AU_TRESOR_QUESTS = {
   arthurien: [
     {
       titre: "La Quête du Graal",
@@ -3312,9 +3283,6 @@ const CHASSE_AU_TRESOR_QUESTS = {
 
 
 
-// === CHRONO ===
-
-const CHRONO_QUESTS = {
   arthurien: [
     {
       titre: "L’Épreuve du Graal",
@@ -3612,9 +3580,6 @@ const CHRONO_QUESTS = {
 };
 
 
- // === DUEL ===
-
-const DUEL_QUESTS = {
   arthurien: [
     {
       titre: "Duel d’Escrime",
@@ -3912,9 +3877,8 @@ const DUEL_QUESTS = {
 };
 
 
-// === PENDU ===
 
-const PENDU_QUESTS = {
+
   arthurien: [
     {
       titre: "Le Mot Secret du Graal",
