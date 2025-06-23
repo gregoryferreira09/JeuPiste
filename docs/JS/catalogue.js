@@ -268,8 +268,9 @@ const QUESTS_CATALOGUE = [
           defi: "Prenez une photo de l’objet et expliquez sa fonction.",
           gps: "47.494100,-0.599100"
        }
+     ] 
+  }
   },
-  
         
   {
   id: "photo_inconnus",
@@ -540,6 +541,8 @@ const QUESTS_CATALOGUE = [
         defi: "Prenez une photo de groupe avec deux visiteurs différents sur le site.",
         gps: "47.511900,-0.611800"
       }
+     ] 
+  }
   },
 
 
@@ -815,6 +818,8 @@ const QUESTS_CATALOGUE = [
         defi: "Rapportez l’objet trouvé et racontez son histoire.",
         gps: "47.501900,-0.603900"
       }
+     ] 
+  }
   },
 
 
@@ -1089,6 +1094,8 @@ const QUESTS_CATALOGUE = [
         defi: "Enregistrez une imitation collective d’un animal.",
         gps: "47.501900,-0.603900"
       }
+     ] 
+  }
   },
 
 
@@ -1362,6 +1369,8 @@ const QUESTS_CATALOGUE = [
         defi: "Validez chaque point de passage.",
         gps: "47.508300,-0.610300"
       }
+     ] 
+  }
   },
  
 
@@ -1636,6 +1645,8 @@ const QUESTS_CATALOGUE = [
         defi: "Tapez le mot découvert pour valider l’étape.",
         gps: "47.498700,-0.600700"
       }
+     ] 
+  }
   },
  
 
@@ -1912,6 +1923,8 @@ const QUESTS_CATALOGUE = [
         defi: "Résolvez l’anagramme pour ouvrir la crypte.",
         gps: "47.502600,-0.604600"
       }
+     ] 
+  }
   },
     
     
@@ -2186,6 +2199,8 @@ const QUESTS_CATALOGUE = [
         defi: "Quel est l’élément étrange sur le manuscrit sur la photo ?",
         gps: "47.498700,-0.600700"
       }
+     ] 
+  }
   },
 
     
@@ -2459,6 +2474,8 @@ const QUESTS_CATALOGUE = [
         defi: "Trouvez l’amulette grâce à la devinette sur le site.",
         gps: "47.505800,-0.606800"
       }
+     ] 
+  }
   },
       
 
@@ -2472,7 +2489,9 @@ const QUESTS_CATALOGUE = [
     ],
     combinable: [],
     preview: "multi"
- }
+}
+     ] 
+  }
   },
 
 
@@ -2746,6 +2765,8 @@ const QUESTS_CATALOGUE = [
         defi: "L’objet doit passer dans toutes les mains avant la fin.",
         gps: "47.501900,-0.603900"
       }
+     ] 
+  }
   },
   
 
@@ -3018,6 +3039,8 @@ const QUESTS_CATALOGUE = [
         defi: "Premier à finir la reconstitution remporte le duel.",
         gps: "47.501900,-0.603900"
       }
+     ] 
+  }
   },
 
 
@@ -3291,6 +3314,6 @@ const QUESTS_CATALOGUE = [
         defi: "Chaque erreur efface un peu plus l’histoire.",
         gps: "47.498700,-0.600700"
       }
-    ];
+     ] 
   }
-}
+  },
