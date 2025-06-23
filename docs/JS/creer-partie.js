@@ -18,6 +18,19 @@ firebase.auth().signInAnonymously().catch(function(error) {
   alert("Erreur d'authentification : " + error.message);
 });
 
+// --- Attente robuste de l'auth avant écriture ---
+function attendreAuthFirebase() {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        unsubscribe();
+        resolve(user);
+      }
+    });
+    setTimeout(() => reject(new Error("Timeout Auth Firebase")), 10000);
+  });
+}
+
 // Génère un UUID v4
 function generateUUID() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -36,7 +49,7 @@ function getRandomElements(arr, n) {
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('scenarioSelect');
   // Ajoute "Parc Saint Nicolas" par défaut (valeur vide)
-  select.innerHTML = '<option value="">Parc Saint Nicolas (scénario de base)</option>';
+  select.innerHTML = '<option value="">-- Choisissez un scénario --</option><option value="parc_saint_nicolas">Parc Saint Nicolas</option>';
 
   // Charge les scénarios personnalisés depuis Firebase
   db.ref('scenariosList').once('value').then(snap => {
@@ -49,10 +62,9 @@ document.addEventListener("DOMContentLoaded", function() {
         select.appendChild(opt);
       });
     }
-    // === AJOUTE ICI la pré-sélection du dernier scénario créé ===
+    // === Pré-sélection du dernier scénario créé ===
     const dernier = localStorage.getItem("dernierScenarioCree");
     if (dernier) {
-      // Correction de casse si besoin
       Array.from(select.options).forEach(opt => {
         if (opt.value.toLowerCase() === dernier.toLowerCase()) {
           select.value = opt.value;
@@ -70,8 +82,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Fonction globale accessible depuis l'extérieur
 window.creerPartie = async function(formData) {
+  await attendreAuthFirebase(); // <-- ATTENDRE L'AUTH AVANT TOUT
+
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
   const scenarioCode = formData.get("scenarioSelect");
+
+  if (!scenarioCode) {
+    alert("Veuillez choisir un scénario.");
+    return;
+  }
 
   if (isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12) {
     alert("Veuillez remplir tous les champs correctement.");
@@ -99,38 +118,23 @@ window.creerPartie = async function(formData) {
   // Enregistre les paramètres dans Firebase
   await db.ref('parties/' + salonCode + '/parametres').set(parametresPartie);
 
-  console.log("scenarioCode sélectionné :", scenarioCode);
-
   // --- Gestion du SCÉNARIO ---
   let scenarioToUse = null;
 
-  if (scenarioCode) {
-    // L'utilisateur choisit un scénario personnalisé
-    const snap = await db.ref('scenarios/' + scenarioCode).once('value');
-    if (!snap.exists()) {
-      alert("Scénario sélectionné introuvable.");
-      return;
-    }
-    scenarioToUse = snap.val();
-    // PATCH : convertit scenario objet en array si besoin (pour les scénarios personnalisés)
-    if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
-      scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
-    }
-    if (!scenarioToUse || !Array.isArray(scenarioToUse.scenario) || scenarioToUse.scenario.length === 0) {
-      alert("Le scénario personnalisé est vide ou mal formé. Génère-le à nouveau.");
-      return;
-    }
-  } else {
-    // Scénario par défaut (Parc Saint Nicolas)
-    if (typeof SCENARIO_PAR_DEFAUT === "undefined") {
-      alert("Scénario par défaut manquant. Contactez l'administrateur.");
-      return;
-    }
-    scenarioToUse = SCENARIO_PAR_DEFAUT;
-    // PATCH : convertit scenario objet en array si besoin (par sécurité)
-    if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
-      scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
-    }
+  // On charge toujours le scénario choisi depuis Firebase
+  const snap = await db.ref('scenarios/' + scenarioCode).once('value');
+  if (!snap.exists()) {
+    alert("Scénario sélectionné introuvable.");
+    return;
+  }
+  scenarioToUse = snap.val();
+  // PATCH : convertit scenario objet en array si besoin
+  if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
+    scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
+  }
+  if (!scenarioToUse || !Array.isArray(scenarioToUse.scenario) || scenarioToUse.scenario.length === 0) {
+    alert("Le scénario est vide ou mal formé.");
+    return;
   }
 
   // Stocke le scénario dans la partie
