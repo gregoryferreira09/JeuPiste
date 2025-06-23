@@ -270,7 +270,7 @@ const QUESTS_CATALOGUE = [
        }
      ] 
   }
-,
+},
 
   // === Photo inconnus ===  
   {
