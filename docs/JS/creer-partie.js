@@ -94,7 +94,7 @@ window.creerPartie = async function(formData) {
   };
 
   // Génère un code salon unique pour la partie (toujours nouveau)
-  const salonCode = (Math.random().toString(36).substr(2, 6)).toUpperCase();
+  const salonCode = scenarioCode || (Math.random().toString(36).substr(2, 6)).toUpperCase();
 
   // Enregistre les paramètres dans Firebase
   await db.ref('parties/' + salonCode + '/parametres').set(parametresPartie);
