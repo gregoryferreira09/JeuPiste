@@ -57,6 +57,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// === Effet fade-in pour afficher le contenu principal ===
+document.addEventListener("DOMContentLoaded", function() {
+  var main = document.querySelector('.fadeIn');
+  if (main) main.classList.add('visible');
+});
+
 // === Gestion de la modale de retour accueil ===
 document.addEventListener("DOMContentLoaded", function () {
   const btnRetour = document.getElementById("btnRetourAccueil");
