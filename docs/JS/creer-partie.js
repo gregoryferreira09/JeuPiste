@@ -52,7 +52,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // === AJOUTE ICI la pré-sélection du dernier scénario créé ===
     const dernier = localStorage.getItem("dernierScenarioCree");
     if (dernier) {
-      select.value = dernier;
+      // Correction de casse si besoin
+      Array.from(select.options).forEach(opt => {
+        if (opt.value.toLowerCase() === dernier.toLowerCase()) {
+          select.value = opt.value;
+        }
+      });
       localStorage.removeItem("dernierScenarioCree");
     }
   });
@@ -73,7 +78,7 @@ window.creerPartie = async function(formData) {
     return;
   }
 
-  // >>> AJOUTE CE BLOC ICI <<<
+  // >>> GESTION DU JOUEUR <<<
   let uuid = localStorage.getItem("uuid");
   if (!uuid) {
     uuid = generateUUID();
@@ -81,24 +86,21 @@ window.creerPartie = async function(formData) {
   }
   let pseudo = localStorage.getItem("pseudo") || "Anonyme";
   pseudo = pseudo.replace(/[<>\/\\'"`]/g, "").trim().substring(0, 30);
-  // >>> FIN BLOC À AJOUTER <<<
 
-const parametresPartie = {
-  nombreJoueurs,
-  createur: uuid,
-  scenarioCode: scenarioCode || ""
-};
+  const parametresPartie = {
+    nombreJoueurs,
+    createur: uuid,
+    scenarioCode: scenarioCode || ""
+  };
 
-
-   // Génère un code salon unique pour la partie (toujours nouveau)
+  // Génère un code salon unique pour la partie (toujours nouveau)
   const salonCode = (Math.random().toString(36).substr(2, 6)).toUpperCase();
 
   // Enregistre les paramètres dans Firebase
   await db.ref('parties/' + salonCode + '/parametres').set(parametresPartie);
 
   console.log("scenarioCode sélectionné :", scenarioCode);
-  console.log("Chargement du scénario personnalisé :", scenarioCode);
-  
+
   // --- Gestion du SCÉNARIO ---
   let scenarioToUse = null;
 
@@ -110,19 +112,25 @@ const parametresPartie = {
       return;
     }
     scenarioToUse = snap.val();
+    // PATCH : convertit scenario objet en array si besoin (pour les scénarios personnalisés)
+    if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
+      scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
+    }
+    if (!scenarioToUse || !Array.isArray(scenarioToUse.scenario) || scenarioToUse.scenario.length === 0) {
+      alert("Le scénario personnalisé est vide ou mal formé. Génère-le à nouveau.");
+      return;
+    }
   } else {
     // Scénario par défaut (Parc Saint Nicolas)
     if (typeof SCENARIO_PAR_DEFAUT === "undefined") {
       alert("Scénario par défaut manquant. Contactez l'administrateur.");
       return;
     }
-
-    // Corrige le format si scenario est un objet {0:...,1:...}
-if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
-  scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
-}
-    
     scenarioToUse = SCENARIO_PAR_DEFAUT;
+    // PATCH : convertit scenario objet en array si besoin (par sécurité)
+    if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
+      scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
+    }
   }
 
   // Stocke le scénario dans la partie
