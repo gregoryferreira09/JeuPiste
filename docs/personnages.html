@@ -381,13 +381,21 @@
           decompteTimeoutID = setTimeout(() => {
             // REDIRECTION VERS LA 1ère ÉNIGME DU BON PARCOURS
             const equipeNum = localStorage.getItem("equipeNum");
-            db.ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
-              const mapping = snap.val() || {};
-              const parcoursIdx = mapping[equipeNum];
-              const parcours = window.parcoursEquipes[parcoursIdx];
-              const premiereEpreuve = parcours[0];
-              window.location.href = `equipe${premiereEpreuve}-a.html`;
-            });
+           db.ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
+  const mapping = snap.val() || {};
+  const parcoursIdx = mapping[equipeNum];
+  if (parcoursIdx === undefined || !window.parcoursEquipes || !window.parcoursEquipes[parcoursIdx]) {
+    alert("Erreur : parcours de l’équipe introuvable. Veuillez rafraîchir la page ou contacter l’administrateur.");
+    return;
+  }
+  const parcours = window.parcoursEquipes[parcoursIdx];
+  if (!Array.isArray(parcours) || parcours.length === 0) {
+    alert("Erreur : parcours vide ou mal formé.");
+    return;
+  }
+  const premiereEpreuve = parcours[0];
+  window.location.href = `equipe${premiereEpreuve}-a.html`;
+});
           }, 600);
         }
       }
