@@ -30,6 +30,17 @@ let mapTargetInput = null;
 let mapSearchTimeout = null;
 let searchMarker = null;
 
+let currentGameMode = "arthurien"; // valeur par défaut
+
+// ...dans le DOMContentLoaded :
+const modeSelect = document.getElementById('modeScenarioSelect');
+if (modeSelect) {
+  modeSelect.onchange = function() {
+    currentGameMode = this.value;
+  };
+  currentGameMode = modeSelect.value; // initialise
+}
+
 // === INITIALISATION PAGE ===
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('questTypeSelect');
