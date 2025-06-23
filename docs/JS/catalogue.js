@@ -270,7 +270,7 @@ const QUESTS_CATALOGUE = [
        }
      ] 
   }
-  },
+,
         
   {
   id: "photo_inconnus",
@@ -543,7 +543,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
 
 
     
@@ -820,7 +820,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
 
 
     
@@ -1096,7 +1096,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
 
 
     
@@ -1371,7 +1371,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
  
 
     
@@ -1647,7 +1647,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+ ,
  
 
     
@@ -1925,7 +1925,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
     
     
 
@@ -2201,7 +2201,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
 
     
 
@@ -2476,7 +2476,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
       
 
   // === COMBO (Plusieurs actions sur la même étape) ===
@@ -2492,7 +2492,7 @@ const QUESTS_CATALOGUE = [
 }
      ] 
   }
-  },
+,
 
 
     
@@ -2767,7 +2767,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
   
 
   // === DEFI EN DUEL ===
@@ -3041,7 +3041,7 @@ const QUESTS_CATALOGUE = [
       }
      ] 
   }
-  },
+,
 
 
     // === Jeu du pendu ===
