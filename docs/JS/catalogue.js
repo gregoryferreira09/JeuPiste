@@ -296,9 +296,10 @@ const QUESTS_CATALOGUE = {
       defi: "Prenez une photo de l’objet et expliquez sa fonction.",
       gps: "47.494100,-0.599100",
       type: "photo"
-    }
-  ],
-
+      }
+  ]
+}
+    
 photo_inconnus: {
   arthurien: [
     {
@@ -592,8 +593,9 @@ photo_inconnus: {
       defi: "Prenez une photo de groupe avec deux visiteurs différents sur le site.",
       gps: "47.511900,-0.611800",
       type: "photo_inconnus"
-    }
-  ],
+     }
+  ]
+}
 
 video: {
   arthurien: [
