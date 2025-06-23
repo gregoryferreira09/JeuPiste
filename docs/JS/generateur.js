@@ -381,43 +381,7 @@ function generateQuestForm(quest, containerId, values = {}) {
   container.appendChild(form);
 }
 
-  let actionsRow = document.createElement('div');
-  actionsRow.style.display = "flex";
-  actionsRow.style.alignItems = "center";
-  actionsRow.style.gap = "16px";
-  actionsRow.style.marginTop = "4px";
-
-  let addBtn = document.createElement('button');
-  addBtn.type = 'button';
-  addBtn.className = 'main-btn';
-  addBtn.textContent = 'Ajouter';
-  addBtn.style.marginLeft = "2px";
-  actionsRow.appendChild(addBtn);
-
-  gpsZone.appendChild(actionsRow);
-  form.appendChild(gpsZone);
-
-  function renderGpsPoints() {
-    gpsListDiv.innerHTML = '';
-    gpsPoints.forEach((pt, idx) => {
-      let row = document.createElement('div');
-      row.style = "display: flex; align-items: center; gap: 12px; margin-bottom: 4px;";
-      // Icône boussole SVG harmonisée (comme sur les pages épreuves)
-      let logo = document.createElement('span');
-      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]`;
-      logo.title = "Choisir/modifier ce point GPS";
-      logo.style.cursor = "pointer";
-      logo.onclick = function() {
-        openMapPicker({
-          value: pt,
-          set value(val) {
-            if(val) {
-              gpsPoints[idx] = val;
-              renderGpsPoints();
-            }
-          }
-        });
-      };
+  
       row.appendChild(logo);
 
       let input = document.createElement('input');
