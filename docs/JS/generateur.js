@@ -45,17 +45,27 @@ if (modeSelect) {
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('questTypeSelect');
   if (select && typeof QUESTS_CATALOGUE !== "undefined") {
-    QUESTS_CATALOGUE.forEach(quest => {
+    for (const type in QUESTS_CATALOGUE) {
+  for (const theme in QUESTS_CATALOGUE[type]) {
+    QUESTS_CATALOGUE[type][theme].forEach((quest, idx) => {
       let opt = document.createElement('option');
-      opt.value = quest.id;
-      opt.textContent = quest.nom;
+      // On encode type|theme|index comme value
+      opt.value = `${type}|${theme}|${idx}`;
+      opt.textContent = `[${type}] [${theme}] ${quest.titre}`;
       select.appendChild(opt);
     });
-    select.onchange = function() {
-      if (this.value) generateQuestForm(this.value, 'formContainer');
-      else document.getElementById('formContainer').innerHTML = '';
-    };
   }
+}
+    select.onchange = function() {
+  if (this.value) {
+    // Décoder type, theme, index
+    const [type, theme, idx] = this.value.split('|');
+    const quest = QUESTS_CATALOGUE[type][theme][parseInt(idx, 10)];
+    generateQuestForm(quest, 'formContainer'); // On transmet la quête entière !
+  } else {
+    document.getElementById('formContainer').innerHTML = '';
+  }
+};
 
   // Effet fadeIn harmonisé
   var main = document.querySelector('.fadeIn');
@@ -271,29 +281,31 @@ function genererSalon() {
 // ===================
 // Formulaire dynamique
 // ===================
-function generateQuestForm(questTypeId, containerId, values = {}) {
-  const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
-  if (!quest) return;
+function generateQuestForm(quest, containerId, values = {}) {
+  if (!quest || !quest.titre) return;
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  container.innerHTML = `<h3>${quest.nom}</h3><p>${quest.description}</p>`;
-
-  let form = document.createElement('form');
-  form.className = 'quest-form';
-
-  // Bloc multi-points GPS façon boussole harmonisée + bouton ajouter
-  let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
-  let gpsZone = document.createElement('div');
-  gpsZone.className = 'form-field';
-  gpsZone.style.display = "flex";
-  gpsZone.style.flexDirection = "column";
-  gpsZone.style.gap = "8px";
-  gpsZone.style.marginBottom = "20px";
-
-  let gpsListDiv = document.createElement('div');
-  gpsListDiv.id = "gpsPointsList";
-  gpsZone.appendChild(gpsListDiv);
+  container.innerHTML = `
+    <h3>${quest.titre}</h3>
+    <p><b>Objectif :</b> ${quest.objectif}</p>
+    <p><i>${quest.metaphore}</i></p>
+    <p><b>Défi :</b> ${quest.defi}</p>
+    <p><b>Coordonnées GPS :</b> ${quest.gps}</p>
+  `;
+  // Ici tu ajoutes tes champs/formulaires personnalisés si besoin
+  // Tu peux aussi proposer d’ajouter cette quête au scénario
+  // Par exemple :
+  let btn = document.createElement('button');
+  btn.type = 'button';
+  btn.textContent = 'Ajouter cette quête au scénario';
+  btn.className = 'main-btn';
+  btn.onclick = function() {
+    ajouterEtapeAuScenario({...quest});
+    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne une nouvelle quête ci-dessus.</div>`;
+  };
+  container.appendChild(btn);
+}
 
   let actionsRow = document.createElement('div');
   actionsRow.style.display = "flex";
