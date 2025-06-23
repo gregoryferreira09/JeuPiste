@@ -80,9 +80,9 @@ document.addEventListener("DOMContentLoaded", function() {
   if (main) main.classList.add('visible');
 });
 
-// Fonction globale accessible depuis l'extérieur
+
 window.creerPartie = async function(formData) {
-  await attendreAuthFirebase(); // <-- ATTENDRE L'AUTH AVANT TOUT
+  await attendreAuthFirebase();
 
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
   const scenarioCode = formData.get("scenarioSelect");
@@ -97,7 +97,7 @@ window.creerPartie = async function(formData) {
     return;
   }
 
-  // >>> GESTION DU JOUEUR <<<
+  // GESTION DU JOUEUR (inchangé)
   let uuid = localStorage.getItem("uuid");
   if (!uuid) {
     uuid = generateUUID();
@@ -121,39 +121,45 @@ window.creerPartie = async function(formData) {
   // --- Gestion du SCÉNARIO ---
   let scenarioToUse = null;
 
-  // On charge toujours le scénario choisi depuis Firebase
-  const snap = await db.ref('scenarios/' + scenarioCode).once('value');
-  if (!snap.exists()) {
-    alert("Scénario sélectionné introuvable.");
-    return;
-  }
-  scenarioToUse = snap.val();
-  // PATCH : convertit scenario objet en array si besoin
-  if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
-    scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
-  }
-  if (!scenarioToUse || !Array.isArray(scenarioToUse.scenario) || scenarioToUse.scenario.length === 0) {
-    alert("Le scénario est vide ou mal formé.");
-    return;
+  if (scenarioCode === "parc_saint_nicolas") {
+    // On utilise le scénario local (dans le JS)
+    if (typeof SCENARIO_PAR_DEFAUT === "undefined") {
+      alert("Scénario Parc Saint Nicolas manquant dans le code.");
+      return;
+    }
+    scenarioToUse = SCENARIO_PAR_DEFAUT;
+  } else {
+    // On charge depuis Firebase
+    const snap = await db.ref('scenarios/' + scenarioCode).once('value');
+    if (!snap.exists()) {
+      alert("Scénario sélectionné introuvable.");
+      return;
+    }
+    scenarioToUse = snap.val();
+    if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
+      scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
+    }
+    if (!scenarioToUse || !Array.isArray(scenarioToUse.scenario) || scenarioToUse.scenario.length === 0) {
+      alert("Le scénario est vide ou mal formé.");
+      return;
+    }
   }
 
   // Stocke le scénario dans la partie
   await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
 
-  // GÉNÉRATION DES PERSONNAGES (exemple simple)
+  // ... suite inchangée ...
   let persosObj = {};
   for (let i = 0; i < nombreJoueurs; i++) {
     persosObj['perso' + i] = {};
   }
   await db.ref('parties/' + salonCode + '/personnages').set(persosObj);
 
-  // Enregistre le créateur comme premier joueur
   await db.ref('parties/' + salonCode + '/joueurs').push({
     uuid,
     pseudo
   });
 
-  // Stocke les paramètres de la partie dans le localStorage pour les autres pages
   localStorage.setItem("parametresPartie", JSON.stringify(parametresPartie));
   localStorage.setItem("salonCode", salonCode);
   localStorage.setItem("nombreJoueurs", nombreJoueurs);
