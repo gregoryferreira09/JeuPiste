@@ -2491,8 +2491,6 @@ parametres: [
     combinable: [],
     preview: "multi"
 }
-     ] 
-  }
 },
 
 
