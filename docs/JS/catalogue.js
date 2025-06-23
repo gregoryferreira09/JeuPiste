@@ -3,596 +3,606 @@
 const QUESTS_CATALOGUE = {
 
   photo: {
-  arthurien: [
-    {
-      titre: "L'épreuve du Vaillant",
-      metaphore: "La lumière du Graal ne brille que pour ceux qui osent s’élever.",
-      objectif: "Grimper au sommet de la toile.",
-      defi: "Prenez une photo de votre équipe tout en haut.",
-      gps: "47.477821,-0.577896",
-      type: "photo"
-    },
-    {
-      titre: "L’œil de Merlin",
-      metaphore: "Le vieux mage observe qui sait ouvrir les yeux sur le monde.",
-      objectif: "Repérer un symbole caché.",
-      defi: "Prenez la photo du symbole secret de Merlin.",
-      gps: "47.478000,-0.578000",
-      type: "photo"
-    },
-    {
-      titre: "La Relique cachée",
-      metaphore: "Les vestiges du passé n’attendent que d’être révélés.",
-      objectif: "Trouver et immortaliser un objet ancien.",
-      defi: "Prenez une photo de l’objet le plus ancien du site.",
-      gps: "47.478500,-0.577500",
-      type: "photo"
-    },
-    {
-      titre: "La Bête Mystique",
-      metaphore: "Celui qui débusque l’animal sacré saura guider sa quête.",
-      objectif: "Photographier un animal du parc choisi par Merlin.",
-      defi: "Prenez une photo du chevreau ou de la tortue.",
-      gps: "47.479000,-0.577600",
-      type: "photo"
-    },
-    {
-      titre: "Le Passage Secret",
-      metaphore: "L’entrée cachée n’apparaît qu’aux yeux des justes.",
-      objectif: "Découvrir un passage ou un abri discret.",
-      defi: "Prenez une photo de l’entrée cachée.",
-      gps: "47.480000,-0.578200",
-      type: "photo"
-    }
-  ],
-  
-  pirate: [
-    {
-      titre: "Le Trésor Enfoui",
-      metaphore: "Le sable garde jalousement ses secrets.",
-      objectif: "Localiser l’emplacement du coffre.",
-      defi: "Prenez une photo d’un X ou d’un indice au sol.",
-      gps: "47.480200,-0.578300",
-      type: "photo"
-    },
-    {
-      titre: "Le Drapeau Noir",
-      metaphore: "Le pavillon flotte toujours là où le danger rôde.",
-      objectif: "Repérer un drapeau ou un symbole pirate.",
-      defi: "Prenez une photo du drapeau hissé.",
-      gps: "47.480800,-0.579000",
-      type: "photo"
-    },
-    {
-      titre: "La Bouteille à la Mer",
-      metaphore: "Un message flotte sur les flots, perdu mais pas oublié.",
-      objectif: "Trouver un message caché dans une bouteille.",
-      defi: "Prenez une photo de la bouteille et du message.",
-      gps: "47.481000,-0.579200",
-      type: "photo"
-    },
-    {
-      titre: "L’Accostage",
-      metaphore: "La terre promise s’annonce par l’ancre jetée.",
-      objectif: "Montrer l’arrivée de l’équipage à bon port.",
-      defi: "Prenez une photo de votre équipe devant la berge ou la rive.",
-      gps: "47.481500,-0.579800",
-      type: "photo"
-    },
-    {
-      titre: "Le Compas d’Or",
-      metaphore: "Sans compas, point de fortune !",
-      objectif: "Trouver un objet en forme de cercle ou de compas.",
-      defi: "Prenez une photo de l’objet trouvé par l’équipe.",
-      gps: "47.482000,-0.580000",
-      type: "photo"
-    }
-  ],
-  prison: [
-    {
-      titre: "L’ombre des barreaux",
-      metaphore: "Même derrière les barreaux, la lumière trouve son chemin.",
-      objectif: "Trouver le passage secret de la prison.",
-      defi: "Prenez une photo de l’ouverture cachée.",
-      gps: "47.471000,-0.576000",
-      type: "photo"
-    },
-    {
-      titre: "Évasion en image",
-      metaphore: "Un cliché vaut parfois toutes les complicités.",
-      objectif: "Immortaliser le plan d’évasion dessiné sur le mur.",
-      defi: "Prenez une photo du schéma ou du plan secret.",
-      gps: "47.471200,-0.576200",
-      type: "photo"
-    },
-    {
-      titre: "La Sentinelle",
-      metaphore: "Repérer qui surveille, c’est déjà s’en libérer.",
-      objectif: "Trouver un poste de garde ou une caméra factice.",
-      defi: "Prenez une photo du poste de surveillance.",
-      gps: "47.471900,-0.576800",
-      type: "photo"
-    },
-    {
-      titre: "La Clé du Passage",
-      metaphore: "La clé de la liberté se cache là où on ne l’attend pas.",
-      objectif: "Repérer une clé ou un objet symbolique.",
-      defi: "Prenez une photo de la clé ou de l’objet.",
-      gps: "47.472300,-0.576300",
-      type: "photo"
-    },
-    {
-      titre: "Trace de liberté",
-      metaphore: "Même une trace de pas peut ouvrir la voie.",
-      objectif: "Suivre une série de marques jusqu’à la sortie.",
-      defi: "Prenez une photo de la trace la plus éloignée.",
-      gps: "47.472900,-0.577000",
-      type: "photo"
-    }
-  ],
-  sorcier: [
-    {
-      titre: "La Pierre Philosophale",
-      metaphore: "Le secret de la magie se cache dans la matière.",
-      objectif: "Trouver une pierre ou un objet mystérieux.",
-      defi: "Prenez une photo de la pierre la plus étrange.",
-      gps: "47.475100,-0.580100",
-      type: "photo"
-    },
-    {
-      titre: "Herbier magique",
-      metaphore: "Chaque feuille porte la mémoire d’un sort.",
-      objectif: "Trouver trois plantes différentes.",
-      defi: "Prenez en photo trois feuilles ou fleurs inhabituelles.",
-      gps: "47.475600,-0.580600",
-      type: "photo"
-    },
-    {
-      titre: "Baguette du hasard",
-      metaphore: "La magie se choisit parfois elle-même.",
-      objectif: "Chercher un bâton ou une branche à la forme étrange.",
-      defi: "Prenez une photo de la baguette improvisée.",
-      gps: "47.476100,-0.581100",
-      type: "photo"
-    },
-    {
-      titre: "L’ingrédient secret",
-      metaphore: "Pas de potion sans ingrédient rare.",
-      objectif: "Trouver un ingrédient unique pour une potion.",
-      defi: "Prenez une photo de l’ingrédient le plus insolite.",
-      gps: "47.476800,-0.581800",
-      type: "photo"
-    },
-    {
-      titre: "Le miroir du mage",
-      metaphore: "Le reflet révèle parfois l’invisible.",
-      objectif: "Trouver un endroit qui réfléchit la lumière.",
-      defi: "Prenez une photo du reflet le plus surprenant.",
-      gps: "47.477400,-0.582400",
-      type: "photo"
-    }
-  ],
-  super_heros: [
-    {
-      titre: "La Planque Secrète",
-      metaphore: "Chaque héros a son repaire, caché aux yeux du monde.",
-      objectif: "Identifier un lieu discret du parc.",
-      defi: "Prenez une photo de l’endroit le plus secret.",
-      gps: "47.480000,-0.585000",
-      type: "photo"
-    },
-    {
-      titre: "Signal d’Alerte",
-      metaphore: "Un signe lumineux appelle toujours les justiciers.",
-      objectif: "Trouver un objet lumineux ou haut perché.",
-      defi: "Prenez une photo de la lumière ou de la tour la plus haute.",
-      gps: "47.480800,-0.585800",
-      type: "photo"
-    },
-    {
-      titre: "Camouflage Express",
-      metaphore: "Un vrai héros sait se fondre dans le décor.",
-      objectif: "Trouver un endroit où se cacher.",
-      defi: "Prenez une photo de votre équipe camouflée.",
-      gps: "47.481500,-0.586500",
-      type: "photo"
-    },
-    {
-      titre: "L’Artefact Perdu",
-      metaphore: "Le pouvoir sommeille dans l’objet le plus anodin.",
-      objectif: "Trouver un objet insolite ou coloré.",
-      defi: "Prenez une photo de votre découverte.",
-      gps: "47.482300,-0.587300",
-      type: "photo"
-    },
-    {
-      titre: "La Mission Sauvetage",
-      metaphore: "Un héros n’abandonne jamais un allié.",
-      objectif: "Mettre en scène un sauvetage dans le décor.",
-      defi: "Prenez une photo de l’équipe en pleine action de sauvetage.",
-      gps: "47.482900,-0.587900",
-      type: "photo"
-    }
-  ],
-  zombie: [
-    {
-      titre: "La Cabane Assiégée",
-      metaphore: "Parfois, la survie tient à une porte bien fermée.",
-      objectif: "Trouver un abri et prouver qu’il est sécurisé.",
-      defi: "Prenez une photo de votre équipe barricadant une cabane.",
-      gps: "47.485100,-0.590100",
-      type: "photo"
-    },
-    {
-      titre: "L’Objet de l’Antidote",
-      metaphore: "La vie ne tient qu’à un fil… ou à une fiole.",
-      objectif: "Trouver l’objet qui pourrait servir d’antidote.",
-      defi: "Prenez une photo de l’objet choisi.",
-      gps: "47.486100,-0.591100",
-      type: "photo"
-    },
-    {
-      titre: "Trace de Survivant",
-      metaphore: "Une trace peut sauver un groupe entier.",
-      objectif: "Repérer une marque étrange au sol.",
-      defi: "Prenez une photo de l’empreinte ou de la trace.",
-      gps: "47.487100,-0.592100",
-      type: "photo"
-    },
-    {
-      titre: "Le Cercle de Protection",
-      metaphore: "Un cercle peut repousser la horde.",
-      objectif: "Dessiner ou trouver un cercle sur le terrain.",
-      defi: "Prenez une photo du cercle protecteur.",
-      gps: "47.488100,-0.593100",
-      type: "photo"
-    },
-    {
-      titre: "Le Survivant Masqué",
-      metaphore: "Se cacher, c’est parfois survivre.",
-      objectif: "Mettre en scène une cachette efficace.",
-      defi: "Prenez une photo de l’équipe dissimulée au maximum.",
-      gps: "47.489100,-0.594100",
-      type: "photo"
-    }
-  ],
-  archeologue: [
-    {
-      titre: "La Relique Disparue",
-      metaphore: "Sous la terre, l’histoire attend d’être révélée.",
-      objectif: "Trouver et photographier une relique du passé.",
-      defi: "Prenez une photo d’un objet ancien trouvé sur le terrain.",
-      gps: "47.490100,-0.595100",
-      type: "photo"
-    },
-    {
-      titre: "Le Manuscrit Caché",
-      metaphore: "Les secrets sont faits pour être découverts.",
-      objectif: "Trouver un texte ou une inscription ancienne.",
-      defi: "Prenez une photo d’un texte gravé ou manuscrit.",
-      gps: "47.491100,-0.596100",
-      type: "photo"
-    },
-    {
-      titre: "Fossile ou Fantaisie",
-      metaphore: "Un œil attentif distingue le vrai du faux.",
-      objectif: "Repérer une forme fossile ou inhabituelle.",
-      defi: "Prenez une photo de la découverte insolite.",
-      gps: "47.492100,-0.597100",
-      type: "photo"
-    },
-    {
-      titre: "Le Mystère des Pierres",
-      metaphore: "Chaque pierre raconte une histoire.",
-      objectif: "Trouver deux pierres de forme étrange.",
-      defi: "Prenez une photo des deux pierres côte à côte.",
-      gps: "47.493100,-0.598100",
-      type: "photo"
-    },
-    {
-      titre: "L’Objet du Savoir",
-      metaphore: "La connaissance se transmet par les objets.",
-      objectif: "Trouver un objet qui pourrait appartenir à un chercheur.",
-      defi: "Prenez une photo de l’objet et expliquez sa fonction.",
-      gps: "47.494100,-0.599100",
-      type: "photo"
-      ],
-    
-photo_inconnus: {
-  arthurien: [
-    {
-      titre: "La Fraternité des Chevaliers",
-      metaphore: "Un vrai chevalier sait s’entourer des âmes vaillantes.",
-      objectif: "Rencontrer des inconnus dignes de la Table Ronde.",
-      defi: "Prenez une photo avec [nbPersonnes] personnes portant un vêtement rouge.",
-      gps: "47.477900,-0.577950",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "L’Alliance des Bravest",
-      metaphore: "La quête s’accomplit rarement seul.",
-      objectif: "Former une alliance temporaire avec des passants.",
-      defi: "Prenez une photo de groupe avec des inconnus mimant une épée.",
-      gps: "47.478900,-0.578800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Rencontre en Carmélide",
-      metaphore: "Les terres lointaines offrent toujours de nouveaux alliés.",
-      objectif: "Trouver des inconnus prêts à relever un défi.",
-      defi: "Prenez une photo avec [nbPersonnes] personnes faisant une grimace.",
-      gps: "47.479900,-0.579800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Conseil des Sages",
-      metaphore: "L’expérience s’échange au détour d’un sourire.",
-      objectif: "Rencontrer des personnes de plus de 50 ans.",
-      defi: "Photographiez-vous avec deux inconnus ayant des cheveux gris ou blancs.",
-      gps: "47.480900,-0.580800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "L’Émissaire du Royaume",
-      metaphore: "La paix se construit par l’ouverture à l’autre.",
-      objectif: "Saluer de nouveaux visages.",
-      defi: "Prenez une photo avec des inconnus faisant le signe de la paix.",
-      gps: "47.481900,-0.581800",
-      type: "photo_inconnus"
-    }
-  ],
-  pirate: [
-    {
-      titre: "Portraits de Matelots",
-      metaphore: "Un bon équipage se compose sur les quais.",
-      objectif: "Trouver des complices de fortune.",
-      defi: "Prenez une photo avec [nbPersonnes] personnes portant un chapeau.",
-      gps: "47.482900,-0.582800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "La Frimousse du Flibustier",
-      metaphore: "Le sourire d’un pirate cache mille ruses.",
-      objectif: "Repérer des passants déguisés ou originaux.",
-      defi: "Prenez une photo avec deux inconnus arborant un accessoire insolite.",
-      gps: "47.483900,-0.583800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "La Taverne Animée",
-      metaphore: "C’est à la taverne qu’on trouve les meilleurs alliés.",
-      objectif: "Faire la connaissance de nouveaux moussaillons.",
-      defi: "Prenez une photo avec des inconnus levant un verre (même d’eau !).",
-      gps: "47.484900,-0.584800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Complices de Fortune",
-      metaphore: "Parfois, un trésor se cache dans la rencontre.",
-      objectif: "Trouver des inconnus prêts à faire le salut pirate.",
-      defi: "Prenez une photo avec [nbPersonnes] personnes faisant le salut pirate.",
-      gps: "47.485900,-0.585800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "La Chasse aux Barbes",
-      metaphore: "Chaque barbe raconte un voyage.",
-      objectif: "Trouver des inconnus barbus.",
-      defi: "Prenez une photo avec au moins deux personnes à la barbe fournie.",
-      gps: "47.486900,-0.586800",
-      type: "photo_inconnus"
-    }
-  ],
-  prison: [
-    {
-      titre: "Complices de Cavale",
-      metaphore: "Pour s’évader, il faut des alliés inattendus.",
-      objectif: "Trouver des inconnus prêts à jouer les complices.",
-      defi: "Prenez une photo avec des inconnus mimant des menottes.",
-      gps: "47.487900,-0.587800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Les Fugitifs Solidaires",
-      metaphore: "L’union fait la force même derrière les barreaux.",
-      objectif: "Trouver des inconnus prêts à courir.",
-      defi: "Prenez une photo avec des inconnus en position de départ de course.",
-      gps: "47.488900,-0.588800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Évasion Collective",
-      metaphore: "Une évasion réussie se prépare à plusieurs.",
-      objectif: "Créer une chaîne humaine avec des passants.",
-      defi: "Prenez une photo avec [nbPersonnes] personnes se tenant la main.",
-      gps: "47.489900,-0.589800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Garde et le Prisonnier",
-      metaphore: "Les rôles s’inversent parfois dans une photo.",
-      objectif: "Photographiez-vous avec un inconnu mimant un gardien.",
-      defi: "Un inconnu fait le regard sévère, l’équipe feint la peur.",
-      gps: "47.490900,-0.590800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Sourires derrière les Barreaux",
-      metaphore: "Même en prison, un sourire franchit toutes les grilles.",
-      objectif: "Photographier des inconnus affichant leur plus beau sourire.",
-      defi: "Prenez une photo avec deux passants souriants.",
-      gps: "47.491900,-0.591800",
-      type: "photo_inconnus"
-    }
-  ],
-  sorcier: [
-    {
-      titre: "Le Conseil des Sorciers",
-      metaphore: "Une magie nouvelle naît de la diversité.",
-      objectif: "Composer une assemblée magique.",
-      defi: "Prenez une photo avec [nbPersonnes] personnes tenant une baguette imaginaire.",
-      gps: "47.492900,-0.592800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "La Potion Collective",
-      metaphore: "Les meilleures potions se partagent.",
-      objectif: "Trouver des inconnus prêts à mimer la préparation d’une potion.",
-      defi: "Prenez une photo de groupe en pleine concoction imaginaire.",
-      gps: "47.493900,-0.593800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Sabbat Improbable",
-      metaphore: "Même les moldus peuvent participer au sabbat.",
-      objectif: "Trouver des inconnus acceptant de faire le signe magique.",
-      defi: "Prenez une photo avec des inconnus faisant le geste du sort.",
-      gps: "47.494900,-0.594800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Rassemblement des Enchanteurs",
-      metaphore: "Chaque sourire peut cacher un pouvoir.",
-      objectif: "Photographier des inconnus qui acceptent de se faire appeler Merlin.",
-      defi: "Prenez une photo de groupe avec au moins un inconnu 'Merlin'.",
-      gps: "47.495900,-0.595800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "L’École des Apprentis",
-      metaphore: "Chaque rencontre est une leçon.",
-      objectif: "Assembler des inconnus pour une photo de classe improvisée.",
-      defi: "Prenez une photo de groupe avec la pose la plus sérieuse possible.",
-      gps: "47.496900,-0.596800",
-      type: "photo_inconnus"
-    }
-  ],
-  super_heros: [
-    {
-      titre: "La Ligue des Justiciers",
-      metaphore: "Chaque héros a besoin d’alliés.",
-      objectif: "Trouver des inconnus prêts à faire le signe de super-héros.",
-      defi: "Prenez une photo de groupe avec les bras croisés façon justicier.",
-      gps: "47.497900,-0.597800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "La Recrue Mystère",
-      metaphore: "Le prochain héros se cache peut-être parmi la foule.",
-      objectif: "Inviter un inconnu à rejoindre l’équipe pour la photo.",
-      defi: "Prenez une photo avec un passant imitant un pouvoir imaginaire.",
-      gps: "47.498900,-0.598800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Selfie de la Victoire",
-      metaphore: "Une victoire partagée est deux fois plus belle.",
-      objectif: "Faire un selfie de groupe avec des inconnus levants les poings.",
-      defi: "Levez tous les poings au ciel pour la photo.",
-      gps: "47.499900,-0.599800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "La Pause Camouflage",
-      metaphore: "Un vrai héros sait se fondre dans la foule.",
-      objectif: "Se cacher parmi les passants et faire une photo collective.",
-      defi: "Prenez une photo où l’équipe est difficile à repérer.",
-      gps: "47.500900,-0.600800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Signal Héroïque",
-      metaphore: "Un appel au secours rassemble toujours des héros.",
-      objectif: "Faire le signal de détresse avec des inconnus.",
-      defi: "Prenez une photo de groupe mimant un appel à l’aide.",
-      gps: "47.501900,-0.601800",
-      type: "photo_inconnus"
-    }
-  ],
-  zombie: [
-    {
-      titre: "Le Clan des Survivants",
-      metaphore: "L’union fait la survie.",
-      objectif: "Trouver d’autres survivants du parc.",
-      defi: "Prenez une photo de groupe avec des inconnus mimant la peur.",
-      gps: "47.502900,-0.602800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Les Alliés Inespérés",
-      metaphore: "Dans la nuit, chaque visage peut sauver.",
-      objectif: "Photographier des inconnus grimés ou effrayés.",
-      defi: "Prenez une photo de groupe avec le maquillage le plus effrayant.",
-      gps: "47.503900,-0.603800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Festin du Zombie",
-      metaphore: "Un vrai zombie ne dîne jamais seul.",
-      objectif: "Trouver des inconnus prêts à jouer les zombies.",
-      defi: "Prenez une photo avec des passants imitant la marche des zombies.",
-      gps: "47.504900,-0.604800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Refuge Commun",
-      metaphore: "Un abri n’est sûr que s’il est partagé.",
-      objectif: "Faire entrer des inconnus dans la photo d’abri.",
-      defi: "Prenez une photo avec des inconnus cachés dans la cabane.",
-      gps: "47.505900,-0.605800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Cri de la Horde",
-      metaphore: "Plus on crie fort, plus on fait peur aux morts.",
-      objectif: "Faire pousser un cri collectif.",
-      defi: "Prenez une photo pile au moment du cri.",
-      gps: "47.506900,-0.606800",
-      type: "photo_inconnus"
-    }
-  ],
-  archeologue: [
-    {
-      titre: "Les Découvreurs du Jour",
-      metaphore: "À plusieurs, on déterre mieux les secrets.",
-      objectif: "Prendre une photo de groupe avec des inconnus autour d’une trouvaille.",
-      defi: "Tous pointent l’objet de la découverte.",
-      gps: "47.507900,-0.607800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "La Transmission du Savoir",
-      metaphore: "Le passé s’apprend en écoutant les autres.",
-      objectif: "Photographier des inconnus expliquant leur objet favori.",
-      defi: "Prenez une photo de groupe avec chacun tenant un objet.",
-      gps: "47.508900,-0.608800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "Le Savoir-Partagé",
-      metaphore: "Chaque main aide à creuser plus profond.",
-      objectif: "Faire une chaîne humaine de chercheurs.",
-      defi: "Prenez une photo de groupe se tenant la main autour d’un objet.",
-      gps: "47.509900,-0.609800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "La Photo du Savant Fou",
-      metaphore: "Un peu de folie fait parfois avancer la science.",
-      objectif: "Chercher des inconnus prêts à faire la grimace du savant fou.",
-      defi: "Prenez une photo de groupe grimaçant au maximum.",
-      gps: "47.510900,-0.610800",
-      type: "photo_inconnus"
-    },
-    {
-      titre: "L’Équipe des Découvreurs",
-      metaphore: "La gloire est plus grande à plusieurs.",
-      objectif: "Faire participer des inconnus à la découverte.",
-      defi: "Prenez une photo de groupe avec deux visiteurs différents sur le site.",
-      gps: "47.511900,-0.611800",
-      type: "photo_inconnus"
-     ],
+    arthurien: [
+      {
+        titre: "L'épreuve du Vaillant",
+        metaphore: "La lumière du Graal ne brille que pour ceux qui osent s’élever.",
+        objectif: "Grimper au sommet de la toile.",
+        defi: "Prenez une photo de votre équipe tout en haut.",
+        gps: "47.477821,-0.577896",
+        type: "photo"
+      },
+      {
+        titre: "L’œil de Merlin",
+        metaphore: "Le vieux mage observe qui sait ouvrir les yeux sur le monde.",
+        objectif: "Repérer un symbole caché.",
+        defi: "Prenez la photo du symbole secret de Merlin.",
+        gps: "47.478000,-0.578000",
+        type: "photo"
+      },
+      {
+        titre: "La Relique cachée",
+        metaphore: "Les vestiges du passé n’attendent que d’être révélés.",
+        objectif: "Trouver et immortaliser un objet ancien.",
+        defi: "Prenez une photo de l’objet le plus ancien du site.",
+        gps: "47.478500,-0.577500",
+        type: "photo"
+      },
+      {
+        titre: "La Bête Mystique",
+        metaphore: "Celui qui débusque l’animal sacré saura guider sa quête.",
+        objectif: "Photographier un animal du parc choisi par Merlin.",
+        defi: "Prenez une photo du chevreau ou de la tortue.",
+        gps: "47.479000,-0.577600",
+        type: "photo"
+      },
+      {
+        titre: "Le Passage Secret",
+        metaphore: "L’entrée cachée n’apparaît qu’aux yeux des justes.",
+        objectif: "Découvrir un passage ou un abri discret.",
+        defi: "Prenez une photo de l’entrée cachée.",
+        gps: "47.480000,-0.578200",
+        type: "photo"
+      }
+    ],
+    pirate: [
+      {
+        titre: "Le Trésor Enfoui",
+        metaphore: "Le sable garde jalousement ses secrets.",
+        objectif: "Localiser l’emplacement du coffre.",
+        defi: "Prenez une photo d’un X ou d’un indice au sol.",
+        gps: "47.480200,-0.578300",
+        type: "photo"
+      },
+      {
+        titre: "Le Drapeau Noir",
+        metaphore: "Le pavillon flotte toujours là où le danger rôde.",
+        objectif: "Repérer un drapeau ou un symbole pirate.",
+        defi: "Prenez une photo du drapeau hissé.",
+        gps: "47.480800,-0.579000",
+        type: "photo"
+      },
+      {
+        titre: "La Bouteille à la Mer",
+        metaphore: "Un message flotte sur les flots, perdu mais pas oublié.",
+        objectif: "Trouver un message caché dans une bouteille.",
+        defi: "Prenez une photo de la bouteille et du message.",
+        gps: "47.481000,-0.579200",
+        type: "photo"
+      },
+      {
+        titre: "L’Accostage",
+        metaphore: "La terre promise s’annonce par l’ancre jetée.",
+        objectif: "Montrer l’arrivée de l’équipage à bon port.",
+        defi: "Prenez une photo de votre équipe devant la berge ou la rive.",
+        gps: "47.481500,-0.579800",
+        type: "photo"
+      },
+      {
+        titre: "Le Compas d’Or",
+        metaphore: "Sans compas, point de fortune !",
+        objectif: "Trouver un objet en forme de cercle ou de compas.",
+        defi: "Prenez une photo de l’objet trouvé par l’équipe.",
+        gps: "47.482000,-0.580000",
+        type: "photo"
+      }
+    ],
+    prison: [
+      {
+        titre: "L’ombre des barreaux",
+        metaphore: "Même derrière les barreaux, la lumière trouve son chemin.",
+        objectif: "Trouver le passage secret de la prison.",
+        defi: "Prenez une photo de l’ouverture cachée.",
+        gps: "47.471000,-0.576000",
+        type: "photo"
+      },
+      {
+        titre: "Évasion en image",
+        metaphore: "Un cliché vaut parfois toutes les complicités.",
+        objectif: "Immortaliser le plan d’évasion dessiné sur le mur.",
+        defi: "Prenez une photo du schéma ou du plan secret.",
+        gps: "47.471200,-0.576200",
+        type: "photo"
+      },
+      {
+        titre: "La Sentinelle",
+        metaphore: "Repérer qui surveille, c’est déjà s’en libérer.",
+        objectif: "Trouver un poste de garde ou une caméra factice.",
+        defi: "Prenez une photo du poste de surveillance.",
+        gps: "47.471900,-0.576800",
+        type: "photo"
+      },
+      {
+        titre: "La Clé du Passage",
+        metaphore: "La clé de la liberté se cache là où on ne l’attend pas.",
+        objectif: "Repérer une clé ou un objet symbolique.",
+        defi: "Prenez une photo de la clé ou de l’objet.",
+        gps: "47.472300,-0.576300",
+        type: "photo"
+      },
+      {
+        titre: "Trace de liberté",
+        metaphore: "Même une trace de pas peut ouvrir la voie.",
+        objectif: "Suivre une série de marques jusqu’à la sortie.",
+        defi: "Prenez une photo de la trace la plus éloignée.",
+        gps: "47.472900,-0.577000",
+        type: "photo"
+      }
+    ],
+    sorcier: [
+      {
+        titre: "La Pierre Philosophale",
+        metaphore: "Le secret de la magie se cache dans la matière.",
+        objectif: "Trouver une pierre ou un objet mystérieux.",
+        defi: "Prenez une photo de la pierre la plus étrange.",
+        gps: "47.475100,-0.580100",
+        type: "photo"
+      },
+      {
+        titre: "Herbier magique",
+        metaphore: "Chaque feuille porte la mémoire d’un sort.",
+        objectif: "Trouver trois plantes différentes.",
+        defi: "Prenez en photo trois feuilles ou fleurs inhabituelles.",
+        gps: "47.475600,-0.580600",
+        type: "photo"
+      },
+      {
+        titre: "Baguette du hasard",
+        metaphore: "La magie se choisit parfois elle-même.",
+        objectif: "Chercher un bâton ou une branche à la forme étrange.",
+        defi: "Prenez une photo de la baguette improvisée.",
+        gps: "47.476100,-0.581100",
+        type: "photo"
+      },
+      {
+        titre: "L’ingrédient secret",
+        metaphore: "Pas de potion sans ingrédient rare.",
+        objectif: "Trouver un ingrédient unique pour une potion.",
+        defi: "Prenez une photo de l’ingrédient le plus insolite.",
+        gps: "47.476800,-0.581800",
+        type: "photo"
+      },
+      {
+        titre: "Le miroir du mage",
+        metaphore: "Le reflet révèle parfois l’invisible.",
+        objectif: "Trouver un endroit qui réfléchit la lumière.",
+        defi: "Prenez une photo du reflet le plus surprenant.",
+        gps: "47.477400,-0.582400",
+        type: "photo"
+      }
+    ],
+    super_heros: [
+      {
+        titre: "La Planque Secrète",
+        metaphore: "Chaque héros a son repaire, caché aux yeux du monde.",
+        objectif: "Identifier un lieu discret du parc.",
+        defi: "Prenez une photo de l’endroit le plus secret.",
+        gps: "47.480000,-0.585000",
+        type: "photo"
+      },
+      {
+        titre: "Signal d’Alerte",
+        metaphore: "Un signe lumineux appelle toujours les justiciers.",
+        objectif: "Trouver un objet lumineux ou haut perché.",
+        defi: "Prenez une photo de la lumière ou de la tour la plus haute.",
+        gps: "47.480800,-0.585800",
+        type: "photo"
+      },
+      {
+        titre: "Camouflage Express",
+        metaphore: "Un vrai héros sait se fondre dans le décor.",
+        objectif: "Trouver un endroit où se cacher.",
+        defi: "Prenez une photo de votre équipe camouflée.",
+        gps: "47.481500,-0.586500",
+        type: "photo"
+      },
+      {
+        titre: "L’Artefact Perdu",
+        metaphore: "Le pouvoir sommeille dans l’objet le plus anodin.",
+        objectif: "Trouver un objet insolite ou coloré.",
+        defi: "Prenez une photo de votre découverte.",
+        gps: "47.482300,-0.587300",
+        type: "photo"
+      },
+      {
+        titre: "La Mission Sauvetage",
+        metaphore: "Un héros n’abandonne jamais un allié.",
+        objectif: "Mettre en scène un sauvetage dans le décor.",
+        defi: "Prenez une photo de l’équipe en pleine action de sauvetage.",
+        gps: "47.482900,-0.587900",
+        type: "photo"
+      }
+    ],
+    zombie: [
+      {
+        titre: "La Cabane Assiégée",
+        metaphore: "Parfois, la survie tient à une porte bien fermée.",
+        objectif: "Trouver un abri et prouver qu’il est sécurisé.",
+        defi: "Prenez une photo de votre équipe barricadant une cabane.",
+        gps: "47.485100,-0.590100",
+        type: "photo"
+      },
+      {
+        titre: "L’Objet de l’Antidote",
+        metaphore: "La vie ne tient qu’à un fil… ou à une fiole.",
+        objectif: "Trouver l’objet qui pourrait servir d’antidote.",
+        defi: "Prenez une photo de l’objet choisi.",
+        gps: "47.486100,-0.591100",
+        type: "photo"
+      },
+      {
+        titre: "Trace de Survivant",
+        metaphore: "Une trace peut sauver un groupe entier.",
+        objectif: "Repérer une marque étrange au sol.",
+        defi: "Prenez une photo de l’empreinte ou de la trace.",
+        gps: "47.487100,-0.592100",
+        type: "photo"
+      },
+      {
+        titre: "Le Cercle de Protection",
+        metaphore: "Un cercle peut repousser la horde.",
+        objectif: "Dessiner ou trouver un cercle sur le terrain.",
+        defi: "Prenez une photo du cercle protecteur.",
+        gps: "47.488100,-0.593100",
+        type: "photo"
+      },
+      {
+        titre: "Le Survivant Masqué",
+        metaphore: "Se cacher, c’est parfois survivre.",
+        objectif: "Mettre en scène une cachette efficace.",
+        defi: "Prenez une photo de l’équipe dissimulée au maximum.",
+        gps: "47.489100,-0.594100",
+        type: "photo"
+      }
+    ],
+    archeologue: [
+      {
+        titre: "La Relique Disparue",
+        metaphore: "Sous la terre, l’histoire attend d’être révélée.",
+        objectif: "Trouver et photographier une relique du passé.",
+        defi: "Prenez une photo d’un objet ancien trouvé sur le terrain.",
+        gps: "47.490100,-0.595100",
+        type: "photo"
+      },
+      {
+        titre: "Le Manuscrit Caché",
+        metaphore: "Les secrets sont faits pour être découverts.",
+        objectif: "Trouver un texte ou une inscription ancienne.",
+        defi: "Prenez une photo d’un texte gravé ou manuscrit.",
+        gps: "47.491100,-0.596100",
+        type: "photo"
+      },
+      {
+        titre: "Fossile ou Fantaisie",
+        metaphore: "Un œil attentif distingue le vrai du faux.",
+        objectif: "Repérer une forme fossile ou inhabituelle.",
+        defi: "Prenez une photo de la découverte insolite.",
+        gps: "47.492100,-0.597100",
+        type: "photo"
+      },
+      {
+        titre: "Le Mystère des Pierres",
+        metaphore: "Chaque pierre raconte une histoire.",
+        objectif: "Trouver deux pierres de forme étrange.",
+        defi: "Prenez une photo des deux pierres côte à côte.",
+        gps: "47.493100,-0.598100",
+        type: "photo"
+      },
+      {
+        titre: "L’Objet du Savoir",
+        metaphore: "La connaissance se transmet par les objets.",
+        objectif: "Trouver un objet qui pourrait appartenir à un chercheur.",
+        defi: "Prenez une photo de l’objet et expliquez sa fonction.",
+        gps: "47.494100,-0.599100",
+        type: "photo"
+      }
+    ]
+  },
 
+
+
+
+
+
+  photo_inconnus: {
+    arthurien: [
+      {
+        titre: "La Fraternité des Chevaliers",
+        metaphore: "Un vrai chevalier sait s’entourer des âmes vaillantes.",
+        objectif: "Rencontrer des inconnus dignes de la Table Ronde.",
+        defi: "Prenez une photo avec [nbPersonnes] personnes portant un vêtement rouge.",
+        gps: "47.477900,-0.577950",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "L’Alliance des Bravest",
+        metaphore: "La quête s’accomplit rarement seul.",
+        objectif: "Former une alliance temporaire avec des passants.",
+        defi: "Prenez une photo de groupe avec des inconnus mimant une épée.",
+        gps: "47.478900,-0.578800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Rencontre en Carmélide",
+        metaphore: "Les terres lointaines offrent toujours de nouveaux alliés.",
+        objectif: "Trouver des inconnus prêts à relever un défi.",
+        defi: "Prenez une photo avec [nbPersonnes] personnes faisant une grimace.",
+        gps: "47.479900,-0.579800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Conseil des Sages",
+        metaphore: "L’expérience s’échange au détour d’un sourire.",
+        objectif: "Rencontrer des personnes de plus de 50 ans.",
+        defi: "Photographiez-vous avec deux inconnus ayant des cheveux gris ou blancs.",
+        gps: "47.480900,-0.580800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "L’Émissaire du Royaume",
+        metaphore: "La paix se construit par l’ouverture à l’autre.",
+        objectif: "Saluer de nouveaux visages.",
+        defi: "Prenez une photo avec des inconnus faisant le signe de la paix.",
+        gps: "47.481900,-0.581800",
+        type: "photo_inconnus"
+      }
+    ],
+    pirate: [
+      {
+        titre: "Portraits de Matelots",
+        metaphore: "Un bon équipage se compose sur les quais.",
+        objectif: "Trouver des complices de fortune.",
+        defi: "Prenez une photo avec [nbPersonnes] personnes portant un chapeau.",
+        gps: "47.482900,-0.582800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "La Frimousse du Flibustier",
+        metaphore: "Le sourire d’un pirate cache mille ruses.",
+        objectif: "Repérer des passants déguisés ou originaux.",
+        defi: "Prenez une photo avec deux inconnus arborant un accessoire insolite.",
+        gps: "47.483900,-0.583800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "La Taverne Animée",
+        metaphore: "C’est à la taverne qu’on trouve les meilleurs alliés.",
+        objectif: "Faire la connaissance de nouveaux moussaillons.",
+        defi: "Prenez une photo avec des inconnus levant un verre (même d’eau !).",
+        gps: "47.484900,-0.584800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Complices de Fortune",
+        metaphore: "Parfois, un trésor se cache dans la rencontre.",
+        objectif: "Trouver des inconnus prêts à faire le salut pirate.",
+        defi: "Prenez une photo avec [nbPersonnes] personnes faisant le salut pirate.",
+        gps: "47.485900,-0.585800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "La Chasse aux Barbes",
+        metaphore: "Chaque barbe raconte un voyage.",
+        objectif: "Trouver des inconnus barbus.",
+        defi: "Prenez une photo avec au moins deux personnes à la barbe fournie.",
+        gps: "47.486900,-0.586800",
+        type: "photo_inconnus"
+      }
+    ],
+    prison: [
+      {
+        titre: "Complices de Cavale",
+        metaphore: "Pour s’évader, il faut des alliés inattendus.",
+        objectif: "Trouver des inconnus prêts à jouer les complices.",
+        defi: "Prenez une photo avec des inconnus mimant des menottes.",
+        gps: "47.487900,-0.587800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Les Fugitifs Solidaires",
+        metaphore: "L’union fait la force même derrière les barreaux.",
+        objectif: "Trouver des inconnus prêts à courir.",
+        defi: "Prenez une photo avec des inconnus en position de départ de course.",
+        gps: "47.488900,-0.588800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Évasion Collective",
+        metaphore: "Une évasion réussie se prépare à plusieurs.",
+        objectif: "Créer une chaîne humaine avec des passants.",
+        defi: "Prenez une photo avec [nbPersonnes] personnes se tenant la main.",
+        gps: "47.489900,-0.589800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Garde et le Prisonnier",
+        metaphore: "Les rôles s’inversent parfois dans une photo.",
+        objectif: "Photographiez-vous avec un inconnu mimant un gardien.",
+        defi: "Un inconnu fait le regard sévère, l’équipe feint la peur.",
+        gps: "47.490900,-0.590800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Sourires derrière les Barreaux",
+        metaphore: "Même en prison, un sourire franchit toutes les grilles.",
+        objectif: "Photographier des inconnus affichant leur plus beau sourire.",
+        defi: "Prenez une photo avec deux passants souriants.",
+        gps: "47.491900,-0.591800",
+        type: "photo_inconnus"
+      }
+    ],
+    sorcier: [
+      {
+        titre: "Le Conseil des Sorciers",
+        metaphore: "Une magie nouvelle naît de la diversité.",
+        objectif: "Composer une assemblée magique.",
+        defi: "Prenez une photo avec [nbPersonnes] personnes tenant une baguette imaginaire.",
+        gps: "47.492900,-0.592800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "La Potion Collective",
+        metaphore: "Les meilleures potions se partagent.",
+        objectif: "Trouver des inconnus prêts à mimer la préparation d’une potion.",
+        defi: "Prenez une photo de groupe en pleine concoction imaginaire.",
+        gps: "47.493900,-0.593800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Sabbat Improbable",
+        metaphore: "Même les moldus peuvent participer au sabbat.",
+        objectif: "Trouver des inconnus acceptant de faire le signe magique.",
+        defi: "Prenez une photo avec des inconnus faisant le geste du sort.",
+        gps: "47.494900,-0.594800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Rassemblement des Enchanteurs",
+        metaphore: "Chaque sourire peut cacher un pouvoir.",
+        objectif: "Photographier des inconnus qui acceptent de se faire appeler Merlin.",
+        defi: "Prenez une photo de groupe avec au moins un inconnu 'Merlin'.",
+        gps: "47.495900,-0.595800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "L’École des Apprentis",
+        metaphore: "Chaque rencontre est une leçon.",
+        objectif: "Assembler des inconnus pour une photo de classe improvisée.",
+        defi: "Prenez une photo de groupe avec la pose la plus sérieuse possible.",
+        gps: "47.496900,-0.596800",
+        type: "photo_inconnus"
+      }
+    ],
+    super_heros: [
+      {
+        titre: "La Ligue des Justiciers",
+        metaphore: "Chaque héros a besoin d’alliés.",
+        objectif: "Trouver des inconnus prêts à faire le signe de super-héros.",
+        defi: "Prenez une photo de groupe avec les bras croisés façon justicier.",
+        gps: "47.497900,-0.597800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "La Recrue Mystère",
+        metaphore: "Le prochain héros se cache peut-être parmi la foule.",
+        objectif: "Inviter un inconnu à rejoindre l’équipe pour la photo.",
+        defi: "Prenez une photo avec un passant imitant un pouvoir imaginaire.",
+        gps: "47.498900,-0.598800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Selfie de la Victoire",
+        metaphore: "Une victoire partagée est deux fois plus belle.",
+        objectif: "Faire un selfie de groupe avec des inconnus levants les poings.",
+        defi: "Levez tous les poings au ciel pour la photo.",
+        gps: "47.499900,-0.599800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "La Pause Camouflage",
+        metaphore: "Un vrai héros sait se fondre dans la foule.",
+        objectif: "Se cacher parmi les passants et faire une photo collective.",
+        defi: "Prenez une photo où l’équipe est difficile à repérer.",
+        gps: "47.500900,-0.600800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Signal Héroïque",
+        metaphore: "Un appel au secours rassemble toujours des héros.",
+        objectif: "Faire le signal de détresse avec des inconnus.",
+        defi: "Prenez une photo de groupe mimant un appel à l’aide.",
+        gps: "47.501900,-0.601800",
+        type: "photo_inconnus"
+      }
+    ],
+    zombie: [
+      {
+        titre: "Le Clan des Survivants",
+        metaphore: "L’union fait la survie.",
+        objectif: "Trouver d’autres survivants du parc.",
+        defi: "Prenez une photo de groupe avec des inconnus mimant la peur.",
+        gps: "47.502900,-0.602800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Les Alliés Inespérés",
+        metaphore: "Dans la nuit, chaque visage peut sauver.",
+        objectif: "Photographier des inconnus grimés ou effrayés.",
+        defi: "Prenez une photo de groupe avec le maquillage le plus effrayant.",
+        gps: "47.503900,-0.603800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Festin du Zombie",
+        metaphore: "Un vrai zombie ne dîne jamais seul.",
+        objectif: "Trouver des inconnus prêts à jouer les zombies.",
+        defi: "Prenez une photo avec des passants imitant la marche des zombies.",
+        gps: "47.504900,-0.604800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Refuge Commun",
+        metaphore: "Un abri n’est sûr que s’il est partagé.",
+        objectif: "Faire entrer des inconnus dans la photo d’abri.",
+        defi: "Prenez une photo avec des inconnus cachés dans la cabane.",
+        gps: "47.505900,-0.605800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Cri de la Horde",
+        metaphore: "Plus on crie fort, plus on fait peur aux morts.",
+        objectif: "Faire pousser un cri collectif.",
+        defi: "Prenez une photo pile au moment du cri.",
+        gps: "47.506900,-0.606800",
+        type: "photo_inconnus"
+      }
+    ],
+    archeologue: [
+      {
+        titre: "Les Découvreurs du Jour",
+        metaphore: "À plusieurs, on déterre mieux les secrets.",
+        objectif: "Prendre une photo de groupe avec des inconnus autour d’une trouvaille.",
+        defi: "Tous pointent l’objet de la découverte.",
+        gps: "47.507900,-0.607800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "La Transmission du Savoir",
+        metaphore: "Le passé s’apprend en écoutant les autres.",
+        objectif: "Photographier des inconnus expliquant leur objet favori.",
+        defi: "Prenez une photo de groupe avec chacun tenant un objet.",
+        gps: "47.508900,-0.608800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "Le Savoir-Partagé",
+        metaphore: "Chaque main aide à creuser plus profond.",
+        objectif: "Faire une chaîne humaine de chercheurs.",
+        defi: "Prenez une photo de groupe se tenant la main autour d’un objet.",
+        gps: "47.509900,-0.609800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "La Photo du Savant Fou",
+        metaphore: "Un peu de folie fait parfois avancer la science.",
+        objectif: "Chercher des inconnus prêts à faire la grimace du savant fou.",
+        defi: "Prenez une photo de groupe grimaçant au maximum.",
+        gps: "47.510900,-0.610800",
+        type: "photo_inconnus"
+      },
+      {
+        titre: "L’Équipe des Découvreurs",
+        metaphore: "La gloire est plus grande à plusieurs.",
+        objectif: "Faire participer des inconnus à la découverte.",
+        defi: "Prenez une photo de groupe avec deux visiteurs différents sur le site.",
+        gps: "47.511900,-0.611800",
+        type: "photo_inconnus"
+      }
+    ]
+  },
+
+
+ 
 video: {
   arthurien: [
     {
@@ -886,7 +896,11 @@ video: {
       defi: "Filmez l’équipe expliquant à la caméra pourquoi l’objet est exceptionnel.",
       gps: "47.500400,-0.600400",
       type: "video"
-    ],
+  }
+    ]
+  },
+
+  
   
 
 collecte_objet: {
@@ -1182,7 +1196,11 @@ collecte_objet: {
       defi: "Rapportez l’objet trouvé et racontez son histoire.",
       gps: "47.501900,-0.603900",
       type: "collecte_objet"
-    ],
+}
+    ]
+  },
+
+  
 
 
 audio : {
@@ -1478,8 +1496,11 @@ audio : {
       defi: "Enregistrez une imitation collective d’un animal.",
       gps: "47.501900,-0.603900",
       type: "audio"
-    }
-  ],
+}
+    ]
+  },
+
+  
 
 
 gps : {
@@ -1775,8 +1796,11 @@ gps : {
       defi: "Validez chaque point de passage.",
       gps: "47.508300,-0.610300",
       type: "gps"
-    }
-  ],
+}
+    ]
+  },
+
+  
 
 
 
@@ -2073,11 +2097,14 @@ mot_de_passe : {
       defi: "Tapez le mot découvert pour valider l’étape.",
       gps: "47.498700,-0.600700",
       type: "mot_de_passe"
-    }
-  ],
+     }
+    ]
+  },
 
 
 
+
+  
 anagramme : {                            
   arthurien: [
     {
@@ -2371,8 +2398,9 @@ anagramme : {
       defi: "Résolvez l’anagramme pour ouvrir la crypte.",
       gps: "47.502600,-0.604600",
       type: "anagramme"
-    }
-  ],
+     }
+    ]
+  },
 
 
 
@@ -2669,8 +2697,9 @@ puzzle_visuel : {
       defi: "Quel est l’élément étrange sur le manuscrit sur la photo ?",
       gps: "47.498700,-0.600700",
       type: "puzzle_visuel"
-    }
-  ],
+     }
+    ]
+  },
 
 
 
@@ -2967,8 +2996,9 @@ defi_collectif : {
       defi: "Criez ensemble comme si vous veniez de trouver un trésor.",
       gps: "47.501900,-0.603900",
       type: "defi_collectif"
-    }
-  ],
+     }
+    ]
+  },
 
 
 
@@ -3265,9 +3295,9 @@ defi_collectif : {
       defi: "Trouvez l’amulette grâce à la devinette sur le site.",
       gps: "47.505800,-0.606800",
       type: "chasse_au_tresor"
-    }
-  ],
-
+     }
+    ]
+  },
 
 
 chrono : {
@@ -3563,8 +3593,9 @@ chrono : {
       defi: "L’objet doit passer dans toutes les mains avant la fin.",
       gps: "47.501900,-0.603900",
       type: "chrono"
-    }
-  ],
+     }
+    ]
+  },
 
 
 duel : {
@@ -3860,8 +3891,9 @@ duel : {
       defi: "Premier à finir la reconstitution remporte le duel.",
       gps: "47.501900,-0.603900",
       type: "duel"
-    }
-  ],
+     }
+    ]
+  },
 
 
 
