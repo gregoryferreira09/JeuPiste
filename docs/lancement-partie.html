@@ -16,19 +16,20 @@
   <div class="center-wrapper">
     <main>
       <section class="main-accueil fadeIn" role="main" aria-live="polite">
-        <div class="presentation-jeu">
-          <div class="titre-course">Avalon</div>
-          <div class="texte-course">
+        <div class="presentation-jeu" id="presentationJeu">
+          <!-- Contenu statique pour Avalon (sera remplacé dynamiquement si besoin) -->
+          <div class="titre-course" id="titreCourse">Avalon</div>
+          <div class="texte-course" id="textePresentation">
             Moi, Merlin l'Enchanteur, vous convoque pour la plus noble des aventures : la quête du Saint-Graal.<br>
             Les temps sont sombres, et seul les plus dignes des chevaliers parmi vous pourrez retrouver le Graal sacré, source de sagesse et de paix pour le royaume.
           </div>
           <div class="objectif-course">
             <span class="objectif-label">Objectif&nbsp;:</span>
-            <span class="objectif-text">Rassemblez votre équipe, serrez les rangs… et courez, car les vents de la destinée soufflent sur votre route.</span>
+            <span class="objectif-text" id="objectifText">Rassemblez votre équipe, serrez les rangs… et courez, car les vents de la destinée soufflent sur votre route.</span>
           </div>
-          <div class="regles-course">
+          <div class="regles-course" id="reglesCourse">
             <strong>Règles du jeu&nbsp;:</strong><br>
-            Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis des siècles…
+            Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis [...]
           </div>
         </div>
         <div class="boutons-actions actions-bandeau">
@@ -45,17 +46,17 @@
   </footer>
 
   <!-- Fenêtre flottante confirmation retour accueil -->
-  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
-  <div class="main-accueil">
-    <div class="modal-question" id="confirmationTitle">
-      Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
-    </div>
-    <div class="boutons-actions">
-      <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
-      <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
+  <div id="confirmationRetourAccueil" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle" style="display:none;">
+    <div class="main-accueil">
+      <div class="modal-question" id="confirmationTitle">
+        Voulez-vous vraiment quitter la partie et revenir à l’accueil ?
+      </div>
+      <div class="boutons-actions">
+        <button id="confirmerRetourAccueilBtn" class="main-btn">Oui</button>
+        <button id="annulerRetourAccueilBtn" class="main-btn">Non</button>
+      </div>
     </div>
   </div>
-</div>
 
   <!-- Loader visuel -->
   <div id="loader" aria-live="polite" style="display:none;">
@@ -65,115 +66,12 @@
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
 
   <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-  <script>
-    // === CONFIG FIREBASE ===
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // === FONCTIONS UTILITAIRES ===
-    function showLoader() { document.getElementById('loader').style.display = 'flex'; }
-    function hideLoader() { document.getElementById('loader').style.display = 'none'; }
-    function showToast(msg) {
-      const toast = document.getElementById('toast-message');
-      toast.textContent = msg;
-      toast.classList.add('visible');
-      setTimeout(() => { toast.classList.remove('visible'); }, 2700);
-    }
-
-    // Effet fade-in
-    document.addEventListener("DOMContentLoaded", function() {
-      var section = document.querySelector('.fadeIn');
-      if (section) section.classList.add('visible');
-    });
-
-    // Décompte visible du bouton Démarrer
-    document.addEventListener("DOMContentLoaded", function() {
-      const demarrerBtn = document.getElementById("demarrerBtn");
-      let timer = 30;
-      if (demarrerBtn) {
-        demarrerBtn.textContent = "Disponible dans 30s";
-        const interval = setInterval(() => {
-          timer--;
-          if (timer > 0) {
-            demarrerBtn.textContent = `Disponible dans ${timer}s`;
-          } else {
-            clearInterval(interval);
-            demarrerBtn.style.pointerEvents = "auto";
-            demarrerBtn.style.opacity = "1";
-            demarrerBtn.textContent = "Démarrer la partie";
-          }
-        }, 1000);
-      }
-    });
-
-    // Gestion de la modale de retour accueil
-    document.addEventListener("DOMContentLoaded", function() {
-      const btnRetour = document.getElementById("btnRetourAccueil");
-      const confirmation = document.getElementById("confirmationRetourAccueil");
-      const btnConfirmer = document.getElementById("confirmerRetourAccueilBtn");
-      const btnAnnuler = document.getElementById("annulerRetourAccueilBtn");
-      if (btnRetour && confirmation && btnConfirmer && btnAnnuler) {
-        btnRetour.addEventListener("click", () => {
-          confirmation.style.display = "flex";
-          document.getElementById('confirmerRetourAccueilBtn').focus();
-        });
-        btnConfirmer.addEventListener("click", () => {
-          window.location.href = "accueil.html";
-        });
-        btnAnnuler.addEventListener("click", () => {
-          confirmation.style.display = "none";
-          btnRetour.focus();
-        });
-      }
-    });
-
-    // === VERROUILLAGE NAVIGATION/FORCING ===
-    document.addEventListener("DOMContentLoaded", function() {
-      showLoader();
-      const salonCode = localStorage.getItem("salonCode");
-      const equipeNum = Number(localStorage.getItem("equipeNum"));
-      if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
-        hideLoader();
-        window.location.href = "accueil.html";
-        return;
-      }
-      db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep').on('value', function(snapshot) {
-        hideLoader();
-        const step = snapshot.val();
-        if (step !== undefined && step !== null && step > 0) {
-          db.ref('parties/' + salonCode + '/cheminsParEquipe/' + equipeNum).once('value', function(snapIdx) {
-            const parcoursIdx = snapIdx.val();
-            db.ref('parties/' + salonCode + '/parcoursEquipes/' + parcoursIdx).once('value', function(snapParcours) {
-              const parcours = snapParcours.val() || [1,2,3,4,5];
-              const target = parcours[step-1];
-              if (target === 6) window.location.href = "epreuve6.html";
-              else if (target === 7) window.location.href = "révélation.html";
-              else window.location.href = `equipe${target}-a.html`;
-            });
-          });
-        }
-      });
-    });
-
-    // Optionnel : gestion du retour arrière (anti-back)
-    window.addEventListener("pageshow", function(evt) {
-      if (evt.persisted) {
-        location.reload();
-      }
-    });
-  </script>
+  <!-- Catalogue de lancements dynamiques -->
+  <script src="JS/catalogue-lancements.js"></script>
+  <!-- Script de lancement partie (gère injection dynamique et les boutons) -->
+  <script src="JS/lancement-partie.js"></script>
 </body>
 </html>
