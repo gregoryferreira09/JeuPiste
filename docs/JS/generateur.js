@@ -543,26 +543,31 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       }
     });
 
-    // --- PATCH : force les champs params pour collecte_objet, photo, etc. ---
+// --- PATCH UNIVERSEL POUR TOUS LES CAS ---
+// 1. Pour collecte_objet/photo... force les champs attendus dans params
 if (
   quest.id === "collecte_objet" ||
   quest.id === "photo" ||
   quest.id === "photo_inconnus" ||
   quest.id === "video"
 ) {
-  if (typeof data.nbObjets === "undefined" && typeof data.nombre === "undefined") {
-    data.nbObjets = 1; // ou data.nombre = 1 selon le champ attendu par ton code ailleurs
-  }
+  // Trouve le vrai nom du champ de quantité dans le catalogue
+  let champQuantite = "nbObjets";
+  if (quest.parametres.some(p => p.key === "nombre")) champQuantite = "nombre";
+  if (typeof data[champQuantite] === "undefined") data[champQuantite] = 1;
   if (!Array.isArray(data.consignes)) data.consignes = [];
-  if (typeof data.objet === "undefined") data.objet = ""; // ou 'critere' selon ton catalogue
+  if (typeof data.objet === "undefined" && typeof data.critere === "undefined") {
+    if (quest.parametres.some(p => p.key === "objet")) data.objet = "";
+    if (quest.parametres.some(p => p.key === "critere")) data.critere = "";
+  }
 }
-    
-    data.points = [...gpsPoints];
-    ajouterEtapeAuScenario({ type: questTypeId, params: data });
-    form.reset();
-    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-  };
-}
+// 2. Retire le champ "type" de params s'il existe (nettoyage)
+if ("type" in data) delete data.type;
+
+data.points = [...gpsPoints];
+ajouterEtapeAuScenario({ type: questTypeId, params: data });
+form.reset();
+container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
 
 // === Carte Leaflet pour sélection GPS + recherche adresse ===
 let mapSearchTimeout = null;
