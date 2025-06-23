@@ -13,25 +13,34 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  // Récupération du mode de scénario via Firebase
-  firebase.database().ref('scenarios/' + salonCode + '/mode').once
-    const mode = snap.val() || 'arthurien';
-    // Si c'est Avalon (scénario spécial), NE TOUCHE PAS au HTML statique
-    if (mode === "avalon") return;
-    // Sinon, injecte le texte de lancement dynamique
-    const textes = LANCEMENT_TEXTE[mode] || LANCEMENT_TEXTE['arthurien'];
-    const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
-    const presentation = document.getElementById("textePresentation");
-    if (presentation) presentation.innerHTML = texteAleatoire;
-    // Optionnel : pour supprimer le titre "Avalon" si présent pour d'autres modes
-    const titre = document.getElementById("titreCourse");
-    if (titre) titre.textContent = mode.charAt(0).toUpperCase() + mode.slice(1).replace(/_/g, " ");
-  }).catch(() => {
-    // Fallback si erreur
-    const textes = LANCEMENT_TEXTE['arthurien'];
-    const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
-    const presentation = document.getElementById("textePresentation");
-    if (presentation) presentation.innerHTML = texteAleatoire;
+  // On récupère le code scénario joué pour ce salon
+  firebase.database().ref('parties/' + salonCode + '/parametres').once('value').then(paramSnap => {
+    const params = paramSnap.val() || {};
+    const scenarioCode = params.scenarioCode;
+
+    // Cas spécial : scénario local Parc Saint Nicolas => texte statique Avalon (on ne touche à rien)
+    if (scenarioCode === "parc_saint_nicolas") {
+      return;
+    }
+
+    // Sinon on va chercher le mode du scénario et on injecte le texte dynamique
+    firebase.database().ref('scenarios/' + scenarioCode + '/mode').once('value').then(snap => {
+      const mode = snap.val() || 'arthurien';
+      // Si jamais "avalon" est utilisé ailleurs, tu peux adapter ici
+      const textes = LANCEMENT_TEXTE[mode] || LANCEMENT_TEXTE['arthurien'];
+      const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
+      const presentation = document.getElementById("textePresentation");
+      if (presentation) presentation.innerHTML = texteAleatoire;
+      // Met à jour le titre aussi
+      const titre = document.getElementById("titreCourse");
+      if (titre) titre.textContent = mode.charAt(0).toUpperCase() + mode.slice(1).replace(/_/g, " ");
+    }).catch(() => {
+      // Fallback si erreur
+      const textes = LANCEMENT_TEXTE['arthurien'];
+      const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
+      const presentation = document.getElementById("textePresentation");
+      if (presentation) presentation.innerHTML = texteAleatoire;
+    });
   });
 });
 
