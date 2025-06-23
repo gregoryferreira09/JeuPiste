@@ -544,7 +544,7 @@ parametres: [
       }
      ] 
   }
-,
+},
 
 
     
@@ -821,7 +821,7 @@ parametres: [
       }
      ] 
   }
-,
+},
 
 
     
@@ -1097,7 +1097,7 @@ parametres: [
       }
      ] 
   }
-,
+},
 
 
     
@@ -1372,7 +1372,7 @@ parametres: [
       }
      ] 
   }
-,
+},
  
 
     
@@ -1648,7 +1648,7 @@ parametres: [
       }
      ] 
   }
- ,
+ },
  
 
     
@@ -1926,7 +1926,7 @@ parametres: [
       }
      ] 
   }
-,
+},
     
     
 
@@ -2202,7 +2202,7 @@ parametres: [
       }
      ] 
   }
-,
+},
 
     
 
@@ -2477,7 +2477,7 @@ parametres: [
       }
      ] 
   }
-,
+},
       
 
   // === COMBO (Plusieurs actions sur la même étape) ===
@@ -2493,7 +2493,7 @@ parametres: [
 }
      ] 
   }
-,
+},
 
 
     
@@ -2768,8 +2768,7 @@ parametres: [
       }
      ] 
   }
-,
-  
+},
 
   // === DEFI EN DUEL ===
  {
@@ -3042,8 +3041,7 @@ parametres: [
       }
      ] 
   }
-,
-
+},
 
     // === Jeu du pendu ===
  {
