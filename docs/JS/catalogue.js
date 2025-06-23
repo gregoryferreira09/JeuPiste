@@ -296,9 +296,7 @@ const QUESTS_CATALOGUE = {
       defi: "Prenez une photo de l’objet et expliquez sa fonction.",
       gps: "47.494100,-0.599100",
       type: "photo"
-      }
-  ]
-}
+      ],
     
 photo_inconnus: {
   arthurien: [
@@ -593,9 +591,7 @@ photo_inconnus: {
       defi: "Prenez une photo de groupe avec deux visiteurs différents sur le site.",
       gps: "47.511900,-0.611800",
       type: "photo_inconnus"
-     }
-  ]
-}
+     ],
 
 video: {
   arthurien: [
@@ -890,8 +886,8 @@ video: {
       defi: "Filmez l’équipe expliquant à la caméra pourquoi l’objet est exceptionnel.",
       gps: "47.500400,-0.600400",
       type: "video"
-    }
-  ],
+    ],
+  
 
 collecte_objet: {
   arthurien: [
@@ -1186,8 +1182,7 @@ collecte_objet: {
       defi: "Rapportez l’objet trouvé et racontez son histoire.",
       gps: "47.501900,-0.603900",
       type: "collecte_objet"
-    }
-  ],
+    ],
 
 
 audio : {
