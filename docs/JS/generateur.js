@@ -573,6 +573,8 @@ container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un
 let mapSearchTimeout = null;
 let searchMarker = null;
 
+console.log("DEBUG étape ajoutée :", { type: questTypeId, params: data });
+    
 function resetMapContainer() {
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
