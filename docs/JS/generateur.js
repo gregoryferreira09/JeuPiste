@@ -81,6 +81,13 @@ function ajouterEtapeAuScenario(etape) {
   afficherScenario();
 }
 
+function genererPhraseQuete(type, mode, variables = {}) {
+  const templates = (QUEST_TEXTS[type] && QUEST_TEXTS[type][mode]) || [];
+  if (!templates.length) return "";
+  const phrase = templates[Math.floor(Math.random() * templates.length)];
+  return phrase.replace(/\[([a-z_]+)\]/gi, (_, v) => variables[v] || `[${v}]`);
+}
+
 // Affichage de la liste des épreuves
 function afficherScenario() {
   const listDiv = document.getElementById('scenarioList');
