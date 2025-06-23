@@ -116,6 +116,12 @@ const parametresPartie = {
       alert("Scénario par défaut manquant. Contactez l'administrateur.");
       return;
     }
+
+    // Corrige le format si scenario est un objet {0:...,1:...}
+if (scenarioToUse && scenarioToUse.scenario && !Array.isArray(scenarioToUse.scenario)) {
+  scenarioToUse.scenario = Object.values(scenarioToUse.scenario);
+}
+    
     scenarioToUse = SCENARIO_PAR_DEFAUT;
   }
 
