@@ -15,6 +15,14 @@
   </script>
   <!-- ========= SCENARIO PAR DÉFAUT ========== -->
   <script>
+
+    // Nettoyage du contexte si retour à la création d'une partie
+localStorage.removeItem('pseudo');
+localStorage.removeItem('pseudoOrigine');
+localStorage.removeItem('salonCode');
+localStorage.removeItem('enCours');
+localStorage.removeItem('parametresPartie');
+    
   // ⚠️ Modifie ici les étapes selon ton vrai scénario Parc Saint Nicolas !
   window.SCENARIO_PAR_DEFAUT = {
     scenario: [
