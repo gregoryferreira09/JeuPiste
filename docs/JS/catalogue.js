@@ -267,8 +267,8 @@ const QUESTS_CATALOGUE = [
           objectif: "Trouver un objet qui pourrait appartenir à un chercheur.",
           defi: "Prenez une photo de l’objet et expliquez sa fonction.",
           gps: "47.494100,-0.599100"
-        },
-      ]
+       ],
+  },
   
 
 
@@ -542,8 +542,8 @@ const QUESTS_CATALOGUE = [
         objectif: "Faire participer des inconnus à la découverte.",
         defi: "Prenez une photo de groupe avec deux visiteurs différents sur le site.",
         gps: "47.511900,-0.611800"
-      },
-    ]
+      ],
+  },
 
 
     
@@ -817,8 +817,8 @@ const QUESTS_CATALOGUE = [
         objectif: "Ramener un objet et expliquer pourquoi il est précieux.",
         defi: "Rapportez l’objet trouvé et racontez son histoire.",
         gps: "47.501900,-0.603900"
-      },
-    ]
+      ],
+  },
 
 
     
