@@ -686,3 +686,4 @@ function handleMapSearch() {
       });
   }, 350);
 }
+}
