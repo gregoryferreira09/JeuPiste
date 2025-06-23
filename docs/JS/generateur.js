@@ -119,8 +119,7 @@ function afficherScenario() {
     return;
   }
   listDiv.innerHTML = scenario.map((etape, idx) => {
-    const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
-    let label = quest ? quest.nom : etape.type;
+let label = etape.titre || etape.type;
     let consignesHtml = '';
     if (etape.params && Array.isArray(etape.params.consignes) && etape.params.consignes.length > 0) {
       consignesHtml = etape.params.consignes.map(c => c ? ` : ${c}` : '').join('');
