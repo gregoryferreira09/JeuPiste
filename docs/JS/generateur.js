@@ -651,6 +651,7 @@ function handleMapSearch() {
     resultsDiv.innerHTML = '';
     return;
   }
+  
   if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
   mapSearchTimeout = setTimeout(() => {
     resultsDiv.innerHTML = '<div>Recherche...</div>';
@@ -662,6 +663,7 @@ function handleMapSearch() {
           resultsDiv.innerHTML = '<div>Aucun résultat</div>';
           return;
         }
+        
         resultsDiv.innerHTML = data.map(place =>
           `<div data-lat="${place.lat}" data-lon="${place.lon}">
             ${place.display_name}
@@ -683,5 +685,4 @@ function handleMapSearch() {
         resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
       });
   }, 350);
-}
 }
