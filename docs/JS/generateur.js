@@ -45,27 +45,17 @@ if (modeSelect) {
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('questTypeSelect');
   if (select && typeof QUESTS_CATALOGUE !== "undefined") {
-    for (const type in QUESTS_CATALOGUE) {
-  for (const theme in QUESTS_CATALOGUE[type]) {
-    QUESTS_CATALOGUE[type][theme].forEach((quest, idx) => {
+    QUESTS_CATALOGUE.forEach(quest => {
       let opt = document.createElement('option');
-      // On encode type|theme|index comme value
-      opt.value = `${type}|${theme}|${idx}`;
-      opt.textContent = `[${type}] [${theme}] ${quest.titre}`;
+      opt.value = quest.id;
+      opt.textContent = quest.nom;
       select.appendChild(opt);
     });
-  }
-}
     select.onchange = function() {
-  if (this.value) {
-    // Décoder type, theme, index
-    const [type, theme, idx] = this.value.split('|');
-    const quest = QUESTS_CATALOGUE[type][theme][parseInt(idx, 10)];
-    generateQuestForm(quest, 'formContainer'); // On transmet la quête entière !
-  } else {
-    document.getElementById('formContainer').innerHTML = '';
+      if (this.value) generateQuestForm(this.value, 'formContainer');
+      else document.getElementById('formContainer').innerHTML = '';
+    };
   }
-};
 
   // Effet fadeIn harmonisé
   var main = document.querySelector('.fadeIn');
@@ -119,7 +109,8 @@ function afficherScenario() {
     return;
   }
   listDiv.innerHTML = scenario.map((etape, idx) => {
-let label = `${etape.titre} — ${etape.objectif}`;
+    const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
+    let label = quest ? quest.nom : etape.type;
     let consignesHtml = '';
     if (etape.params && Array.isArray(etape.params.consignes) && etape.params.consignes.length > 0) {
       consignesHtml = etape.params.consignes.map(c => c ? ` : ${c}` : '').join('');
@@ -163,7 +154,7 @@ function supprimerEtape(idx) {
 function editerEtape(idx) {
   const etape = scenario[idx];
   document.getElementById('questTypeSelect').value = etape.type;
- generateQuestForm(etape, 'formContainer', etape.params);
+  generateQuestForm(etape.type, 'formContainer', etape.params);
   scenario.splice(idx, 1);
   afficherScenario();
 }
@@ -280,105 +271,332 @@ function genererSalon() {
 // ===================
 // Formulaire dynamique
 // ===================
-
-function generateQuestForm(quest, containerId, values = {}) {
-  if (!quest || !quest.titre) return;
+function generateQuestForm(questTypeId, containerId, values = {}) {
+  const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
+  if (!quest) return;
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  container.innerHTML = `
-    <h3>${quest.titre}</h3>
-    <p><b>Objectif :</b> ${quest.objectif}</p>
-    <p><i>${quest.metaphore}</i></p>
-    <p><b>Défi :</b> ${quest.defi}</p>
-    <p><b>Coordonnées GPS :</b> ${quest.gps}</p>
-  `;
+  container.innerHTML = `<h3>${quest.nom}</h3><p>${quest.description}</p>`;
 
   let form = document.createElement('form');
   form.className = 'quest-form';
 
-  // Champs dynamiques
-  let qtyField = null;
-  let consigneFields = [];
-  let gpsField = null;
+  // Bloc multi-points GPS façon boussole harmonisée + bouton ajouter
+  let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
+  let gpsZone = document.createElement('div');
+  gpsZone.className = 'form-field';
+  gpsZone.style.display = "flex";
+  gpsZone.style.flexDirection = "column";
+  gpsZone.style.gap = "8px";
+  gpsZone.style.marginBottom = "20px";
 
-  // Quantité et consignes multiples
-  if (["photo", "photo_inconnus", "video", "collecte_objet"].includes(quest.type)) {
-    qtyField = document.createElement('input');
-    qtyField.type = 'number';
-    qtyField.name = 'quantite';
-    qtyField.min = 1;
-    qtyField.max = 10;
-    qtyField.value = values.quantite || 1;
-    qtyField.style.width = "60px";
-    let qtyLabel = document.createElement('label');
-    qtyLabel.textContent = "Quantité : ";
-    qtyLabel.appendChild(qtyField);
-    form.appendChild(qtyLabel);
+  let gpsListDiv = document.createElement('div');
+  gpsListDiv.id = "gpsPointsList";
+  gpsZone.appendChild(gpsListDiv);
 
-    // Consignes
-    let consignesDiv = document.createElement('div');
-    consignesDiv.style.margin = "10px 0";
-    consignesDiv.id = 'consignesDiv';
-    form.appendChild(consignesDiv);
+  let actionsRow = document.createElement('div');
+  actionsRow.style.display = "flex";
+  actionsRow.style.alignItems = "center";
+  actionsRow.style.gap = "16px";
+  actionsRow.style.marginTop = "4px";
 
-    function renderConsignes() {
-      consignesDiv.innerHTML = '';
-      consigneFields = [];
-      let nombre = parseInt(qtyField.value, 10) || 1;
+  let addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.className = 'main-btn';
+  addBtn.textContent = 'Ajouter';
+  addBtn.style.marginLeft = "2px";
+  actionsRow.appendChild(addBtn);
+
+  gpsZone.appendChild(actionsRow);
+  form.appendChild(gpsZone);
+
+  function renderGpsPoints() {
+    gpsListDiv.innerHTML = '';
+    gpsPoints.forEach((pt, idx) => {
+      let row = document.createElement('div');
+      row.style = "display: flex; align-items: center; gap: 12px; margin-bottom: 4px;";
+      // Icône boussole SVG harmonisée (comme sur les pages épreuves)
+      let logo = document.createElement('span');
+      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]`;
+      logo.title = "Choisir/modifier ce point GPS";
+      logo.style.cursor = "pointer";
+      logo.onclick = function() {
+        openMapPicker({
+          value: pt,
+          set value(val) {
+            if(val) {
+              gpsPoints[idx] = val;
+              renderGpsPoints();
+            }
+          }
+        });
+      };
+      row.appendChild(logo);
+
+      let input = document.createElement('input');
+      input.type = "text";
+      input.value = pt;
+      input.style.width = "150px";
+      input.style.textAlign = "center";
+      input.readOnly = true;
+      row.appendChild(input);
+
+      let delBtn = document.createElement('button');
+      delBtn.type = "button";
+      delBtn.className = "main-btn";
+      delBtn.textContent = "❌";
+      delBtn.style.padding = "0 10px";
+      delBtn.onclick = function() {
+        gpsPoints.splice(idx, 1);
+        renderGpsPoints();
+      };
+      row.appendChild(delBtn);
+
+      gpsListDiv.appendChild(row);
+    });
+  }
+  renderGpsPoints();
+
+  addBtn.onclick = function() {
+    openMapPicker({
+      value: "",
+      set value(val) {
+        if(val) {
+          gpsPoints.push(val);
+          renderGpsPoints();
+        }
+      }
+    });
+  };
+
+  // Détection : comportement spécial (photos, vidéos, etc.)
+  if (
+    (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet")
+    && quest.parametres.some(p => p.type === "number")
+  ) {
+    const qtyParam = quest.parametres.find(p => p.type === "number");
+    const consigneParam = quest.parametres.find(p => p.key === "consigne" || p.key === "critere" || p.key === "objet");
+
+    let fieldWrapper = document.createElement('div');
+    fieldWrapper.className = 'form-field';
+    fieldWrapper.style.display = 'flex';
+    fieldWrapper.style.alignItems = 'center';
+    fieldWrapper.style.gap = '12px';
+    fieldWrapper.style.marginBottom = '10px';
+
+    // Label quantité
+    let labelQty = document.createElement('label');
+    labelQty.textContent = qtyParam.label;
+    labelQty.setAttribute('for', qtyParam.key);
+    labelQty.style.marginRight = "8px";
+    fieldWrapper.appendChild(labelQty);
+
+    // Input quantité minuscule
+    let inputQty = document.createElement('input');
+    inputQty.type = 'number';
+    inputQty.id = qtyParam.key;
+    inputQty.name = qtyParam.key;
+    inputQty.min = qtyParam.min || 1;
+    inputQty.max = qtyParam.max || 10;
+    inputQty.value = values[qtyParam.key] || qtyParam.default || qtyParam.min || 1;
+    inputQty.style.width = "2cm";
+    inputQty.style.fontSize = "1em";
+    inputQty.style.padding = "4px 6px";
+    inputQty.style.textAlign = "center";
+    fieldWrapper.appendChild(inputQty);
+
+    form.appendChild(fieldWrapper);
+
+    // Zone pour consignes
+    let consignesZone = document.createElement('div');
+    consignesZone.id = 'consignesZone';
+    consignesZone.style.marginTop = "14px";
+    form.appendChild(consignesZone);
+
+    function updateConsignes() {
+      consignesZone.innerHTML = '';
+      let nombre = parseInt(inputQty.value, 10) || 1;
+      let row;
       for (let i = 0; i < nombre; i++) {
-        let cField = document.createElement('input');
-        cField.type = 'text';
-        cField.name = `consigne_${i}`;
-        cField.placeholder = "Consigne...";
-        cField.value = (values.consignes && values.consignes[i]) || "";
-        cField.style.display = "block";
-        cField.style.margin = "4px 0";
-        consignesDiv.appendChild(cField);
-        consigneFields.push(cField);
+        if (i % 2 === 0) {
+          row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.gap = '12px';
+          row.style.marginBottom = '8px';
+          consignesZone.appendChild(row);
+        }
+        let field = document.createElement('div');
+        field.style.display = 'flex';
+        field.style.alignItems = 'center';
+        field.style.gap = '6px';
+        let lab = document.createElement('span');
+        lab.textContent = (quest.id.startsWith("photo") ? "Photo" : quest.id === "video" ? "Vidéo" : "Objet") + ` ${i+1} :`;
+        lab.style.fontSize = "1em";
+        lab.style.minWidth = "56px";
+        field.appendChild(lab);
+        let champ = document.createElement('input');
+        champ.type = 'text';
+        champ.name = `consigne_${i}`;
+        champ.placeholder = consigneParam && consigneParam.placeholder ? consigneParam.placeholder : "ex : un arbre";
+        champ.style.width = "66%";
+        champ.style.maxWidth = "8.5em";
+        champ.style.padding = "4px 8px";
+        champ.style.fontSize = "1em";
+        champ.value = (values['consignes'] && values['consignes'][i]) || '';
+        field.appendChild(champ);
+        row.appendChild(field);
       }
     }
-    qtyField.oninput = renderConsignes;
-    renderConsignes();
+
+    inputQty.oninput = updateConsignes;
+    updateConsignes();
   }
 
-  // GPS personnalisable
-  gpsField = document.createElement('input');
-  gpsField.type = "text";
-  gpsField.name = "gps";
-  gpsField.value = values.gps || quest.gps;
-  gpsField.readOnly = true;
-  gpsField.style.width = "180px";
-  gpsField.style.margin = "10px 0";
-  gpsField.onclick = function() { openMapPicker(gpsField); };
-  let gpsLabel = document.createElement('label');
-  gpsLabel.textContent = "Point GPS : ";
-  gpsLabel.appendChild(gpsField);
-  form.appendChild(gpsLabel);
+  // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
+  quest.parametres.forEach(param => {
+    if (
+      (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
+      (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
+    )
+      return;
 
-  // Bouton d'ajout
-  let btn = document.createElement('button');
-  btn.type = 'submit';
-  btn.textContent = 'Ajouter cette quête au scénario';
-  btn.className = 'main-btn';
-  form.appendChild(btn);
+    let fieldWrapper = document.createElement('div');
+    fieldWrapper.className = 'form-field';
+
+    let label = document.createElement('label');
+    label.textContent = param.label;
+    label.setAttribute('for', param.key);
+    fieldWrapper.appendChild(label);
+
+    let input = null;
+    switch (param.type) {
+      case 'number':
+        input = document.createElement('input');
+        input.type = 'number';
+        input.id = param.key;
+        input.name = param.key;
+        if (param.min !== undefined) input.min = param.min;
+        if (param.max !== undefined) input.max = param.max;
+        input.value = values[param.key] || param.default || param.min || 0;
+        break;
+      case 'text':
+        input = document.createElement('input');
+        input.type = 'text';
+        input.id = param.key;
+        input.name = param.key;
+        input.placeholder = param.placeholder || '';
+        input.value = values[param.key] || '';
+        break;
+      case 'textarea':
+        input = document.createElement('textarea');
+        input.id = param.key;
+        input.name = param.key;
+        input.placeholder = param.placeholder || '';
+        input.value = values[param.key] || '';
+        break;
+      case 'file':
+        input = document.createElement('input');
+        input.type = 'file';
+        input.id = param.key;
+        input.name = param.key;
+        break;
+      case 'select':
+        input = document.createElement('select');
+        input.id = param.key;
+        input.name = param.key;
+        (param.options || []).forEach(opt => {
+          let option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt;
+          input.appendChild(option);
+        });
+        input.value = values[param.key] || param.default || '';
+        break;
+      default:
+        input = document.createElement('input');
+        input.type = 'text';
+        input.id = param.key;
+        input.name = param.key;
+        input.value = values[param.key] || '';
+    }
+
+    fieldWrapper.appendChild(input);
+    form.appendChild(fieldWrapper);
+  });
+
+  // Bouton de validation
+  let submit = document.createElement('button');
+  submit.type = 'submit';
+  submit.textContent = 'Valider cette quête';
+  submit.className = 'gold-btn';
+  form.appendChild(submit);
+
+  container.appendChild(form);
 
   form.onsubmit = function(e) {
     e.preventDefault();
-    let params = {};
-    if (qtyField) params.quantite = parseInt(qtyField.value, 10) || 1;
-    if (consigneFields.length) params.consignes = consigneFields.map(f => f.value);
-    if (gpsField) params.gps = gpsField.value;
+    const data = {};
 
-    // Ajoute l’étape complète, y compris type, theme, index pour édition
-    ajouterEtapeAuScenario({
-      ...quest,
-      params
+    // Pour les types avec quantité/consignes multiples
+    if (
+      (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
+      quest.parametres.some(p => p.type === "number")
+    ) {
+      const qtyParam = quest.parametres.find(p => p.type === "number");
+      let nombre = parseInt(form.elements[qtyParam.key].value, 10) || 1;
+      data[qtyParam.key] = nombre;
+      let consignes = [];
+      for (let i = 0; i < nombre; i++) {
+        consignes.push(form.elements[`consigne_${i}`].value);
+      }
+      data['consignes'] = consignes;
+    }
+
+    // Les autres champs
+    quest.parametres.forEach(param => {
+      if (
+        (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
+        (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
+      )
+        return;
+      if (param.type === 'file') {
+        data[param.key] = form.elements[param.key].files[0] || null;
+      } else if (!(param.key in data)) {
+        data[param.key] = form.elements[param.key].value;
+      }
     });
-    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne une nouvelle quête ci-dessus.</div>`;
-  };
 
- 
+    // --- PATCH UNIVERSEL POUR TOUS LES CAS ---
+    if (
+      quest.id === "collecte_objet" ||
+      quest.id === "photo" ||
+      quest.id === "photo_inconnus" ||
+      quest.id === "video"
+    ) {
+      // Trouve dynamiquement le champ quantité dans le catalogue
+      const champQuantite = (quest.parametres.find(p => p.type === "number") || {}).key;
+      if (champQuantite && typeof data[champQuantite] === "undefined") data[champQuantite] = 1;
+
+      // Consignes : TOUJOURS tableau (pour compatibilité)
+      if (!Array.isArray(data.consignes)) data.consignes = [];
+
+      // Ajoute objet OU critere OU consigne selon le catalogue
+      if (quest.parametres.some(p => p.key === "objet") && typeof data.objet === "undefined") data.objet = "";
+      if (quest.parametres.some(p => p.key === "critere") && typeof data.critere === "undefined") data.critere = "";
+      if (quest.parametres.some(p => p.key === "consigne") && typeof data.consigne === "undefined") data.consigne = "";
+    }
+    // 2. Retire le champ "type" de params s'il existe (nettoyage)
+    if ("type" in data) delete data.type;
+
+    data.points = [...gpsPoints];
+    console.log("DEBUG étape ajoutée :", { type: questTypeId, params: data });
+    ajouterEtapeAuScenario({ type: questTypeId, params: data });
+    form.reset();
+    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
+  };
+}
+
 // =======================
 // Fonctions pour la carte
 // =======================
