@@ -208,10 +208,11 @@ function exporterScenario() {
   })
   .then(() => {
     // Retourne la promesse !
-    return firebase.database().ref('scenarios/' + codeSalon).set({
-      coordEnd,
-      scenario
-    });
+firebase.database().ref('scenarios/' + codeSalon).set({
+  mode: currentGameMode,
+  coordEnd,
+  scenario
+});
   })
   .then(() => {
     localStorage.setItem("dernierScenarioCree", codeSalon);
