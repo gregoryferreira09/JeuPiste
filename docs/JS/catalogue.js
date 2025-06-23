@@ -267,12 +267,9 @@ const QUESTS_CATALOGUE = [
           objectif: "Trouver un objet qui pourrait appartenir à un chercheur.",
           defi: "Prenez une photo de l’objet et expliquez sa fonction.",
           gps: "47.494100,-0.599100"
-       ],
+       }
   },
   
-
-
-
         
   {
   id: "photo_inconnus",
@@ -542,7 +539,7 @@ const QUESTS_CATALOGUE = [
         objectif: "Faire participer des inconnus à la découverte.",
         defi: "Prenez une photo de groupe avec deux visiteurs différents sur le site.",
         gps: "47.511900,-0.611800"
-      ],
+      }
   },
 
 
@@ -817,7 +814,7 @@ const QUESTS_CATALOGUE = [
         objectif: "Ramener un objet et expliquer pourquoi il est précieux.",
         defi: "Rapportez l’objet trouvé et racontez son histoire.",
         gps: "47.501900,-0.603900"
-      ],
+      }
   },
 
 
@@ -1091,8 +1088,8 @@ const QUESTS_CATALOGUE = [
         objectif: "Imiter le cri d’un animal ou d’un oiseau.",
         defi: "Enregistrez une imitation collective d’un animal.",
         gps: "47.501900,-0.603900"
-      },
-    ]
+      }
+  },
 
 
     
@@ -1364,8 +1361,8 @@ const QUESTS_CATALOGUE = [
         objectif: "Suivre un itinéraire à plusieurs points GPS.",
         defi: "Validez chaque point de passage.",
         gps: "47.508300,-0.610300"
-      },
-    ]
+      }
+  },
  
 
     
@@ -1638,8 +1635,8 @@ const QUESTS_CATALOGUE = [
         objectif: "Résoudre l’énigme du scribe.",
         defi: "Tapez le mot découvert pour valider l’étape.",
         gps: "47.498700,-0.600700"
-      },
-    ]
+      }
+  },
  
 
     
@@ -1914,10 +1911,9 @@ const QUESTS_CATALOGUE = [
         objectif: "Décoder le mot de passe caché.",
         defi: "Résolvez l’anagramme pour ouvrir la crypte.",
         gps: "47.502600,-0.604600"
-      },
-    ]
-
-
+      }
+  },
+    
     
 
  {
@@ -2189,8 +2185,8 @@ const QUESTS_CATALOGUE = [
         objectif: "Repérer le mot ou le symbole anormal sur le manuscrit.",
         defi: "Quel est l’élément étrange sur le manuscrit sur la photo ?",
         gps: "47.498700,-0.600700"
-      },
-    ]
+      }
+  },
 
     
 
@@ -2462,9 +2458,9 @@ const QUESTS_CATALOGUE = [
         objectif: "Trouver l’amulette cachée selon la description donnée.",
         defi: "Trouvez l’amulette grâce à la devinette sur le site.",
         gps: "47.505800,-0.606800"
-      },
-    ]
-  
+      }
+  },
+      
 
   // === COMBO (Plusieurs actions sur la même étape) ===
   {
@@ -2476,6 +2472,7 @@ const QUESTS_CATALOGUE = [
     ],
     combinable: [],
     preview: "multi"
+ }
   },
 
 
@@ -2748,8 +2745,8 @@ const QUESTS_CATALOGUE = [
         objectif: "Faire passer un objet à tous les membres en 40 secondes.",
         defi: "L’objet doit passer dans toutes les mains avant la fin.",
         gps: "47.501900,-0.603900"
-      },
-    ]
+      }
+  },
   
 
   // === DEFI EN DUEL ===
@@ -3020,8 +3017,8 @@ const QUESTS_CATALOGUE = [
         objectif: "Reconstituer un puzzle ou un objet plus vite que l’adversaire.",
         defi: "Premier à finir la reconstitution remporte le duel.",
         gps: "47.501900,-0.603900"
-      },
-    ]
+      }
+  },
 
 
     // === Jeu du pendu ===
