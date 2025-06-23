@@ -125,7 +125,7 @@ window.creerPartie = async function(formData) {
   };
 
   // Génère un code salon unique pour la partie (toujours nouveau)
-  const salonCode = scenarioCode || (Math.random().toString(36).substr(2, 6)).toUpperCase();
+const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
 
   // *** SUPPRESSION DE L'ANCIEN SALON SI EXISTANT ***
   await db.ref('parties/' + salonCode).remove();
