@@ -26,6 +26,10 @@ let scenario = [];
 let dragSrcIdx = null;
 let mapTargetInput = null;
 
+// Variables globales pour la carte
+let mapSearchTimeout = null;
+let searchMarker = null;
+
 // === INITIALISATION PAGE ===
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('questTypeSelect');
@@ -294,7 +298,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       row.style = "display: flex; align-items: center; gap: 12px; margin-bottom: 4px;";
       // Icône boussole SVG harmonisée (comme sur les pages épreuves)
       let logo = document.createElement('span');
-      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]`
+      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]`;
       logo.title = "Choisir/modifier ce point GPS";
       logo.style.cursor = "pointer";
       logo.onclick = function() {
@@ -543,40 +547,40 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       }
     });
 
-// --- PATCH UNIVERSEL POUR TOUS LES CAS ---
-if (
-  quest.id === "collecte_objet" ||
-  quest.id === "photo" ||
-  quest.id === "photo_inconnus" ||
-  quest.id === "video"
-) {
-  // Trouve dynamiquement le champ quantité dans le catalogue
-  const champQuantite = (quest.parametres.find(p => p.type === "number") || {}).key;
-  if (champQuantite && typeof data[champQuantite] === "undefined") data[champQuantite] = 1;
+    // --- PATCH UNIVERSEL POUR TOUS LES CAS ---
+    if (
+      quest.id === "collecte_objet" ||
+      quest.id === "photo" ||
+      quest.id === "photo_inconnus" ||
+      quest.id === "video"
+    ) {
+      // Trouve dynamiquement le champ quantité dans le catalogue
+      const champQuantite = (quest.parametres.find(p => p.type === "number") || {}).key;
+      if (champQuantite && typeof data[champQuantite] === "undefined") data[champQuantite] = 1;
 
-  // Consignes : TOUJOURS tableau (pour compatibilité)
-  if (!Array.isArray(data.consignes)) data.consignes = [];
+      // Consignes : TOUJOURS tableau (pour compatibilité)
+      if (!Array.isArray(data.consignes)) data.consignes = [];
 
-  // Ajoute objet OU critere OU consigne selon le catalogue
-  if (quest.parametres.some(p => p.key === "objet") && typeof data.objet === "undefined") data.objet = "";
-  if (quest.parametres.some(p => p.key === "critere") && typeof data.critere === "undefined") data.critere = "";
-  if (quest.parametres.some(p => p.key === "consigne") && typeof data.consigne === "undefined") data.consigne = "";
+      // Ajoute objet OU critere OU consigne selon le catalogue
+      if (quest.parametres.some(p => p.key === "objet") && typeof data.objet === "undefined") data.objet = "";
+      if (quest.parametres.some(p => p.key === "critere") && typeof data.critere === "undefined") data.critere = "";
+      if (quest.parametres.some(p => p.key === "consigne") && typeof data.consigne === "undefined") data.consigne = "";
+    }
+    // 2. Retire le champ "type" de params s'il existe (nettoyage)
+    if ("type" in data) delete data.type;
+
+    data.points = [...gpsPoints];
+    console.log("DEBUG étape ajoutée :", { type: questTypeId, params: data });
+    ajouterEtapeAuScenario({ type: questTypeId, params: data });
+    form.reset();
+    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
+  };
 }
-// 2. Retire le champ "type" de params s'il existe (nettoyage)
-if ("type" in data) delete data.type;
 
-data.points = [...gpsPoints];
-console.log("DEBUG étape ajoutée :", { type: questTypeId, params: data });
-ajouterEtapeAuScenario({ type: questTypeId, params: data });
-form.reset();
-container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-    
-// === Carte Leaflet pour sélection GPS + recherche adresse ===
-let mapSearchTimeout = null;
-let searchMarker = null;
+// =======================
+// Fonctions pour la carte
+// =======================
 
-console.log("DEBUG étape ajoutée :", { type: questTypeId, params: data });
-    
 function resetMapContainer() {
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
@@ -651,7 +655,7 @@ function handleMapSearch() {
     resultsDiv.innerHTML = '';
     return;
   }
-  
+
   if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
   mapSearchTimeout = setTimeout(() => {
     resultsDiv.innerHTML = '<div>Recherche...</div>';
@@ -663,7 +667,7 @@ function handleMapSearch() {
           resultsDiv.innerHTML = '<div>Aucun résultat</div>';
           return;
         }
-        
+
         resultsDiv.innerHTML = data.map(place =>
           `<div data-lat="${place.lat}" data-lon="${place.lon}">
             ${place.display_name}
@@ -685,6 +689,4 @@ function handleMapSearch() {
         resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
       });
   }, 350);
-}
-}
 }
