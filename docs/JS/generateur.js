@@ -543,6 +543,20 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       }
     });
 
+    // --- PATCH : force les champs params pour collecte_objet, photo, etc. ---
+if (
+  quest.id === "collecte_objet" ||
+  quest.id === "photo" ||
+  quest.id === "photo_inconnus" ||
+  quest.id === "video"
+) {
+  if (typeof data.nbObjets === "undefined" && typeof data.nombre === "undefined") {
+    data.nbObjets = 1; // ou data.nombre = 1 selon le champ attendu par ton code ailleurs
+  }
+  if (!Array.isArray(data.consignes)) data.consignes = [];
+  if (typeof data.objet === "undefined") data.objet = ""; // ou 'critere' selon ton catalogue
+}
+    
     data.points = [...gpsPoints];
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
