@@ -2490,7 +2490,6 @@ parametres: [
     ],
     combinable: [],
     preview: "multi"
-}
 },
 
 
