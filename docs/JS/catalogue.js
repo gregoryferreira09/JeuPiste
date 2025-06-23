@@ -1,7 +1,8 @@
 // quests-catalogue.js
 
-const QUESTS_CATALOGUE = [
+const QUESTS_CATALOGUE = {
 
+  photo: {
   arthurien: [
     {
       titre: "L'épreuve du Vaillant",
@@ -296,11 +297,11 @@ const QUESTS_CATALOGUE = [
       gps: "47.494100,-0.599100",
       type: "photo"
     }
-  ]
+  ],
 };
 
 
-
+photo_inconnus: {
   arthurien: [
     {
       titre: "La Fraternité des Chevaliers",
@@ -599,7 +600,7 @@ const QUESTS_CATALOGUE = [
 
 
 
-
+video: {
   arthurien: [
     {
       titre: "Force du Chevalier",
@@ -897,7 +898,7 @@ const QUESTS_CATALOGUE = [
 };
 
 
-
+collecte_objet: {
   arthurien: [
     {
       titre: "L'Herbier de Merlin",
@@ -1195,7 +1196,7 @@ const QUESTS_CATALOGUE = [
 };
 
 
-
+audio : {
   arthurien: [
     {
       titre: "Le Chant des Chevaliers",
@@ -1494,7 +1495,7 @@ const QUESTS_CATALOGUE = [
 
 
 
-
+gps : {
   arthurien: [
     {
       titre: "Le Sentier d'Avalon",
@@ -1792,7 +1793,7 @@ const QUESTS_CATALOGUE = [
 };
 
 
-
+mot_de_passe : {
   arthurien: [
     {
       titre: "L'Énigme de Merlin",
@@ -2090,7 +2091,7 @@ const QUESTS_CATALOGUE = [
 };
 
 
-
+anagramme : {                            
   arthurien: [
     {
       titre: "Le Sort de Confusion",
@@ -2388,7 +2389,7 @@ const QUESTS_CATALOGUE = [
 };
 
 
-
+puzzle_visuel : {
   arthurien: [
     {
       titre: "Le Blason Mystérieux",
@@ -2686,7 +2687,7 @@ const QUESTS_CATALOGUE = [
 };
 
 
-
+defi_collectif : {
   arthurien: [
     {
       titre: "Le Pont Humain",
@@ -2984,7 +2985,7 @@ const QUESTS_CATALOGUE = [
 };
 
 
- 
+ chasse_au_tresor : {
   arthurien: [
     {
       titre: "La Quête du Graal",
@@ -3282,7 +3283,7 @@ const QUESTS_CATALOGUE = [
 };
 
 
-
+chrono : {
   arthurien: [
     {
       titre: "L’Épreuve du Graal",
@@ -3579,7 +3580,7 @@ const QUESTS_CATALOGUE = [
   ]
 };
 
-
+duel : {
   arthurien: [
     {
       titre: "Duel d’Escrime",
@@ -3878,7 +3879,7 @@ const QUESTS_CATALOGUE = [
 
 
 
-
+pendu : {
   arthurien: [
     {
       titre: "Le Mot Secret du Graal",
