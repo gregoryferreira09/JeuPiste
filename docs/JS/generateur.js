@@ -280,6 +280,7 @@ function genererSalon() {
 // ===================
 // Formulaire dynamique
 // ===================
+
 function generateQuestForm(quest, containerId, values = {}) {
   if (!quest || !quest.titre) return;
   const container = document.getElementById(containerId);
@@ -292,18 +293,92 @@ function generateQuestForm(quest, containerId, values = {}) {
     <p><b>Défi :</b> ${quest.defi}</p>
     <p><b>Coordonnées GPS :</b> ${quest.gps}</p>
   `;
-  // Ici tu ajoutes tes champs/formulaires personnalisés si besoin
-  // Tu peux aussi proposer d’ajouter cette quête au scénario
-  // Par exemple :
+
+  let form = document.createElement('form');
+  form.className = 'quest-form';
+
+  // Champs dynamiques
+  let qtyField = null;
+  let consigneFields = [];
+  let gpsField = null;
+
+  // Quantité et consignes multiples
+  if (["photo", "photo_inconnus", "video", "collecte_objet"].includes(quest.type)) {
+    qtyField = document.createElement('input');
+    qtyField.type = 'number';
+    qtyField.name = 'quantite';
+    qtyField.min = 1;
+    qtyField.max = 10;
+    qtyField.value = values.quantite || 1;
+    qtyField.style.width = "60px";
+    let qtyLabel = document.createElement('label');
+    qtyLabel.textContent = "Quantité : ";
+    qtyLabel.appendChild(qtyField);
+    form.appendChild(qtyLabel);
+
+    // Consignes
+    let consignesDiv = document.createElement('div');
+    consignesDiv.style.margin = "10px 0";
+    consignesDiv.id = 'consignesDiv';
+    form.appendChild(consignesDiv);
+
+    function renderConsignes() {
+      consignesDiv.innerHTML = '';
+      consigneFields = [];
+      let nombre = parseInt(qtyField.value, 10) || 1;
+      for (let i = 0; i < nombre; i++) {
+        let cField = document.createElement('input');
+        cField.type = 'text';
+        cField.name = `consigne_${i}`;
+        cField.placeholder = "Consigne...";
+        cField.value = (values.consignes && values.consignes[i]) || "";
+        cField.style.display = "block";
+        cField.style.margin = "4px 0";
+        consignesDiv.appendChild(cField);
+        consigneFields.push(cField);
+      }
+    }
+    qtyField.oninput = renderConsignes;
+    renderConsignes();
+  }
+
+  // GPS personnalisable
+  gpsField = document.createElement('input');
+  gpsField.type = "text";
+  gpsField.name = "gps";
+  gpsField.value = values.gps || quest.gps;
+  gpsField.readOnly = true;
+  gpsField.style.width = "180px";
+  gpsField.style.margin = "10px 0";
+  gpsField.onclick = function() { openMapPicker(gpsField); };
+  let gpsLabel = document.createElement('label');
+  gpsLabel.textContent = "Point GPS : ";
+  gpsLabel.appendChild(gpsField);
+  form.appendChild(gpsLabel);
+
+  // Bouton d'ajout
   let btn = document.createElement('button');
-  btn.type = 'button';
+  btn.type = 'submit';
   btn.textContent = 'Ajouter cette quête au scénario';
   btn.className = 'main-btn';
-  btn.onclick = function() {
-    ajouterEtapeAuScenario({...quest});
+  form.appendChild(btn);
+
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    let params = {};
+    if (qtyField) params.quantite = parseInt(qtyField.value, 10) || 1;
+    if (consigneFields.length) params.consignes = consigneFields.map(f => f.value);
+    if (gpsField) params.gps = gpsField.value;
+
+    // Ajoute l’étape complète, y compris type, theme, index pour édition
+    ajouterEtapeAuScenario({
+      ...quest,
+      params
+    });
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne une nouvelle quête ci-dessus.</div>`;
   };
-  container.appendChild(btn);
+
+  container.appendChild(form);
 }
 
   let actionsRow = document.createElement('div');
