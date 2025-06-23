@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Récupération du mode de scénario via Firebase
-  firebase.database().ref('scenarios/' + salonCode + '/mode').once('value').then(snap => {
+  firebase.database().ref('scenarios/' + salonCode + '/mode').once
     const mode = snap.val() || 'arthurien';
     // Si c'est Avalon (scénario spécial), NE TOUCHE PAS au HTML statique
     if (mode === "avalon") return;
