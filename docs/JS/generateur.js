@@ -401,24 +401,8 @@ function generateQuestForm(quest, containerId, values = {}) {
         gpsPoints.splice(idx, 1);
         renderGpsPoints();
       };
-      row.appendChild(delBtn);
+    
 
-      gpsListDiv.appendChild(row);
-    });
-  }
-  renderGpsPoints();
-
-  addBtn.onclick = function() {
-    openMapPicker({
-      value: "",
-      set value(val) {
-        if(val) {
-          gpsPoints.push(val);
-          renderGpsPoints();
-        }
-      }
-    });
-  };
 
   // Détection : comportement spécial (photos, vidéos, etc.)
   if (
