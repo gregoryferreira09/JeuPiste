@@ -415,6 +415,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
  
     
 function updateConsignes() {
+  const selectSuggestion = document.getElementById('suggestionSelect');
   consignesZone.innerHTML = '';
   let nombre = parseInt(inputQty.value, 10) || 1;
   let row;
@@ -763,7 +764,6 @@ function handleMapSearch() {
     resultsDiv.innerHTML = '';
     return;
   }
-
   if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
   mapSearchTimeout = setTimeout(() => {
     resultsDiv.innerHTML = '<div>Recherche...</div>';
@@ -775,11 +775,8 @@ function handleMapSearch() {
           resultsDiv.innerHTML = '<div>Aucun résultat</div>';
           return;
         }
-
         resultsDiv.innerHTML = data.map(place =>
-          `<div data-lat="${place.lat}" data-lon="${place.lon}">
-            ${place.display_name}
-          </div>`
+          `<div data-lat="${place.lat}" data-lon="${place.lon}">${place.display_name}</div>`
         ).join('');
         Array.from(resultsDiv.children).forEach(child => {
           child.onclick = function() {
@@ -797,5 +794,4 @@ function handleMapSearch() {
         resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
       });
   }, 350);
-}
 }
