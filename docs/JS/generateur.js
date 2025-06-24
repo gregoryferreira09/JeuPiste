@@ -374,6 +374,8 @@ if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
     opt.textContent = sugg;
     select.appendChild(opt);
   });
+   }
+   }
   
   // Bloc multi-points GPS façon boussole harmonisée + bouton ajouter
   let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
