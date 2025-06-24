@@ -102,6 +102,7 @@ function genererPhraseQuete(type, mode, variables = {}) {
 // ... après la création des champs nombre/quantité ...
 
 // Ajoute une liste déroulante si suggestions disponibles
+console.log("quest:", quest);
 if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
   let wrapper = document.createElement('div');
   wrapper.className = 'form-field';
