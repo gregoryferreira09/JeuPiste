@@ -798,3 +798,4 @@ function handleMapSearch() {
       });
   }, 350);
 }
+}
