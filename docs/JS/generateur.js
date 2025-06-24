@@ -484,14 +484,22 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       wrapper.appendChild(label);
 
       let select = document.createElement('select');
-      select.id = "suggestionSelect";
-      select.style.marginLeft = "8px";
-      select.style.minWidth = "200px";
+select.id = "suggestionSelect";
+select.style.marginLeft = "8px";
+select.style.minWidth = "200px";
 
-      let optRandom = document.createElement('option');
-      optRandom.value = "random";
-      optRandom.textContent = "Aléatoire (consignes révélées au jeu)";
-      select.appendChild(optRandom);
+// ---- AJOUTE CETTE OPTION VIDE EN PREMIER ----
+let optEmpty = document.createElement('option');
+optEmpty.value = "";
+optEmpty.textContent = "--- choisir une suggestion ---";
+select.appendChild(optEmpty);
+
+let optRandom = document.createElement('option');
+optRandom.value = "random";
+optRandom.textContent = "Aléatoire (consignes révélées au jeu)";
+select.appendChild(optRandom);
+
+// ... puis SUGGESTIONS[quest.id].forEach...
 
       SUGGESTIONS[quest.id].forEach((sugg, i) => {
         let opt = document.createElement('option');
