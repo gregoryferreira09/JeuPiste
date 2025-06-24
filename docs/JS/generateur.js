@@ -99,33 +99,6 @@ function genererPhraseQuete(type, mode, variables = {}) {
   return phrase.replace(/\[([a-z_]+)\]/gi, (_, v) => variables[v] || `[${v}]`);
 }
 
-// ... après la création des champs nombre/quantité ...
-
-  
-  // Quand on change la suggestion
-  select.onchange = function() {
-    if (this.value === "random") {
-      // Mode aléatoire : consignes éditables et vides
-      inputQty.disabled = false;
-      updateConsignes();
-      Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
-        inp.value = "";
-        inp.readOnly = false;
-      });
-    } else {
-      // Suggestion précise : 1 consigne, pas éditable
-      inputQty.value = 1;
-      inputQty.disabled = true;
-      updateConsignes();
-      Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
-        inp.value = SUGGESTIONS[quest.id][parseInt(this.value, 10)];
-        inp.readOnly = true;
-      });
-    }
-  };
-  // Choix par défaut = aléatoire
-  select.value = "random";
-}
 // Affichage de la liste des épreuves
 function afficherScenario() {
   const listDiv = document.getElementById('scenarioList');
@@ -235,11 +208,11 @@ function exporterScenario() {
   })
   .then(() => {
     // Retourne la promesse !
-firebase.database().ref('scenarios/' + codeSalon).set({
-  mode: currentGameMode,
-  coordEnd,
-  scenario
-});
+    firebase.database().ref('scenarios/' + codeSalon).set({
+      mode: currentGameMode,
+      coordEnd,
+      scenario
+    });
   })
   .then(() => {
     localStorage.setItem("dernierScenarioCree", codeSalon);
@@ -285,8 +258,8 @@ function genererSalon() {
     return;
   }
   const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
-    firebase.database().ref('scenarios/' + codeSalon).set({
-    mode: currentGameMode, // <-- Ajoute cette ligne !
+  firebase.database().ref('scenarios/' + codeSalon).set({
+    mode: currentGameMode,
     coordEnd,
     scenario
   }).then(() => {
@@ -309,74 +282,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   let form = document.createElement('form');
   form.className = 'quest-form';
 
-  // Ajoute une liste déroulante si suggestions disponibles
-console.log("quest:", quest);
-if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
-  let wrapper = document.createElement('div');
-  wrapper.className = 'form-field';
-  wrapper.style.margin = '8px 0';
-
-  let label = document.createElement('label');
-  label.textContent = "Suggestion :";
-  label.setAttribute('for', 'suggestionSelect');
-  wrapper.appendChild(label);
-
-  let select = document.createElement('select');
-  select.id = "suggestionSelect";
-  select.style.marginLeft = "8px";
-  select.style.minWidth = "200px";
-
-  let optRandom = document.createElement('option');
-  optRandom.value = "random";
-  optRandom.textContent = "Aléatoire (consignes révélées au jeu)";
-  select.appendChild(optRandom);
-
-  SUGGESTIONS[quest.id].forEach((sugg, i) => {
-    let opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = sugg;
-    select.appendChild(opt);
-  });
-
-  wrapper.appendChild(select);
-  let aideSmall = document.createElement('small');
-aideSmall.textContent = "Choisis une consigne précise ou laisse « Aléatoire » pour découvrir au moment du jeu.";
-aideSmall.style.display = "block";
-aideSmall.style.margin = "6px 0 0 2px";
-wrapper.appendChild(aideSmall);
-form.insertBefore(wrapper, consignesZone);
-
-
-                // Ajoute une liste déroulante si suggestions disponibles
-if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
-  let wrapper = document.createElement('div');
-  wrapper.className = 'form-field';
-  wrapper.style.margin = '8px 0';
-
-  let label = document.createElement('label');
-  label.textContent = "Suggestion :";
-  label.setAttribute('for', 'suggestionSelect');
-  wrapper.appendChild(label);
-
-  let select = document.createElement('select');
-  select.id = "suggestionSelect";
-  select.style.marginLeft = "8px";
-  select.style.minWidth = "200px";
-
-  let optRandom = document.createElement('option');
-  optRandom.value = "random";
-  optRandom.textContent = "Aléatoire (consignes révélées au jeu)";
-  select.appendChild(optRandom);
-
-  SUGGESTIONS[quest.id].forEach((sugg, i) => {
-    let opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = sugg;
-    select.appendChild(opt);
-  });
-   }
-   }
-  
   // Bloc multi-points GPS façon boussole harmonisée + bouton ajouter
   let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
   let gpsZone = document.createElement('div');
@@ -423,8 +328,6 @@ if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
             if(val) {
               gpsPoints[idx] = val;
               renderGpsPoints();
-
-
             }
           }
         });
@@ -468,6 +371,8 @@ if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
   };
 
   // Détection : comportement spécial (photos, vidéos, etc.)
+  let inputQty = null;
+  let consignesZone = null;
   if (
     (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet")
     && quest.parametres.some(p => p.type === "number")
@@ -490,7 +395,7 @@ if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
     fieldWrapper.appendChild(labelQty);
 
     // Input quantité minuscule
-    let inputQty = document.createElement('input');
+    inputQty = document.createElement('input');
     inputQty.type = 'number';
     inputQty.id = qtyParam.key;
     inputQty.name = qtyParam.key;
@@ -506,7 +411,7 @@ if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
     form.appendChild(fieldWrapper);
 
     // Zone pour consignes
-    let consignesZone = document.createElement('div');
+    consignesZone = document.createElement('div');
     consignesZone.id = 'consignesZone';
     consignesZone.style.marginTop = "14px";
     form.appendChild(consignesZone);
@@ -548,6 +453,64 @@ if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
 
     inputQty.oninput = updateConsignes;
     updateConsignes();
+
+    // === Ajoute la liste déroulante suggestions ici, APRES consignesZone ===
+    if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
+      let wrapper = document.createElement('div');
+      wrapper.className = 'form-field';
+      wrapper.style.margin = '8px 0';
+
+      let label = document.createElement('label');
+      label.textContent = "Suggestion :";
+      label.setAttribute('for', 'suggestionSelect');
+      wrapper.appendChild(label);
+
+      let select = document.createElement('select');
+      select.id = "suggestionSelect";
+      select.style.marginLeft = "8px";
+      select.style.minWidth = "200px";
+
+      let optRandom = document.createElement('option');
+      optRandom.value = "random";
+      optRandom.textContent = "Aléatoire (consignes révélées au jeu)";
+      select.appendChild(optRandom);
+
+      SUGGESTIONS[quest.id].forEach((sugg, i) => {
+        let opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = sugg;
+        select.appendChild(opt);
+      });
+
+      wrapper.appendChild(select);
+      let aideSmall = document.createElement('small');
+      aideSmall.textContent = "Choisis une consigne précise ou laisse « Aléatoire » pour découvrir au moment du jeu.";
+      aideSmall.style.display = "block";
+      aideSmall.style.margin = "6px 0 0 2px";
+      wrapper.appendChild(aideSmall);
+      form.insertBefore(wrapper, consignesZone);
+
+      select.onchange = function() {
+        if (this.value === "random") {
+          inputQty.disabled = false;
+          updateConsignes();
+          Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
+            inp.value = "";
+            inp.readOnly = false;
+          });
+        } else {
+          inputQty.value = 1;
+          inputQty.disabled = true;
+          updateConsignes();
+          Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
+            inp.value = SUGGESTIONS[quest.id][parseInt(this.value, 10)];
+            inp.readOnly = true;
+          });
+        }
+      };
+
+      select.value = "random";
+    }
   }
 
   // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
@@ -636,20 +599,20 @@ if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
     const data = {};
 
     // Gestion suggestions (random ou précise)
-const selectSuggestion = form.querySelector('#suggestionSelect');
-if (selectSuggestion) {
-  if (selectSuggestion.value !== "random") {
-    // Suggestion précise : quantité 1, consigne imposée
-    const qtyParam = quest.parametres.find(p => p.type === "number");
-    if (qtyParam) {
-      data[qtyParam.key] = 1;
+    const selectSuggestion = form.querySelector('#suggestionSelect');
+    if (selectSuggestion) {
+      if (selectSuggestion.value !== "random") {
+        // Suggestion précise : quantité 1, consigne imposée
+        const qtyParam = quest.parametres.find(p => p.type === "number");
+        if (qtyParam) {
+          data[qtyParam.key] = 1;
+        }
+        data['consignes'] = [SUGGESTIONS[quest.id][parseInt(selectSuggestion.value, 10)]];
+      } else {
+        // Aléatoire : laisser les consignes vides pour tirage lors du jeu
+        data['consignes'] = [];
+      }
     }
-    data['consignes'] = [SUGGESTIONS[quest.id][parseInt(selectSuggestion.value, 10)]];
-  } else {
-    // Aléatoire : laisser les consignes vides pour tirage lors du jeu
-    data['consignes'] = [];
-  }
-}
     
     // Pour les types avec quantité/consignes multiples
     if (
@@ -708,6 +671,7 @@ if (selectSuggestion) {
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
   };
+}
 
 // =======================
 // Fonctions pour la carte
