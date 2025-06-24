@@ -102,26 +102,31 @@ function genererPhraseQuete(type, mode, variables = {}) {
 // Affichage de la liste des épreuves
 function afficherScenario() {
   const listDiv = document.getElementById('scenarioList');
+  const modeSelect = document.getElementById('modeScenarioSelect');
   if (!listDiv) return;
   if (scenario.length === 0) {
     listDiv.innerHTML = "<p>Aucune épreuve ajoutée.</p>";
     afficherBoutonSalon();
+    // Réactive le select de mode si plus d'épreuves
+    if (modeSelect) modeSelect.disabled = false;
     return;
   }
+  // Désactive le select de mode dès qu'il y a une épreuve
+  if (modeSelect) modeSelect.disabled = true;
+
   listDiv.innerHTML = scenario.map((etape, idx) => {
     const quest = QUESTS_CATALOGUE.find(q => q.id === etape.type);
     let label = quest ? quest.nom : etape.type;
     let consignesHtml = '';
     if (etape.params && Array.isArray(etape.params.consignes) && etape.params.consignes.length > 0) {
-  const isMultiMystery = ["photo", "photo_inconnus", "collecte_objet"].includes(etape.type);
-  if (isMultiMystery) {
-    // Affiche "Mission mystère" pour chaque consigne (pour ne rien révéler avant le jeu)
-    consignesHtml = etape.params.consignes.map(() => ` : Mission mystère`).join('');
-  } else {
-    consignesHtml = etape.params.consignes.map(c => c ? ` : ${c}` : '').join('');
-  }
-}
-    
+      const isMultiMystery = ["photo", "photo_inconnus", "collecte_objet"].includes(etape.type);
+      if (isMultiMystery) {
+        // Affiche "Mission mystère" pour chaque consigne (pour ne rien révéler avant le jeu)
+        consignesHtml = etape.params.consignes.map(() => ` : Mission mystère`).join('');
+      } else {
+        consignesHtml = etape.params.consignes.map(c => c ? ` : ${c}` : '').join('');
+      }
+    }
     return `
       <div class="epreuve-ligne" draggable="true" data-idx="${idx}">
         <span class="epreuve-delete" title="Supprimer" onclick="supprimerEtape(${idx})">❌</span>
