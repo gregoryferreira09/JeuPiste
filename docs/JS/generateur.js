@@ -369,137 +369,171 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     });
   };
 
+
+
+
+
+
+
+  
   // === Bloc multi-consigne moderne (photo, photo_inconnus, collecte_objet) ===
-  const MULTI_CONSIGNE_TYPES = ["photo", "photo_inconnus", "collecte_objet"];
-  if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type === "number")) {
-    const qtyParam = quest.parametres.find(p => p.type === "number");
-    let consigneList = Array.isArray(values.consignes) ? [...values.consignes] : [''];
+ const MULTI_CONSIGNE_TYPES = ["photo", "photo_inconnus", "collecte_objet"];
+if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type === "number")) {
+  const qtyParam = quest.parametres.find(p => p.type === "number");
+  let consigneList = Array.isArray(values.consignes) ? [...values.consignes] : [''];
 
-    // Champ quantité (toujours éditable)
-    let fieldWrapper = document.createElement('div');
-    fieldWrapper.className = 'form-field';
-    fieldWrapper.style.display = 'flex';
-    fieldWrapper.style.alignItems = 'center';
-    fieldWrapper.style.gap = '12px';
-    fieldWrapper.style.marginBottom = '10px';
+  // Champ quantité (toujours éditable)
+  let fieldWrapper = document.createElement('div');
+  fieldWrapper.className = 'form-field';
+  fieldWrapper.style.display = 'flex';
+  fieldWrapper.style.alignItems = 'center';
+  fieldWrapper.style.gap = '12px';
+  fieldWrapper.style.marginBottom = '10px';
 
-    let labelQty = document.createElement('label');
-    labelQty.textContent = qtyParam.label;
-    labelQty.setAttribute('for', qtyParam.key);
-    labelQty.style.marginRight = "8px";
-    fieldWrapper.appendChild(labelQty);
+  let labelQty = document.createElement('label');
+  labelQty.textContent = qtyParam.label;
+  labelQty.setAttribute('for', qtyParam.key);
+  labelQty.style.marginRight = "8px";
+  fieldWrapper.appendChild(labelQty);
 
-    let inputQty = document.createElement('input');
-    inputQty.type = 'number';
-    inputQty.id = qtyParam.key;
-    inputQty.name = qtyParam.key;
-    inputQty.min = qtyParam.min || 1;
-    inputQty.max = qtyParam.max || 10;
-    inputQty.value = consigneList.length;
-    inputQty.style.width = "2cm";
-    inputQty.style.fontSize = "1em";
-    inputQty.style.padding = "4px 6px";
-    inputQty.style.textAlign = "center";
-    fieldWrapper.appendChild(inputQty);
+  let inputQty = document.createElement('input');
+  inputQty.type = 'number';
+  inputQty.id = qtyParam.key;
+  inputQty.name = qtyParam.key;
+  inputQty.min = qtyParam.min || 1;
+  inputQty.max = qtyParam.max || 10;
+  inputQty.value = consigneList.length;
+  inputQty.style.width = "2cm";
+  inputQty.style.fontSize = "1em";
+  inputQty.style.padding = "4px 6px";
+  inputQty.style.textAlign = "center";
+  fieldWrapper.appendChild(inputQty);
 
-    form.appendChild(fieldWrapper);
+  form.appendChild(fieldWrapper);
 
-    // Zone consignes dynamique
-    let consignesZone = document.createElement('div');
-    consignesZone.id = 'consignesZone';
-    consignesZone.style.marginTop = "14px";
-    form.appendChild(consignesZone);
+  // Zone consignes dynamique
+  let consignesZone = document.createElement('div');
+  consignesZone.id = 'consignesZone';
+  consignesZone.style.marginTop = "14px";
+  form.appendChild(consignesZone);
 
-    function renderConsignesSelects() {
-      consignesZone.innerHTML = '';
-      let used = new Set(consigneList.filter(x => x));
-      for (let i = 0; i < consigneList.length; i++) {
-        let row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.alignItems = 'center';
-        row.style.gap = '8px';
-        row.style.marginBottom = '6px';
+  function renderConsignesSelects() {
+    consignesZone.innerHTML = '';
+    let used = new Set(consigneList.filter(x => x && x !== '__random__'));
+    for (let i = 0; i < consigneList.length; i++) {
+      let row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.alignItems = 'center';
+      row.style.gap = '8px';
+      row.style.marginBottom = '6px';
 
-        let optRandom = document.createElement('option');
-        optRandom.value = '__random__';
-        optRandom.textContent = 'Aléatoire (mission surprise)';
-        select.appendChild(optRandom);
-        
-        let label = document.createElement('span');
-        // Libellé adapté selon le type
-        if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
-        else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
-        else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
-        else label.textContent = `Consigne ${i+1}:`;
-        label.style.minWidth = "80px";
-        row.appendChild(label);
+      let label = document.createElement('span');
+      if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
+      else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
+      else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
+      else label.textContent = `Consigne ${i+1}:`;
+      label.style.minWidth = "80px";
+      row.appendChild(label);
 
-        let select = document.createElement('select');
-        let optEmpty = document.createElement('option');
-        optEmpty.value = '';
-        optEmpty.textContent = '-- choisir une mission --';
-        select.appendChild(optEmpty);
+      let select = document.createElement('select');
+      let optEmpty = document.createElement('option');
+      optEmpty.value = '';
+      optEmpty.textContent = '-- choisir une mission --';
+      select.appendChild(optEmpty);
 
-        (SUGGESTIONS[quest.id] || []).forEach((sugg, idx) => {
-          let opt = document.createElement('option');
-          opt.value = sugg;
-          opt.textContent = sugg;
-          if (used.has(sugg) && consigneList[i] !== sugg) opt.disabled = true;
-          select.appendChild(opt);
-        });
-        select.value = consigneList[i];
+      // Option Aléatoire
+      let optRandom = document.createElement('option');
+      optRandom.value = '__random__';
+      optRandom.textContent = 'Aléatoire (mission surprise)';
+      select.appendChild(optRandom);
 
-        select.onchange = function() {
-          consigneList[i] = this.value;
+      (SUGGESTIONS[quest.id] || []).forEach((sugg, idx) => {
+        let opt = document.createElement('option');
+        opt.value = sugg;
+        opt.textContent = sugg;
+        // Ne grise QUE les suggestions déjà choisies explicitement (jamais l'aléatoire)
+        if (used.has(sugg) && consigneList[i] !== sugg) opt.disabled = true;
+        select.appendChild(opt);
+      });
+      select.value = consigneList[i];
+
+      select.onchange = function() {
+        consigneList[i] = this.value;
+        renderConsignesSelects();
+      };
+      row.appendChild(select);
+
+      // Bouton suppression (si plus d'une ligne)
+      if (consigneList.length > 1) {
+        let delBtn = document.createElement('button');
+        delBtn.type = "button";
+        delBtn.textContent = "❌";
+        delBtn.style.marginLeft = "6px";
+        delBtn.onclick = function() {
+          consigneList.splice(i, 1);
+          inputQty.value = consigneList.length;
           renderConsignesSelects();
         };
-        row.appendChild(select);
-
-        // Bouton suppression (si plus d'une ligne)
-        if (consigneList.length > 1) {
-          let delBtn = document.createElement('button');
-          delBtn.type = "button";
-          delBtn.textContent = "❌";
-          delBtn.style.marginLeft = "6px";
-          delBtn.onclick = function() {
-            consigneList.splice(i, 1);
-            inputQty.value = consigneList.length;
-            renderConsignesSelects();
-          };
-          row.appendChild(delBtn);
-        }
-
-        consignesZone.appendChild(row);
+        row.appendChild(delBtn);
       }
+
+      consignesZone.appendChild(row);
     }
-
-    inputQty.oninput = function() {
-      let n = parseInt(inputQty.value, 10) || 1;
-      n = Math.max(qtyParam.min || 1, Math.min(qtyParam.max || 10, n));
-      while (consigneList.length < n) consigneList.push('');
-      while (consigneList.length > n) consigneList.pop();
-      renderConsignesSelects();
-    };
-
-    // Initialisation
-    inputQty.value = consigneList.length;
-    renderConsignesSelects();
-
-    // AU SUBMIT :
-    form.onsubmit = function(e) {
-      e.preventDefault();
-      const data = {};
-      data[qtyParam.key] = consigneList.filter(x => x).length;
-      data.consignes = consigneList.filter(x => x);
-      data.points = [...gpsPoints];
-      ajouterEtapeAuScenario({ type: questTypeId, params: data });
-      form.reset();
-      container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-    };
-    container.appendChild(form);
-    return; // Ne pas générer les champs standards, tout est géré ici pour ce cas
   }
 
+  inputQty.oninput = function() {
+    let n = parseInt(inputQty.value, 10) || 1;
+    n = Math.max(qtyParam.min || 1, Math.min(qtyParam.max || 10, n));
+    while (consigneList.length < n) consigneList.push('');
+    while (consigneList.length > n) consigneList.pop();
+    renderConsignesSelects();
+  };
+
+  // Initialisation
+  inputQty.value = consigneList.length;
+  renderConsignesSelects();
+
+  // AU SUBMIT : Tirage aléatoire sans doublon pour chaque "__random__"
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    const data = {};
+    let result = [];
+    let pool = (SUGGESTIONS[quest.id] || []).filter(Boolean);
+    // Retire de pool les suggestions explicitement déjà choisies
+    consigneList.forEach(val => {
+      if (val && val !== '__random__') {
+        const idx = pool.indexOf(val);
+        if (idx !== -1) pool.splice(idx, 1);
+      }
+    });
+    consigneList.forEach(val => {
+      if (val === '__random__') {
+        if (pool.length > 0) {
+          let idx = Math.floor(Math.random() * pool.length);
+          result.push(pool[idx]);
+          pool.splice(idx, 1);
+        } else {
+          result.push('Aléatoire');
+        }
+      } else {
+        result.push(val);
+      }
+    });
+    data[qtyParam.key] = result.filter(x => x).length;
+    data.consignes = result.filter(x => x);
+    data.points = [...gpsPoints];
+    ajouterEtapeAuScenario({ type: questTypeId, params: data });
+    form.reset();
+    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
+  };
+  container.appendChild(form);
+  return; // Ne pas générer les champs standards, tout est géré ici pour ce cas
+}
+
+
+
+
+  
   // === Autres champs standards ===
   quest.parametres.forEach(param => {
     // Sauter les champs déjà gérés dans le bloc multi-consigne
