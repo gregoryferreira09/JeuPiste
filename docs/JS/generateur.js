@@ -639,11 +639,16 @@ function updateConsignes() {
       let nombre = parseInt(form.elements[qtyParam.key].value, 10) || 1;
       data[qtyParam.key] = nombre;
       let consignes = [];
-      for (let i = 0; i < nombre; i++) {
-        consignes.push(form.elements[`consigne_${i}`].value);
-      }
-      data['consignes'] = consignes;
-    }
+for (let i = 0; i < nombre; i++) {
+  let champ = form.elements[`consigne_${i}`];
+  // Ajoute ceci :
+  if (champ && champ.value === "mystère" && champ.dataset.suggestion) {
+    consignes.push(champ.dataset.suggestion);
+  } else {
+    consignes.push(champ ? champ.value : "");
+  }
+}
+
     // Les autres champs
     quest.parametres.forEach(param => {
       if (
