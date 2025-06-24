@@ -788,10 +788,10 @@ function handleMapSearch() {
             resultsDiv.style.display = 'none';
             resultsDiv.innerHTML = '';
             if (mapTargetInput) mapTargetInput.value = lat + ", " + lon;
-          }
+         };
         });
       }).catch(() => {
         resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
       });
-  }, 350);
+  }, 350); //
 }
