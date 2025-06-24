@@ -377,12 +377,12 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   
   // === Bloc multi-consigne moderne (photo, photo_inconnus, collecte_objet) ===
- const MULTI_CONSIGNE_TYPES = ["photo", "photo_inconnus", "collecte_objet"];
+const MULTI_CONSIGNE_TYPES = ["photo", "photo_inconnus", "collecte_objet"];
 if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type === "number")) {
   const qtyParam = quest.parametres.find(p => p.type === "number");
   let consigneList = Array.isArray(values.consignes) ? [...values.consignes] : [''];
 
-  // Champ quantité (toujours éditable)
+  // Champ quantité
   let fieldWrapper = document.createElement('div');
   fieldWrapper.className = 'form-field';
   fieldWrapper.style.display = 'flex';
@@ -451,7 +451,6 @@ if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type
         let opt = document.createElement('option');
         opt.value = sugg;
         opt.textContent = sugg;
-        // Ne grise QUE les suggestions déjà choisies explicitement (jamais l'aléatoire)
         if (used.has(sugg) && consigneList[i] !== sugg) opt.disabled = true;
         select.appendChild(opt);
       });
@@ -493,41 +492,56 @@ if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type
   inputQty.value = consigneList.length;
   renderConsignesSelects();
 
-  // AU SUBMIT : Tirage aléatoire sans doublon pour chaque "__random__"
+  // AU SUBMIT
   form.onsubmit = function(e) {
     e.preventDefault();
     const data = {};
     let result = [];
     let pool = (SUGGESTIONS[quest.id] || []).filter(Boolean);
-    // Retire de pool les suggestions explicitement déjà choisies
+    // Retire les suggestions déjà explicitement choisies
     consigneList.forEach(val => {
       if (val && val !== '__random__') {
         const idx = pool.indexOf(val);
         if (idx !== -1) pool.splice(idx, 1);
       }
     });
+    let poolCopy = pool.slice();
     consigneList.forEach(val => {
       if (val === '__random__') {
         if (pool.length > 0) {
           let idx = Math.floor(Math.random() * pool.length);
           result.push(pool[idx]);
           pool.splice(idx, 1);
+        } else if (poolCopy.length > 0) {
+          // Tirage avec répétition si pool épuisé
+          let idx = Math.floor(Math.random() * poolCopy.length);
+          result.push(poolCopy[idx]);
         } else {
-          result.push('Aléatoire');
+          result.push('');
         }
       } else {
         result.push(val);
       }
     });
+
+    // Nettoie les vides
     data[qtyParam.key] = result.filter(x => x).length;
     data.consignes = result.filter(x => x);
     data.points = [...gpsPoints];
+
+    if (data.consignes.length === 0) {
+      alert("Merci de sélectionner au moins une mission valide !");
+      return;
+    }
+
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
+    // Réinitialisation propre
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
   };
   container.appendChild(form);
-  return; // Ne pas générer les champs standards, tout est géré ici pour ce cas
+  return; // Ne pas générer les champs standards
+}// Ne pas générer les champs standards, tout est géré ici pour ce cas
 }
 
 
