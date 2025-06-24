@@ -29,7 +29,7 @@ const QUESTS_CATALOGUE = [
           titre: "La Relique cachée",
           metaphore: "Les vestiges du passé n’attendent que d’être révélés.",
           objectif: "Trouver et immortaliser un objet ancien.",
-          defi: "Prenez une photo de l’objet le plus ancien du site.",
+          defi: "Prenez une photo de la chose la plus ancienne que vous trouverez.",
           gps: "47.478500,-0.577500"
         },
         {
@@ -65,8 +65,8 @@ const QUESTS_CATALOGUE = [
         {
           titre: "La Bouteille à la Mer",
           metaphore: "Un message flotte sur les flots, perdu mais pas oublié.",
-          objectif: "Trouver un message caché dans une bouteille.",
-          defi: "Prenez une photo de la bouteille et du message.",
+          objectif: "Trouver un message caché dans une bouteille jetée à la mer.",
+          defi: "Prenez une photo de la fameuse bouteille.",
           gps: "47.481000,-0.579200"
         },
         {
