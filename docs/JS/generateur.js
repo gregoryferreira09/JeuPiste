@@ -57,6 +57,39 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   }
 
+
+
+
+  // ... toute la fin de ton generateur.js ...
+// (après toutes tes fonctions et ton document.addEventListener principal)
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Bouton "Test scénario"
+  const btnTest = document.getElementById('testScenarioBtn');
+  if (btnTest) {
+    btnTest.onclick = function() {
+      if (scenario.length < 1) {
+        alert("Ajoute au moins une épreuve pour tester !");
+        return;
+      }
+      // On stocke le scénario en localStorage pour la page de test
+      localStorage.setItem('scenarioTest', JSON.stringify({
+        mode: currentGameMode,
+        coordEnd: document.getElementById('coordEnd').value,
+        scenario: scenario
+      }));
+      // Redirection vers la page de test (utilise un template d'épreuve)
+      window.open('template-epreuve.html?test=1', '_blank');
+    };
+  }
+});
+
+
+
+
+
+
+  
   // Effet fadeIn harmonisé
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
