@@ -112,6 +112,48 @@
   const db = firebase.database();
   const storage = firebase.storage();
 
+    // --- Mode test local sans Firebase/partie ---
+const params = new URLSearchParams(window.location.search);
+const isTestMode = params.get('test') === '1';
+
+if (isTestMode) {
+  // Récupère le scénario temporaire
+  const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
+  if (!scenarioTest || !scenarioTest.scenario || !Array.isArray(scenarioTest.scenario) || scenarioTest.scenario.length === 0) {
+    document.getElementById('main-content').innerHTML = "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
+  } else {
+    // Permet de faire défiler les épreuves une à une
+    let currentStep = 0;
+    function showStep(idx) {
+      const etape = scenarioTest.scenario[idx];
+      if (!etape) {
+        document.getElementById('main-content').innerHTML = "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
+        return;
+      }
+      // Simule l'affichage de l'étape (tu peux réutiliser ta fonction existante afficherEtape ou l'adapter)
+      afficherEtape(etape, idx);
+      // Ajoute navigation test
+      let nav = document.getElementById('test-nav');
+      if (!nav) {
+        nav = document.createElement('div');
+        nav.id = 'test-nav';
+        nav.style = "margin:18px 0;text-align:center;";
+        document.getElementById('main-content').appendChild(nav);
+      }
+      nav.innerHTML = `
+        <button class="main-btn" ${idx<=0?'disabled':''} onclick="window.showStepTest(${idx-1})">⬅️ Précédent</button>
+        <button class="main-btn" ${idx>=scenarioTest.scenario.length-1?'disabled':''} onclick="window.showStepTest(${idx+1})">Suivant ➡️</button>
+        <div style="margin-top:10px;font-size:0.97em;">Étape ${idx+1} / ${scenarioTest.scenario.length}</div>
+      `;
+      window.showStepTest = showStep;
+    }
+    window.showStepTest = showStep;
+    showStep(currentStep);
+  }
+  // Stoppe tout le code Firebase/partie !
+  return;
+}
+    
   // --- Sécurité session ---
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
