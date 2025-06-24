@@ -159,7 +159,7 @@ form.insertBefore(wrapper, consignesZone);
       });
     }
   };
-
+}
   // Choix par défaut = aléatoire
   select.value = "random";
 }
