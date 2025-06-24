@@ -509,24 +509,32 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       form.insertBefore(wrapper, consignesZone);
 
       select.onchange = function() {
-        if (this.value === "random") {
-          inputQty.disabled = false;
-          updateConsignes();
-          Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
-            inp.value = "";
-            inp.readOnly = false;
-          });
-        } else {
-          inputQty.value = 1;
-          inputQty.disabled = true;
-          updateConsignes();
-          Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
-            inp.value = SUGGESTIONS[quest.id][parseInt(this.value, 10)];
-            inp.readOnly = true;
-          });
-        }
-      };
-
+  if (this.value === "random") {
+    inputQty.disabled = false;
+    updateConsignes();
+    Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
+      inp.value = "";
+      inp.readOnly = false;
+    });
+  } else if (this.value === "") {
+    // Mode libre : plusieurs champs éditables
+    inputQty.disabled = false;
+    updateConsignes();
+    Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
+      inp.readOnly = false;
+      inp.value = "";
+    });
+  } else {
+    // Suggestion précise choisie : 1 seul champ, non éditable
+    inputQty.value = 1;
+    inputQty.disabled = true;
+    updateConsignes();
+    Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
+      inp.value = SUGGESTIONS[quest.id][parseInt(this.value, 10)];
+      inp.readOnly = true;
+    });
+  }
+};
       select.value = "random";
     }
   }
