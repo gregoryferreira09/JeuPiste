@@ -420,6 +420,11 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
         row.style.gap = '8px';
         row.style.marginBottom = '6px';
 
+        let optRandom = document.createElement('option');
+        optRandom.value = '__random__';
+        optRandom.textContent = 'Aléatoire (mission surprise)';
+        select.appendChild(optRandom);
+        
         let label = document.createElement('span');
         // Libellé adapté selon le type
         if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
