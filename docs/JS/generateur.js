@@ -492,6 +492,13 @@ if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type
   inputQty.value = consigneList.length;
   renderConsignesSelects();
 
+  // Ajoute le bouton de validation
+  let submit = document.createElement('button');
+  submit.type = 'submit';
+  submit.textContent = 'Valider cette quête';
+  submit.className = 'gold-btn';
+  form.appendChild(submit);
+
   // AU SUBMIT
   form.onsubmit = function(e) {
     e.preventDefault();
@@ -540,8 +547,11 @@ if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
   };
   container.appendChild(form);
-  return; // Ne pas générer les champs standards
-}// Ne pas générer les champs standards, tout est géré ici pour ce cas
+  return; // Ne pas générer les champs standards pour ces types
+}
+
+
+
 
   
   // === Autres champs standards ===
