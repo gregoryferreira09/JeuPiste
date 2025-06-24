@@ -542,10 +542,6 @@ if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type
   container.appendChild(form);
   return; // Ne pas générer les champs standards
 }// Ne pas générer les champs standards, tout est géré ici pour ce cas
-}
-
-
-
 
   
   // === Autres champs standards ===
