@@ -99,6 +99,64 @@ function genererPhraseQuete(type, mode, variables = {}) {
   return phrase.replace(/\[([a-z_]+)\]/gi, (_, v) => variables[v] || `[${v}]`);
 }
 
+// ... après la création des champs nombre/quantité ...
+
+// Ajoute une liste déroulante si suggestions disponibles
+if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
+  let wrapper = document.createElement('div');
+  wrapper.className = 'form-field';
+  wrapper.style.margin = '8px 0';
+
+  let label = document.createElement('label');
+  label.textContent = "Suggestion :";
+  label.setAttribute('for', 'suggestionSelect');
+  wrapper.appendChild(label);
+
+  let select = document.createElement('select');
+  select.id = "suggestionSelect";
+  select.style.marginLeft = "8px";
+  select.style.minWidth = "200px";
+
+  let optRandom = document.createElement('option');
+  optRandom.value = "random";
+  optRandom.textContent = "Aléatoire (consignes révélées au jeu)";
+  select.appendChild(optRandom);
+
+  SUGGESTIONS[quest.id].forEach((sugg, i) => {
+    let opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = sugg;
+    select.appendChild(opt);
+  });
+
+  wrapper.appendChild(select);
+  form.insertBefore(wrapper, consignesZone);
+
+  // Quand on change la suggestion
+  select.onchange = function() {
+    if (this.value === "random") {
+      // Mode aléatoire : consignes éditables et vides
+      inputQty.disabled = false;
+      updateConsignes();
+      Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
+        inp.value = "";
+        inp.readOnly = false;
+      });
+    } else {
+      // Suggestion précise : 1 consigne, pas éditable
+      inputQty.value = 1;
+      inputQty.disabled = true;
+      updateConsignes();
+      Array.from(consignesZone.querySelectorAll('input[type="text"]')).forEach(inp => {
+        inp.value = SUGGESTIONS[quest.id][parseInt(this.value, 10)];
+        inp.readOnly = true;
+      });
+    }
+  };
+
+  // Choix par défaut = aléatoire
+  select.value = "random";
+}
 // Affichage de la liste des épreuves
 function afficherScenario() {
   const listDiv = document.getElementById('scenarioList');
