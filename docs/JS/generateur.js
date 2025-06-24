@@ -412,64 +412,40 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     consignesZone.style.marginTop = "14px";
     form.appendChild(consignesZone);
 
- 
-    
-function updateConsignes() {
-  const selectSuggestion = document.getElementById('suggestionSelect');
-  consignesZone.innerHTML = '';
-  let nombre = parseInt(inputQty.value, 10) || 1;
-  let row;
-  // Préparer suggestions aléatoires SANS doublon
-  let suggestionsAleatoires = [];
-  if (selectSuggestion && selectSuggestion.value === "random" && SUGGESTIONS[quest.id] && SUGGESTIONS[quest.id].length >= nombre) {
-    let pool = [...SUGGESTIONS[quest.id]];
-    for (let i = 0; i < nombre; i++) {
-      // Tirer une suggestion au hasard et la retirer du pool
-      let idx = Math.floor(Math.random() * pool.length);
-      suggestionsAleatoires.push(pool[idx]);
-      pool.splice(idx, 1);
+    function updateConsignes() {
+      consignesZone.innerHTML = '';
+      let nombre = parseInt(inputQty.value, 10) || 1;
+      let row;
+      for (let i = 0; i < nombre; i++) {
+        if (i % 2 === 0) {
+          row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.gap = '12px';
+          row.style.marginBottom = '8px';
+          consignesZone.appendChild(row);
+        }
+        let field = document.createElement('div');
+        field.style.display = 'flex';
+        field.style.alignItems = 'center';
+        field.style.gap = '6px';
+        let lab = document.createElement('span');
+        lab.textContent = (quest.id.startsWith("photo") ? "Photo" : quest.id === "video" ? "Vidéo" : "Objet") + ` ${i+1} :`;
+        lab.style.fontSize = "1em";
+        lab.style.minWidth = "56px";
+        field.appendChild(lab);
+        let champ = document.createElement('input');
+        champ.type = 'text';
+        champ.name = `consigne_${i}`;
+        champ.placeholder = consigneParam && consigneParam.placeholder ? consigneParam.placeholder : "ex : un arbre";
+        champ.style.width = "66%";
+        champ.style.maxWidth = "8.5em";
+        champ.style.padding = "4px 8px";
+        champ.style.fontSize = "1em";
+        champ.value = (values['consignes'] && values['consignes'][i]) || '';
+        field.appendChild(champ);
+        row.appendChild(field);
+      }
     }
-  }
-  for (let i = 0; i < nombre; i++) {
-    if (i % 2 === 0) {
-      row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.gap = '12px';
-      row.style.marginBottom = '8px';
-      consignesZone.appendChild(row);
-    }
-    let field = document.createElement('div');
-    field.style.display = 'flex';
-    field.style.alignItems = 'center';
-    field.style.gap = '6px';
-    let lab = document.createElement('span');
-    lab.textContent = (quest.id.startsWith("photo") ? "Photo" : quest.id === "video" ? "Vidéo" : "Objet") + ` ${i + 1} :`;
-    lab.style.fontSize = "1em";
-    lab.style.minWidth = "56px";
-    field.appendChild(lab);
-    let champ = document.createElement('input');
-    champ.type = 'text';
-    champ.name = `consigne_${i}`;
-    champ.style.width = "66%";
-    champ.style.maxWidth = "8.5em";
-    champ.style.padding = "4px 8px";
-    champ.style.fontSize = "1em";
-    // --- Ici la logique d'affichage ---
-    if (selectSuggestion && selectSuggestion.value === "random" && suggestionsAleatoires.length === nombre) {
-      champ.value = "mystère";
-      champ.readOnly = true;
-      champ.dataset.suggestion = suggestionsAleatoires[i]; // Pour garder la vraie valeur (pas affichée)
-    } else if (selectSuggestion && selectSuggestion.value !== "random") {
-      champ.value = SUGGESTIONS[quest.id][parseInt(selectSuggestion.value, 10)];
-      champ.readOnly = true;
-    } else {
-      champ.value = (values['consignes'] && values['consignes'][i]) || '';
-      champ.placeholder = consigneParam && consigneParam.placeholder ? consigneParam.placeholder : "ex : un arbre";
-    }
-    field.appendChild(champ);
-    row.appendChild(field);
-  }
-}
 
     inputQty.oninput = updateConsignes;
     updateConsignes();
@@ -640,16 +616,11 @@ function updateConsignes() {
       let nombre = parseInt(form.elements[qtyParam.key].value, 10) || 1;
       data[qtyParam.key] = nombre;
       let consignes = [];
-for (let i = 0; i < nombre; i++) {
-  let champ = form.elements[`consigne_${i}`];
-  // Ajoute ceci :
-  if (champ && champ.value === "mystère" && champ.dataset.suggestion) {
-    consignes.push(champ.dataset.suggestion);
-  } else {
-    consignes.push(champ ? champ.value : "");
-  }
-}
-
+      for (let i = 0; i < nombre; i++) {
+        consignes.push(form.elements[`consigne_${i}`].value);
+      }
+      data['consignes'] = consignes;
+    }
     // Les autres champs
     quest.parametres.forEach(param => {
       if (
@@ -764,6 +735,7 @@ function handleMapSearch() {
     resultsDiv.innerHTML = '';
     return;
   }
+
   if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
   mapSearchTimeout = setTimeout(() => {
     resultsDiv.innerHTML = '<div>Recherche...</div>';
@@ -775,8 +747,11 @@ function handleMapSearch() {
           resultsDiv.innerHTML = '<div>Aucun résultat</div>';
           return;
         }
+
         resultsDiv.innerHTML = data.map(place =>
-          `<div data-lat="${place.lat}" data-lon="${place.lon}">${place.display_name}</div>`
+          `<div data-lat="${place.lat}" data-lon="${place.lon}">
+            ${place.display_name}
+          </div>`
         ).join('');
         Array.from(resultsDiv.children).forEach(child => {
           child.onclick = function() {
@@ -788,9 +763,10 @@ function handleMapSearch() {
             resultsDiv.style.display = 'none';
             resultsDiv.innerHTML = '';
             if (mapTargetInput) mapTargetInput.value = lat + ", " + lon;
-         };
+          }
         });
       }).catch(() => {
         resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
       });
-  }, 350); //
+  }, 350);
+}
