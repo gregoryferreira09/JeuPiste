@@ -596,6 +596,22 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     e.preventDefault();
     const data = {};
 
+    // Gestion suggestions (random ou précise)
+const selectSuggestion = form.querySelector('#suggestionSelect');
+if (selectSuggestion) {
+  if (selectSuggestion.value !== "random") {
+    // Suggestion précise : quantité 1, consigne imposée
+    const qtyParam = quest.parametres.find(p => p.type === "number");
+    if (qtyParam) {
+      data[qtyParam.key] = 1;
+    }
+    data['consignes'] = [SUGGESTIONS[quest.id][parseInt(selectSuggestion.value, 10)]];
+  } else {
+    // Aléatoire : laisser les consignes vides pour tirage lors du jeu
+    data['consignes'] = [];
+  }
+}
+    
     // Pour les types avec quantité/consignes multiples
     if (
       (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
