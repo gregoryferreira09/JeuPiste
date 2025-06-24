@@ -129,29 +129,28 @@ if (isTestMode) {
       if (!etape) {
         document.getElementById('main-content').innerHTML = "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
         return;
+      } else {
+        afficherEtape(etape, idx);
+        // Ajoute navigation test
+        let nav = document.getElementById('test-nav');
+        if (!nav) {
+          nav = document.createElement('div');
+          nav.id = 'test-nav';
+          nav.style = "margin:18px 0;text-align:center;";
+          document.getElementById('main-content').appendChild(nav);
+        }
+        nav.innerHTML = `
+          <button class="main-btn" ${idx<=0?'disabled':''} onclick="window.showStepTest(${idx-1})">⬅️ Précédent</button>
+          <button class="main-btn" ${idx>=scenarioTest.scenario.length-1?'disabled':''} onclick="window.showStepTest(${idx+1})">Suivant ➡️</button>
+          <div style="margin-top:10px;font-size:0.97em;">Étape ${idx+1} / ${scenarioTest.scenario.length}</div>
+        `;
+        window.showStepTest = showStep;
       }
-      // Simule l'affichage de l'étape (tu peux réutiliser ta fonction existante afficherEtape ou l'adapter)
-      afficherEtape(etape, idx);
-      // Ajoute navigation test
-      let nav = document.getElementById('test-nav');
-      if (!nav) {
-        nav = document.createElement('div');
-        nav.id = 'test-nav';
-        nav.style = "margin:18px 0;text-align:center;";
-        document.getElementById('main-content').appendChild(nav);
-      }
-      nav.innerHTML = `
-        <button class="main-btn" ${idx<=0?'disabled':''} onclick="window.showStepTest(${idx-1})">⬅️ Précédent</button>
-        <button class="main-btn" ${idx>=scenarioTest.scenario.length-1?'disabled':''} onclick="window.showStepTest(${idx+1})">Suivant ➡️</button>
-        <div style="margin-top:10px;font-size:0.97em;">Étape ${idx+1} / ${scenarioTest.scenario.length}</div>
-      `;
-      window.showStepTest = showStep;
     }
     window.showStepTest = showStep;
     showStep(currentStep);
   }
-  // Stoppe tout le code Firebase/partie !
-  return;
+  // ⛔ SUPPRIME LE "return;" ICI ⛔
 }
     
   // --- Sécurité session ---
