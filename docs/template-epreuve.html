@@ -117,42 +117,60 @@ const params = new URLSearchParams(window.location.search);
 const isTestMode = params.get('test') === '1';
 
 if (isTestMode) {
-  // Récupère le scénario temporaire
+  // ----- MODE TEST (PAS DE REDIRECTION, PAS DE FIREBASE, PAS DE salonCode) -----
   const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
   if (!scenarioTest || !scenarioTest.scenario || !Array.isArray(scenarioTest.scenario) || scenarioTest.scenario.length === 0) {
-    document.getElementById('main-content').innerHTML = "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
+    document.getElementById('main-content').innerHTML =
+      "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
   } else {
-    // Permet de faire défiler les épreuves une à une
     let currentStep = 0;
     function showStep(idx) {
       const etape = scenarioTest.scenario[idx];
       if (!etape) {
-        document.getElementById('main-content').innerHTML = "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
+        document.getElementById('main-content').innerHTML =
+          "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
         return;
-      } else {
-        afficherEtape(etape, idx);
-        // Ajoute navigation test
-        let nav = document.getElementById('test-nav');
-        if (!nav) {
-          nav = document.createElement('div');
-          nav.id = 'test-nav';
-          nav.style = "margin:18px 0;text-align:center;";
-          document.getElementById('main-content').appendChild(nav);
-        }
-        nav.innerHTML = `
-          <button class="main-btn" ${idx<=0?'disabled':''} onclick="window.showStepTest(${idx-1})">⬅️ Précédent</button>
-          <button class="main-btn" ${idx>=scenarioTest.scenario.length-1?'disabled':''} onclick="window.showStepTest(${idx+1})">Suivant ➡️</button>
-          <div style="margin-top:10px;font-size:0.97em;">Étape ${idx+1} / ${scenarioTest.scenario.length}</div>
-        `;
-        window.showStepTest = showStep;
       }
+      afficherEtape(etape, idx);
+
+      // Navigation test
+      let nav = document.getElementById('test-nav');
+      if (!nav) {
+        nav = document.createElement('div');
+        nav.id = 'test-nav';
+        nav.style = "margin:18px 0;text-align:center;";
+        document.getElementById('main-content').appendChild(nav);
+      }
+      nav.innerHTML = `
+        <button class="main-btn" ${idx <= 0 ? 'disabled' : ''} onclick="window.showStepTest(${idx - 1})">⬅️ Précédent</button>
+        <button class="main-btn" ${idx >= scenarioTest.scenario.length - 1 ? 'disabled' : ''} onclick="window.showStepTest(${idx + 1})">Suivant ➡️</button>
+        <div style="margin-top:10px;font-size:0.97em;">Étape ${idx + 1} / ${scenarioTest.scenario.length}</div>
+      `;
+      window.showStepTest = showStep;
     }
     window.showStepTest = showStep;
     showStep(currentStep);
+
+    // OPTIONNEL : Bloque les uploads en mode test pour éviter toute erreur
+    window.afficherBlocUpload = function(type, stepIndex, idxMission, onUploaded) {
+      const bloc = document.getElementById('bloc-upload');
+      const row = document.getElementById('upload-row');
+      row.innerHTML = '';
+      bloc.style.display = '';
+      let fakeBtn = document.createElement('button');
+      fakeBtn.className = "main-btn";
+      fakeBtn.textContent = "Upload désactivé en mode test";
+      fakeBtn.disabled = true;
+      row.appendChild(fakeBtn);
+      document.getElementById('upload-feedback').textContent = "Aucun fichier n'est envoyé en mode test.";
+      if (typeof onUploaded === "function") onUploaded();
+    };
   }
-  // ⛔ SUPPRIME LE "return;" ICI ⛔
+  // NE METS RIEN ICI (surtout pas de return)
 } else {
-    
+  // ----- MODE NORMAL : ICI SEULEMENT la sécurité session, Firebase, etc -----
+
+  
   // --- Sécurité session ---
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = Number(localStorage.getItem("equipeNum"));
