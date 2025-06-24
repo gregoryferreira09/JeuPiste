@@ -794,4 +794,3 @@ function handleMapSearch() {
         resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
       });
   }, 350); //
-}
