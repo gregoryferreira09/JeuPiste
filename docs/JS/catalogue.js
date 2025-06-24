@@ -162,9 +162,9 @@ const SUGGESTIONS = {
     "Un membre de l’équipe le plus haut possible",
     "Une photo prise “à travers” quelque chose (trou, branches…)",
     "Un monument ou vestige caché du parc"
-  ]
+  ],
 
- {,
+ 
   photo_inconnus: [
     "Avec une personne portant un chapeau",
     "Avec quelqu’un ayant une barbe remarquable",
@@ -185,9 +185,9 @@ const SUGGESTIONS = {
     "Avec quelqu’un qui accepte de mimer la peur ou la surprise",
     "Avec toute une famille comme si vous en étiez un membre",
     "Avec la plus belle personne du parc"
-  ]
+  ],
 
-  {,
+
   collecte_objet: [
     "Une feuille d’arbre d’une forme originale",
     "Le plus beau caillou que vous trouverez",
@@ -211,18 +211,17 @@ const SUGGESTIONS = {
     "Un objet qui porte une trace d’animal (coquille, plume…)",
     "Trois objets que tu mets en histoire durant deux minutes",
     "Un objet qui pourrait appartenir à un pirate/sorcier/héros…"
-  ]
+  ],
 
-    {,
+  
 
   audio: [
     "Chanter le refrain de la musique qui apparait sous vos yeux",
     "Murmurer un secret à l’enregistreur",
     "Faire une imitation d’un personnage célèbre (dessin animé, cinéma…)",
     "Chanter une note qui tient le plus longtemps possible en un seul souffle"
-  ]
+  ],
 
-{,
   gps_chaud_froid: [
     "Trouve le banc caché au centre du parc",
     "Atteins la fontaine au nord sans la carte, en mode chaud/froid",
@@ -234,9 +233,9 @@ const SUGGESTIONS = {
     "Rends-toi au point GPS caché à moins de 30 pas d’ici",
     "Découvre la cachette sous le vieux pont",
     "Trouve la zone d’ombre la plus fraîche du parc"
-  ]
+  ],
 
-    {,
+    
 
   enigme: [
     "Anagramme d’un mot en rapport avec le parc (ex : « RVABE » —> Réponse : “Arbre”)",
@@ -249,9 +248,9 @@ const SUGGESTIONS = {
     "Trouver le nom d’un monument caché dans un texte",
     "Trouver le nombre exact d’objets d’une couleur dans la zone",
     "Trouver l’intrus dans une liste d’éléments naturels"
-  ]
+  ],
 
-    {,
+  
   chrono: [
     "Ramasser et rapporter 3 objets différents en moins de 30 secondes et prendre la photo",
     "Prendre une photo d’un animal ou d’un insecte en moins de 40 secondes et prendre la photo",
@@ -264,9 +263,9 @@ const SUGGESTIONS = {
     "Trouver et ramasser un déchet en moins de 40 secondes et prendre la photo",
     "Faire la photo la plus sexy de vous en 10 secondes",
     "Faire la pire grimace de vous en 10 secondes"
-  ]
+  ],
 
-{,
+
 
   defi_amis: [
     "Pierre-Feuille-Ciseaux (classique, un tour ou en 2 manches gagnantes)",
@@ -279,5 +278,5 @@ const SUGGESTIONS = {
     "Cri le plus long (qui tient un cri ou une note la plus longue)",
     "Pierre-feuille-ciseaux en relais (enchaîner 3 duels en équipe)"
   ]
-};
+}
   
