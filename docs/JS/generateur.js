@@ -130,8 +130,14 @@ if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
   });
 
   wrapper.appendChild(select);
-  form.insertBefore(wrapper, consignesZone);
+  let aideSmall = document.createElement('small');
+aideSmall.textContent = "Choisis une consigne précise ou laisse « Aléatoire » pour découvrir au moment du jeu.";
+aideSmall.style.display = "block";
+aideSmall.style.margin = "6px 0 0 2px";
+wrapper.appendChild(aideSmall);
+form.insertBefore(wrapper, consignesZone);
 
+  
   // Quand on change la suggestion
   select.onchange = function() {
     if (this.value === "random") {
