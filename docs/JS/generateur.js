@@ -708,7 +708,6 @@ if (selectSuggestion) {
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
   };
-}
 
 // =======================
 // Fonctions pour la carte
