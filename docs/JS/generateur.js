@@ -392,6 +392,34 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
             if(val) {
               gpsPoints[idx] = val;
               renderGpsPoints();
+
+              // Ajoute une liste déroulante si suggestions disponibles
+if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
+  let wrapper = document.createElement('div');
+  wrapper.className = 'form-field';
+  wrapper.style.margin = '8px 0';
+
+  let label = document.createElement('label');
+  label.textContent = "Suggestion :";
+  label.setAttribute('for', 'suggestionSelect');
+  wrapper.appendChild(label);
+
+  let select = document.createElement('select');
+  select.id = "suggestionSelect";
+  select.style.marginLeft = "8px";
+  select.style.minWidth = "200px";
+
+  let optRandom = document.createElement('option');
+  optRandom.value = "random";
+  optRandom.textContent = "Aléatoire (consignes révélées au jeu)";
+  select.appendChild(optRandom);
+
+  SUGGESTIONS[quest.id].forEach((sugg, i) => {
+    let opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = sugg;
+    select.appendChild(opt);
+  });
             }
           }
         });
