@@ -27,18 +27,6 @@ const QUESTS_CATALOGUE = [
     preview: "photo"
   },
 
-  // === VIDEO ===
-  {
-    id: "video",
-    nom: "Vidéo à tourner",
-    description: "Se filmer en train de réaliser une action précise, une ou plusieurs fois. (vidéo de moins de 20 secondes pour être bien uploadée)",
-    parametres: [
-      { key: "nbVideos", type: "number", label: "Nombre de vidéos", default: 1, min: 1, max: 5 },
-      { key: "consigne", type: "text", label: "Consigne vidéo", placeholder: "ex : fais une roulade" }
-    ],
-    combinable: ["gps", "chrono"],
-    preview: "video"
-  },
 
   // === COLLECTE OBJET ===
   {
@@ -77,18 +65,6 @@ const QUESTS_CATALOGUE = [
     preview: "gps"
   },
 
-  // === MOT DE PASSE / ENIGME ===
-  {
-    id: "mot_de_passe",
-    nom: "Mot de passe à deviner",
-    description: "Résoudre une énigme pour trouver le mot de passe.",
-    parametres: [
-      { key: "enigme", type: "textarea", label: "Énigme à résoudre" },
-      { key: "solution", type: "text", label: "Mot de passe attendu" }
-    ],
-    combinable: ["gps", "chrono"],
-    preview: "enigme"
-  },
 
   // === ANAGRAMME/CRYPTAGE ===
   {
@@ -104,81 +80,9 @@ const QUESTS_CATALOGUE = [
     preview: "enigme"
   },
 
-  // === PUZZLE VISUEL ===
-  {
-    id: "puzzle_visuel",
-    nom: "Puzzle visuel",
-    description: "Trouver l’erreur sur une image, reconstituer une photo, etc.",
-    parametres: [
-      { key: "image", type: "file", label: "Image à afficher" },
-      { key: "question", type: "text", label: "Question à poser" },
-      { key: "solution", type: "text", label: "Réponse attendue" }
-    ],
-    combinable: ["chrono"],
-    preview: "image"
-  },
 
-  // === SIGNATURE INCONNU ===
-  {
-    id: "signature_inconnu",
-    nom: "Signature/message d’inconnu",
-    description: "Faire écrire un mot/une signature/un dessin à quelqu’un.",
-    parametres: [
-      { key: "consigne", type: "text", label: "Consigne à l’inconnu", placeholder: "ex : écris ton plat préféré" }
-    ],
-    combinable: ["chrono", "photo"],
-    preview: "texte"
-  },
 
-  // === DEFI COLLECTIF ===
-  {
-    id: "defi_collectif",
-    nom: "Défi collectif",
-    description: "Réaliser une action ensemble ou avec des inconnus.",
-    parametres: [
-      { key: "consigne", type: "text", label: "Consigne du défi", placeholder: "ex : pyramide humaine, saute-mouton..." },
-      { key: "preuve", type: "select", label: "Preuve à fournir", options: ["photo", "video", "audio", "texte"], default: "photo" }
-    ],
-    combinable: ["chrono", "gps"],
-    preview: "collectif"
-  },
 
-  // === OBSERVATION ===
-  {
-    id: "observation",
-    nom: "Trouver un détail sur place",
-    description: "Repérer un symbole, mot, nombre, couleur, statue, etc.",
-    parametres: [
-      { key: "question", type: "text", label: "Question à poser", placeholder: "ex : quelle couleur sur la porte ?" },
-      { key: "solution", type: "text", label: "Bonne réponse" }
-    ],
-    combinable: ["gps", "chrono"],
-    preview: "texte"
-  },
-
-  // === CHASSE AU TRESOR ===
-  {
-    id: "chasse_tresor",
-    nom: "Chasse au trésor",
-    description: "Plusieurs étapes, chaque indice mène à la suivante.",
-    parametres: [
-      { key: "etapes", type: "list", label: "Liste d’énigmes/indices", itemType: "texte_ou_gps" }
-    ],
-    combinable: ["chrono"],
-    preview: "multi"
-  },
-
-  // === COMBO (Plusieurs actions sur la même étape) ===
-  {
-    id: "combo",
-    nom: "Combinaison d’actions",
-    description: "Réaliser plusieurs actions à la suite ou en même temps (photo + GPS + mot de passe…).",
-    parametres: [
-      { key: "actions", type: "list", label: "Liste d’actions à combiner", itemType: "reference_autre_quete" }
-    ],
-    combinable: [],
-    preview: "multi"
-  },
 
   // === CHRONOMETRE ===
   {
@@ -203,6 +107,7 @@ const QUESTS_CATALOGUE = [
     combinable: [],
     preview: "duel"
   },
+  
   {
     id: "pendu",
     nom: "Le Jeu du Pendu", // mettre "nom" pour l'affichage, pas "titre"
