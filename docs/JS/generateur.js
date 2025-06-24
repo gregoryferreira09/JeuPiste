@@ -32,22 +32,17 @@ let searchMarker = null;
 
 let currentGameMode = "arthurien"; // valeur par défaut
 
-// ...dans le DOMContentLoaded :
-const modeSelect = document.getElementById('modeScenarioSelect');
-if (modeSelect) {
-  modeSelect.onchange = function() {
-    currentGameMode = this.value;
-  };
-  currentGameMode = modeSelect.value; // initialise
-}
-
-
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", function() {
+  // Initialisation du select univers
+  const modeSelect = document.getElementById('modeScenarioSelect');
+  if (modeSelect) {
+    modeSelect.onchange = function() {
+      currentGameMode = this.value;
+    };
+    currentGameMode = modeSelect.value; // initialise
+  }
+
+  // Initialisation du select type d'épreuve
   const select = document.getElementById('questTypeSelect');
   if (select && typeof QUESTS_CATALOGUE !== "undefined") {
     QUESTS_CATALOGUE.forEach(quest => {
@@ -62,43 +57,6 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   }
 
-  // ... (tous tes autres trucs d'init de page) ...
-
-  // Effet fadeIn harmonisé
-  var main = document.querySelector('.fadeIn');
-  if (main) main.classList.add('visible');
-
-  // Champ coordonnée d'arrivée ...
-  // Fermeture carte ...
-  // Recherche adresse ...
-  // Première mise à jour de la liste des épreuves
-  afficherScenario();
-
-  // === ICI, à la fin du bloc, AJOUTE le bouton test ===
-  const btnTest = document.getElementById('testScenarioBtn');
-  if (btnTest) {
-    btnTest.onclick = function() {
-      if (scenario.length < 1) {
-        alert("Ajoute au moins une épreuve pour tester !");
-        return;
-      }
-      localStorage.setItem('scenarioTest', JSON.stringify({
-        mode: currentGameMode,
-        coordEnd: document.getElementById('coordEnd').value,
-        scenario: scenario
-      }));
-      window.open('template-epreuve.html?test=1', '_blank');
-    };
-  }
-
-}); // <== ceci ferme ton unique bloc DOMContentLoaded
-
-
-
-
-
-
-  
   // Effet fadeIn harmonisé
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
@@ -126,6 +84,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Première mise à jour de la liste des épreuves
   afficherScenario();
+
+  // === Bouton "Test scénario" ===
+  const btnTest = document.getElementById('testScenarioBtn');
+  if (btnTest) {
+    btnTest.onclick = function() {
+      if (scenario.length < 1) {
+        alert("Ajoute au moins une épreuve pour tester !");
+        return;
+      }
+      localStorage.setItem('scenarioTest', JSON.stringify({
+        mode: currentGameMode,
+        coordEnd: document.getElementById('coordEnd').value,
+        scenario: scenario
+      }));
+      window.open('template-epreuve.html?test=1', '_blank');
+    };
+  }
 });
 
 // Ajouter une étape au scénario
@@ -371,7 +346,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       row.style = "display: flex; align-items: center; gap: 12px; margin-bottom: 4px;";
       // Icône boussole SVG harmonisée (comme sur les pages épreuves)
       let logo = document.createElement('span');
-      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]`;
+      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5..."/></svg>`;
       logo.title = "Choisir/modifier ce point GPS";
       logo.style.cursor = "pointer";
       logo.onclick = function() {
@@ -423,191 +398,180 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     });
   };
 
-
-
-
-
-
-
-  
   // === Bloc multi-consigne moderne (photo, photo_inconnus, collecte_objet) ===
-const MULTI_CONSIGNE_TYPES = ["photo", "photo_inconnus", "collecte_objet"];
-if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type === "number")) {
-  const qtyParam = quest.parametres.find(p => p.type === "number");
-  let consigneList = Array.isArray(values.consignes) ? [...values.consignes] : [''];
+  const MULTI_CONSIGNE_TYPES = ["photo", "photo_inconnus", "collecte_objet"];
+  if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type === "number")) {
+    const qtyParam = quest.parametres.find(p => p.type === "number");
+    let consigneList = Array.isArray(values.consignes) ? [...values.consignes] : [''];
 
-  // Champ quantité
-  let fieldWrapper = document.createElement('div');
-  fieldWrapper.className = 'form-field';
-  fieldWrapper.style.display = 'flex';
-  fieldWrapper.style.alignItems = 'center';
-  fieldWrapper.style.gap = '12px';
-  fieldWrapper.style.marginBottom = '10px';
+    // Champ quantité
+    let fieldWrapper = document.createElement('div');
+    fieldWrapper.className = 'form-field';
+    fieldWrapper.style.display = 'flex';
+    fieldWrapper.style.alignItems = 'center';
+    fieldWrapper.style.gap = '12px';
+    fieldWrapper.style.marginBottom = '10px';
 
-  let labelQty = document.createElement('label');
-  labelQty.textContent = qtyParam.label;
-  labelQty.setAttribute('for', qtyParam.key);
-  labelQty.style.marginRight = "8px";
-  fieldWrapper.appendChild(labelQty);
+    let labelQty = document.createElement('label');
+    labelQty.textContent = qtyParam.label;
+    labelQty.setAttribute('for', qtyParam.key);
+    labelQty.style.marginRight = "8px";
+    fieldWrapper.appendChild(labelQty);
 
-  let inputQty = document.createElement('input');
-  inputQty.type = 'number';
-  inputQty.id = qtyParam.key;
-  inputQty.name = qtyParam.key;
-  inputQty.min = qtyParam.min || 1;
-  inputQty.max = qtyParam.max || 10;
-  inputQty.value = consigneList.length;
-  inputQty.style.width = "2cm";
-  inputQty.style.fontSize = "1em";
-  inputQty.style.padding = "4px 6px";
-  inputQty.style.textAlign = "center";
-  fieldWrapper.appendChild(inputQty);
+    let inputQty = document.createElement('input');
+    inputQty.type = 'number';
+    inputQty.id = qtyParam.key;
+    inputQty.name = qtyParam.key;
+    inputQty.min = qtyParam.min || 1;
+    inputQty.max = qtyParam.max || 10;
+    inputQty.value = consigneList.length;
+    inputQty.style.width = "2cm";
+    inputQty.style.fontSize = "1em";
+    inputQty.style.padding = "4px 6px";
+    inputQty.style.textAlign = "center";
+    fieldWrapper.appendChild(inputQty);
 
-  form.appendChild(fieldWrapper);
+    form.appendChild(fieldWrapper);
 
-  // Zone consignes dynamique
-  let consignesZone = document.createElement('div');
-  consignesZone.id = 'consignesZone';
-  consignesZone.style.marginTop = "14px";
-  form.appendChild(consignesZone);
+    // Zone consignes dynamique
+    let consignesZone = document.createElement('div');
+    consignesZone.id = 'consignesZone';
+    consignesZone.style.marginTop = "14px";
+    form.appendChild(consignesZone);
 
-  function renderConsignesSelects() {
-    consignesZone.innerHTML = '';
-    let used = new Set(consigneList.filter(x => x && x !== '__random__'));
-    for (let i = 0; i < consigneList.length; i++) {
-      let row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.alignItems = 'center';
-      row.style.gap = '8px';
-      row.style.marginBottom = '6px';
+    function renderConsignesSelects() {
+      consignesZone.innerHTML = '';
+      let used = new Set(consigneList.filter(x => x && x !== '__random__'));
+      for (let i = 0; i < consigneList.length; i++) {
+        let row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.gap = '8px';
+        row.style.marginBottom = '6px';
 
-      let label = document.createElement('span');
-      if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
-      else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
-      else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
-      else label.textContent = `Consigne ${i+1}:`;
-      label.style.minWidth = "80px";
-      row.appendChild(label);
+        let label = document.createElement('span');
+        if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
+        else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
+        else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
+        else label.textContent = `Consigne ${i+1}:`;
+        label.style.minWidth = "80px";
+        row.appendChild(label);
 
-      let select = document.createElement('select');
-      let optEmpty = document.createElement('option');
-      optEmpty.value = '';
-      optEmpty.textContent = '-- choisir une mission --';
-      select.appendChild(optEmpty);
+        let select = document.createElement('select');
+        let optEmpty = document.createElement('option');
+        optEmpty.value = '';
+        optEmpty.textContent = '-- choisir une mission --';
+        select.appendChild(optEmpty);
 
-      // Option Aléatoire
-      let optRandom = document.createElement('option');
-      optRandom.value = '__random__';
-      optRandom.textContent = 'Aléatoire (mission surprise)';
-      select.appendChild(optRandom);
+        // Option Aléatoire
+        let optRandom = document.createElement('option');
+        optRandom.value = '__random__';
+        optRandom.textContent = 'Aléatoire (mission surprise)';
+        select.appendChild(optRandom);
 
-      (SUGGESTIONS[quest.id] || []).forEach((sugg, idx) => {
-        let opt = document.createElement('option');
-        opt.value = sugg;
-        opt.textContent = sugg;
-        if (used.has(sugg) && consigneList[i] !== sugg) opt.disabled = true;
-        select.appendChild(opt);
-      });
-      select.value = consigneList[i];
+        (SUGGESTIONS[quest.id] || []).forEach((sugg, idx) => {
+          let opt = document.createElement('option');
+          opt.value = sugg;
+          opt.textContent = sugg;
+          if (used.has(sugg) && consigneList[i] !== sugg) opt.disabled = true;
+          select.appendChild(opt);
+        });
+        select.value = consigneList[i];
 
-      select.onchange = function() {
-        consigneList[i] = this.value;
-        renderConsignesSelects();
-      };
-      row.appendChild(select);
-
-      // Bouton suppression (si plus d'une ligne)
-      if (consigneList.length > 1) {
-        let delBtn = document.createElement('button');
-        delBtn.type = "button";
-        delBtn.textContent = "❌";
-        delBtn.style.marginLeft = "6px";
-        delBtn.onclick = function() {
-          consigneList.splice(i, 1);
-          inputQty.value = consigneList.length;
+        select.onchange = function() {
+          consigneList[i] = this.value;
           renderConsignesSelects();
         };
-        row.appendChild(delBtn);
+        row.appendChild(select);
+
+        // Bouton suppression (si plus d'une ligne)
+        if (consigneList.length > 1) {
+          let delBtn = document.createElement('button');
+          delBtn.type = "button";
+          delBtn.textContent = "❌";
+          delBtn.style.marginLeft = "6px";
+          delBtn.onclick = function() {
+            consigneList.splice(i, 1);
+            inputQty.value = consigneList.length;
+            renderConsignesSelects();
+          };
+          row.appendChild(delBtn);
+        }
+
+        consignesZone.appendChild(row);
+      }
+    }
+
+    inputQty.oninput = function() {
+      let n = parseInt(inputQty.value, 10) || 1;
+      n = Math.max(qtyParam.min || 1, Math.min(qtyParam.max || 10, n));
+      while (consigneList.length < n) consigneList.push('');
+      while (consigneList.length > n) consigneList.pop();
+      renderConsignesSelects();
+    };
+
+    // Initialisation
+    inputQty.value = consigneList.length;
+    renderConsignesSelects();
+
+    // Ajoute le bouton de validation
+    let submit = document.createElement('button');
+    submit.type = 'submit';
+    submit.textContent = 'Valider cette quête';
+    submit.className = 'gold-btn';
+    form.appendChild(submit);
+
+    // AU SUBMIT
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      const data = {};
+      let result = [];
+      let pool = (SUGGESTIONS[quest.id] || []).filter(Boolean);
+      // Retire les suggestions déjà explicitement choisies
+      consigneList.forEach(val => {
+        if (val && val !== '__random__') {
+          const idx = pool.indexOf(val);
+          if (idx !== -1) pool.splice(idx, 1);
+        }
+      });
+      let poolCopy = pool.slice();
+      consigneList.forEach(val => {
+        if (val === '__random__') {
+          if (pool.length > 0) {
+            let idx = Math.floor(Math.random() * pool.length);
+            result.push(pool[idx]);
+            pool.splice(idx, 1);
+          } else if (poolCopy.length > 0) {
+            // Tirage avec répétition si pool épuisé
+            let idx = Math.floor(Math.random() * poolCopy.length);
+            result.push(poolCopy[idx]);
+          } else {
+            result.push('');
+          }
+        } else {
+          result.push(val);
+        }
+      });
+
+      // Nettoie les vides
+      data[qtyParam.key] = result.filter(x => x).length;
+      data.consignes = result.filter(x => x);
+      data.points = [...gpsPoints];
+
+      if (data.consignes.length === 0) {
+        alert("Merci de sélectionner au moins une mission valide !");
+        return;
       }
 
-      consignesZone.appendChild(row);
-    }
+      ajouterEtapeAuScenario({ type: questTypeId, params: data });
+      // Réinitialisation propre
+      form.reset();
+      container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
+    };
+    container.appendChild(form);
+    return; // Ne pas générer les champs standards pour ces types
   }
 
-  inputQty.oninput = function() {
-    let n = parseInt(inputQty.value, 10) || 1;
-    n = Math.max(qtyParam.min || 1, Math.min(qtyParam.max || 10, n));
-    while (consigneList.length < n) consigneList.push('');
-    while (consigneList.length > n) consigneList.pop();
-    renderConsignesSelects();
-  };
-
-  // Initialisation
-  inputQty.value = consigneList.length;
-  renderConsignesSelects();
-
-  // Ajoute le bouton de validation
-  let submit = document.createElement('button');
-  submit.type = 'submit';
-  submit.textContent = 'Valider cette quête';
-  submit.className = 'gold-btn';
-  form.appendChild(submit);
-
-  // AU SUBMIT
-  form.onsubmit = function(e) {
-    e.preventDefault();
-    const data = {};
-    let result = [];
-    let pool = (SUGGESTIONS[quest.id] || []).filter(Boolean);
-    // Retire les suggestions déjà explicitement choisies
-    consigneList.forEach(val => {
-      if (val && val !== '__random__') {
-        const idx = pool.indexOf(val);
-        if (idx !== -1) pool.splice(idx, 1);
-      }
-    });
-    let poolCopy = pool.slice();
-    consigneList.forEach(val => {
-      if (val === '__random__') {
-        if (pool.length > 0) {
-          let idx = Math.floor(Math.random() * pool.length);
-          result.push(pool[idx]);
-          pool.splice(idx, 1);
-        } else if (poolCopy.length > 0) {
-          // Tirage avec répétition si pool épuisé
-          let idx = Math.floor(Math.random() * poolCopy.length);
-          result.push(poolCopy[idx]);
-        } else {
-          result.push('');
-        }
-      } else {
-        result.push(val);
-      }
-    });
-
-    // Nettoie les vides
-    data[qtyParam.key] = result.filter(x => x).length;
-    data.consignes = result.filter(x => x);
-    data.points = [...gpsPoints];
-
-    if (data.consignes.length === 0) {
-      alert("Merci de sélectionner au moins une mission valide !");
-      return;
-    }
-
-    ajouterEtapeAuScenario({ type: questTypeId, params: data });
-    // Réinitialisation propre
-    form.reset();
-    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-  };
-  container.appendChild(form);
-  return; // Ne pas générer les champs standards pour ces types
-}
-
-
-
-
-  
   // === Autres champs standards ===
   quest.parametres.forEach(param => {
     // Sauter les champs déjà gérés dans le bloc multi-consigne
