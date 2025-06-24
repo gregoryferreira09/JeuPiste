@@ -48,11 +48,33 @@ if (modeSelect) {
 
 
 document.addEventListener("DOMContentLoaded", function() {
-  // ... tout le code d'init (select, fadein, map, etc)
-  // ... première mise à jour de la liste des épreuves
+  const select = document.getElementById('questTypeSelect');
+  if (select && typeof QUESTS_CATALOGUE !== "undefined") {
+    QUESTS_CATALOGUE.forEach(quest => {
+      let opt = document.createElement('option');
+      opt.value = quest.id;
+      opt.textContent = quest.nom;
+      select.appendChild(opt);
+    });
+    select.onchange = function() {
+      if (this.value) generateQuestForm(this.value, 'formContainer');
+      else document.getElementById('formContainer').innerHTML = '';
+    };
+  }
+
+  // ... (tous tes autres trucs d'init de page) ...
+
+  // Effet fadeIn harmonisé
+  var main = document.querySelector('.fadeIn');
+  if (main) main.classList.add('visible');
+
+  // Champ coordonnée d'arrivée ...
+  // Fermeture carte ...
+  // Recherche adresse ...
+  // Première mise à jour de la liste des épreuves
   afficherScenario();
 
-  // Ajoute ici le code du bouton test
+  // === ICI, à la fin du bloc, AJOUTE le bouton test ===
   const btnTest = document.getElementById('testScenarioBtn');
   if (btnTest) {
     btnTest.onclick = function() {
@@ -68,7 +90,8 @@ document.addEventListener("DOMContentLoaded", function() {
       window.open('template-epreuve.html?test=1', '_blank');
     };
   }
-});
+
+}); // <== ceci ferme ton unique bloc DOMContentLoaded
 
 
 
