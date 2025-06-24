@@ -207,7 +207,6 @@ function exporterScenario() {
     date: Date.now()
   })
   .then(() => {
-    // Retourne la promesse !
     firebase.database().ref('scenarios/' + codeSalon).set({
       mode: currentGameMode,
       coordEnd,
@@ -387,14 +386,12 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     fieldWrapper.style.gap = '12px';
     fieldWrapper.style.marginBottom = '10px';
 
-    // Label quantité
     let labelQty = document.createElement('label');
     labelQty.textContent = qtyParam.label;
     labelQty.setAttribute('for', qtyParam.key);
     labelQty.style.marginRight = "8px";
     fieldWrapper.appendChild(labelQty);
 
-    // Input quantité minuscule
     inputQty = document.createElement('input');
     inputQty.type = 'number';
     inputQty.id = qtyParam.key;
@@ -410,7 +407,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
     form.appendChild(fieldWrapper);
 
-    // Zone pour consignes
     consignesZone = document.createElement('div');
     consignesZone.id = 'consignesZone';
     consignesZone.style.marginTop = "14px";
@@ -454,7 +450,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     inputQty.oninput = updateConsignes;
     updateConsignes();
 
-    // === Ajoute la liste déroulante suggestions ici, APRES consignesZone ===
+    // === Suggestions, APRES création de consignesZone et inputQty ===
     if (SUGGESTIONS[quest.id] && Array.isArray(SUGGESTIONS[quest.id])) {
       let wrapper = document.createElement('div');
       wrapper.className = 'form-field';
@@ -602,18 +598,15 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     const selectSuggestion = form.querySelector('#suggestionSelect');
     if (selectSuggestion) {
       if (selectSuggestion.value !== "random") {
-        // Suggestion précise : quantité 1, consigne imposée
         const qtyParam = quest.parametres.find(p => p.type === "number");
         if (qtyParam) {
           data[qtyParam.key] = 1;
         }
         data['consignes'] = [SUGGESTIONS[quest.id][parseInt(selectSuggestion.value, 10)]];
       } else {
-        // Aléatoire : laisser les consignes vides pour tirage lors du jeu
         data['consignes'] = [];
       }
     }
-    
     // Pour les types avec quantité/consignes multiples
     if (
       (quest.id === "photo" || quest.id === "photo_inconnus" || quest.id === "video" || quest.id === "collecte_objet") &&
@@ -628,7 +621,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       }
       data['consignes'] = consignes;
     }
-
     // Les autres champs
     quest.parametres.forEach(param => {
       if (
@@ -642,7 +634,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
         data[param.key] = form.elements[param.key].value;
       }
     });
-
     // --- PATCH UNIVERSEL POUR TOUS LES CAS ---
     if (
       quest.id === "collecte_objet" ||
@@ -650,28 +641,21 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       quest.id === "photo_inconnus" ||
       quest.id === "video"
     ) {
-      // Trouve dynamiquement le champ quantité dans le catalogue
       const champQuantite = (quest.parametres.find(p => p.type === "number") || {}).key;
       if (champQuantite && typeof data[champQuantite] === "undefined") data[champQuantite] = 1;
-
-      // Consignes : TOUJOURS tableau (pour compatibilité)
       if (!Array.isArray(data.consignes)) data.consignes = [];
-
-      // Ajoute objet OU critere OU consigne selon le catalogue
       if (quest.parametres.some(p => p.key === "objet") && typeof data.objet === "undefined") data.objet = "";
       if (quest.parametres.some(p => p.key === "critere") && typeof data.critere === "undefined") data.critere = "";
       if (quest.parametres.some(p => p.key === "consigne") && typeof data.consigne === "undefined") data.consigne = "";
     }
-    // 2. Retire le champ "type" de params s'il existe (nettoyage)
     if ("type" in data) delete data.type;
-
     data.points = [...gpsPoints];
     console.log("DEBUG étape ajoutée :", { type: questTypeId, params: data });
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
   };
-}
+} // Fin de generateQuestForm
 
 // =======================
 // Fonctions pour la carte
