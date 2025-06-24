@@ -112,16 +112,42 @@
   const db = firebase.database();
   const storage = firebase.storage();
 
-  // --- Mode test local sans Firebase/partie ---
   const params = new URLSearchParams(window.location.search);
   const isTestMode = params.get('test') === '1';
 
   if (isTestMode) {
-    // ----- MODE TEST (PAS DE REDIRECTION, PAS DE FIREBASE, PAS DE salonCode) -----
+    // ======= MODE TEST (PAS DE REDIRECTION, PAS DE FIREBASE, PAS DE salonCode) =======
     const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
     if (scenarioTest && Array.isArray(scenarioTest.scenario) && scenarioTest.scenario.length > 0) {
-      function afficherEtape(etape, idx) {
-        // Version simplifiée pour le test local : tu peux l'enrichir si tu veux !
+
+      // Bloc upload désactivé mais visuel identique
+      window.afficherBlocUpload = function(type, stepIndex, idxMission, onUploaded) {
+        const bloc = document.getElementById('bloc-upload');
+        const row = document.getElementById('upload-row');
+        row.innerHTML = '';
+        bloc.style.display = '';
+        let label = document.createElement('label');
+        label.innerHTML = type === "audio"
+          ? '🎤 <span>Audio à envoyer</span>'
+          : '<svg viewBox="0 0 24 24" style="width:32px;height:32px;"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5l2.5-2.5A2 2 0 0 1 9.17 4h5.66a2 2 0 0 1 1.41.59L19 7h-3.17z"/>';
+        let input = document.createElement('input');
+        input.type = "file";
+        input.className = "visually-hidden";
+        input.accept = type === "audio" ? "audio/*" : "image/*";
+        input.disabled = true;
+        input.id = `upload-file-${type}-${idxMission}`;
+        label.appendChild(input);
+        row.appendChild(label);
+        document.getElementById('upload-feedback').textContent = "Upload désactivé en mode test.";
+        if (typeof onUploaded === "function") onUploaded();
+      };
+
+      function afficherEtape(etape, stepIndex) {
+        ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
+          const el = document.getElementById(id); if(el) el.style.display = 'none';
+        });
+        document.getElementById('next-quest').style.display = 'none';
+
         document.title = (etape.titre || etape.nom || etape.type || "Quête") + " - Jeu de piste";
         document.getElementById('titre-quete').textContent = etape.titre || etape.nom || etape.type || "";
         document.getElementById('metaphore-quete').innerHTML = etape.metaphore ? `<em>${etape.metaphore}</em>` : '';
@@ -129,7 +155,50 @@
         document.getElementById('objectif-text').textContent = etape.params?.objectif || '';
         document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
         document.getElementById('defi-text').textContent = etape.params?.defi || '';
-        // Ici tu peux simuler plus de blocs si besoin (mission, upload, etc)
+
+        // Affichage selon le type
+        if(etape.type === "photo" || etape.type === "photo_inconnus") {
+          afficherBlocMissionProgressiveTest(etape, stepIndex, "photo");
+        }
+        else if(etape.type === "collecte_objet") {
+          afficherBlocMissionProgressiveTest(etape, stepIndex, "collecte_objet");
+        }
+        else if(etape.type === "audio") {
+          afficherBlocMissionProgressiveTest(etape, stepIndex, "audio");
+        }
+        else {
+          document.getElementById('bloc-mission').style.display = '';
+          document.getElementById('mission-label').textContent = "Mission";
+          document.getElementById('mission-text').textContent = etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "";
+          document.getElementById('next-quest').style.display = '';
+          document.getElementById('next-quest').disabled = false;
+          document.getElementById('next-quest').onclick = function() {
+            showToast("En mode test, ce bouton ne valide rien 😉");
+          };
+        }
+      }
+
+      function afficherBlocMissionProgressiveTest(etape, stepIndex, type) {
+        let missions = etape.params?.consignes || (etape.params?.consigne ? [etape.params.consigne] : []);
+        if (!missions.length) missions = [etape.params?.objectif || etape.description || "Mission à accomplir"];
+        let currentMission = 0;
+        document.getElementById('bloc-mission').style.display = '';
+        document.getElementById('mission-label').textContent = "Mission";
+        function showMission(idx) {
+          document.getElementById('mission-text').textContent = missions[idx];
+          window.afficherBlocUpload(type, stepIndex, idx, function() {
+            if (idx < missions.length-1) {
+              showMission(idx+1);
+            } else {
+              document.getElementById('next-quest').style.display = '';
+              document.getElementById('next-quest').disabled = false;
+              document.getElementById('next-quest').onclick = function() {
+                showToast("En mode test, ce bouton ne valide rien 😉");
+              };
+            }
+          });
+        }
+        showMission(currentMission);
       }
 
       let currentStep = 0;
@@ -142,7 +211,6 @@
         }
         afficherEtape(etape, idx);
 
-        // Navigation test
         let nav = document.getElementById('test-nav');
         if (!nav) {
           nav = document.createElement('div');
@@ -160,27 +228,22 @@
       window.showStepTest = showStep;
       showStep(currentStep);
 
-      // Upload désactivé en mode test
-      window.afficherBlocUpload = function(type, stepIndex, idxMission, onUploaded) {
-        const bloc = document.getElementById('bloc-upload');
-        const row = document.getElementById('upload-row');
-        row.innerHTML = '';
-        bloc.style.display = '';
-        let fakeBtn = document.createElement('button');
-        fakeBtn.className = "main-btn";
-        fakeBtn.textContent = "Upload désactivé en mode test";
-        fakeBtn.disabled = true;
-        row.appendChild(fakeBtn);
-        document.getElementById('upload-feedback').textContent = "Aucun fichier n'est envoyé en mode test.";
-        if (typeof onUploaded === "function") onUploaded();
-      };
+      function showToast(msg) {
+        const toast = document.getElementById('toast-message');
+        if (toast) {
+          toast.textContent = msg;
+          toast.classList.add('visible');
+          setTimeout(() => { toast.classList.remove('visible'); }, 2200);
+        }
+      }
+      window.showToast = showToast;
     } else {
       document.getElementById('main-content').innerHTML =
         "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
     }
     // RIEN APRÈS ICI EN MODE TEST
   } else {
-    // ----- MODE NORMAL -----
+    // ======= MODE NORMAL =======
     // --- Sécurité session ---
     const salonCode = localStorage.getItem("salonCode");
     const equipeNum = Number(localStorage.getItem("equipeNum"));
@@ -194,7 +257,6 @@
       else chargerEtapeDynamique();
     });
 
-    // --- Récupère l'étape courante et injecte dynamiquement ---
     function chargerEtapeDynamique() {
       db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
         const step = snapStep.val() || 0;
@@ -209,15 +271,12 @@
       });
     }
 
-    // --- Affiche dynamiquement l'étape selon le type ---
     function afficherEtape(etape, stepIndex) {
-      // Masque tout
       ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
         const el = document.getElementById(id); if(el) el.style.display = 'none';
       });
       document.getElementById('next-quest').style.display = 'none';
 
-      // Titre, métaphore, objectif, défi
       document.title = (etape.titre || etape.nom || etape.type || "Quête") + " - Jeu de piste";
       document.getElementById('titre-quete').textContent = etape.titre || etape.nom || etape.type || "";
       document.getElementById('metaphore-quete').innerHTML = etape.metaphore ? `<em>${etape.metaphore}</em>` : '';
@@ -226,7 +285,6 @@
       document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
       document.getElementById('defi-text').textContent = etape.params?.defi || '';
 
-      // 1. Bloc GPS obligatoire ?
       if (etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || etape.params?.points) {
         afficherBlocGPS(etape, () => afficherSuite(etape, stepIndex));
       } else {
@@ -320,7 +378,7 @@
       let label = document.createElement('label');
       label.innerHTML = type === "audio"
         ? '🎤 <span>Audio à envoyer</span>'
-        : '<svg viewBox="0 0 24 24" style="width:32px;height:32px;"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5l2.5-2.5A2 2 0 0 1 9.17 4h5.66a2 2 0 0 1 1.41.59L19 7h-3.17z"/>';
+        : '<svg viewBox="0 0 24 24" style="width:32px;height:32px;"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7[...]
       let input = document.createElement('input');
       input.type = "file";
       input.className = "visually-hidden";
