@@ -270,6 +270,17 @@ function genererSalon() {
 // ===================
 // Formulaire dynamique
 // ===================
+
+
+
+
+
+
+
+
+
+
+
 function generateQuestForm(questTypeId, containerId, values = {}) {
   const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
   if (!quest) return;
@@ -369,7 +380,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     });
   };
 
-  // Détection : comportement spécial (photos, vidéos, etc.)
+  // === Gestion spéciale pour Photo, Vidéo, Objet, etc. ===
   let inputQty = null;
   let consignesZone = null;
   if (
@@ -413,62 +424,61 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     form.appendChild(consignesZone);
 
     function updateConsignes() {
-  const selectSuggestion = document.getElementById('suggestionSelect');
-  consignesZone.innerHTML = '';
-  let nombre = parseInt(inputQty.value, 10) || 1;
-  let row;
-  let suggestionsAleatoires = [];
-  // Si aléatoire et suggestions dispo, tire au hasard SANS DOUBLON
-  if (selectSuggestion && selectSuggestion.value === "random" && SUGGESTIONS[quest.id] && SUGGESTIONS[quest.id].length >= nombre) {
-    let pool = [...SUGGESTIONS[quest.id]];
-    for (let i = 0; i < nombre; i++) {
-      let idx = Math.floor(Math.random() * pool.length);
-      suggestionsAleatoires.push(pool[idx]);
-      pool.splice(idx, 1);
-    }
-  }
-  for (let i = 0; i < nombre; i++) {
-    if (i % 2 === 0) {
-      row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.gap = '12px';
-      row.style.marginBottom = '8px';
-      consignesZone.appendChild(row);
-    }
-    let field = document.createElement('div');
-    field.style.display = 'flex';
-    field.style.alignItems = 'center';
-    field.style.gap = '6px';
-    let lab = document.createElement('span');
-    lab.textContent = (quest.id.startsWith("photo") ? "Photo" : quest.id === "video" ? "Vidéo" : "Objet") + ` ${i + 1} :`;
-    lab.style.fontSize = "1em";
-    lab.style.minWidth = "56px";
-    field.appendChild(lab);
-    let champ = document.createElement('input');
-    champ.type = 'text';
-    champ.name = `consigne_${i}`;
-    champ.style.width = "66%";
-    champ.style.maxWidth = "8.5em";
-    champ.style.padding = "4px 8px";
-    champ.style.fontSize = "1em";
+      const selectSuggestion = document.getElementById('suggestionSelect');
+      consignesZone.innerHTML = '';
+      let nombre = parseInt(inputQty.value, 10) || 1;
+      let row;
+      let suggestionsAleatoires = [];
+      // Tirage suggestions aléatoires sans doublon
+      if (selectSuggestion && selectSuggestion.value === "random" && SUGGESTIONS[quest.id] && SUGGESTIONS[quest.id].length >= nombre) {
+        let pool = [...SUGGESTIONS[quest.id]];
+        for (let i = 0; i < nombre; i++) {
+          let idx = Math.floor(Math.random() * pool.length);
+          suggestionsAleatoires.push(pool[idx]);
+          pool.splice(idx, 1);
+        }
+      }
+      for (let i = 0; i < nombre; i++) {
+        if (i % 2 === 0) {
+          row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.gap = '12px';
+          row.style.marginBottom = '8px';
+          consignesZone.appendChild(row);
+        }
+        let field = document.createElement('div');
+        field.style.display = 'flex';
+        field.style.alignItems = 'center';
+        field.style.gap = '6px';
+        let lab = document.createElement('span');
+        lab.textContent = (quest.id.startsWith("photo") ? "Photo" : quest.id === "video" ? "Vidéo" : "Objet") + ` ${i + 1} :`;
+        lab.style.fontSize = "1em";
+        lab.style.minWidth = "56px";
+        field.appendChild(lab);
+        let champ = document.createElement('input');
+        champ.type = 'text';
+        champ.name = `consigne_${i}`;
+        champ.style.width = "66%";
+        champ.style.maxWidth = "8.5em";
+        champ.style.padding = "4px 8px";
+        champ.style.fontSize = "1em";
 
-    // Logique selon le mode
-    if (selectSuggestion && selectSuggestion.value === "random" && suggestionsAleatoires.length === nombre) {
-      champ.value = "mystère";
-      champ.readOnly = true;
-      champ.dataset.suggestion = suggestionsAleatoires[i]; // Stocke la vraie valeur ici
-    } else if (selectSuggestion && selectSuggestion.value !== "random") {
-      champ.value = SUGGESTIONS[quest.id][parseInt(selectSuggestion.value, 10)];
-      champ.readOnly = true;
-    } else {
-      champ.value = (values['consignes'] && values['consignes'][i]) || '';
-      champ.placeholder = consigneParam && consigneParam.placeholder ? consigneParam.placeholder : "ex : un arbre";
-      champ.readOnly = false;
+        if (selectSuggestion && selectSuggestion.value === "random" && suggestionsAleatoires.length === nombre) {
+          champ.value = "mystère";
+          champ.readOnly = true;
+          champ.dataset.suggestion = suggestionsAleatoires[i]; // Stocke la vraie suggestion
+        } else if (selectSuggestion && selectSuggestion.value !== "random") {
+          champ.value = SUGGESTIONS[quest.id][parseInt(selectSuggestion.value, 10)];
+          champ.readOnly = true;
+        } else {
+          champ.value = (values['consignes'] && values['consignes'][i]) || '';
+          champ.placeholder = consigneParam && consigneParam.placeholder ? consigneParam.placeholder : "ex : un arbre";
+          champ.readOnly = false;
+        }
+        field.appendChild(champ);
+        row.appendChild(field);
+      }
     }
-    field.appendChild(champ);
-    row.appendChild(field);
-  }
-}
 
     inputQty.oninput = updateConsignes;
     updateConsignes();
@@ -531,6 +541,8 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       select.value = "random";
     }
   }
+  // ... suite de generateQuestForm (ajout des autres champs, bouton, onsubmit, etc.)
+}
 
   // Ajoute le reste des champs standards (hors nombre/consigne déjà traités)
   quest.parametres.forEach(param => {
