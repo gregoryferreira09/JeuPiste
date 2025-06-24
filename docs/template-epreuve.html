@@ -4,9 +4,20 @@
   <meta charset="UTF-8">
   <title id="page-title">Quête - Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices et styles communs -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
+  <style>
+    .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px,1px,1px,1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+    .grayed { opacity: 0.5; pointer-events: none; }
+    .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+    .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
+    .actions-row-horizontal { display: flex; align-items: center; gap: 24px; margin: 24px 0; }
+    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
+    .icon-action label, .icon-action a { cursor: pointer; }
+    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 9999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw;}
+    .modal-toast.visible { display: block; animation: fadein 0.3s;}
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+  </style>
 </head>
 <body>
   <header>
@@ -14,47 +25,65 @@
   </header>
   <div class="center-wrapper">
     <main class="main-accueil" id="main-content" role="main">
-      <!-- Titre de la quête -->
       <h2 class="titre-course" id="titre-quete">Titre de la quête</h2>
-      <!-- Métaphore ou phrase évocatrice (optionnelle) -->
-      <div class="texte-course" id="metaphore-quete" style="margin-bottom: 18px;">
-        <em>Comme l'aube perce les ténèbres, votre courage sera la lumière du royaume...</em>
-      </div>
-      <!-- Objectif -->
-      <div class="objectif-course" id="objectif-block">
+      <div class="texte-course" id="metaphore-quete" style="margin-bottom: 18px;"></div>
+      <div class="objectif-course" id="objectif-block" style="display:none;">
         <div class="objectif-label">Objectif</div>
-        <div class="objectif-text" id="objectif-text">
-          Remporter la course contre les autres équipes et atteindre le trésor.
-        </div>
+        <div class="objectif-text" id="objectif-text"></div>
       </div>
-      <!-- Défi (optionnel mais conseillé si action spécifique attendue) -->
-      <div class="objectif-course" id="defi-block" style="background: #251a1a;">
+      <div class="objectif-course" id="defi-block" style="display:none;background: #251a1a;">
         <div class="objectif-label" style="background:#cba55a; color:#231d1d;">Défi</div>
-        <div class="objectif-text" id="defi-text">
-          <strong>Photo à envoyer :</strong> Prenez une photo de votre équipe au sommet de la colline.
+        <div class="objectif-text" id="defi-text"></div>
+      </div>
+      <!-- Bloc GPS -->
+      <div id="bloc-gps" style="display:none;">
+        <div class="actions-row-horizontal">
+          <div class="icon-action side-icon">
+            <a id="gps-link" href="#" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/></svg>
+              <span>Boussole</span>
+            </a>
+          </div>
+          <div style="flex:1;text-align:center;">
+            <button id="check-gps" class="main-btn" style="margin-top:10px;">Je suis arrivé !</button>
+            <div id="gps-feedback"></div>
+          </div>
         </div>
       </div>
-      <!-- Actions et icônes -->
-      <div class="actions-row-horizontal">
-        <!-- Icône Boussole -->
-        <div class="icon-action side-icon">
-          <a href="https://maps.google.com/?q=LAT,LON" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/></svg>
-            <span>Boussole</span>
-          </a>
+      <!-- Bloc Mission (consigne courante) -->
+      <div id="bloc-mission" style="display:none;">
+        <div class="objectif-course">
+          <div class="objectif-label" id="mission-label">Mission</div>
+          <div class="objectif-text" id="mission-text"></div>
         </div>
-        <!-- Icône Photo/vidéo/audio selon besoin -->
-        <div class="icon-action side-icon">
-          <label for="photo-upload">
-            <svg viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-            <span>Photo à envoyer</span>
-            <input id="photo-upload" class="visually-hidden" type="file" accept="image/*" capture="environment">
-          </label>
-        </div>
-        <!-- Ajoute d'autres icônes si besoin (vidéo, audio...) -->
       </div>
-      <div id="photo-filename"></div>
-      <button id="next-quest" class="main-btn" disabled>Quête suivante</button>
+      <!-- Bloc Upload (photo, audio, etc) -->
+      <div id="bloc-upload" style="display:none;">
+        <div class="actions-row-horizontal" id="upload-row"></div>
+        <div id="upload-feedback"></div>
+      </div>
+      <!-- Bloc Réponse (input pour anagramme, réponse libre, etc) -->
+      <div id="bloc-answer" style="display:none;"></div>
+      <!-- Bloc Indice (modale) -->
+      <div id="bloc-indice" style="display:none;">
+        <button id="show-indice" type="button">Voir l’indice</button>
+        <div id="indice-modal" style="display:none;">
+          <div class="modal-img-wrapper">
+            <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
+            <img id="indice-img" src="" alt="Indice visuel" style="display:none;">
+            <div id="indice-text" style="margin-top:12px;"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Bloc Chrono (si besoin) -->
+      <div id="bloc-chrono" style="display:none;">
+        <span class="chrono-timer" id="timer"></span>
+        <span class="chrono-message" id="chrono-message"></span>
+      </div>
+      <!-- Bloc Pendu (mini-jeu) -->
+      <div id="bloc-pendu" style="display:none;"></div>
+      <!-- Bouton validation -->
+      <button id="next-quest" class="main-btn" style="display:none;" disabled>Quête suivante</button>
     </main>
   </div>
   <footer class="footer">
@@ -62,7 +91,6 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
-  <!-- Scripts JS (à adapter selon ta logique de validation/JS Firebase) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -91,7 +119,7 @@
     window.location.href = "accueil.html";
   }
 
-  // Auth anonyme obligatoire
+  // --- Auth anonyme obligatoire ---
   firebase.auth().onAuthStateChanged(function(user) {
     if (!user) firebase.auth().signInAnonymously();
     else chargerEtapeDynamique();
@@ -114,207 +142,173 @@
 
   // --- Affiche dynamiquement l'étape selon le type ---
   function afficherEtape(etape, stepIndex) {
-    // Reset tous les blocs
-    ['bloc-gps','bloc-indice','bloc-uploads','bloc-password','bloc-answer'].forEach(id => {
-      document.getElementById(id).style.display = 'none';
+    // Masque tout
+    ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.style.display = 'none';
     });
-    // Titre et objectif
+    document.getElementById('next-quest').style.display = 'none';
+
+    // Titre, métaphore, objectif, défi
     document.title = (etape.titre || etape.nom || etape.type || "Quête") + " - Jeu de piste";
     document.getElementById('titre-quete').textContent = etape.titre || etape.nom || etape.type || "";
-    document.getElementById('objectif-label').textContent = "Objectif";
-    document.getElementById('objectif-text').textContent =
-      (etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "");
+    document.getElementById('metaphore-quete').innerHTML = etape.metaphore ? `<em>${etape.metaphore}</em>` : '';
+    document.getElementById('objectif-block').style.display = etape.params?.objectif ? '' : 'none';
+    document.getElementById('objectif-text').textContent = etape.params?.objectif || '';
+    document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
+    document.getElementById('defi-text').textContent = etape.params?.defi || '';
 
-    // Bloc GPS
-    if (etape.params?.gps || etape.params?.coord || etape.params?.coordonnees) {
-      document.getElementById('bloc-gps').style.display = '';
-      const gps = etape.params.gps || etape.params.coord || etape.params.coordonnees;
-      document.getElementById('gps-link').href = "https://maps.google.com/?q=" + gps;
-      document.getElementById('check-gps').onclick = function() {
-        const feedback = document.getElementById("gps-feedback");
-        feedback.textContent = "Recherche de votre position...";
-        if (!navigator.geolocation) {
-          feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
-          return;
-        }
-        const [destLat, destLon] = gps.split(',').map(Number);
-        const TOLERANCE_METERS = 30;
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          function getDistanceMeters(lat1, lon1, lat2, lon2) {
-            const R = 6378137;
-            const dLat = (lat2-lat1)*Math.PI/180;
-            const dLon = (lon2-lon1)*Math.PI/180;
-            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-          }
-          const dist = getDistanceMeters(lat, lon, destLat, destLon);
-          if (dist < TOLERANCE_METERS) {
-            document.getElementById("bloc-gps").style.display = "none";
-            showToast("Tu es bien arrivé !");
-          } else {
-            feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " m)";
-          }
-        }, function(err) {
-          feedback.textContent = "Position non trouvée (" + err.message + ")";
-        });
-      };
+    // 1. Bloc GPS obligatoire ?
+    if (etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || etape.params?.points) {
+      afficherBlocGPS(etape, () => afficherSuite(etape, stepIndex));
+    } else {
+      afficherSuite(etape, stepIndex);
     }
+  }
 
-    // Bloc indice (texte ou image)
-    if (etape.params?.indice || etape.params?.indiceImg) {
-      document.getElementById('bloc-indice').style.display = '';
-      document.getElementById('show-indice').onclick = function() {
-        document.getElementById('indice-modal').classList.add('active');
-        if (etape.params.indiceImg) {
-          document.getElementById('indice-img').src = etape.params.indiceImg;
-          document.getElementById('indice-img').style.display = '';
-        } else {
-          document.getElementById('indice-img').style.display = 'none';
-        }
-        if (etape.params.indice) {
-          document.getElementById('indice-text').textContent = etape.params.indice;
-        }
-      };
-      document.getElementById('close-indice').onclick = function() {
-        document.getElementById('indice-modal').classList.remove('active');
-      };
-    }
-
-    // Bloc upload (photo, vidéo, audio, collecte_objet, defi_collectif)
-    const blocUploads = document.getElementById('bloc-uploads');
-    const uploadsInner = document.getElementById('bloc-uploads-inner');
-    blocUploads.style.display = 'none';
-    uploadsInner.innerHTML = "";
-    let uploadType = null;
-    let nbUpload = 1;
-    if (["photo","photo_inconnus"].includes(etape.type)) {
-      uploadType = "image";
-      nbUpload = Number(etape.params.nbPhotos || etape.params.nbPersonnes || 1);
-    }
-    if (etape.type === "video") {
-      uploadType = "video"; nbUpload = Number(etape.params.nbVideos || 1);
-    }
-    if (etape.type === "audio") {
-      uploadType = "audio"; nbUpload = 1;
-    }
-    if (etape.type === "collecte_objet") {
-      uploadType = "image"; nbUpload = Number(etape.params.nbObjets || 1);
-    }
-    if (etape.type === "defi_collectif") {
-      uploadType = etape.params.preuve || "photo"; nbUpload = 1;
-    }
-    if (uploadType) {
-      blocUploads.style.display = '';
-      for (let i = 1; i <= nbUpload; i++) {
-        let label = document.createElement('label');
-        label.setAttribute('for', `upload-file-${i}`);
-        let svg = `<svg viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
-        label.innerHTML = svg + `<span>${uploadType === "image" ? "Photo" : uploadType.charAt(0).toUpperCase() + uploadType.slice(1)} ${i}</span>`;
-        let input = document.createElement('input');
-        input.type = "file";
-        input.accept = uploadType === "video" ? "video/*" : uploadType === "audio" ? "audio/*" : "image/*";
-        input.id = `upload-file-${i}`;
-        input.className = 'visually-hidden';
-        let div = document.createElement('div');
-        div.className = 'icon-action side-icon';
-        div.appendChild(label);
-        div.appendChild(input);
-        uploadsInner.appendChild(div);
-
-        // Ajoute gestionnaire upload
-        input.addEventListener('change', async function() {
-          if (!this.files || !this.files[0]) return;
-          let file = this.files[0];
-          let storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${uploadType}${i}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
-          try {
-            let snapshot = await storage.ref(storagePath).put(file);
-            let url = await snapshot.ref.getDownloadURL();
-            let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${uploadType}${i}`);
-            await ref.set(url);
-            showToast((uploadType === "image" ? "Photo" : uploadType.charAt(0).toUpperCase() + uploadType.slice(1)) + " envoyée !");
-            checkUploadsCompleted();
-          } catch (e) {
-            showToast("Erreur upload !")
-          }
-        });
+  function afficherBlocGPS(etape, callback) {
+    const gps = etape.params.gps || etape.params.coord || etape.params.coordonnees || (Array.isArray(etape.params.points) ? etape.params.points[0] : null);
+    if (!gps) { callback(); return; }
+    document.getElementById('bloc-gps').style.display = '';
+    document.getElementById('gps-link').href = "https://maps.google.com/?q=" + gps;
+    document.getElementById('check-gps').onclick = function() {
+      const feedback = document.getElementById("gps-feedback");
+      feedback.textContent = "Recherche de votre position...";
+      if (!navigator.geolocation) {
+        feedback.textContent = "Votre navigateur ne supporte pas la géolocalisation.";
+        return;
       }
-    }
+      const [destLat, destLon] = gps.split(',').map(Number);
+      const TOLERANCE_METERS = 30;
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        function getDistanceMeters(lat1, lon1, lat2, lon2) {
+          const R = 6378137;
+          const dLat = (lat2-lat1)*Math.PI/180;
+          const dLon = (lon2-lon1)*Math.PI/180;
+          const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          return R * c;
+        }
+        const dist = getDistanceMeters(lat, lon, destLat, destLon);
+        if (dist < TOLERANCE_METERS) {
+          document.getElementById("bloc-gps").style.display = "none";
+          showToast("Tu es bien arrivé !");
+          callback();
+        } else {
+          feedback.textContent = "Tu n’es pas encore assez proche ! (" + Math.round(dist) + " m)";
+        }
+      }, function(err) {
+        feedback.textContent = "Position non trouvée (" + err.message + ")";
+      });
+    };
+  }
 
-    // Mot de passe/énigme/anagramme
-    if (["mot_de_passe","anagramme"].includes(etape.type)) {
-      document.getElementById('bloc-password').style.display = '';
-      const passwordField = document.getElementById('password-field');
-      passwordField.value = "";
-      passwordField.oninput = function() {
-        let value = normalize(passwordField.value);
-        let good = value === normalize(etape.params.solution || "");
-        nextBtn.disabled = !good;
-        nextBtn.classList.toggle('enabled', good);
-      };
+  function afficherSuite(etape, stepIndex) {
+    // TODO: Ajoute ici la logique par type (photo, collecte_objet, audio, anagramme, pendu, chrono, gps multi-points...)
+    // Exemples (à compléter selon tes besoins) :
+    if(etape.type === "photo" || etape.type === "photo_inconnus") {
+      afficherBlocMissionProgressive(etape, stepIndex, "photo");
     }
-
-    // Réponse libre (observation, puzzle_visuel, signature_inconnu, chasse_tresor)
-    if (["observation","puzzle_visuel","signature_inconnu","chasse_tresor"].includes(etape.type)) {
-      document.getElementById('bloc-answer').style.display = '';
-      document.getElementById('answer-field').value = "";
-      document.getElementById('answer-field').oninput = function() {
-        let value = normalize(this.value);
-        let solution = normalize(etape.params.solution || "");
-        let ok = value === solution && !!solution;
-        nextBtn.disabled = !ok;
-        nextBtn.classList.toggle('enabled', ok);
-      };
+    else if(etape.type === "collecte_objet") {
+      afficherBlocMissionProgressive(etape, stepIndex, "collecte_objet");
     }
+    else if(etape.type === "audio") {
+      afficherBlocMissionProgressive(etape, stepIndex, "audio");
+    }
+    // Ajoute ici les autres types (gps multi-points, anagramme, chrono, pendu, etc)
+    else {
+      // Pour un type inconnu, affiche la consigne brute
+      document.getElementById('bloc-mission').style.display = '';
+      document.getElementById('mission-text').textContent = etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "";
+      document.getElementById('next-quest').style.display = '';
+      document.getElementById('next-quest').disabled = false;
+    }
+  }
 
-    // Gestion du bouton « quête suivante »
+  // ----------- Exemples de logique pour missions progressives -------------
+  function afficherBlocMissionProgressive(etape, stepIndex, type) {
+    let missions = etape.params?.consignes || (etape.params?.consigne ? [etape.params.consigne] : []);
+    if (!missions.length) missions = [etape.params?.objectif || etape.description || "Mission à accomplir"];
+    let currentMission = 0;
+    document.getElementById('bloc-mission').style.display = '';
+    document.getElementById('mission-label').textContent = "Mission";
+    function showMission(idx) {
+      document.getElementById('mission-text').textContent = missions[idx];
+      afficherBlocUpload(type, stepIndex, idx, function() {
+        if (idx < missions.length-1) {
+          showMission(idx+1);
+        } else {
+          document.getElementById('next-quest').style.display = '';
+          document.getElementById('next-quest').disabled = false;
+          document.getElementById('next-quest').onclick = validerEtape;
+        }
+      });
+    }
+    showMission(currentMission);
+  }
+
+  function afficherBlocUpload(type, stepIndex, idxMission, onUploaded) {
+    // Affiche un bloc upload harmonisé selon le type (photo, audio, ...)
+    const bloc = document.getElementById('bloc-upload');
+    const row = document.getElementById('upload-row');
+    row.innerHTML = '';
+    bloc.style.display = '';
+    let label = document.createElement('label');
+    label.innerHTML = type === "audio"
+      ? '🎤 <span>Audio à envoyer</span>'
+      : '<svg viewBox="0 0 24 24" style="width:32px;height:32px;"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg><span>Photo à envoyer</span>';
+    let input = document.createElement('input');
+    input.type = "file";
+    input.className = "visually-hidden";
+    input.accept = type === "audio" ? "audio/*" : "image/*";
+    input.id = `upload-file-${type}-${idxMission}`;
+    label.appendChild(input);
+    row.appendChild(label);
+
+    input.onchange = async function() {
+      if(!this.files || !this.files[0]) return;
+      const file = this.files[0];
+      const storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${type}${idxMission}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
+      try {
+        let snapshot = await storage.ref(storagePath).put(file);
+        let url = await snapshot.ref.getDownloadURL();
+        let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${idxMission}`);
+        await ref.set(url);
+        document.getElementById('upload-feedback').textContent = (type === "audio" ? "Audio" : "Photo") + " envoyée !";
+        onUploaded();
+      } catch (e) {
+        document.getElementById('upload-feedback').textContent = "Erreur upload !";
+      }
+    };
+  }
+
+  function validerEtape() {
     const nextBtn = document.getElementById('next-quest');
     nextBtn.disabled = true;
     nextBtn.classList.remove('enabled');
-
-    // Activation du bouton si tous les fichiers sont uploadés
-    async function checkUploadsCompleted() {
-      let ok = true;
-      for (let i = 1; i <= nbUpload; i++) {
-        let snap = await db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${uploadType}${i}`).once('value');
-        if (!snap.val()) ok = false;
-      }
-      nextBtn.disabled = !ok;
-      nextBtn.classList.toggle('enabled', ok);
-    }
-
-    // Pour les uploads, activer le bouton si déjà tout envoyé
-    if (uploadType) checkUploadsCompleted();
-
-    // Validation & passage à l'étape suivante
-    nextBtn.onclick = function() {
-      if (this.disabled) return;
-      this.disabled = true;
-      this.classList.remove('enabled');
-      showToast("Validation en cours...");
-      const now = Date.now();
-      db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/startTime`)
-        .once('value', function(snap) {
-          const sTime = snap.val();
-          if (sTime) {
-            const elapsed = Math.round((now - sTime) / 1000);
-            db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${stepIndex}`).set(elapsed);
-          }
-          db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
-            .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
-              if (!error && committed) {
-                showToast("Étape validée !");
-                setTimeout(() => { window.location.reload(); }, 800);
-              } else {
-                showToast("Erreur lors de la validation...");
-                nextBtn.disabled = false;
-                nextBtn.classList.add('enabled');
-              }
-            });
-        });
-    };
+    showToast("Validation en cours...");
+    const now = Date.now();
+    // Enregistre le temps passé (optionnel)
+    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/current/startTime`)
+      .once('value', function(snap) {
+        const sTime = snap.val();
+        if (sTime) {
+          const elapsed = Math.round((now - sTime) / 1000);
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/current`).set(elapsed);
+        }
+        db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
+          .transaction(step => (step || 0) + 1, function(error, committed, snapshot) {
+            if (!error && committed) {
+              showToast("Étape validée !");
+              setTimeout(() => { window.location.reload(); }, 800);
+            } else {
+              showToast("Erreur lors de la validation...");
+              nextBtn.disabled = false;
+              nextBtn.classList.add('enabled');
+            }
+          });
+      });
   }
 
   // --- Toast harmonisé ---
@@ -326,20 +320,6 @@
       setTimeout(() => { toast.classList.remove('visible'); }, 2200);
     }
   }
-  function normalize(str) {
-    return (str||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]+/g, "").replace(/\s+/g, " ").trim();
-  }
-
-  // --- Anti-retour arrière et navigation auto ---
-  db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/currentStep')
-    .on('value', function(snapshot) {
-      chargerEtapeDynamique();
-    });
-  window.addEventListener("pageshow", function(evt) {
-    if (evt.persisted) {
-      chargerEtapeDynamique();
-    }
-  });
   </script>
 </body>
 </html>
