@@ -41,30 +41,18 @@ if (modeSelect) {
   currentGameMode = modeSelect.value; // initialise
 }
 
-// === INITIALISATION PAGE ===
+
+
+
+
+
+
 document.addEventListener("DOMContentLoaded", function() {
-  const select = document.getElementById('questTypeSelect');
-  if (select && typeof QUESTS_CATALOGUE !== "undefined") {
-    QUESTS_CATALOGUE.forEach(quest => {
-      let opt = document.createElement('option');
-      opt.value = quest.id;
-      opt.textContent = quest.nom;
-      select.appendChild(opt);
-    });
-    select.onchange = function() {
-      if (this.value) generateQuestForm(this.value, 'formContainer');
-      else document.getElementById('formContainer').innerHTML = '';
-    };
-  }
+  // ... tout le code d'init (select, fadein, map, etc)
+  // ... première mise à jour de la liste des épreuves
+  afficherScenario();
 
-
-
-
-  // ... toute la fin de ton generateur.js ...
-// (après toutes tes fonctions et ton document.addEventListener principal)
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Bouton "Test scénario"
+  // Ajoute ici le code du bouton test
   const btnTest = document.getElementById('testScenarioBtn');
   if (btnTest) {
     btnTest.onclick = function() {
@@ -72,13 +60,11 @@ document.addEventListener('DOMContentLoaded', function() {
         alert("Ajoute au moins une épreuve pour tester !");
         return;
       }
-      // On stocke le scénario en localStorage pour la page de test
       localStorage.setItem('scenarioTest', JSON.stringify({
         mode: currentGameMode,
         coordEnd: document.getElementById('coordEnd').value,
         scenario: scenario
       }));
-      // Redirection vers la page de test (utilise un template d'épreuve)
       window.open('template-epreuve.html?test=1', '_blank');
     };
   }
