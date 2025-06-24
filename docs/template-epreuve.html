@@ -120,6 +120,18 @@
     // ----- MODE TEST (PAS DE REDIRECTION, PAS DE FIREBASE, PAS DE salonCode) -----
     const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
     if (scenarioTest && Array.isArray(scenarioTest.scenario) && scenarioTest.scenario.length > 0) {
+      function afficherEtape(etape, idx) {
+        // Version simplifiée pour le test local : tu peux l'enrichir si tu veux !
+        document.title = (etape.titre || etape.nom || etape.type || "Quête") + " - Jeu de piste";
+        document.getElementById('titre-quete').textContent = etape.titre || etape.nom || etape.type || "";
+        document.getElementById('metaphore-quete').innerHTML = etape.metaphore ? `<em>${etape.metaphore}</em>` : '';
+        document.getElementById('objectif-block').style.display = etape.params?.objectif ? '' : 'none';
+        document.getElementById('objectif-text').textContent = etape.params?.objectif || '';
+        document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
+        document.getElementById('defi-text').textContent = etape.params?.defi || '';
+        // Ici tu peux simuler plus de blocs si besoin (mission, upload, etc)
+      }
+
       let currentStep = 0;
       function showStep(idx) {
         const etape = scenarioTest.scenario[idx];
@@ -262,7 +274,6 @@
     }
 
     function afficherSuite(etape, stepIndex) {
-      // TODO: Ajoute ici la logique par type (photo, collecte_objet, audio, anagramme, pendu, chrono, gps multi-points...)
       if(etape.type === "photo" || etape.type === "photo_inconnus") {
         afficherBlocMissionProgressive(etape, stepIndex, "photo");
       }
@@ -273,7 +284,6 @@
         afficherBlocMissionProgressive(etape, stepIndex, "audio");
       }
       else {
-        // Pour un type inconnu, affiche la consigne brute
         document.getElementById('bloc-mission').style.display = '';
         document.getElementById('mission-text').textContent = etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "";
         document.getElementById('next-quest').style.display = '';
@@ -281,7 +291,6 @@
       }
     }
 
-    // ----------- Exemples de logique pour missions progressives -------------
     function afficherBlocMissionProgressive(etape, stepIndex, type) {
       let missions = etape.params?.consignes || (etape.params?.consigne ? [etape.params.consigne] : []);
       if (!missions.length) missions = [etape.params?.objectif || etape.description || "Mission à accomplir"];
@@ -304,7 +313,6 @@
     }
 
     function afficherBlocUpload(type, stepIndex, idxMission, onUploaded) {
-      // Affiche un bloc upload harmonisé selon le type (photo, audio, ...)
       const bloc = document.getElementById('bloc-upload');
       const row = document.getElementById('upload-row');
       row.innerHTML = '';
@@ -344,7 +352,6 @@
       nextBtn.classList.remove('enabled');
       showToast("Validation en cours...");
       const now = Date.now();
-      // Enregistre le temps passé (optionnel)
       db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/current/startTime`)
         .once('value', function(snap) {
           const sTime = snap.val();
@@ -366,7 +373,6 @@
         });
     }
 
-    // --- Toast harmonisé ---
     function showToast(msg) {
       const toast = document.getElementById('toast-message');
       if (toast) {
