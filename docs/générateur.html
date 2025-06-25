@@ -7,19 +7,6 @@
   <!-- Harmonisation des polices avec le reste du site -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
-  <style>
-    .lancement-jeu, .regle-jeu {
-      margin: 16px 0 12px 0;
-      padding: 12px;
-      background: #f5f0e3;
-      border: 1px solid #cba55a;
-      border-radius: 7px;
-      font-size: 1.09em;
-      font-family: 'Cormorant Garamond', serif;
-    }
-    .lancement-jeu { font-weight: 600; color: #2e2510; }
-    .regle-jeu    { color: #49413e; font-style: italic; }
-  </style>
 </head>
 <body>
   <header>
@@ -28,10 +15,6 @@
 
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <!-- Bloc dynamique pour ambiance de lancement et règle du jeu -->
-      <div id="lancement-jeu" class="lancement-jeu"></div>
-      <div id="regle-jeu" class="regle-jeu"></div>
-
       <form class="form-container" id="epreuveForm" autocomplete="off">
         <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
             <div style="flex:1; min-width:180px;">
@@ -41,18 +24,18 @@
         </div>
 
         <div class="form-field">
-          <label for="modeScenarioSelect">Univers du scénario :</label>
-          <select id="modeScenarioSelect" name="modeScenarioSelect" required>
-            <option value="arthurien">Arthurien</option>
-            <option value="pirate">Pirate</option>
-            <option value="prison">Prison</option>
-            <option value="sorcier">Sorcier</option>
-            <option value="super_heros">Super-héros</option>
-            <option value="zombie">Zombie</option>
-            <option value="archeologue">Archéologue</option>
-            <!-- Ajoute d’autres modes ici -->
-          </select>
-        </div>
+  <label for="modeScenarioSelect">Univers du scénario :</label>
+  <select id="modeScenarioSelect" name="modeScenarioSelect" required>
+    <option value="arthurien">Arthurien</option>
+    <option value="pirate">Pirate</option>
+    <option value="prison">Prison</option>
+    <option value="sorcier">Sorcier</option>
+    <option value="super_heros">Super-héros</option>
+    <option value="zombie">Zombie</option>
+    <option value="archeologue">Archéologue</option>
+    <!-- Ajoute d’autres modes ici -->
+  </select>
+</div>
         
         <!-- Liste des épreuves ajoutées, sous les coordonnées -->
         <div id="scenarioList" style="margin-bottom:18px;"></div>
@@ -96,7 +79,7 @@
   
   <script src="JS/catalogue.js"></script>
   <script src="JS/catalogue-phrases.js"></script>
-  <script src="JS/catalogue-lancements.js"></script>
   <script src="JS/generateur.js"></script>
+
 </body>
 </html>
