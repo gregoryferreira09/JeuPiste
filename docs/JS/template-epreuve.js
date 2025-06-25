@@ -4,7 +4,7 @@ const firebaseConfig = {
   authDomain: "murder-party-ba8d1.firebaseapp.com",
   databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.firebasestorage.app",
+  storageBucket: "murder-party-ba8d1",
   messagingSenderId: "20295055805",
   appId: "1:20295055805:web:0963719c3f23ab7752fad4",
   measurementId: "G-KSBMBB7KMJ"
@@ -25,13 +25,39 @@ function getModeScenario(etape) {
   return 'arthurien';
 }
 
-// Génère une phrase adaptée à la mission à partir du catalogue (QUEST_TEXTS)
+// Fonction robuste pour remplacer tous les placeholders [key] dans une chaîne
+function replacePlaceholders(str, variables = {}) {
+  // Cherche tous les [clé] dans la phrase et remplace par la valeur correspondante dans variables.
+  return str.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => {
+    if (variables[key] !== undefined && variables[key] !== null) return variables[key];
+    if (variables.params && variables.params[key] !== undefined) return variables.params[key];
+    // Si rien trouvé, laisse le placeholder visible pour debug
+    return `[${key}]`;
+  });
+}
+
+// Génère une phrase adaptée à la mission à partir du catalogue (QUEST_TEXTS) avec robustesse
 function genererPhraseMission(type, mode, variables) {
-  if (!window.QUEST_TEXTS || !QUEST_TEXTS[type] || !QUEST_TEXTS[type][mode]) return "";
+  if (!window.QUEST_TEXTS) {
+    console.warn("QUEST_TEXTS non chargé !");
+    return "[Catalogue de phrases manquant]";
+  }
+  if (!QUEST_TEXTS[type]) {
+    console.warn(`Aucune entrée QUEST_TEXTS pour le type '${type}'`);
+    return "[Type d'épreuve inconnu – à configurer dans le catalogue]";
+  }
+  if (!QUEST_TEXTS[type][mode]) {
+    console.warn(`Aucune phrase pour le type '${type}' et le mode '${mode}' dans QUEST_TEXTS`);
+    return "[Aucune phrase disponible pour ce mode d'univers]";
+  }
   const templates = QUEST_TEXTS[type][mode];
-  if (!templates.length) return "";
+  if (!templates.length) {
+    console.warn(`Aucune phrase dans la liste pour le type '${type}' et le mode '${mode}'`);
+    return "[Aucune phrase dans le catalogue pour ce type/mode]";
+  }
+  // On choisit un template au hasard
   let phrase = templates[Math.floor(Math.random() * templates.length)];
-  phrase = phrase.replace(/\[([a-z_]+)\]/gi, (_, v) => (variables && (variables[v] || variables['params']?.[v])) || `[${v}]`);
+  phrase = replacePlaceholders(phrase, variables);
   return phrase;
 }
 
@@ -115,8 +141,7 @@ function showToast(msg) {
     document.getElementById('bloc-mission').style.display = '';
     document.getElementById('mission-label').textContent = "Consigne";
 
-    // --- Correction ici : gestion des multi-consignes (ex: plusieurs photos à prendre)
-    // Si params.consignes existe (tableau), on génère une phrase par consigne
+    // Multi-consigne (ex: plusieurs photos à prendre)
     if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
       document.getElementById('mission-text').innerHTML = etape.params.consignes.map(objet =>
         genererPhraseMission(etape.type, mode, { ...etape.params, objet })
@@ -124,8 +149,13 @@ function showToast(msg) {
     } else {
       const phraseMission =
         genererPhraseMission(etape.type, mode, etape.params) ||
-        etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "";
-      document.getElementById('mission-text').textContent = phraseMission;
+        etape.params?.consigne ||
+        etape.params?.objectif ||
+        etape.params?.enigme ||
+        etape.params?.question ||
+        etape.description ||
+        "[Aucune consigne définie]";
+      document.getElementById('mission-text').innerHTML = phraseMission;
     }
 
     // Bloc upload (photo/audio/video)
@@ -157,7 +187,7 @@ function showToast(msg) {
       nextBtn.style.display = '';
       nextBtn.disabled = true;
       input.oninput = function () {
-        // Ici tu peux ajuster la logique de validation selon le type
+        // Tu peux ajuster la logique de validation selon le type ici si besoin
         if (this.value.trim().length > 2) {
           nextBtn.disabled = false;
           nextBtn.classList.add('enabled');
@@ -185,7 +215,7 @@ function showToast(msg) {
       type === "audio"
         ? '🎤 <span>Audio à envoyer</span>'
         : `<svg viewBox="0 0 24 24" style="width:32px;height:32px;">
-              <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-7 0V6h4v1H7z"/>
+              <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-[...]
           </svg>
           <span>Photo à envoyer</span>`;
     let input = document.createElement('input');
