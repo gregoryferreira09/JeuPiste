@@ -23,18 +23,19 @@ function accorderRegle(phrase, N) {
   return phrase;
 }
 
-// === Affichage du texte de lancement (statique pour Avalon, dynamique sinon) ===
+// === Masque la page tant que le JS n'a pas injecté les données ===
+document.body.setAttribute('data-loading', '1');
+
 document.addEventListener("DOMContentLoaded", function () {
   const salonCode = localStorage.getItem("salonCode");
+  // Fallback si pas de code, pas de Firebase ou pas de catalogue
   if (!salonCode || typeof firebase === "undefined" || typeof LANCEMENT_TEXTE === "undefined") {
-    // Fallback si pas de code, pas de Firebase ou pas de catalogue
     const textes = (typeof LANCEMENT_TEXTE !== "undefined" ? LANCEMENT_TEXTE["arthurien"] : []);
     const texteAleatoire = textes.length ? textes[Math.floor(Math.random() * textes.length)] :
       "Bienvenue dans l'aventure ! Préparez-vous pour des épreuves épiques.";
     const presentation = document.getElementById("textePresentation");
     if (presentation) presentation.innerHTML = texteAleatoire;
 
-    // Fallback pour objectif et règles
     if (typeof OBJECTIF_TEXTE !== "undefined") {
       const objectifs = OBJECTIF_TEXTE["arthurien"];
       const objectifAleatoire = objectifs[Math.floor(Math.random() * objectifs.length)];
@@ -48,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const reglesElem = document.getElementById("reglesCourse");
       if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
     }
+    document.body.setAttribute('data-loading', '0');
     return;
   }
 
@@ -58,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Cas spécial : scénario local Parc Saint Nicolas => texte statique Avalon (on ne touche à rien)
     if (scenarioCode === "parc_saint_nicolas") {
+      document.body.setAttribute('data-loading', '0');
       return;
     }
 
@@ -94,6 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const reglesElem = document.getElementById("reglesCourse");
         if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
       }
+      document.body.setAttribute('data-loading', '0');
     }).catch(() => {
       // Fallback si erreur
       const textes = LANCEMENT_TEXTE['arthurien'];
@@ -114,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const reglesElem = document.getElementById("reglesCourse");
         if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
       }
+      document.body.setAttribute('data-loading', '0');
     });
   });
 });
