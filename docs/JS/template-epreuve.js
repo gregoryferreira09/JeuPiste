@@ -149,7 +149,7 @@ function joinList(arr) {
       // Détermine la clé variable et singulier/pluriel
       let variableKeySing = "objet";
       let variableKeyPlur = "objets";
-      if (etape.type.startsWith("photo_inconnus")) { variableKeySing = "personne"; variableKeyPlur = "personnes"; }
+      if (etape.type === "photo_inconnus") { variableKeySing = "personne"; variableKeyPlur = "personnes"; }
       else if (etape.type === "collecte_objet") { variableKeySing = "objet"; variableKeyPlur = "objets"; }
       else if (etape.type === "audio") { variableKeySing = "consigne"; variableKeyPlur = "consignes"; }
       // Ajoute d'autres cas si besoin
