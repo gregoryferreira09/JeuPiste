@@ -8,6 +8,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <!-- CSS global harmonisé -->
   <link rel="stylesheet" href="styles/style.css">
+  <style>
+    .lancement-jeu, .regle-jeu {
+      margin: 16px 0 12px 0;
+      padding: 12px;
+      background: #f5f0e3;
+      border: 1px solid #cba55a;
+      border-radius: 7px;
+      font-size: 1.09em;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .lancement-jeu { font-weight: 600; color: #2e2510; }
+    .regle-jeu    { color: #49413e; font-style: italic; }
+  </style>
 </head>
 <body>
   <header>
@@ -17,20 +30,8 @@
     <main>
       <section class="main-accueil fadeIn" role="main" aria-live="polite">
         <div class="presentation-jeu" id="presentationJeu">
-          <!-- Contenu statique pour Avalon (sera remplacé dynamiquement si besoin) -->
-          <div class="titre-course" id="titreCourse">Avalon</div>
-          <div class="texte-course" id="textePresentation">
-            Moi, Merlin l'Enchanteur, vous convoque pour la plus noble des aventures : la quête du Saint-Graal.<br>
-            Les temps sont sombres, et seul les plus dignes des chevaliers parmi vous pourrez retrouver le Graal sacré, source de sagesse et de paix pour le royaume.
-          </div>
-          <div class="objectif-course">
-            <span class="objectif-label">Objectif&nbsp;:</span>
-            <span class="objectif-text" id="objectifText">Rassemblez votre équipe, serrez les rangs… et courez, car les vents de la destinée soufflent sur votre route.</span>
-          </div>
-          <div class="regles-course" id="reglesCourse">
-            <strong>Règles du jeu&nbsp;:</strong><br>
-            Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis [...]
-          </div>
+          <div class="lancement-jeu" id="lancement-jeu"></div>
+          <div class="regle-jeu" id="regle-jeu"></div>
         </div>
         <div class="boutons-actions actions-bandeau">
           <a class="main-btn" id="demarrerBtn" href="personnages.html" style="pointer-events:none; opacity:0.6;">Disponible dans 30s</a>
@@ -57,12 +58,9 @@
       </div>
     </div>
   </div>
-
-  <!-- Loader visuel -->
   <div id="loader" aria-live="polite" style="display:none;">
     <div class="spinner"></div>
   </div>
-  <!-- Toast feedback -->
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
 
   <!-- Firebase SDK -->
@@ -86,7 +84,39 @@
 
   <!-- Catalogue de lancements dynamiques -->
   <script src="JS/catalogue-lancements.js"></script>
-  <!-- Script de lancement partie (gère injection dynamique et les boutons) -->
-  <script src="JS/lancement-partie.js"></script>
+
+  <!-- Script dynamique d'injection de l'ambiance et règle -->
+  <script>
+    // Récupération du scénario (adapte selon ton système, ici via localStorage)
+    let scenario = JSON.parse(localStorage.getItem('scenarioTest'));
+    let mode = scenario.mode;
+    let nbEtapes = scenario.scenario.length;
+
+    // Texte d'ambiance (tiré au hasard selon le mode)
+    let lancementArray = LANCEMENT_TEXTE[mode] || [];
+    let lancement = lancementArray.length ? lancementArray[Math.floor(Math.random() * lancementArray.length)] : "";
+
+    // Règle dynamique adaptée au nombre d'étapes
+    function regleAccordee(brut, N) {
+      let phrase = brut.replace("{N}", N);
+      if (N === 1) {
+        phrase = phrase
+          .replace(/étapes/gi, "étape")
+          .replace(/\bsont\b/gi, "est")
+          .replace(/\bindispensables\b/gi, "indispensable")
+          .replace(/\bdéfis\b/gi, "défi")
+          .replace(/\bmissions\b/gi, "mission")
+          .replace(/\baventures\b/gi, "aventure");
+      }
+      return phrase;
+    }
+    let regles = REGLES_TEXTE[mode] || [];
+    let regleBrute = regles.length ? regles[Math.floor(Math.random() * regles.length)] : "";
+    let regle = regleAccordee(regleBrute, nbEtapes);
+
+    document.getElementById('lancement-jeu').textContent = lancement;
+    document.getElementById('regle-jeu').textContent = regle;
+  </script>
+  <!-- Si tu as un JS spécifique pour les boutons/actions, tu peux le remettre ici -->
 </body>
 </html>
