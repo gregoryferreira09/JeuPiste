@@ -289,6 +289,12 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
     else chargerEtapeDynamique();
   });
 
+  function getModeScenario(etape) {
+  // Renvoie simplement le mode de l'étape s'il existe, sinon 'arthurien'
+  if (etape && etape.mode) return etape.mode;
+  return 'arthurien';
+}
+  
   function chargerEtapeDynamique() {
     db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
       const step = snapStep.val() || 0;
