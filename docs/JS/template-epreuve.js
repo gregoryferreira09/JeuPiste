@@ -146,8 +146,6 @@ function afficherBlocGPS(etape, callback, testMode = false) {
   };
 }
 
-
- 
 function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
@@ -172,7 +170,7 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
       vars.nb = liste.length;
     }
 
-    // PATCH DE SÉCURITÉ GLOBAL (toujours exécuté, jamais dans un if/else)
+    // Patch sécurité pour garantir le remplacement [objet]/[objets]
     if (!vars.objet && Array.isArray(liste) && liste.length === 1) {
       vars.objet = lowerFirst(liste[0]);
     }
@@ -199,9 +197,6 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
       "[Aucune consigne définie]";
   }
   document.getElementById('mission-text').innerHTML = phraseMission;
-
-  // ... (le reste ne change pas)
-}
 
   if (["photo", "photo_inconnus", "audio", "collecte_objet"].includes(etape.type)) {
     afficherBlocUpload(etape.type, stepIndex, 0, () => {
