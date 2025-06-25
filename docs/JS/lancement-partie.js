@@ -18,10 +18,15 @@ function accorderRegle(phrase, n) {
   // Insertion du nombre
   phrase = phrase.replace("{N}", n);
 
-  // Accord sur le mot variable seulement (jamais sur le verbe avant)
-  accords.forEach(acc => {
-    phrase = phrase.replace(acc.regex, n === 1 ? acc.singulier : acc.pluriel);
-  });
+// Accord sur le mot variable seulement (jamais sur le verbe avant)
+accords.forEach(acc => {
+  phrase = phrase.replace(acc.regex, n === 1 ? acc.singulier : acc.pluriel);
+});
+
+// Accord des adjectifs qui suivent directement le nom compté
+phrase = phrase.replace(/(\d+)\s+([a-zéèêîïûùa-zA-Z-]+)\s+critiques\b/gi, function(_, nombre, nom) {
+  return (parseInt(nombre) === 1) ? `${nombre} ${nom} critique` : `${nombre} ${nom} critiques`;
+});
 
   return phrase;
 }
