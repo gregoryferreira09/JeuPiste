@@ -27,11 +27,9 @@ function getModeScenario(etape) {
 
 // Fonction robuste pour remplacer tous les placeholders [key] dans une chaîne
 function replacePlaceholders(str, variables = {}) {
-  // Cherche tous les [clé] dans la phrase et remplace par la valeur correspondante dans variables.
   return str.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => {
     if (variables[key] !== undefined && variables[key] !== null) return variables[key];
     if (variables.params && variables.params[key] !== undefined) return variables.params[key];
-    // Si rien trouvé, laisse le placeholder visible pour debug
     return `[${key}]`;
   });
 }
@@ -55,7 +53,6 @@ function genererPhraseMission(type, mode, variables) {
     console.warn(`Aucune phrase dans la liste pour le type '${type}' et le mode '${mode}'`);
     return "[Aucune phrase dans le catalogue pour ce type/mode]";
   }
-  // On choisit un template au hasard
   let phrase = templates[Math.floor(Math.random() * templates.length)];
   phrase = replacePlaceholders(phrase, variables);
   return phrase;
@@ -71,13 +68,20 @@ function showToast(msg) {
   }
 }
 
+// Fonction utilitaire pour joindre une liste au format "A et B", "A, B et C"
+function joinList(arr) {
+  if (!Array.isArray(arr)) return arr;
+  if (arr.length === 1) return arr[0];
+  if (arr.length === 2) return arr[0] + ' et ' + arr[1];
+  return arr.slice(0, -1).join(', ') + ' et ' + arr[arr.length - 1];
+}
+
 (function () {
   const params = new URLSearchParams(window.location.search);
   const isTestMode = params.get('test') === '1';
 
   // Harmonise l'affichage des blocs dans le bon ordre, GPS, Mission, etc.
   function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
-    // 1. Affiche titre, métaphore, objectif
     document.getElementById('titre-quete').textContent = etape.titre || etape.nom || etape.type || "";
     document.getElementById('metaphore-quete').innerHTML = etape.metaphore ? `<em>${etape.metaphore}</em>` : '';
     document.getElementById('objectif-block').style.display = etape.params?.objectif ? '' : 'none';
@@ -85,7 +89,6 @@ function showToast(msg) {
     document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
     document.getElementById('defi-text').textContent = etape.params?.defi || '';
 
-    // 2. GPS obligatoire ? Place le bloc GPS juste après la présentation
     let hasGPS = !!(etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length));
     if (hasGPS) {
       afficherBlocGPS(etape, () => afficherMissionSuite(etape, stepIndex, mode, testMode), testMode);
@@ -137,17 +140,33 @@ function showToast(msg) {
 
   // Affichage de la mission et de la suite (upload, input, bouton)
   function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
-    // Affiche la mission/consigne harmonisée
     document.getElementById('bloc-mission').style.display = '';
     document.getElementById('mission-label').textContent = "Consigne";
 
-    // Multi-consigne (ex: plusieurs photos à prendre)
+    let phraseMission = "";
+    // Nouvelle logique : une seule phrase même pour plusieurs consignes
     if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
-      document.getElementById('mission-text').innerHTML = etape.params.consignes.map(objet =>
-        genererPhraseMission(etape.type, mode, { ...etape.params, objet })
-      ).join('<br>');
+      let liste = etape.params.consignes;
+      // On choisit la clé variable selon le type d'épreuve
+      let variableKey = "consignes";
+      if (etape.type.startsWith("photo")) variableKey = "objets";
+      else if (etape.type === "collecte_objet") variableKey = "objets";
+      else if (etape.type === "photo_inconnus") variableKey = "personnes";
+      else if (etape.type === "audio") variableKey = "audios";
+      // Ajoute d'autres cas ici si besoin
+
+      let joinTxt = joinList(liste);
+      let vars = { ...etape.params, [variableKey]: joinTxt, nb: liste.length };
+      phraseMission =
+        genererPhraseMission(etape.type, mode, vars) ||
+        etape.params?.consigne ||
+        etape.params?.objectif ||
+        etape.params?.enigme ||
+        etape.params?.question ||
+        etape.description ||
+        "[Aucune consigne définie]";
     } else {
-      const phraseMission =
+      phraseMission =
         genererPhraseMission(etape.type, mode, etape.params) ||
         etape.params?.consigne ||
         etape.params?.objectif ||
@@ -155,8 +174,8 @@ function showToast(msg) {
         etape.params?.question ||
         etape.description ||
         "[Aucune consigne définie]";
-      document.getElementById('mission-text').innerHTML = phraseMission;
     }
+    document.getElementById('mission-text').innerHTML = phraseMission;
 
     // Bloc upload (photo/audio/video)
     if (["photo", "photo_inconnus", "audio", "collecte_objet"].includes(etape.type)) {
@@ -187,7 +206,6 @@ function showToast(msg) {
       nextBtn.style.display = '';
       nextBtn.disabled = true;
       input.oninput = function () {
-        // Tu peux ajuster la logique de validation selon le type ici si besoin
         if (this.value.trim().length > 2) {
           nextBtn.disabled = false;
           nextBtn.classList.add('enabled');
@@ -212,13 +230,12 @@ function showToast(msg) {
     bloc.style.display = '';
     let label = document.createElement('label');
     label.innerHTML =
-      label.innerHTML =
-  type === "audio"
-    ? '🎤 <span>Audio à envoyer</span>'
-    : `<svg viewBox="0 0 24 24" width="32" height="32" style="display:inline-block;vertical-align:middle;margin-right:8px;">
-      <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-      </svg>
-      <span>Photo à envoyer</span>`;
+      type === "audio"
+        ? '🎤 <span>Audio à envoyer</span>'
+        : `<svg viewBox="0 0 24 24" width="32" height="32" style="display:inline-block;vertical-align:middle;margin-right:8px;">
+            <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+          </svg>
+          <span>Photo à envoyer</span>`;
     let input = document.createElement('input');
     input.type = "file";
     input.className = "visually-hidden";
@@ -265,7 +282,6 @@ function showToast(msg) {
             "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
           return;
         }
-        // Nettoie tous les blocs
         ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
           const el = document.getElementById(id); if(el) el.style.display = 'none';
         });
@@ -293,7 +309,7 @@ function showToast(msg) {
       document.getElementById('main-content').innerHTML =
         "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
     }
-    return; // RIEN APRÈS ICI EN MODE TEST
+    return;
   }
 
   // --- Mode normal ---
@@ -321,13 +337,11 @@ function showToast(msg) {
           document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
           return;
         }
-        // Nettoie tous les blocs
         ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
           const el = document.getElementById(id); if(el) el.style.display = 'none';
         });
         document.getElementById('next-quest').style.display = 'none';
         afficherEtapeHarmonisee(etape, step, getModeScenario(etape), false);
-        // Gestion du bouton "Quête suivante"
         document.getElementById('next-quest').onclick = validerEtape;
       });
     });
