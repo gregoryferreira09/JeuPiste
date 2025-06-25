@@ -1,45 +1,60 @@
 // docs/JS/lancement-partie.js
 
-// === Fonction d'accord dynamique pour les règles, y compris la conjugaison ===
-function accorderRegle(phrase, N) {
-  phrase = phrase.replace("{N}", N);
+/**
+ * Accord dynamique des phrases selon le sujet et le nombre
+ * - Remplace {N} par le nombre.
+ * - Accorde les mots variables (défi, mission, etc.).
+ * - Accorde la conjugaison si le sujet change avec N (ex: "1 mission sera validée" / "2 missions seront validées").
+ * - NE modifie PAS les verbes ni les pronoms dont le sujet ne dépend pas de N (ex: "Les survivants seront ceux qui...")
+ */
+function accorderRegle(phrase, n) {
+  // Accord des mots à nombre variable
+  phrase = phrase.replace("{N}", n);
 
-  // Remplacements singulier/pluriel
-  if (N === 1) {
+  // Cas particulier : on ne touche pas aux verbes/pronoms dont le sujet ne dépend pas de N
+  // On ne touche pas à "Les survivants seront ceux qui..." ni à "Les équipes devront..."
+  // On accorde seulement si {N} est le véritable sujet du verbe (ex: "{N} missions seront validées")
+
+  // Accord mots
+  if (n === 1) {
     phrase = phrase
-      .replace(/épreuves magiques/gi, "épreuve magique")
-      .replace(/épreuves/gi, "épreuve")
-      .replace(/magiques/gi, "magique")
-      .replace(/quêtes/gi, "quête")
-      .replace(/étapes/gi, "étape")
-      .replace(/missions/gi, "mission")
-      .replace(/défis/gi, "défi")
-      .replace(/actions clés/gi, "action clé")
-      .replace(/aventures/gi, "aventure")
-      .replace(/interventions héroïques/gi, "intervention héroïque")
-      .replace(/étapes décisives/gi, "étape décisive")
-      .replace(/situations critiques/gi, "situation critique");
-    // Remplacements des verbes à conjuguer
+      .replace(/\bmissions\b/gi, "mission")
+      .replace(/\bdéfis\b/gi, "défi")
+      .replace(/\bquêtes\b/gi, "quête")
+      .replace(/\bépreuves\b/gi, "épreuve")
+      .replace(/\bétapes\b/gi, "étape")
+      .replace(/\bactions clés\b/gi, "action clé")
+      .replace(/\baventures\b/gi, "aventure")
+      .replace(/\binterventions héroïques\b/gi, "intervention héroïque")
+      .replace(/\bétapes décisives\b/gi, "étape décisive")
+      .replace(/\bsituations critiques\b/gi, "situation critique");
+    // Accord adjectifs
     phrase = phrase
-      .replace(/\bsont\b/gi, "est")
       .replace(/\bindispensables\b/gi, "indispensable")
+      .replace(/\bmagiques\b/gi, "magique");
+    // Accord des verbes si le sujet est {N}
+    // Cas typique : "1 mission sera validée", "1 défi sépare", etc.
+    phrase = phrase
+      .replace(/\bseront validées\b/gi, "sera validée")
+      .replace(/\bsont\b/gi, "est")
       .replace(/\bséparent\b/gi, "sépare")
       .replace(/\brestent\b/gi, "reste")
       .replace(/\battendent\b/gi, "attend")
       .replace(/\bdoivent\b/gi, "doit")
       .replace(/\bpeuvent\b/gi, "peut")
       .replace(/\bpermettent\b/gi, "permet")
-      .replace(/\battendent\b/gi, "attend")
-      .replace(/\bseront\b/gi, "sera")
-      .replace(/\bdoivent\b/gi, "doit")
-      .replace(/\bdérobent\b/gi, "dérobe")
+      .replace(/\bouvrent\b/gi, "ouvre")
       .replace(/\bprouvent\b/gi, "prouve")
       .replace(/\bvalident\b/gi, "valide")
-      .replace(/\bouvrent\b/gi, "ouvre")
-      .replace(/\bentravent\b/gi, "entrave")
-      // Ajoute ici d'autres verbes à conjuguer si tu en as dans tes règles !
-      ;
+      .replace(/\bentravent\b/gi, "entrave");
+    // Exceptions : NE PAS toucher à "seront" si le sujet est toujours pluriel ("Les survivants seront...")
+    // On évite toute transformation de "seront" si la phrase commence par "Les survivants", "Les équipes", "Tous", etc.
+    if (/^(Les survivants|Les équipes|Tous|Toutes|Chaque équipe|Chaque joueur)/i.test(phrase.trim())) {
+      // Annuler les remplacements qui auraient touché à "seront"
+      phrase = phrase.replace(/\bsera\b/gi, "seront");
+    }
   }
+  // Sinon (n > 1), rien à remplacer, le template doit être correct à la base.
   return phrase;
 }
 
@@ -48,7 +63,8 @@ document.body.setAttribute('data-loading', '1');
 
 document.addEventListener("DOMContentLoaded", function () {
   const salonCode = localStorage.getItem("salonCode");
-  // Fallback si pas de code, pas de Firebase ou pas de catalogue
+
+  // Fallback : affiche un contenu par défaut si pas de code, pas de Firebase ou pas de catalogue
   if (!salonCode || typeof firebase === "undefined" || typeof LANCEMENT_TEXTE === "undefined") {
     const textes = (typeof LANCEMENT_TEXTE !== "undefined" ? LANCEMENT_TEXTE["arthurien"] : []);
     const texteAleatoire = textes.length ? textes[Math.floor(Math.random() * textes.length)] :
@@ -78,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const params = paramSnap.val() || {};
     const scenarioCode = params.scenarioCode;
 
-    // Cas spécial : scénario local Parc Saint Nicolas => texte statique Avalon (on ne touche à rien)
+    // Cas spécial : scénario local Parc Saint Nicolas => texte statique Avalon (on ne touche à rien)
     if (scenarioCode === "parc_saint_nicolas") {
       document.body.setAttribute('data-loading', '0');
       return;
@@ -109,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (objectifElem) objectifElem.textContent = objectifAleatoire;
       }
 
-      // Règles dynamiques (avec {N} correct ET accord et conjugaison)
+      // Règles dynamiques (avec {N} correct ET accord)
       if (typeof REGLES_TEXTE !== "undefined") {
         const regles = REGLES_TEXTE[mode] || REGLES_TEXTE['arthurien'];
         let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
