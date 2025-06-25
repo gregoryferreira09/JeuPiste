@@ -162,29 +162,29 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     else if (etape.type === "collecte_objet") { variableKeySing = "objet"; variableKeyPlur = "objets"; }
     else if (etape.type === "audio") { variableKeySing = "consigne"; variableKeyPlur = "consignes"; }
     let vars = { ...etape.params };
-    if (liste.length === 1) {
-      vars[variableKeySing] = getPrepDe(liste[0]);
-      vars.nb = 1;
-      phraseMission =
-        genererPhraseMission(etape.type, mode, vars) ||
-        etape.params?.consigne ||
-        etape.params?.objectif ||
-        etape.params?.enigme ||
-        etape.params?.question ||
-        etape.description ||
-        "[Aucune consigne définie]";
-    } else {
-      vars[variableKeyPlur] = joinListPrep(liste);
-      vars.nb = liste.length;
-      phraseMission =
-        genererPhraseMission(etape.type, mode, vars) ||
-        etape.params?.consigne ||
-        etape.params?.objectif ||
-        etape.params?.enigme ||
-        etape.params?.question ||
-        etape.description ||
-        "[Aucune consigne définie]";
-    }
+   if (liste.length === 1) {
+  vars[variableKeySing] = getPrepDe(liste[0]);
+  vars.nb = 1;
+  phraseMission =
+    genererPhraseMission(etape.type, mode, vars) ||
+    etape.params?.consigne ||
+    etape.params?.objectif ||
+    etape.params?.enigme ||
+    etape.params?.question ||
+    etape.description ||
+    "[Aucune consigne définie]";
+} else {
+  vars[variableKeyPlur] = joinListPrep(liste);
+  vars.nb = liste.length;
+  phraseMission =
+    genererPhraseMission(etape.type, mode, vars) ||
+    etape.params?.consigne ||
+    etape.params?.objectif ||
+    etape.params?.enigme ||
+    etape.params?.question ||
+    etape.description ||
+    "[Aucune consigne définie]";
+}
   } else {
     phraseMission =
       genererPhraseMission(etape.type, mode, etape.params) ||
