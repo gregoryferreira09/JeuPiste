@@ -239,3 +239,5 @@ const QUEST_TEXTS = {
   }
   // Ajoute ici d'autres types ou d'autres modes à volonté !
 };
+// Fin du fichier :
+window.QUEST_TEXTS = QUEST_TEXTS;
