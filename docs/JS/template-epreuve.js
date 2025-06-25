@@ -45,13 +45,7 @@ function joinListPrep(list) {
   return list.slice(0, -1).join(", ") + " et " + list[list.length - 1];
 }
 
-  // --- Patch sécurité ---
-if (!vars.objet && Array.isArray(liste) && liste.length === 1) {
-  vars.objet = lowerFirst(liste[0]);
-}
-if (!vars.objets && Array.isArray(liste) && liste.length > 1) {
-  vars.objets = joinListPrep(liste.map(lowerFirst));
-}
+
 // Fonction genererPhraseMission DYNAMIQUE et robuste
 function genererPhraseMission(type, mode, vars = {}) {
   // Cherche les textes dans la variable globale (catalogue-phrases.js)
@@ -178,6 +172,15 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
   vars[variableKeySing] = lowerFirst(liste[0]);
   vars.objet = lowerFirst(liste[0]);
   vars.nb = 1;
+
+  // Patch sécurité pour garantir le remplacement [objet]/[objets]
+if (!vars.objet && Array.isArray(liste) && liste.length === 1) {
+  vars.objet = lowerFirst(liste[0]);
+}
+if (!vars.objets && Array.isArray(liste) && liste.length > 1) {
+  vars.objets = joinListPrep(liste.map(lowerFirst));
+}
+    
   phraseMission =
     genererPhraseMission(etape.type, mode, vars) ||
     etape.params?.consigne ||
