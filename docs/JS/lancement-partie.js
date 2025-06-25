@@ -1,72 +1,96 @@
 // docs/JS/lancement-partie.js
 
-// === Affichage dynamique de l'ambiance et de la règle ===
+// === Affichage du texte de lancement (statique pour Avalon, dynamique sinon) ===
 document.addEventListener("DOMContentLoaded", function () {
   const salonCode = localStorage.getItem("salonCode");
-  const eltLancement = document.getElementById('lancement-jeu');
-  const eltRegle = document.getElementById('regle-jeu');
+  if (!salonCode || typeof firebase === "undefined" || typeof LANCEMENT_TEXTE === "undefined") {
+    // Fallback si pas de code, pas de Firebase ou pas de catalogue
+    const textes = (typeof LANCEMENT_TEXTE !== "undefined" ? LANCEMENT_TEXTE["arthurien"] : []);
+    const texteAleatoire = textes.length ? textes[Math.floor(Math.random() * textes.length)] :
+      "Bienvenue dans l'aventure ! Préparez-vous pour des épreuves épiques.";
+    const presentation = document.getElementById("textePresentation");
+    if (presentation) presentation.innerHTML = texteAleatoire;
 
-  function afficherTexts(mode, nbEtapes) {
-    // Ambiance
-    let lancementArray = typeof LANCEMENT_TEXTE !== "undefined" && LANCEMENT_TEXTE[mode] ? LANCEMENT_TEXTE[mode] : [];
-    let lancement = lancementArray.length ? lancementArray[Math.floor(Math.random() * lancementArray.length)] : "Bienvenue dans l'aventure !";
-    eltLancement.textContent = lancement;
-
-    // Règle dynamique
-    function regleAccordee(brut, N) {
-      let phrase = brut.replace("{N}", N);
-      if (N === 1) {
-        phrase = phrase
-          .replace(/étapes/gi, "étape")
-          .replace(/\bsont\b/gi, "est")
-          .replace(/\bindispensables\b/gi, "indispensable")
-          .replace(/\bdéfis\b/gi, "défi")
-          .replace(/\bmissions\b/gi, "mission")
-          .replace(/\baventures\b/gi, "aventure");
-      }
-      return phrase;
+    // Fallback pour objectif et règles
+    if (typeof OBJECTIF_TEXTE !== "undefined") {
+      const objectifs = OBJECTIF_TEXTE["arthurien"];
+      const objectifAleatoire = objectifs[Math.floor(Math.random() * objectifs.length)];
+      const objectifElem = document.getElementById("objectifText");
+      if (objectifElem) objectifElem.textContent = objectifAleatoire;
     }
-    let regles = typeof REGLES_TEXTE !== "undefined" && REGLES_TEXTE[mode] ? REGLES_TEXTE[mode] : [];
-    let regleBrute = regles.length ? regles[Math.floor(Math.random() * regles.length)] : "Pour vous évader, il faudra réussir {N} étapes sans vous faire prendre.";
-    let regle = regleAccordee(regleBrute, nbEtapes);
-    eltRegle.textContent = regle;
+    if (typeof REGLES_TEXTE !== "undefined") {
+      const regles = REGLES_TEXTE["arthurien"];
+      let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
+      regleAleatoire = regleAleatoire.replace('{N}', 6); // Valeur par défaut
+      const reglesElem = document.getElementById("reglesCourse");
+      if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
+    }
+    return;
   }
 
-  if (
-    salonCode &&
-    typeof firebase !== "undefined" &&
-    typeof LANCEMENT_TEXTE !== "undefined"
-  ) {
-    // Cas : partie en salon (Firebase)
-    firebase.database().ref('parties/' + salonCode + '/parametres').once('value').then(paramSnap => {
-      const params = paramSnap.val() || {};
-      const scenarioCode = params.scenarioCode;
-      firebase.database().ref('scenarios/' + scenarioCode).once('value').then(snap => {
-        const scenar = snap.val() || {};
-        const mode = scenar.mode || 'arthurien';
-        const nbEtapes = Array.isArray(scenar.scenario) ? scenar.scenario.length : (params.nbQuetes || 6);
-        afficherTexts(mode, nbEtapes);
-      }).catch(() => {
-        afficherTexts('arthurien', 6);
-      });
-    }).catch(() => {
-      afficherTexts('arthurien', 6);
-    });
-  } else {
-    // Fallback localStorage (test local)
-    let scenario = null;
-    try {
-      scenario = JSON.parse(localStorage.getItem('scenarioTest'));
-    } catch(e) {}
-    if (!scenario) {
-      eltLancement.textContent = "Bienvenue dans l'aventure !";
-      eltRegle.textContent = "Préparez-vous pour des épreuves épiques.";
+  // On récupère le code scénario joué pour ce salon
+  firebase.database().ref('parties/' + salonCode + '/parametres').once('value').then(paramSnap => {
+    const params = paramSnap.val() || {};
+    const scenarioCode = params.scenarioCode;
+
+    // Cas spécial : scénario local Parc Saint Nicolas => texte statique Avalon (on ne touche à rien)
+    if (scenarioCode === "parc_saint_nicolas") {
       return;
     }
-    let mode = scenario.mode || 'arthurien';
-    let nbEtapes = Array.isArray(scenario.scenario) ? scenario.scenario.length : 1;
-    afficherTexts(mode, nbEtapes);
-  }
+
+    // Sinon on va chercher le mode du scénario et on injecte le texte dynamique
+    firebase.database().ref('scenarios/' + scenarioCode + '/mode').once('value').then(snap => {
+      const mode = snap.val() || 'arthurien';
+
+      // Texte de lancement dynamique
+      const textes = LANCEMENT_TEXTE[mode] || LANCEMENT_TEXTE['arthurien'];
+      const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
+      const presentation = document.getElementById("textePresentation");
+      if (presentation) presentation.innerHTML = texteAleatoire;
+
+      // Titre dynamique
+      const titre = document.getElementById("titreCourse");
+      if (titre) titre.textContent = mode.charAt(0).toUpperCase() + mode.slice(1).replace(/_/g, " ");
+
+      // Objectif dynamique
+      if (typeof OBJECTIF_TEXTE !== "undefined") {
+        const objectifs = OBJECTIF_TEXTE[mode] || OBJECTIF_TEXTE['arthurien'];
+        const objectifAleatoire = objectifs[Math.floor(Math.random() * objectifs.length)];
+        const objectifElem = document.getElementById("objectifText");
+        if (objectifElem) objectifElem.textContent = objectifAleatoire;
+      }
+
+      // Règles dynamiques (avec {N} = nombre de quêtes)
+      if (typeof REGLES_TEXTE !== "undefined") {
+        const nbQuetes = params.nbQuetes || 6; // valeur par défaut si non trouvée
+        const regles = REGLES_TEXTE[mode] || REGLES_TEXTE['arthurien'];
+        let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
+        regleAleatoire = regleAleatoire.replace('{N}', nbQuetes);
+        const reglesElem = document.getElementById("reglesCourse");
+        if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
+      }
+    }).catch(() => {
+      // Fallback si erreur
+      const textes = LANCEMENT_TEXTE['arthurien'];
+      const texteAleatoire = textes[Math.floor(Math.random() * textes.length)];
+      const presentation = document.getElementById("textePresentation");
+      if (presentation) presentation.innerHTML = texteAleatoire;
+
+      if (typeof OBJECTIF_TEXTE !== "undefined") {
+        const objectifs = OBJECTIF_TEXTE["arthurien"];
+        const objectifAleatoire = objectifs[Math.floor(Math.random() * objectifs.length)];
+        const objectifElem = document.getElementById("objectifText");
+        if (objectifElem) objectifElem.textContent = objectifAleatoire;
+      }
+      if (typeof REGLES_TEXTE !== "undefined") {
+        const regles = REGLES_TEXTE["arthurien"];
+        let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
+        regleAleatoire = regleAleatoire.replace('{N}', 6);
+        const reglesElem = document.getElementById("reglesCourse");
+        if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
+      }
+    });
+  });
 });
 
 // === Activation du bouton "Démarrer" après 30s avec décompte ===
