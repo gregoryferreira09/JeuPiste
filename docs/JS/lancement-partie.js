@@ -62,17 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  // Récupère le type et le mode (à adapter selon ton routing)
-const typeMission = window.typeMission || "photo";
-const mode = window.mode || "arthurien";
-
-// Tire un titre et une phrase d'ambiance aléatoires
-const { titre, phrase } = getRandomAtmosphere(typeMission, mode);
-
-// Remplit le HTML
-document.getElementById("titre-quete").textContent = titre;
-document.getElementById("metaphore-quete").innerHTML = phrase;
-  
   // On récupère le code scénario joué pour ce salon
   firebase.database().ref('parties/' + salonCode + '/parametres').once('value').then(paramSnap => {
     const params = paramSnap.val() || {};
@@ -191,6 +180,4 @@ document.addEventListener("DOMContentLoaded", function () {
       btnRetour.focus();
     });
   }
-  console.log("JS chargé, affichage du contenu");
-document.body.setAttribute('data-loading', '0');
 });
