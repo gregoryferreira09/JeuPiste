@@ -191,4 +191,6 @@ document.addEventListener("DOMContentLoaded", function () {
       btnRetour.focus();
     });
   }
+  console.log("JS chargé, affichage du contenu");
+document.body.setAttribute('data-loading', '0');
 });
