@@ -23,6 +23,11 @@ firebase.auth().signInAnonymously().then(function() {
 
 function demarreJeuFirebase() {
 
+
+function lowerFirst(str) {
+  return str ? str.charAt(0).toLowerCase() + str.slice(1) : "";
+}
+  
 // === Fonctions utilitaires minimales ===
 
 // Fallback basique pour getPrepDe
@@ -162,8 +167,9 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     else if (etape.type === "collecte_objet") { variableKeySing = "objet"; variableKeyPlur = "objets"; }
     else if (etape.type === "audio") { variableKeySing = "consigne"; variableKeyPlur = "consignes"; }
     let vars = { ...etape.params };
-   if (liste.length === 1) {
-  vars[variableKeySing] = getPrepDe(liste[0]);
+  if (liste.length === 1) {
+  vars[variableKeySing] = lowerFirst(liste[0]);
+  vars.objet = lowerFirst(liste[0]);
   vars.nb = 1;
   phraseMission =
     genererPhraseMission(etape.type, mode, vars) ||
@@ -174,7 +180,10 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     etape.description ||
     "[Aucune consigne définie]";
 } else {
-  vars[variableKeyPlur] = joinListPrep(liste);
+  // Applique lowerFirst à chaque consigne
+  const consignesLower = liste.map(lowerFirst);
+  vars[variableKeyPlur] = joinListPrep(consignesLower);
+  vars.objets = joinListPrep(consignesLower);
   vars.nb = liste.length;
   phraseMission =
     genererPhraseMission(etape.type, mode, vars) ||
