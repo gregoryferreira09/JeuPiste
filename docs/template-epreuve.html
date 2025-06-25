@@ -14,7 +14,7 @@
     .actions-row-horizontal { display: flex; align-items: center; gap: 24px; margin: 24px 0; }
     .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
     .icon-action label, .icon-action a { cursor: pointer; }
-    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 9999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw;}
+    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 9999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw; }
     .modal-toast.visible { display: block; animation: fadein 0.3s;}
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
@@ -24,13 +24,15 @@
     <h1 class="site-title">Jeu de piste</h1>
   </header>
   <div class="center-wrapper">
-    <h2 class="titre-course" id="titre-quete"></h2>
-<div class="presentation-jeu" style="margin-top:24px;">
-  <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
-</div>
-      
-      <h2 class="titre-course" id="titre-quete">Titre de la quête</h2>
-      <div class="texte-course" id="metaphore-quete" style="margin-bottom: 18px;"></div>
+    <main class="main-accueil" id="main-content" role="main">
+
+      <!-- TITRE ET METAPHORE UNIQUES (corrigé) -->
+      <h2 class="titre-course" id="titre-quete"></h2>
+      <div class="presentation-jeu" style="margin-top:24px;">
+        <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
+      </div>
+      <!-- /TITRE ET METAPHORE UNIQUES -->
+
       <div class="objectif-course" id="objectif-block" style="display:none;">
         <div class="objectif-label">Objectif</div>
         <div class="objectif-text" id="objectif-text"></div>
@@ -105,6 +107,8 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <!-- Catalogue des phrases -->
   <script src="JS/catalogue-phrases.js"></script>
+  <!-- Catalogue des atmosphères (à ajouter si ce n'est pas déjà fait) -->
+  <script src="JS/catalogue-atmospheres.js"></script>
   <!-- Script principal de gestion de l'épreuve -->
   <script src="JS/template-epreuve.js"></script>
 </body>
