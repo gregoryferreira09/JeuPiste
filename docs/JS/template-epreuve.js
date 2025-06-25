@@ -23,7 +23,60 @@ firebase.auth().signInAnonymously().then(function() {
 
 function demarreJeuFirebase() {
 
-// === Fonctions utilitaires ===
+// === Fonctions utilitaires minimales ===
+
+// Fallback basique pour getPrepDe
+function getPrepDe(str) {
+  // Pour l'affichage "de la/le/du/des ..." si besoin, ici on fait simple :
+  if (!str) return "";
+  if (/^[aeiouy]/i.test(str)) return "d’" + str;
+  return "de " + str;
+}
+
+function joinListPrep(list) {
+  if (!Array.isArray(list) || list.length === 0) return "";
+  if (list.length === 1) return list[0];
+  if (list.length === 2) return list[0] + " et " + list[1];
+  return list.slice(0, -1).join(", ") + " et " + list[list.length - 1];
+}
+
+// Fonction genererPhraseMission DYNAMIQUE et robuste
+function genererPhraseMission(type, mode, vars = {}) {
+  // Cherche les textes dans la variable globale (catalogue-phrases.js)
+  if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
+  const textsMode = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
+  let textes = textsMode;
+  // Si textesMode est un objet (ex pour photo_inconnus), prends le tableau
+  if (Array.isArray(textsMode)) textes = textsMode;
+  else if (textsMode && typeof textsMode === "object") textes = Object.values(textsMode).flat();
+  // Choisis un texte au hasard
+  let phrase = "";
+  if (Array.isArray(textes) && textes.length > 0) {
+    phrase = textes[Math.floor(Math.random() * textes.length)];
+  } else if (typeof textes === "string") {
+    phrase = textes;
+  } else {
+    return null;
+  }
+  // Remplace les variables [objet], [objets], [consigne], etc.
+  phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => {
+    if (vars[key]) return vars[key];
+    // Fallbacks pour certains cas
+    if (key === "objet" && vars.objet) return vars.objet;
+    if (key === "objets" && vars.objets) return vars.objets;
+    if (key === "consigne" && vars.consigne) return vars.consigne;
+    if (key === "lieu" && vars.lieu) return vars.lieu;
+    if (key === "nbPersonnes" && vars.nbPersonnes) return vars.nbPersonnes;
+    if (key === "critere" && vars.critere) return vars.critere;
+    return match;
+  });
+  return phrase;
+}
+
+function getModeScenario(etape) {
+  if (etape && etape.mode) return etape.mode;
+  return 'arthurien';
+}
 
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   const typeMission = etape.type || "photo";
@@ -96,13 +149,6 @@ function afficherBlocGPS(etape, callback, testMode = false) {
   };
 }
 
-  function joinListPrep(list) {
-  if (!Array.isArray(list) || list.length === 0) return "";
-  if (list.length === 1) return list[0];
-  if (list.length === 2) return list[0] + " et " + list[1];
-  return list.slice(0, -1).join(", ") + " et " + list[list.length - 1];
-}
-  
 function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
@@ -203,7 +249,7 @@ function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = 
     type === "audio"
       ? '🎤 <span>Audio à envoyer</span>'
       : `<svg viewBox="0 0 24 24" width="32" height="32" style="display:inline-block;vertical-align:middle;margin-right:8px;">
-          <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V[...]"/>
+          <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V[...]
         </svg>
         <span>Photo à envoyer</span>`;
   let input = document.createElement('input');
@@ -296,12 +342,6 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
     else chargerEtapeDynamique();
   });
 
-  function getModeScenario(etape) {
-  // Renvoie simplement le mode de l'étape s'il existe, sinon 'arthurien'
-  if (etape && etape.mode) return etape.mode;
-  return 'arthurien';
-}
-  
   function chargerEtapeDynamique() {
     db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
       const step = snapStep.val() || 0;
