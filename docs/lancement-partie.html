@@ -8,8 +8,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <!-- CSS global harmonisé -->
   <link rel="stylesheet" href="styles/style.css">
+  <!-- Ajout pour masquer le contenu tant que pas chargé -->
+  <style>
+    body[data-loading="1"] .main-accueil { opacity: 0; pointer-events: none; }
+    body[data-loading="0"] .main-accueil { opacity: 1; pointer-events: auto; transition: opacity 0.2s; }
+  </style>
 </head>
-<body>
+<body data-loading="1">
   <header>
     <h1 class="site-title">Lancement de la partie</h1>
   </header>
