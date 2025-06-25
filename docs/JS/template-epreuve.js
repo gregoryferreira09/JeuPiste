@@ -15,14 +15,19 @@ const storage = firebase.storage();
 
 // ==== CONTRACTIONS ET LISTES FRANÇAISES ====
 
-// Retourne la bonne contraction "d'un", "d’une", "du", etc. selon le début du mot
+// Retourne la bonne contraction ("d’un", "d’une", "du", etc.) SANS ajouter "de" si déjà présent
 function getPrepDe(str, opt = {apostrophe:true}) {
   str = str.trim().replace(/^["'«]+|["'»]+$/g, "");
+  // Si déjà commence par 'de ', 'd\'', 'd’', 'du ', 'des ', 'de la ', 'de l’', on ne rajoute rien
+  if (/^(de |d['’]|du |des |de la |de l’|de l')/i.test(str)) {
+    return str.charAt(0).toLowerCase() + str.slice(1);
+  }
   str = str.charAt(0).toLowerCase() + str.slice(1);
 
   if (str.startsWith("un ")) return (opt.apostrophe ? "d’un " : "de un ") + str.slice(3);
   if (str.startsWith("une ")) return (opt.apostrophe ? "d’une " : "de une ") + str.slice(4);
 
+  // Voyelle/h muet
   if (/^(a|e|i|o|u|y|h)[a-zàâäéèêëïîôöùûüÿœæ]/i.test(str)) return (opt.apostrophe ? "d’" : "de ") + str;
   if (str.startsWith("le ")) return "du " + str.slice(3);
   if (str.startsWith("la ")) return "de la " + str.slice(3);
@@ -32,7 +37,7 @@ function getPrepDe(str, opt = {apostrophe:true}) {
   return "de " + str;
 }
 
-// Formate une liste avec la bonne contraction pour chaque élément
+// Liste au format "d’un X et d’une Y"
 function joinListPrep(arr) {
   if (!Array.isArray(arr)) return arr;
   if (arr.length === 1) return getPrepDe(arr[0]);
