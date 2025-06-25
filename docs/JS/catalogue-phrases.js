@@ -4,47 +4,62 @@ const QUEST_TEXTS = {
   photo: {
     arthurien: [
       "Pour plaire à la Table Ronde, capturez en image [objet].",
+      "Pour plaire à la Table Ronde, capturez en image [objets].",
       "La Dame du Lac attend la preuve : photographiez [objet] sans délai.",
-      "Merlin t’a lancé un défi : immortalise [objet] pour recevoir la prochaine énigme."
+      "La Dame du Lac attend la preuve : photographiez [objets] sans délai.",
+      "Merlin t’a lancé un défi : immortalise [objet] pour recevoir la prochaine énigme.",
+      "Merlin t’a lancé un défi : immortalise [objets] pour recevoir la prochaine énigme."
     ],
     pirate: [
       "Un vrai pirate n’avance jamais sans preuve : prends une photo de [objet] et poursuis ta route !",
-      "Ton trésor reste caché tant que tu n’as pas immortalisé [objet] sur ta carte."
+      "Un vrai pirate n’avance jamais sans preuve : prends des photos de [objets] et poursuis ta route !",
+      "Ton trésor reste caché tant que tu n’as pas immortalisé [objet] sur ta carte.",
+      "Ton trésor reste caché tant que tu n’as pas immortalisé [objets] sur ta carte."
     ],
     prison: [
       "Pour tromper le geôlier, capture la preuve de [objet]. Cette image sera ton passe vers la liberté.",
-      "Un complice attend une photo de [objet] pour préparer ta fuite."
+      "Pour tromper le geôlier, capture la preuve de [objets]. Ces images seront ton passe vers la liberté.",
+      "Un complice attend une photo de [objet] pour préparer ta fuite.",
+      "Un complice attend des photos de [objets] pour préparer ta fuite."
     ],
     sorcier: [
       "Le professeur t’ordonne d’immortaliser [objet] pour ta prochaine potion.",
-      "Un sortilège ne s’accomplit qu’avec la photo de [objet]."
+      "Le professeur t’ordonne d’immortaliser [objets] pour ta prochaine potion.",
+      "Un sortilège ne s’accomplit qu’avec la photo de [objet].",
+      "Un sortilège ne s’accomplit qu’avec les photos de [objets]."
     ],
     super_heros: [
       "Une menace plane ! Prends une photo de [objet] pour l’analyse du QG.",
-      "Le QG attend la preuve que tu as bien trouvé [objet]."
+      "Une menace plane ! Prends des photos de [objets] pour l’analyse du QG.",
+      "Le QG attend la preuve que tu as bien trouvé [objet].",
+      "Le QG attend la preuve que tu as bien trouvé [objets]."
     ],
     zombie: [
       "Photographie [objet] : chaque trace peut sauver un survivant.",
-      "Un antidote ne pourra être conçu qu’avec la photo de [objet]."
+      "Photographie [objets] : chaque trace peut sauver un survivant.",
+      "Un antidote ne pourra être conçu qu’avec la photo de [objet].",
+      "Un antidote ne pourra être conçu qu’avec les photos de [objets]."
     ],
     archeologue: [
       "Immortalisez [objet] pour compléter le carnet de fouilles.",
-      "Le musée attend la photo de [objet] pour valider votre découverte."
+      "Immortalisez [objets] pour compléter le carnet de fouilles.",
+      "Le musée attend la photo de [objet] pour valider votre découverte.",
+      "Le musée attend les photos de [objets] pour valider votre découverte."
     ]
   },
   photo_inconnus: {
     arthurien: [
-      "Pars à la rencontre d’âmes en quête d’aventure. Prends une photo avec [nbPersonnes] inconnus remplissant ce critère : [critere].",
-      "Seul un vrai chevalier sait s’entourer : immortalise-toi avec [critere] ([nbPersonnes] personnes différentes)."
+      "Pars à la rencontre d’âmes en quête d’aventure. Prends une photo avec [nbPersonnes] inconnu(e)[s] remplissant ce critère : [critere].",
+      "Seul un vrai chevalier sait s’entourer : immortalise-toi avec [critere] ([nbPersonnes] personne[s] différente[s])."
     ],
     pirate: [
-      "Réalise un portrait avec [nbPersonnes] matelots remplissant ce critère : [critere]."
+      "Réalise un portrait avec [nbPersonnes] matelot(s) remplissant ce critère : [critere]."
     ],
     prison: [
-      "Pour le plan d’évasion, photographiez-vous avec [nbPersonnes] détenus qui [critere]."
+      "Pour le plan d’évasion, photographiez-vous avec [nbPersonnes] détenu(e)[s] qui [critere]."
     ],
     sorcier: [
-      "Compose une photo de groupe avec [nbPersonnes] élèves qui [critere]."
+      "Compose une photo de groupe avec [nbPersonnes] élève(s) qui [critere]."
     ]
   },
   video: {
@@ -66,22 +81,28 @@ const QUEST_TEXTS = {
   collecte_objet: {
     arthurien: [
       "Ramène [objet] à la fée Morgane pour gagner sa bénédiction.",
-      "Le roi réclame [objet] pour poursuivre la quête."
+      "Ramène [objets] à la fée Morgane pour gagner sa bénédiction.",
+      "Le roi réclame [objet] pour poursuivre la quête.",
+      "Le roi réclame [objets] pour poursuivre la quête."
     ],
     pirate: [
       "Trouve et rapporte [objet] à ton équipage.",
-      "Le coffre ne s’ouvrira qu’avec [objet] en main."
+      "Trouve et rapporte [objets] à ton équipage.",
+      "Le coffre ne s’ouvrira qu’avec [objet] en main.",
+      "Le coffre ne s’ouvrira qu’avec [objets] en main."
     ],
     prison: [
-      "Pour fabriquer une clé, il te faut [objet]. Ramène-le discrètement."
+      "Pour fabriquer une clé, il te faut [objet]. Ramène-le discrètement.",
+      "Pour fabriquer une clé, il te faut [objets]. Ramène-les discrètement."
     ],
     zombie: [
-      "Trouve [objet] pour survivre à l’invasion."
+      "Trouve [objet] pour survivre à l’invasion.",
+      "Trouve [objets] pour survivre à l’invasion."
     ]
   },
   audio: {
     arthurien: [
-      "Enregistre le cri de guerre des chevaliers, ou imite [consigne].",
+      "Enregistre le cri de guerre des chevalier(s), ou imite [consigne].",
       "Le mage veut entendre : [consigne]."
     ],
     pirate: [
@@ -91,7 +112,7 @@ const QUEST_TEXTS = {
       "Capture un message magique : [consigne]."
     ],
     zombie: [
-      "Imite le cri d’un zombie ou [consigne] pour effrayer les morts-vivants."
+      "Imite le cri d’un zombie ou [consigne] pour effrayer les mort(s)-vivant(s)."
     ]
   },
   gps: {
@@ -183,13 +204,16 @@ const QUEST_TEXTS = {
   observation: {
     arthurien: [
       "Sous le regard des druides, compte les [objet] autour de [lieu]. Leur nombre est la clef de ta progression.",
+      "Sous le regard des druides, compte les [objets] autour de [lieu]. Leur nombre est la clef de ta progression.",
       "Observe attentivement : quel est le détail caché à [lieu] ?"
     ],
     pirate: [
-      "Les pirates doivent être observateurs : combien de [objet] veillent sur [lieu] ?"
+      "Les pirates doivent être observateurs : combien de [objet] veillent sur [lieu] ?",
+      "Les pirates doivent être observateurs : combien de [objets] veillent sur [lieu] ?"
     ],
     prison: [
-      "Repère le nombre de [objet] dans la cour de la prison."
+      "Repère le nombre de [objet] dans la cour de la prison.",
+      "Repère le nombre de [objets] dans la cour de la prison."
     ]
   },
   chasse_tresor: {
