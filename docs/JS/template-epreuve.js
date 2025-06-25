@@ -96,6 +96,13 @@ function afficherBlocGPS(etape, callback, testMode = false) {
   };
 }
 
+  function joinListPrep(list) {
+  if (!Array.isArray(list) || list.length === 0) return "";
+  if (list.length === 1) return list[0];
+  if (list.length === 2) return list[0] + " et " + list[1];
+  return list.slice(0, -1).join(", ") + " et " + list[list.length - 1];
+}
+  
 function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
