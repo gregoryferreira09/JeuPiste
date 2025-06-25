@@ -92,7 +92,6 @@ if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><b
       }
     });
   });
-});
 
 // === Activation du bouton "Démarrer" après 30s avec décompte ===
 document.addEventListener("DOMContentLoaded", function () {
