@@ -71,6 +71,7 @@ function showToast(msg) {
 // Fonction utilitaire pour joindre une liste au format "A et B", "A, B et C"
 function joinList(arr) {
   if (!Array.isArray(arr)) return arr;
+  const lower = x => x ? x.charAt(0).toLowerCase() + x.slice(1) : x;
   if (arr.length === 1) return arr[0];
   if (arr.length === 2) return arr[0] + ' et ' + arr[1];
   return arr.slice(0, -1).join(', ') + ' et ' + arr[arr.length - 1];
