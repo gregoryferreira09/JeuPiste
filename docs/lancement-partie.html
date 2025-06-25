@@ -8,19 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <!-- CSS global harmonisé -->
   <link rel="stylesheet" href="styles/style.css">
-  <style>
-    .lancement-jeu, .regle-jeu {
-      margin: 16px 0 12px 0;
-      padding: 12px;
-      background: #f5f0e3;
-      border: 1px solid #cba55a;
-      border-radius: 7px;
-      font-size: 1.09em;
-      font-family: 'Cormorant Garamond', serif;
-    }
-    .lancement-jeu { font-weight: 600; color: #2e2510; }
-    .regle-jeu    { color: #49413e; font-style: italic; }
-  </style>
 </head>
 <body>
   <header>
@@ -30,8 +17,20 @@
     <main>
       <section class="main-accueil fadeIn" role="main" aria-live="polite">
         <div class="presentation-jeu" id="presentationJeu">
-          <div class="lancement-jeu" id="lancement-jeu"></div>
-          <div class="regle-jeu" id="regle-jeu"></div>
+          <!-- Contenu statique pour Avalon (sera remplacé dynamiquement si besoin) -->
+          <div class="titre-course" id="titreCourse">Avalon</div>
+          <div class="texte-course" id="textePresentation">
+            Moi, Merlin l'Enchanteur, vous convoque pour la plus noble des aventures : la quête du Saint-Graal.<br>
+            Les temps sont sombres, et seul les plus dignes des chevaliers parmi vous pourrez retrouver le Graal sacré, source de sagesse et de paix pour le royaume.
+          </div>
+          <div class="objectif-course">
+            <span class="objectif-label">Objectif&nbsp;:</span>
+            <span class="objectif-text" id="objectifText">Rassemblez votre équipe, serrez les rangs… et courez, car les vents de la destinée soufflent sur votre route.</span>
+          </div>
+          <div class="regles-course" id="reglesCourse">
+            <strong>Règles du jeu&nbsp;:</strong><br>
+            Six quêtes vous sont proposées pour prouver votre valeur de nobles chevaliers. Sans cela n'espérez pas atteindre l'antre du dragon et encore moins lui dérober ce qu'il détient depuis [...]
+          </div>
         </div>
         <div class="boutons-actions actions-bandeau">
           <a class="main-btn" id="demarrerBtn" href="personnages.html" style="pointer-events:none; opacity:0.6;">Disponible dans 30s</a>
@@ -58,9 +57,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Loader visuel -->
   <div id="loader" aria-live="polite" style="display:none;">
     <div class="spinner"></div>
   </div>
+  <!-- Toast feedback -->
   <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
 
   <!-- Firebase SDK -->
@@ -84,9 +86,7 @@
 
   <!-- Catalogue de lancements dynamiques -->
   <script src="JS/catalogue-lancements.js"></script>
-
-  <!-- Script principal externe de la page (à la fin du body pour tout charger après le DOM) -->
+  <!-- Script de lancement partie (gère injection dynamique et les boutons) -->
   <script src="JS/lancement-partie.js"></script>
-  <!-- Tu peux ajouter ici d'autres scripts, ex: bouton retour, décompte, etc. -->
 </body>
 </html>
