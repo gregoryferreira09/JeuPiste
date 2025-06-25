@@ -1,60 +1,67 @@
 // docs/JS/lancement-partie.js
 
 /**
- * Accord dynamique des phrases selon le sujet et le nombre
- * - Remplace {N} par le nombre.
- * - Accorde les mots variables (défi, mission, etc.).
- * - Accorde la conjugaison si le sujet change avec N (ex: "1 mission sera validée" / "2 missions seront validées").
- * - NE modifie PAS les verbes ni les pronoms dont le sujet ne dépend pas de N (ex: "Les survivants seront ceux qui...")
+ * Accord dynamique des phrases : gère {N}, le mot à accorder, et la conjugaison du verbe selon le sujet réel.
+ * Exemples gérés :
+ * - "Chaque équipe doit franchir {N} étape(s)" => "Chaque équipe doit franchir 1 étape" / "Chaque équipe doit franchir 3 étapes"
+ * - "{N} défis séparent votre équipe du salut" => "1 défi sépare..." / "2 défis séparent..."
+ * - "Les survivants seront ceux qui réussiront {N} mission(s)" => "Les survivants seront ceux qui réussiront 1 mission"
  */
+
 function accorderRegle(phrase, n) {
-  // Accord des mots à nombre variable
+  // Dictionnaires d'accords
+  const accords = [
+    // Accord sur {N} mot(s)
+    { regex: /\b(\d+)\s+([a-zéèêîïûùa-zA-Z-]+)s\b/gi, singulier: "$1 $2", pluriel: "$1 $2s" },
+    { regex: /\b(\d+)\s+([a-zéèêîïûùa-zA-Z-]+)es\b/gi, singulier: "$1 $2e", pluriel: "$1 $2es" },
+    // Cas particuliers féminins/irrégu
+    { regex: /\b(\d+)\s+étapes\b/gi, singulier: "$1 étape", pluriel: "$1 étapes" },
+    { regex: /\b(\d+)\s+missions\b/gi, singulier: "$1 mission", pluriel: "$1 missions" },
+    { regex: /\b(\d+)\s+quêtes\b/gi, singulier: "$1 quête", pluriel: "$1 quêtes" },
+    { regex: /\b(\d+)\s+défis\b/gi, singulier: "$1 défi", pluriel: "$1 défis" },
+    { regex: /\b(\d+)\s+épreuves\b/gi, singulier: "$1 épreuve", pluriel: "$1 épreuves" },
+    { regex: /\b(\d+)\s+actions clés\b/gi, singulier: "$1 action clé", pluriel: "$1 actions clés" },
+    { regex: /\b(\d+)\s+aventures\b/gi, singulier: "$1 aventure", pluriel: "$1 aventures" },
+    // Accord du verbe si le sujet est {N}
+    { regex: /\b(\d+)\s+défis? séparent\b/gi, singulier: "$1 défi sépare", pluriel: "$1 défis séparent" },
+    { regex: /\b(\d+)\s+quêtes? ouvrent\b/gi, singulier: "$1 quête ouvre", pluriel: "$1 quêtes ouvrent" },
+    // Ajoute ici d'autres motifs spécifiques si nécessaire
+  ];
+
+  // Insertion du nombre
   phrase = phrase.replace("{N}", n);
 
-  // Cas particulier : on ne touche pas aux verbes/pronoms dont le sujet ne dépend pas de N
-  // On ne touche pas à "Les survivants seront ceux qui..." ni à "Les équipes devront..."
-  // On accorde seulement si {N} est le véritable sujet du verbe (ex: "{N} missions seront validées")
+  // Recherche de motifs {N} + mot à accorder
+  accords.forEach(acc => {
+    phrase = phrase.replace(acc.regex, n === 1 ? acc.singulier : acc.pluriel);
+  });
 
-  // Accord mots
+  // Accord du verbe si le sujet est {N} (ex : "1 étape doit être validée" / "2 étapes doivent être validées")
+  // Cas générique : <nombre> <mot> doit/devra/doit être/... → doivent/devront/doivent être...
   if (n === 1) {
     phrase = phrase
-      .replace(/\bmissions\b/gi, "mission")
-      .replace(/\bdéfis\b/gi, "défi")
-      .replace(/\bquêtes\b/gi, "quête")
-      .replace(/\bépreuves\b/gi, "épreuve")
-      .replace(/\bétapes\b/gi, "étape")
-      .replace(/\bactions clés\b/gi, "action clé")
-      .replace(/\baventures\b/gi, "aventure")
-      .replace(/\binterventions héroïques\b/gi, "intervention héroïque")
-      .replace(/\bétapes décisives\b/gi, "étape décisive")
-      .replace(/\bsituations critiques\b/gi, "situation critique");
+      .replace(/\bdoivent\b/g, "doit")
+      .replace(/\bdevront\b/g, "devra")
+      .replace(/\bsont\b/g, "est")
+      .replace(/\bseront\b/g, "sera")
+      .replace(/\bséparent\b/g, "sépare")
+      .replace(/\brestent\b/g, "reste")
+      .replace(/\battendent\b/g, "attend")
+      .replace(/\bvalident\b/g, "valide")
+      .replace(/\bouvrent\b/g, "ouvre")
+      .replace(/\bprouvent\b/g, "prouve")
+      .replace(/\bpermettent\b/g, "permet")
+      .replace(/\bpeuvent\b/g, "peut")
+      .replace(/\binterviennent\b/g, "intervient");
     // Accord adjectifs
-    phrase = phrase
-      .replace(/\bindispensables\b/gi, "indispensable")
-      .replace(/\bmagiques\b/gi, "magique");
-    // Accord des verbes si le sujet est {N}
-    // Cas typique : "1 mission sera validée", "1 défi sépare", etc.
-    phrase = phrase
-      .replace(/\bseront validées\b/gi, "sera validée")
-      .replace(/\bsont\b/gi, "est")
-      .replace(/\bséparent\b/gi, "sépare")
-      .replace(/\brestent\b/gi, "reste")
-      .replace(/\battendent\b/gi, "attend")
-      .replace(/\bdoivent\b/gi, "doit")
-      .replace(/\bpeuvent\b/gi, "peut")
-      .replace(/\bpermettent\b/gi, "permet")
-      .replace(/\bouvrent\b/gi, "ouvre")
-      .replace(/\bprouvent\b/gi, "prouve")
-      .replace(/\bvalident\b/gi, "valide")
-      .replace(/\bentravent\b/gi, "entrave");
-    // Exceptions : NE PAS toucher à "seront" si le sujet est toujours pluriel ("Les survivants seront...")
-    // On évite toute transformation de "seront" si la phrase commence par "Les survivants", "Les équipes", "Tous", etc.
-    if (/^(Les survivants|Les équipes|Tous|Toutes|Chaque équipe|Chaque joueur)/i.test(phrase.trim())) {
-      // Annuler les remplacements qui auraient touché à "seront"
-      phrase = phrase.replace(/\bsera\b/gi, "seront");
-    }
+    phrase = phrase.replace(/\bindispensables\b/g, "indispensable");
   }
-  // Sinon (n > 1), rien à remplacer, le template doit être correct à la base.
+  // Pour n>1, on ne touche pas : le template doit être au pluriel
+
+  // Cas où le sujet n'est PAS "N ...", on n'accorde que le mot variable
+  // Ex : "Chaque équipe doit franchir {N} étape(s)" → "doit" ne varie pas
+  // Ex : "Les survivants seront ceux qui réussiront {N} missions" → "seront" ne varie pas
+
   return phrase;
 }
 
@@ -64,7 +71,7 @@ document.body.setAttribute('data-loading', '1');
 document.addEventListener("DOMContentLoaded", function () {
   const salonCode = localStorage.getItem("salonCode");
 
-  // Fallback : affiche un contenu par défaut si pas de code, pas de Firebase ou pas de catalogue
+  // Fallback si pas de code, pas de Firebase ou pas de catalogue
   if (!salonCode || typeof firebase === "undefined" || typeof LANCEMENT_TEXTE === "undefined") {
     const textes = (typeof LANCEMENT_TEXTE !== "undefined" ? LANCEMENT_TEXTE["arthurien"] : []);
     const texteAleatoire = textes.length ? textes[Math.floor(Math.random() * textes.length)] :
@@ -94,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const params = paramSnap.val() || {};
     const scenarioCode = params.scenarioCode;
 
-    // Cas spécial : scénario local Parc Saint Nicolas => texte statique Avalon (on ne touche à rien)
+    // Cas spécial : scénario local Parc Saint Nicolas => texte statique Avalon (on ne touche à rien)
     if (scenarioCode === "parc_saint_nicolas") {
       document.body.setAttribute('data-loading', '0');
       return;
