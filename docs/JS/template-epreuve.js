@@ -69,13 +69,34 @@ function showToast(msg) {
 }
 
 // Fonction utilitaire pour joindre une liste au format "A et B", "A, B et C"
-function joinList(arr) {
+function getPrepDe(str, opt = {apostrophe:true}) {
+  // Retire les guillemets ou espaces superflus
+  str = str.trim().replace(/^["'«]+|["'»]+$/g, "");
+  // On veut minuscule sauf si option
+  str = str.charAt(0).toLowerCase() + str.slice(1);
+
+  // Cas "un/une" → "d'un", "d'une"
+  if (str.startsWith("un ")) return (opt.apostrophe ? "d’un " : "de un ") + str.slice(3);
+  if (str.startsWith("une ")) return (opt.apostrophe ? "d’une " : "de une ") + str.slice(4);
+
+  // Cas voyelle ou h muet → "d’"
+  if (/^(a|e|i|o|u|y|h)[a-zàâäéèêëïîôöùûüÿœæ]/i.test(str)) return (opt.apostrophe ? "d’" : "de ") + str;
+
+  // Cas "le", "la", "les", "l’"
+  if (str.startsWith("le ")) return "du " + str.slice(3);
+  if (str.startsWith("la ")) return "de la " + str.slice(3);
+  if (str.startsWith("les ")) return "des " + str.slice(4);
+  if (str.startsWith("l’") || str.startsWith("l'")) return "de l’" + str.slice(2);
+
+  // Cas générique
+  return "de " + str;
+}
+
+function joinListPrep(arr) {
   if (!Array.isArray(arr)) return arr;
-  // Minuscule sur le premier mot de chaque élément
-  const lower = x => x ? x.charAt(0).toLowerCase() + x.slice(1) : x;
-  if (arr.length === 1) return lower(arr[0]);
-  if (arr.length === 2) return lower(arr[0]) + ' et ' + lower(arr[1]);
-  return arr.slice(0, -1).map(lower).join(', ') + ' et ' + lower(arr[arr.length - 1]);
+  if (arr.length === 1) return getPrepDe(arr[0]);
+  if (arr.length === 2) return getPrepDe(arr[0]) + " et " + getPrepDe(arr[1]);
+  return arr.slice(0, -1).map(getPrepDe).join(", ") + " et " + getPrepDe(arr[arr.length - 1]);
 }
 
 (function () {
