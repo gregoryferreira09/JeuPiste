@@ -1,12 +1,37 @@
+// === Initialisation Firebase (toujours en tout début de fichier) ===
+const firebaseConfig = {
+  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+  authDomain: "murder-party-ba8d1.firebaseapp.com",
+  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "murder-party-ba8d1",
+  storageBucket: "murder-party-ba8d1.firebasestorage.app",
+  messagingSenderId: "20295055805",
+  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+  measurementId: "G-KSBMBB7KMJ"
+};
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const storage = firebase.storage();
+
+// === Authentification anonyme AVANT tout accès ===
+firebase.auth().signInAnonymously().then(function() {
+  demarreJeuFirebase();
+}).catch(function(error) {
+  alert("Erreur d'authentification Firebase : " + error.message);
+  console.error("Erreur d'authentification Firebase :", error);
+});
+
+function demarreJeuFirebase() {
+
+// === Fonctions utilitaires ===
+
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
-  // --- GÉNÉRATION DU TITRE ET DE LA MÉTAPHORE DYNAMIQUES ---
   const typeMission = etape.type || "photo";
   const modeMission = mode || getModeScenario(etape) || "arthurien";
 
   let titre = etape.titre || etape.nom || "";
   let metaphore = etape.metaphore || "";
 
-  // Si pas de titre ou métaphore définis explicitement, on tire dans l'atmosphère dynamique
   if ((!titre || titre === typeMission) || !metaphore) {
     if (typeof getRandomAtmosphere === "function") {
       const random = getRandomAtmosphere(typeMission, modeMission);
@@ -15,11 +40,9 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     }
   }
 
-  // Injection dans le HTML harmonisé (comme pages épreuves 1 à 6)
   document.getElementById('titre-quete').textContent = titre || "";
   document.getElementById('metaphore-quete').innerHTML = metaphore ? `<em>${metaphore}</em>` : '';
 
-  // Objectif et défi classiques
   document.getElementById('objectif-block').style.display = etape.params?.objectif ? '' : 'none';
   document.getElementById('objectif-text').textContent = etape.params?.objectif || '';
   document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
@@ -313,4 +336,21 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
           });
       });
   }
+}
+
+} // Fin de demarreJeuFirebase
+
+// Optionnel : ta fonction showToast (à adapter si tu veux)
+function showToast(msg) {
+  let toast = document.getElementById('toast-message');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast-message';
+    toast.className = 'modal-toast';
+    toast.setAttribute('role', 'alert');
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  setTimeout(() => { toast.classList.remove('visible'); }, 2200);
 }
