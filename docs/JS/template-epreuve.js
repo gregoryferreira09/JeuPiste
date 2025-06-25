@@ -174,19 +174,20 @@ function showToast(msg) {
     document.getElementById('next-quest').disabled = false;
   }
 
-  // Bloc upload harmonisé
+  // Bloc upload harmonisé (SVG corrigé)
   function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false) {
     const bloc = document.getElementById('bloc-upload');
     const row = document.getElementById('upload-row');
     row.innerHTML = '';
     bloc.style.display = '';
     let label = document.createElement('label');
-    label.innerHTML = type === "audio"
-      ? '🎤 <span>Audio à envoyer</span>'
-      : `<svg viewBox="0 0 24 24" style="width:32px;height:32px;">
-          <path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0[...]
-        </svg>
-        <span>Photo à envoyer</span>`;
+    label.innerHTML =
+      type === "audio"
+        ? '🎤 <span>Audio à envoyer</span>'
+        : `<svg viewBox="0 0 24 24" style="width:32px;height:32px;">
+              <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-7 0V6h4v1H7z"/>
+          </svg>
+          <span>Photo à envoyer</span>`;
     let input = document.createElement('input');
     input.type = "file";
     input.className = "visually-hidden";
