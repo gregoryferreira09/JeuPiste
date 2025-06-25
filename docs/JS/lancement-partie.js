@@ -38,9 +38,12 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Sinon on va chercher le mode du scénario et on injecte le texte dynamique
-    firebase.database().ref('scenarios/' + scenarioCode + '/mode').once('value').then(snap => {
-      const mode = snap.val() || 'arthurien';
+    // Récupère le scénario complet pour compter le vrai nombre d'étapes
+    firebase.database().ref('scenarios/' + scenarioCode).once('value').then(scenarSnap => {
+      const data = scenarSnap.val() || {};
+      const mode = data.mode || 'arthurien';
+      const scenarioArray = Array.isArray(data.scenario) ? data.scenario : [];
+      const nbQuetes = scenarioArray.length || params.nbQuetes || 6;
 
       // Texte de lancement dynamique
       const textes = LANCEMENT_TEXTE[mode] || LANCEMENT_TEXTE['arthurien'];
@@ -60,9 +63,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (objectifElem) objectifElem.textContent = objectifAleatoire;
       }
 
-      // Règles dynamiques (avec {N} = nombre de quêtes)
+      // Règles dynamiques (avec {N} correct)
       if (typeof REGLES_TEXTE !== "undefined") {
-        const nbQuetes = params.nbQuetes || 6; // valeur par défaut si non trouvée
         const regles = REGLES_TEXTE[mode] || REGLES_TEXTE['arthurien'];
         let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
         regleAleatoire = regleAleatoire.replace('{N}', nbQuetes);
