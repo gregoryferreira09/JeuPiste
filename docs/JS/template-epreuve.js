@@ -13,6 +13,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
+// Permet de récupérer le mode/scénario actif
 function getModeScenario(etape) {
   const params = new URLSearchParams(window.location.search);
   const isTestMode = params.get('test') === '1';
@@ -24,6 +25,7 @@ function getModeScenario(etape) {
   return 'arthurien';
 }
 
+// Génère une phrase adaptée à la mission à partir du catalogue (QUEST_TEXTS)
 function genererPhraseMission(type, mode, variables) {
   if (!window.QUEST_TEXTS || !QUEST_TEXTS[type] || !QUEST_TEXTS[type][mode]) return "";
   const templates = QUEST_TEXTS[type][mode];
@@ -33,6 +35,7 @@ function genererPhraseMission(type, mode, variables) {
   return phrase;
 }
 
+// Affiche un toast informatif
 function showToast(msg) {
   const toast = document.getElementById('toast-message');
   if (toast) {
@@ -111,6 +114,7 @@ function showToast(msg) {
     // Affiche la mission/consigne harmonisée
     document.getElementById('bloc-mission').style.display = '';
     document.getElementById('mission-label').textContent = "Consigne";
+    // Phrase prioritaire : catalogue > consigne > objectif > enigme > question > description
     const phraseMission =
       genererPhraseMission(etape.type, mode, etape.params) ||
       etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "";
@@ -157,7 +161,7 @@ function showToast(msg) {
       return;
     }
 
-    // Sinon, bouton quête suivante
+    // Sinon, bouton quête suivante direct
     document.getElementById('next-quest').style.display = '';
     document.getElementById('next-quest').disabled = false;
   }
@@ -172,7 +176,7 @@ function showToast(msg) {
     label.innerHTML = type === "audio"
       ? '🎤 <span>Audio à envoyer</span>'
       : `<svg viewBox="0 0 24 24" style="width:32px;height:32px;">
-          <path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+          <path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0[...]
         </svg>
         <span>Photo à envoyer</span>`;
     let input = document.createElement('input');
