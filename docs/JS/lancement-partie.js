@@ -1,8 +1,10 @@
 // docs/JS/lancement-partie.js
 
-// === Fonction d'accord dynamique pour les règles ===
+// === Fonction d'accord dynamique pour les règles, y compris la conjugaison ===
 function accorderRegle(phrase, N) {
   phrase = phrase.replace("{N}", N);
+
+  // Remplacements singulier/pluriel
   if (N === 1) {
     phrase = phrase
       .replace(/épreuves magiques/gi, "épreuve magique")
@@ -16,9 +18,27 @@ function accorderRegle(phrase, N) {
       .replace(/aventures/gi, "aventure")
       .replace(/interventions héroïques/gi, "intervention héroïque")
       .replace(/étapes décisives/gi, "étape décisive")
-      .replace(/situations critiques/gi, "situation critique")
+      .replace(/situations critiques/gi, "situation critique");
+    // Remplacements des verbes à conjuguer
+    phrase = phrase
       .replace(/\bsont\b/gi, "est")
-      .replace(/\bindispensables\b/gi, "indispensable");
+      .replace(/\bindispensables\b/gi, "indispensable")
+      .replace(/\bséparent\b/gi, "sépare")
+      .replace(/\brestent\b/gi, "reste")
+      .replace(/\battendent\b/gi, "attend")
+      .replace(/\bdoivent\b/gi, "doit")
+      .replace(/\bpeuvent\b/gi, "peut")
+      .replace(/\bpermettent\b/gi, "permet")
+      .replace(/\battendent\b/gi, "attend")
+      .replace(/\bseront\b/gi, "sera")
+      .replace(/\bdoivent\b/gi, "doit")
+      .replace(/\bdérobent\b/gi, "dérobe")
+      .replace(/\bprouvent\b/gi, "prouve")
+      .replace(/\bvalident\b/gi, "valide")
+      .replace(/\bouvrent\b/gi, "ouvre")
+      .replace(/\bentravent\b/gi, "entrave")
+      // Ajoute ici d'autres verbes à conjuguer si tu en as dans tes règles !
+      ;
   }
   return phrase;
 }
@@ -89,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (objectifElem) objectifElem.textContent = objectifAleatoire;
       }
 
-      // Règles dynamiques (avec {N} correct ET accord)
+      // Règles dynamiques (avec {N} correct ET accord et conjugaison)
       if (typeof REGLES_TEXTE !== "undefined") {
         const regles = REGLES_TEXTE[mode] || REGLES_TEXTE['arthurien'];
         let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
