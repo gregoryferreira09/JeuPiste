@@ -144,27 +144,40 @@ function joinList(arr) {
     document.getElementById('mission-label').textContent = "Consigne";
 
     let phraseMission = "";
-    // Nouvelle logique : une seule phrase même pour plusieurs consignes
     if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
       let liste = etape.params.consignes;
-      // On choisit la clé variable selon le type d'épreuve
-      let variableKey = "consignes";
-      if (etape.type.startsWith("photo")) variableKey = "objets";
-      else if (etape.type === "collecte_objet") variableKey = "objets";
-      else if (etape.type === "photo_inconnus") variableKey = "personnes";
-      else if (etape.type === "audio") variableKey = "audios";
-      // Ajoute d'autres cas ici si besoin
+      // Détermine la clé variable et singulier/pluriel
+      let variableKeySing = "objet";
+      let variableKeyPlur = "objets";
+      if (etape.type.startsWith("photo_inconnus")) { variableKeySing = "personne"; variableKeyPlur = "personnes"; }
+      else if (etape.type === "collecte_objet") { variableKeySing = "objet"; variableKeyPlur = "objets"; }
+      else if (etape.type === "audio") { variableKeySing = "consigne"; variableKeyPlur = "consignes"; }
+      // Ajoute d'autres cas si besoin
 
-      let joinTxt = joinList(liste);
-      let vars = { ...etape.params, [variableKey]: joinTxt, nb: liste.length };
-      phraseMission =
-        genererPhraseMission(etape.type, mode, vars) ||
-        etape.params?.consigne ||
-        etape.params?.objectif ||
-        etape.params?.enigme ||
-        etape.params?.question ||
-        etape.description ||
-        "[Aucune consigne définie]";
+      let vars = { ...etape.params };
+      if (liste.length === 1) {
+        vars[variableKeySing] = liste[0];
+        vars.nb = 1;
+        phraseMission =
+          genererPhraseMission(etape.type, mode, vars) ||
+          etape.params?.consigne ||
+          etape.params?.objectif ||
+          etape.params?.enigme ||
+          etape.params?.question ||
+          etape.description ||
+          "[Aucune consigne définie]";
+      } else {
+        vars[variableKeyPlur] = joinList(liste);
+        vars.nb = liste.length;
+        phraseMission =
+          genererPhraseMission(etape.type, mode, vars) ||
+          etape.params?.consigne ||
+          etape.params?.objectif ||
+          etape.params?.enigme ||
+          etape.params?.question ||
+          etape.description ||
+          "[Aucune consigne définie]";
+      }
     } else {
       phraseMission =
         genererPhraseMission(etape.type, mode, etape.params) ||
