@@ -1,5 +1,28 @@
 // docs/JS/lancement-partie.js
 
+// === Fonction d'accord dynamique pour les règles ===
+function accorderRegle(phrase, N) {
+  phrase = phrase.replace("{N}", N);
+  if (N === 1) {
+    phrase = phrase
+      .replace(/épreuves magiques/gi, "épreuve magique")
+      .replace(/épreuves/gi, "épreuve")
+      .replace(/magiques/gi, "magique")
+      .replace(/quêtes/gi, "quête")
+      .replace(/étapes/gi, "étape")
+      .replace(/missions/gi, "mission")
+      .replace(/défis/gi, "défi")
+      .replace(/actions clés/gi, "action clé")
+      .replace(/aventures/gi, "aventure")
+      .replace(/interventions héroïques/gi, "intervention héroïque")
+      .replace(/étapes décisives/gi, "étape décisive")
+      .replace(/situations critiques/gi, "situation critique")
+      .replace(/\bsont\b/gi, "est")
+      .replace(/\bindispensables\b/gi, "indispensable");
+  }
+  return phrase;
+}
+
 // === Affichage du texte de lancement (statique pour Avalon, dynamique sinon) ===
 document.addEventListener("DOMContentLoaded", function () {
   const salonCode = localStorage.getItem("salonCode");
@@ -21,9 +44,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (typeof REGLES_TEXTE !== "undefined") {
       const regles = REGLES_TEXTE["arthurien"];
       let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
-regleAleatoire = accorderRegle(regleAleatoire, nbQuetes);
-const reglesElem = document.getElementById("reglesCourse");
-if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
+      regleAleatoire = accorderRegle(regleAleatoire, 6); // Valeur par défaut
+      const reglesElem = document.getElementById("reglesCourse");
+      if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
+    }
     return;
   }
 
@@ -62,11 +86,11 @@ if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><b
         if (objectifElem) objectifElem.textContent = objectifAleatoire;
       }
 
-      // Règles dynamiques (avec {N} correct)
+      // Règles dynamiques (avec {N} correct ET accord)
       if (typeof REGLES_TEXTE !== "undefined") {
         const regles = REGLES_TEXTE[mode] || REGLES_TEXTE['arthurien'];
         let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
-        regleAleatoire = regleAleatoire.replace('{N}', nbQuetes);
+        regleAleatoire = accorderRegle(regleAleatoire, nbQuetes);
         const reglesElem = document.getElementById("reglesCourse");
         if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
       }
@@ -86,12 +110,13 @@ if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><b
       if (typeof REGLES_TEXTE !== "undefined") {
         const regles = REGLES_TEXTE["arthurien"];
         let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
-        regleAleatoire = regleAleatoire.replace('{N}', 6);
+        regleAleatoire = accorderRegle(regleAleatoire, 6);
         const reglesElem = document.getElementById("reglesCourse");
         if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
       }
     });
   });
+});
 
 // === Activation du bouton "Démarrer" après 30s avec décompte ===
 document.addEventListener("DOMContentLoaded", function () {
