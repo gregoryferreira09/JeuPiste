@@ -114,11 +114,19 @@ function showToast(msg) {
     // Affiche la mission/consigne harmonisée
     document.getElementById('bloc-mission').style.display = '';
     document.getElementById('mission-label').textContent = "Consigne";
-    // Phrase prioritaire : catalogue > consigne > objectif > enigme > question > description
-    const phraseMission =
-      genererPhraseMission(etape.type, mode, etape.params) ||
-      etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "";
-    document.getElementById('mission-text').textContent = phraseMission;
+
+    // --- Correction ici : gestion des multi-consignes (ex: plusieurs photos à prendre)
+    // Si params.consignes existe (tableau), on génère une phrase par consigne
+    if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
+      document.getElementById('mission-text').innerHTML = etape.params.consignes.map(objet =>
+        genererPhraseMission(etape.type, mode, { ...etape.params, objet })
+      ).join('<br>');
+    } else {
+      const phraseMission =
+        genererPhraseMission(etape.type, mode, etape.params) ||
+        etape.params?.consigne || etape.params?.objectif || etape.params?.enigme || etape.params?.question || etape.description || "";
+      document.getElementById('mission-text').textContent = phraseMission;
+    }
 
     // Bloc upload (photo/audio/video)
     if (["photo", "photo_inconnus", "audio", "collecte_objet"].includes(etape.type)) {
