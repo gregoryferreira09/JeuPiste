@@ -167,10 +167,19 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     else if (etape.type === "collecte_objet") { variableKeySing = "objet"; variableKeyPlur = "objets"; }
     else if (etape.type === "audio") { variableKeySing = "consigne"; variableKeyPlur = "consignes"; }
     let vars = { ...etape.params };
+ if (Array.isArray(liste) && liste.length > 0) {
   if (liste.length === 1) {
-  vars[variableKeySing] = lowerFirst(liste[0]);
-  vars.objet = lowerFirst(liste[0]);
-  vars.nb = 1;
+    let objet = lowerFirst(liste[0]);
+    vars[variableKeySing] = objet;
+    vars.objet = objet;
+    vars.nb = 1;
+  } else {
+    const consignesLower = liste.map(lowerFirst);
+    let objets = joinListPrep(consignesLower);
+    vars[variableKeyPlur] = objets;
+    vars.objets = objets;
+    vars.nb = liste.length;
+  }
   phraseMission =
     genererPhraseMission(etape.type, mode, vars) ||
     etape.params?.consigne ||
@@ -180,13 +189,8 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     etape.description ||
     "[Aucune consigne définie]";
 } else {
-  // Applique lowerFirst à chaque consigne
-  const consignesLower = liste.map(lowerFirst);
-  vars[variableKeyPlur] = joinListPrep(consignesLower);
-  vars.objets = joinListPrep(consignesLower);
-  vars.nb = liste.length;
   phraseMission =
-    genererPhraseMission(etape.type, mode, vars) ||
+    genererPhraseMission(etape.type, mode, etape.params) ||
     etape.params?.consigne ||
     etape.params?.objectif ||
     etape.params?.enigme ||
@@ -194,16 +198,7 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     etape.description ||
     "[Aucune consigne définie]";
 }
-  } else {
-    phraseMission =
-      genererPhraseMission(etape.type, mode, etape.params) ||
-      etape.params?.consigne ||
-      etape.params?.objectif ||
-      etape.params?.enigme ||
-      etape.params?.question ||
-      etape.description ||
-      "[Aucune consigne définie]";
-  }
+ 
   document.getElementById('mission-text').innerHTML = phraseMission;
 
   if (["photo", "photo_inconnus", "audio", "collecte_objet"].includes(etape.type)) {
