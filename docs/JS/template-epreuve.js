@@ -1,139 +1,38 @@
-// === CONFIG FIREBASE ===
-const firebaseConfig = {
-  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-  authDomain: "murder-party-ba8d1.firebaseapp.com",
-  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1",
-  messagingSenderId: "20295055805",
-  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-  measurementId: "G-KSBMBB7KMJ"
-};
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const storage = firebase.storage();
+function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
+  // --- GÉNÉRATION DU TITRE ET DE LA MÉTAPHORE DYNAMIQUES ---
+  // On récupère dynamiquement type et mode (préférence à etape.type/mode sinon fallback)
+  const typeMission = etape.type || "photo";
+  const modeMission = mode || getModeScenario(etape) || "arthurien";
 
-// ==== CONTRACTIONS ET LISTES FRANÇAISES ====
+  let titre = etape.titre || etape.nom || "";
+  let metaphore = etape.metaphore || "";
 
-// Retourne la bonne contraction ("d’un", "d’une", "du", etc.) SANS ajouter "de" si déjà présent
-function getPrepDe(str, opt = {apostrophe:true}) {
-  str = str.trim().replace(/^["'«]+|["'»]+$/g, "");
-  // Si déjà commence par 'de ', 'd\'', 'd’', 'du ', 'des ', 'de la ', 'de l’', on ne rajoute rien
-  if (/^(de |d['’]|du |des |de la |de l’|de l')/i.test(str)) {
-    return str.charAt(0).toLowerCase() + str.slice(1);
-  }
-  str = str.charAt(0).toLowerCase() + str.slice(1);
-
-  if (str.startsWith("un ")) return (opt.apostrophe ? "d’un " : "de un ") + str.slice(3);
-  if (str.startsWith("une ")) return (opt.apostrophe ? "d’une " : "de une ") + str.slice(4);
-
-  // Voyelle/h muet
-  if (/^(a|e|i|o|u|y|h)[a-zàâäéèêëïîôöùûüÿœæ]/i.test(str)) return (opt.apostrophe ? "d’" : "de ") + str;
-  if (str.startsWith("le ")) return "du " + str.slice(3);
-  if (str.startsWith("la ")) return "de la " + str.slice(3);
-  if (str.startsWith("les ")) return "des " + str.slice(4);
-  if (str.startsWith("l’") || str.startsWith("l'")) return "de l’" + str.slice(2);
-
-  return "de " + str;
-}
-
-// Liste au format "d’un X et d’une Y"
-function joinListPrep(arr) {
-  if (!Array.isArray(arr)) return arr;
-  if (arr.length === 1) return getPrepDe(arr[0]);
-  if (arr.length === 2) return getPrepDe(arr[0]) + " et " + getPrepDe(arr[1]);
-  return arr.slice(0, -1).map(getPrepDe).join(", ") + " et " + getPrepDe(arr[arr.length - 1]);
-}
-
-// Permet de récupérer le mode/scénario actif
-function getModeScenario(etape) {
-  const params = new URLSearchParams(window.location.search);
-  const isTestMode = params.get('test') === '1';
-  if (isTestMode) {
-    const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
-    return scenarioTest && scenarioTest.mode ? scenarioTest.mode : 'arthurien';
-  }
-  if (window.currentScenarioMode) return window.currentScenarioMode;
-  return 'arthurien';
-}
-
-// Fonction robuste pour remplacer tous les placeholders [key] dans une chaîne
-function replacePlaceholders(str, variables = {}) {
-  return str.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => {
-    if (variables[key] !== undefined && variables[key] !== null) return variables[key];
-    if (variables.params && variables.params[key] !== undefined) return variables.params[key];
-    return `[${key}]`;
-  });
-}
-
-// Génère une phrase adaptée à la mission à partir du catalogue (QUEST_TEXTS) avec robustesse
-function genererPhraseMission(type, mode, variables) {
-  if (!window.QUEST_TEXTS) {
-    console.warn("QUEST_TEXTS non chargé !");
-    return "[Catalogue de phrases manquant]";
-  }
-  if (!QUEST_TEXTS[type]) {
-    console.warn(`Aucune entrée QUEST_TEXTS pour le type '${type}'`);
-    return "[Type d'épreuve inconnu – à configurer dans le catalogue]";
-  }
-  if (!QUEST_TEXTS[type][mode]) {
-    console.warn(`Aucune phrase pour le type '${type}' et le mode '${mode}' dans QUEST_TEXTS`);
-    return "[Aucune phrase disponible pour ce mode d'univers]";
-  }
-  const templates = QUEST_TEXTS[type][mode];
-  if (!templates.length) {
-    console.warn(`Aucune phrase dans la liste pour le type '${type}' et le mode '${mode}'`);
-    return "[Aucune phrase dans le catalogue pour ce type/mode]";
-  }
-
-  // Choix du placeholder selon la variable fournie (objet/objets/personne/personnes…)
-  let keyToFind = null;
-  if ('objet' in variables) keyToFind = '[objet]';
-  if ('objets' in variables) keyToFind = '[objets]';
-  if ('personne' in variables) keyToFind = '[personne]';
-  if ('personnes' in variables) keyToFind = '[personnes]';
-  if ('consigne' in variables) keyToFind = '[consigne]';
-  if ('consignes' in variables) keyToFind = '[consignes]';
-
-  let filteredTemplates = templates;
-  if (keyToFind) {
-    filteredTemplates = templates.filter(tpl => tpl.includes(keyToFind));
-    if (!filteredTemplates.length) filteredTemplates = templates;
-  }
-  let phrase = filteredTemplates[Math.floor(Math.random() * filteredTemplates.length)];
-  phrase = replacePlaceholders(phrase, variables);
-  return phrase;
-}
-
-// Affiche un toast informatif
-function showToast(msg) {
-  const toast = document.getElementById('toast-message');
-  if (toast) {
-    toast.textContent = msg;
-    toast.classList.add('visible');
-    setTimeout(() => { toast.classList.remove('visible'); }, 2200);
-  }
-}
-
-(function () {
-  const params = new URLSearchParams(window.location.search);
-  const isTestMode = params.get('test') === '1';
-
-  function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
-    document.getElementById('titre-quete').textContent = etape.titre || etape.nom || etape.type || "";
-    document.getElementById('metaphore-quete').innerHTML = etape.metaphore ? `<em>${etape.metaphore}</em>` : '';
-    document.getElementById('objectif-block').style.display = etape.params?.objectif ? '' : 'none';
-    document.getElementById('objectif-text').textContent = etape.params?.objectif || '';
-    document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
-    document.getElementById('defi-text').textContent = etape.params?.defi || '';
-
-    let hasGPS = !!(etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length));
-    if (hasGPS) {
-      afficherBlocGPS(etape, () => afficherMissionSuite(etape, stepIndex, mode, testMode), testMode);
-    } else {
-      afficherMissionSuite(etape, stepIndex, mode, testMode);
+  // Si pas de titre ou métaphore définis explicitement, on tire dans l'atmosphère dynamique
+  if ((!titre || titre === typeMission) || !metaphore) {
+    if (typeof getRandomAtmosphere === "function") {
+      const random = getRandomAtmosphere(typeMission, modeMission);
+      if (!titre || titre === typeMission) titre = random.titre;
+      if (!metaphore) metaphore = random.phrase;
     }
   }
+
+  // Injection dans le HTML harmonisé (comme pages épreuves 1 à 6)
+  document.getElementById('titre-quete').textContent = titre || "";
+  document.getElementById('metaphore-quete').innerHTML = metaphore ? `<em>${metaphore}</em>` : '';
+
+  // Objectif et défi classiques
+  document.getElementById('objectif-block').style.display = etape.params?.objectif ? '' : 'none';
+  document.getElementById('objectif-text').textContent = etape.params?.objectif || '';
+  document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
+  document.getElementById('defi-text').textContent = etape.params?.defi || '';
+
+  let hasGPS = !!(etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length));
+  if (hasGPS) {
+    afficherBlocGPS(etape, () => afficherMissionSuite(etape, stepIndex, mode, testMode), testMode);
+  } else {
+    afficherMissionSuite(etape, stepIndex, mode, testMode);
+  }
+}
 
   function afficherBlocGPS(etape, callback, testMode = false) {
     const gps = etape.params.gps || etape.params.coord || etape.params.coordonnees || (Array.isArray(etape.params.points) ? etape.params.points[0] : null);
