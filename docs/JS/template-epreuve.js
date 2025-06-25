@@ -13,6 +13,33 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
+// ==== CONTRACTIONS ET LISTES FRANÇAISES ====
+
+// Retourne la bonne contraction "d'un", "d’une", "du", etc. selon le début du mot
+function getPrepDe(str, opt = {apostrophe:true}) {
+  str = str.trim().replace(/^["'«]+|["'»]+$/g, "");
+  str = str.charAt(0).toLowerCase() + str.slice(1);
+
+  if (str.startsWith("un ")) return (opt.apostrophe ? "d’un " : "de un ") + str.slice(3);
+  if (str.startsWith("une ")) return (opt.apostrophe ? "d’une " : "de une ") + str.slice(4);
+
+  if (/^(a|e|i|o|u|y|h)[a-zàâäéèêëïîôöùûüÿœæ]/i.test(str)) return (opt.apostrophe ? "d’" : "de ") + str;
+  if (str.startsWith("le ")) return "du " + str.slice(3);
+  if (str.startsWith("la ")) return "de la " + str.slice(3);
+  if (str.startsWith("les ")) return "des " + str.slice(4);
+  if (str.startsWith("l’") || str.startsWith("l'")) return "de l’" + str.slice(2);
+
+  return "de " + str;
+}
+
+// Formate une liste avec la bonne contraction pour chaque élément
+function joinListPrep(arr) {
+  if (!Array.isArray(arr)) return arr;
+  if (arr.length === 1) return getPrepDe(arr[0]);
+  if (arr.length === 2) return getPrepDe(arr[0]) + " et " + getPrepDe(arr[1]);
+  return arr.slice(0, -1).map(getPrepDe).join(", ") + " et " + getPrepDe(arr[arr.length - 1]);
+}
+
 // Permet de récupérer le mode/scénario actif
 function getModeScenario(etape) {
   const params = new URLSearchParams(window.location.search);
@@ -53,7 +80,22 @@ function genererPhraseMission(type, mode, variables) {
     console.warn(`Aucune phrase dans la liste pour le type '${type}' et le mode '${mode}'`);
     return "[Aucune phrase dans le catalogue pour ce type/mode]";
   }
-  let phrase = templates[Math.floor(Math.random() * templates.length)];
+
+  // Choix du placeholder selon la variable fournie (objet/objets/personne/personnes…)
+  let keyToFind = null;
+  if ('objet' in variables) keyToFind = '[objet]';
+  if ('objets' in variables) keyToFind = '[objets]';
+  if ('personne' in variables) keyToFind = '[personne]';
+  if ('personnes' in variables) keyToFind = '[personnes]';
+  if ('consigne' in variables) keyToFind = '[consigne]';
+  if ('consignes' in variables) keyToFind = '[consignes]';
+
+  let filteredTemplates = templates;
+  if (keyToFind) {
+    filteredTemplates = templates.filter(tpl => tpl.includes(keyToFind));
+    if (!filteredTemplates.length) filteredTemplates = templates;
+  }
+  let phrase = filteredTemplates[Math.floor(Math.random() * filteredTemplates.length)];
   phrase = replacePlaceholders(phrase, variables);
   return phrase;
 }
@@ -68,42 +110,10 @@ function showToast(msg) {
   }
 }
 
-// Fonction utilitaire pour joindre une liste au format "A et B", "A, B et C"
-function getPrepDe(str, opt = {apostrophe:true}) {
-  // Retire les guillemets ou espaces superflus
-  str = str.trim().replace(/^["'«]+|["'»]+$/g, "");
-  // On veut minuscule sauf si option
-  str = str.charAt(0).toLowerCase() + str.slice(1);
-
-  // Cas "un/une" → "d'un", "d'une"
-  if (str.startsWith("un ")) return (opt.apostrophe ? "d’un " : "de un ") + str.slice(3);
-  if (str.startsWith("une ")) return (opt.apostrophe ? "d’une " : "de une ") + str.slice(4);
-
-  // Cas voyelle ou h muet → "d’"
-  if (/^(a|e|i|o|u|y|h)[a-zàâäéèêëïîôöùûüÿœæ]/i.test(str)) return (opt.apostrophe ? "d’" : "de ") + str;
-
-  // Cas "le", "la", "les", "l’"
-  if (str.startsWith("le ")) return "du " + str.slice(3);
-  if (str.startsWith("la ")) return "de la " + str.slice(3);
-  if (str.startsWith("les ")) return "des " + str.slice(4);
-  if (str.startsWith("l’") || str.startsWith("l'")) return "de l’" + str.slice(2);
-
-  // Cas générique
-  return "de " + str;
-}
-
-function joinListPrep(arr) {
-  if (!Array.isArray(arr)) return arr;
-  if (arr.length === 1) return getPrepDe(arr[0]);
-  if (arr.length === 2) return getPrepDe(arr[0]) + " et " + getPrepDe(arr[1]);
-  return arr.slice(0, -1).map(getPrepDe).join(", ") + " et " + getPrepDe(arr[arr.length - 1]);
-}
-
 (function () {
   const params = new URLSearchParams(window.location.search);
   const isTestMode = params.get('test') === '1';
 
-  // Harmonise l'affichage des blocs dans le bon ordre, GPS, Mission, etc.
   function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     document.getElementById('titre-quete').textContent = etape.titre || etape.nom || etape.type || "";
     document.getElementById('metaphore-quete').innerHTML = etape.metaphore ? `<em>${etape.metaphore}</em>` : '';
@@ -120,7 +130,6 @@ function joinListPrep(arr) {
     }
   }
 
-  // Bloc GPS harmonisé
   function afficherBlocGPS(etape, callback, testMode = false) {
     const gps = etape.params.gps || etape.params.coord || etape.params.coordonnees || (Array.isArray(etape.params.points) ? etape.params.points[0] : null);
     if (!gps) { callback(); return; }
@@ -161,7 +170,6 @@ function joinListPrep(arr) {
     };
   }
 
-  // Affichage de la mission et de la suite (upload, input, bouton)
   function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     document.getElementById('bloc-mission').style.display = '';
     document.getElementById('mission-label').textContent = "Consigne";
@@ -169,17 +177,14 @@ function joinListPrep(arr) {
     let phraseMission = "";
     if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
       let liste = etape.params.consignes;
-      // Détermine la clé variable et singulier/pluriel
       let variableKeySing = "objet";
       let variableKeyPlur = "objets";
       if (etape.type === "photo_inconnus") { variableKeySing = "personne"; variableKeyPlur = "personnes"; }
       else if (etape.type === "collecte_objet") { variableKeySing = "objet"; variableKeyPlur = "objets"; }
       else if (etape.type === "audio") { variableKeySing = "consigne"; variableKeyPlur = "consignes"; }
-      // Ajoute d'autres cas si besoin
-
       let vars = { ...etape.params };
       if (liste.length === 1) {
-        vars[variableKeySing] = liste[0];
+        vars[variableKeySing] = getPrepDe(liste[0]);
         vars.nb = 1;
         phraseMission =
           genererPhraseMission(etape.type, mode, vars) ||
@@ -190,7 +195,7 @@ function joinListPrep(arr) {
           etape.description ||
           "[Aucune consigne définie]";
       } else {
-        vars[variableKeyPlur] = joinList(liste);
+        vars[variableKeyPlur] = joinListPrep(liste);
         vars.nb = liste.length;
         phraseMission =
           genererPhraseMission(etape.type, mode, vars) ||
@@ -213,7 +218,6 @@ function joinListPrep(arr) {
     }
     document.getElementById('mission-text').innerHTML = phraseMission;
 
-    // Bloc upload (photo/audio/video)
     if (["photo", "photo_inconnus", "audio", "collecte_objet"].includes(etape.type)) {
       afficherBlocUpload(etape.type, stepIndex, 0, () => {
         document.getElementById('next-quest').style.display = '';
@@ -225,7 +229,6 @@ function joinListPrep(arr) {
       return;
     }
 
-    // Bloc input réponse (pour les énigmes, mot de passe, etc)
     if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
       const blocAnswer = document.getElementById('bloc-answer');
       blocAnswer.style.display = '';
@@ -253,12 +256,10 @@ function joinListPrep(arr) {
       return;
     }
 
-    // Sinon, bouton quête suivante direct
     document.getElementById('next-quest').style.display = '';
     document.getElementById('next-quest').disabled = false;
   }
 
-  // Bloc upload harmonisé (SVG corrigé)
   function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false) {
     const bloc = document.getElementById('bloc-upload');
     const row = document.getElementById('upload-row');
