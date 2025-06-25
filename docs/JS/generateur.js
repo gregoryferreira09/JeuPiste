@@ -15,8 +15,6 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-
-// === AJOUTE CETTE LIGNE POUR L'AUTH ANONYME ===
 firebase.auth().signInAnonymously().catch(function(error) {
   alert("Erreur d'authentification Firebase : " + (error.message || error));
 });
@@ -25,11 +23,8 @@ firebase.auth().signInAnonymously().catch(function(error) {
 let scenario = [];
 let dragSrcIdx = null;
 let mapTargetInput = null;
-
-// Variables globales pour la carte
 let mapSearchTimeout = null;
 let searchMarker = null;
-
 let currentGameMode = "arthurien"; // valeur par défaut
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -38,8 +33,9 @@ document.addEventListener("DOMContentLoaded", function() {
   if (modeSelect) {
     modeSelect.onchange = function() {
       currentGameMode = this.value;
+      afficherLancementEtRegle();
     };
-    currentGameMode = modeSelect.value; // initialise
+    currentGameMode = modeSelect.value;
   }
 
   // Initialisation du select type d'épreuve
@@ -57,11 +53,11 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   }
 
-  // Effet fadeIn harmonisé
+  // FadeIn
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
 
-  // Champ coordonnée d'arrivée (centré, réduit, harmonisé)
+  // Champ coordonnée d'arrivée
   const coordEnd = document.getElementById('coordEnd');
   if (coordEnd) {
     coordEnd.style.textAlign = "center";
@@ -82,10 +78,10 @@ document.addEventListener("DOMContentLoaded", function() {
   const mapSearchBar = document.getElementById('mapSearchBar');
   if (mapSearchBar) mapSearchBar.addEventListener('input', handleMapSearch);
 
-  // Première mise à jour de la liste des épreuves
+  // Première mise à jour
   afficherScenario();
 
-  // === Bouton "Test scénario" ===
+  // Bouton "Test scénario"
   const btnTest = document.getElementById('testScenarioBtn');
   if (btnTest) {
     btnTest.onclick = function() {
@@ -102,6 +98,42 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   }
 });
+
+// Accord dynamique de la règle du jeu
+function regleAccordee(brut, N) {
+  let phrase = brut.replace("{N}", N);
+  if (N == 1) {
+    phrase = phrase
+      .replace(/épreuves magiques/gi, "épreuve magique")
+      .replace(/épreuves/gi, "épreuve")
+      .replace(/magiques/gi, "magique")
+      .replace(/\bsont\b/gi, "est")
+      .replace(/\bindispensables\b/gi, "indispensable")
+      .replace(/\bdéfis\b/gi, "défi")
+      .replace(/\bmissions\b/gi, "mission")
+      .replace(/\bétapes\b/gi, "étape")
+      .replace(/\baventures\b/gi, "aventure")
+      .replace(/\bactions clés\b/gi, "action clé")
+      .replace(/\binterventions héroïques\b/gi, "intervention héroïque")
+      .replace(/\bétapes décisives\b/gi, "étape décisive")
+      .replace(/\bsituations critiques\b/gi, "situation critique");
+  }
+  return phrase;
+}
+
+// Affichage dynamique du lancement et de la règle du jeu
+function afficherLancementEtRegle() {
+  let mode = currentGameMode;
+  let nb = scenario.length || 1;
+  let lancementArray = LANCEMENT_TEXTE[mode] || [];
+  let lancement = lancementArray.length ? lancementArray[Math.floor(Math.random() * lancementArray.length)] : "";
+  let regles = REGLES_TEXTE[mode] || [];
+  let regleBrute = regles.length ? regles[Math.floor(Math.random() * regles.length)] : "";
+  let regle = regleAccordee(regleBrute, nb);
+
+  document.getElementById('lancement-jeu').textContent = lancement;
+  document.getElementById('regle-jeu').textContent = regle;
+}
 
 // Ajouter une étape au scénario
 function ajouterEtapeAuScenario(etape) {
@@ -124,11 +156,10 @@ function afficherScenario() {
   if (scenario.length === 0) {
     listDiv.innerHTML = "<p>Aucune épreuve ajoutée.</p>";
     afficherBoutonSalon();
-    // Réactive le select de mode si plus d'épreuves
     if (modeSelect) modeSelect.disabled = false;
+    afficherLancementEtRegle();
     return;
   }
-  // Désactive le select de mode dès qu'il y a une épreuve
   if (modeSelect) modeSelect.disabled = true;
 
   listDiv.innerHTML = scenario.map((etape, idx) => {
@@ -138,7 +169,6 @@ function afficherScenario() {
     if (etape.params && Array.isArray(etape.params.consignes) && etape.params.consignes.length > 0) {
       const isMultiMystery = ["photo", "photo_inconnus", "collecte_objet"].includes(etape.type);
       if (isMultiMystery) {
-        // Affiche "Mission mystère" pour chaque consigne (pour ne rien révéler avant le jeu)
         consignesHtml = etape.params.consignes.map(() => ` : Mission mystère`).join('');
       } else {
         consignesHtml = etape.params.consignes.map(c => c ? ` : ${c}` : '').join('');
@@ -154,6 +184,7 @@ function afficherScenario() {
     `;
   }).join('');
   afficherBoutonSalon();
+  afficherLancementEtRegle();
   Array.from(listDiv.querySelectorAll('.epreuve-ligne')).forEach(ligne => {
     ligne.addEventListener('dragstart', handleDragStart);
     ligne.addEventListener('dragover', handleDragOver);
