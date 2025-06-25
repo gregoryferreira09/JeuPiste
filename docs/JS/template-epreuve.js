@@ -250,8 +250,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
       document.getElementById('main-content').innerHTML =
         "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
     }
-    return;
-  }
+   
 
   // --- Mode normal ---
   const salonCode = localStorage.getItem("salonCode");
