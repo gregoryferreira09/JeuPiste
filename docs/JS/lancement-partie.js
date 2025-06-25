@@ -21,10 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (typeof REGLES_TEXTE !== "undefined") {
       const regles = REGLES_TEXTE["arthurien"];
       let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
-      regleAleatoire = regleAleatoire.replace('{N}', 6); // Valeur par défaut
-      const reglesElem = document.getElementById("reglesCourse");
-      if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
-    }
+regleAleatoire = accorderRegle(regleAleatoire, nbQuetes);
+const reglesElem = document.getElementById("reglesCourse");
+if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
     return;
   }
 
