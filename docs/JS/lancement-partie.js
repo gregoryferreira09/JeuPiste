@@ -1,66 +1,34 @@
 // docs/JS/lancement-partie.js
 
 /**
- * Accord dynamique des phrases : gère {N}, le mot à accorder, et la conjugaison du verbe selon le sujet réel.
- * Exemples gérés :
- * - "Chaque équipe doit franchir {N} étape(s)" => "Chaque équipe doit franchir 1 étape" / "Chaque équipe doit franchir 3 étapes"
- * - "{N} défis séparent votre équipe du salut" => "1 défi sépare..." / "2 défis séparent..."
- * - "Les survivants seront ceux qui réussiront {N} mission(s)" => "Les survivants seront ceux qui réussiront 1 mission"
+ * Accord dynamique des phrases : gère {N}, le mot à accorder, TOUJOURS au pluriel.
+ * Toutes les phrases et accords seront systématiquement au pluriel.
  */
 
 function accorderRegle(phrase, n) {
-  // Dictionnaires d'accords
+  // Dictionnaires d'accords (pluriel uniquement)
   const accords = [
-    // Accord sur {N} mot(s)
-    { regex: /\b(\d+)\s+([a-zéèêîïûùa-zA-Z-]+)s\b/gi, singulier: "$1 $2", pluriel: "$1 $2s" },
-    { regex: /\b(\d+)\s+([a-zéèêîïûùa-zA-Z-]+)es\b/gi, singulier: "$1 $2e", pluriel: "$1 $2es" },
-    // Cas particuliers féminins/irrégu
-    { regex: /\b(\d+)\s+étapes\b/gi, singulier: "$1 étape", pluriel: "$1 étapes" },
-    { regex: /\b(\d+)\s+missions\b/gi, singulier: "$1 mission", pluriel: "$1 missions" },
-    { regex: /\b(\d+)\s+quêtes\b/gi, singulier: "$1 quête", pluriel: "$1 quêtes" },
-    { regex: /\b(\d+)\s+défis\b/gi, singulier: "$1 défi", pluriel: "$1 défis" },
-    { regex: /\b(\d+)\s+épreuves\b/gi, singulier: "$1 épreuve", pluriel: "$1 épreuves" },
-    { regex: /\b(\d+)\s+actions clés\b/gi, singulier: "$1 action clé", pluriel: "$1 actions clés" },
-    { regex: /\b(\d+)\s+aventures\b/gi, singulier: "$1 aventure", pluriel: "$1 aventures" },
-    // Accord du verbe si le sujet est {N}
-    { regex: /\b(\d+)\s+défis? séparent\b/gi, singulier: "$1 défi sépare", pluriel: "$1 défis séparent" },
-    { regex: /\b(\d+)\s+quêtes? ouvrent\b/gi, singulier: "$1 quête ouvre", pluriel: "$1 quêtes ouvrent" },
+    { regex: /\b(\d+)\s+([a-zéèêîïûùa-zA-Z-]+)s\b/gi, pluriel: "$1 $2s" },
+    { regex: /\b(\d+)\s+([a-zéèêîïûùa-zA-Z-]+)es\b/gi, pluriel: "$1 $2es" },
+    { regex: /\b(\d+)\s+étapes\b/gi, pluriel: "$1 étapes" },
+    { regex: /\b(\d+)\s+missions\b/gi, pluriel: "$1 missions" },
+    { regex: /\b(\d+)\s+quêtes\b/gi, pluriel: "$1 quêtes" },
+    { regex: /\b(\d+)\s+défis\b/gi, pluriel: "$1 défis" },
+    { regex: /\b(\d+)\s+épreuves\b/gi, pluriel: "$1 épreuves" },
+    { regex: /\b(\d+)\s+actions clés\b/gi, pluriel: "$1 actions clés" },
+    { regex: /\b(\d+)\s+aventures\b/gi, pluriel: "$1 aventures" },
+    { regex: /\b(\d+)\s+défis? séparent\b/gi, pluriel: "$1 défis séparent" },
+    { regex: /\b(\d+)\s+quêtes? ouvrent\b/gi, pluriel: "$1 quêtes ouvrent" },
     // Ajoute ici d'autres motifs spécifiques si nécessaire
   ];
 
   // Insertion du nombre
   phrase = phrase.replace("{N}", n);
 
-  // Recherche de motifs {N} + mot à accorder
+  // Applique toujours la forme plurielle
   accords.forEach(acc => {
-    phrase = phrase.replace(acc.regex, n === 1 ? acc.singulier : acc.pluriel);
+    phrase = phrase.replace(acc.regex, acc.pluriel);
   });
-
-  // Accord du verbe si le sujet est {N} (ex : "1 étape doit être validée" / "2 étapes doivent être validées")
-  // Cas générique : <nombre> <mot> doit/devra/doit être/... → doivent/devront/doivent être...
-  if (n === 1) {
-    phrase = phrase
-      .replace(/\bdoivent\b/g, "doit")
-      .replace(/\bdevront\b/g, "devra")
-      .replace(/\bsont\b/g, "est")
-      .replace(/\bseront\b/g, "sera")
-      .replace(/\bséparent\b/g, "sépare")
-      .replace(/\brestent\b/g, "reste")
-      .replace(/\battendent\b/g, "attend")
-      .replace(/\bvalident\b/g, "valide")
-      .replace(/\bouvrent\b/g, "ouvre")
-      .replace(/\bprouvent\b/g, "prouve")
-      .replace(/\bpermettent\b/g, "permet")
-      .replace(/\bpeuvent\b/g, "peut")
-      .replace(/\binterviennent\b/g, "intervient");
-    // Accord adjectifs
-    phrase = phrase.replace(/\bindispensables\b/g, "indispensable");
-  }
-  // Pour n>1, on ne touche pas : le template doit être au pluriel
-
-  // Cas où le sujet n'est PAS "N ...", on n'accorde que le mot variable
-  // Ex : "Chaque équipe doit franchir {N} étape(s)" → "doit" ne varie pas
-  // Ex : "Les survivants seront ceux qui réussiront {N} missions" → "seront" ne varie pas
 
   return phrase;
 }
@@ -88,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (typeof REGLES_TEXTE !== "undefined") {
       const regles = REGLES_TEXTE["arthurien"];
       let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
-      regleAleatoire = accorderRegle(regleAleatoire, 6); // Valeur par défaut
+      regleAleatoire = accorderRegle(regleAleatoire, 6); // Valeur par défaut (toujours au pluriel)
       const reglesElem = document.getElementById("reglesCourse");
       if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
     }
@@ -136,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (typeof REGLES_TEXTE !== "undefined") {
         const regles = REGLES_TEXTE[mode] || REGLES_TEXTE['arthurien'];
         let regleAleatoire = regles[Math.floor(Math.random() * regles.length)];
-        regleAleatoire = accorderRegle(regleAleatoire, nbQuetes);
+        regleAleatoire = accorderRegle(regleAleatoire, nbQuetes > 1 ? nbQuetes : 2); // Forçage au pluriel
         const reglesElem = document.getElementById("reglesCourse");
         if (reglesElem) reglesElem.innerHTML = `<strong>Règles du jeu&nbsp;:</strong><br>${regleAleatoire}`;
       }
