@@ -23,16 +23,13 @@ firebase.auth().signInAnonymously().then(function() {
 
 function demarreJeuFirebase() {
 
-
 function lowerFirst(str) {
   return str ? str.charAt(0).toLowerCase() + str.slice(1) : "";
 }
-  
+
 // === Fonctions utilitaires minimales ===
 
-// Fallback basique pour getPrepDe
 function getPrepDe(str) {
-  // Pour l'affichage "de la/le/du/des ..." si besoin, ici on fait simple :
   if (!str) return "";
   if (/^[aeiouy]/i.test(str)) return "d’" + str;
   return "de " + str;
@@ -45,17 +42,13 @@ function joinListPrep(list) {
   return list.slice(0, -1).join(", ") + " et " + list[list.length - 1];
 }
 
-
 // Fonction genererPhraseMission DYNAMIQUE et robuste
 function genererPhraseMission(type, mode, vars = {}) {
-  // Cherche les textes dans la variable globale (catalogue-phrases.js)
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
   const textsMode = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
   let textes = textsMode;
-  // Si textesMode est un objet (ex pour photo_inconnus), prends le tableau
   if (Array.isArray(textsMode)) textes = textsMode;
-  else if (textsMode && typeof textsMode === "object") textes = Object.values(textsMode).flat();
-  // Choisis un texte au hasard
+  else if (textsMode && typeof textesMode === "object") textes = Object.values(textsMode).flat();
   let phrase = "";
   if (Array.isArray(textes) && textes.length > 0) {
     phrase = textes[Math.floor(Math.random() * textes.length)];
@@ -64,10 +57,8 @@ function genererPhraseMission(type, mode, vars = {}) {
   } else {
     return null;
   }
-  // Remplace les variables [objet], [objets], [consigne], etc.
   phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => {
     if (vars[key]) return vars[key];
-    // Fallbacks pour certains cas
     if (key === "objet" && vars.objet) return vars.objet;
     if (key === "objets" && vars.objets) return vars.objets;
     if (key === "consigne" && vars.consigne) return vars.consigne;
@@ -168,42 +159,32 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     else if (etape.type === "collecte_objet") { variableKeySing = "objet"; variableKeyPlur = "objets"; }
     else if (etape.type === "audio") { variableKeySing = "consigne"; variableKeyPlur = "consignes"; }
     let vars = { ...etape.params };
-  if (liste.length === 1) {
-  vars[variableKeySing] = lowerFirst(liste[0]);
-  vars.objet = lowerFirst(liste[0]);
-  vars.nb = 1;
 
-  // Patch sécurité pour garantir le remplacement [objet]/[objets]
-if (!vars.objet && Array.isArray(liste) && liste.length === 1) {
-  vars.objet = lowerFirst(liste[0]);
-}
-if (!vars.objets && Array.isArray(liste) && liste.length > 1) {
-  vars.objets = joinListPrep(liste.map(lowerFirst));
-}
-    
-  phraseMission =
-    genererPhraseMission(etape.type, mode, vars) ||
-    etape.params?.consigne ||
-    etape.params?.objectif ||
-    etape.params?.enigme ||
-    etape.params?.question ||
-    etape.description ||
-    "[Aucune consigne définie]";
-} else {
-  // Applique lowerFirst à chaque consigne
-  const consignesLower = liste.map(lowerFirst);
-  vars[variableKeyPlur] = joinListPrep(consignesLower);
-  vars.objets = joinListPrep(consignesLower);
-  vars.nb = liste.length;
-  phraseMission =
-    genererPhraseMission(etape.type, mode, vars) ||
-    etape.params?.consigne ||
-    etape.params?.objectif ||
-    etape.params?.enigme ||
-    etape.params?.question ||
-    etape.description ||
-    "[Aucune consigne définie]";
-}
+    if (liste.length === 1) {
+      vars[variableKeySing] = lowerFirst(liste[0]);
+      vars.nb = 1;
+    } else {
+      const consignesLower = liste.map(lowerFirst);
+      vars[variableKeyPlur] = joinListPrep(consignesLower);
+      vars.nb = liste.length;
+    }
+
+    // Patch sécurité pour garantir le remplacement [objet]/[objets]
+    if (!vars.objet && Array.isArray(liste) && liste.length === 1) {
+      vars.objet = lowerFirst(liste[0]);
+    }
+    if (!vars.objets && Array.isArray(liste) && liste.length > 1) {
+      vars.objets = joinListPrep(liste.map(lowerFirst));
+    }
+
+    phraseMission =
+      genererPhraseMission(etape.type, mode, vars) ||
+      etape.params?.consigne ||
+      etape.params?.objectif ||
+      etape.params?.enigme ||
+      etape.params?.question ||
+      etape.description ||
+      "[Aucune consigne définie]";
   } else {
     phraseMission =
       genererPhraseMission(etape.type, mode, etape.params) ||
@@ -412,7 +393,6 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
 
 } // Fin de demarreJeuFirebase
 
-// Optionnel : ta fonction showToast (à adapter si tu veux)
 function showToast(msg) {
   let toast = document.getElementById('toast-message');
   if (!toast) {
