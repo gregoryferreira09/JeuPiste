@@ -118,11 +118,11 @@ case "photo_inconnus":
     <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
   </svg>`;
     case "audio":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="8" y="13" width="8" height="5" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <ellipse cx="12" cy="11" rx="3" ry="4" fill="#231d1d"/>
-        <rect x="11" y="18" width="2" height="2" rx="1" fill="#231d1d"/>
-      </svg>`;
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
+    <path d="M12 17a4 4 0 0 0 4-4V8a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4zm5-4a1 1 0 0 1 2 0 7 7 0 0 1-14 0 1 1 0 0 1 2 0 5 5 0 0 0 10 0zm-5 4v3" stroke="#231d1d" stroke-width="2" fill="none"/>
+    <rect x="9" y="4" width="6" height="10" rx="3" fill="#231d1d"/>
+    <rect x="11" y="14" width="2" height="4" rx="1" fill="#231d1d"/>
+  </svg>`;
     case "collecte_objet":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
         <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
