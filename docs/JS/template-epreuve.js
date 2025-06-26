@@ -37,6 +37,7 @@ function resetAffichageEtape() {
   if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
 
+// Corrige les articles et contractions françaises
 function harmoniseArticles(phrase) {
   phrase = phrase.replace(/\bde un ([aeiouyhAEIOUYH])/g, "d'un $1");
   phrase = phrase.replace(/\bde une ([aeiouyhAEIOUYH])/g, "d'une $1");
@@ -50,6 +51,13 @@ function harmoniseArticles(phrase) {
   phrase = phrase.replace(/  +/g, " ");
   phrase = phrase.replace(/d'([A-Z])/, function (m, p1) { return "d'" + p1.toLowerCase(); });
   return phrase;
+}
+
+// Corrige les pluriels dynamiques type "personne[s]" --> "personne"/"personnes"
+function accordePluriel(phrase, nb) {
+  return phrase.replace(/([a-zA-ZéèêëàâîïôöùûüçÉÈÊËÀÂÎÏÔÖÙÛÜÇ]+)\[s\]/g, function(_, mot) {
+    return nb > 1 ? mot + "s" : mot;
+  });
 }
 
 function buildVars(etape) {
@@ -136,6 +144,7 @@ function genererPhraseMission(type, mode, vars = {}) {
   let phrase = textesFiltres[Math.floor(Math.random() * textesFiltres.length)];
   phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, k) => (vars[k] !== undefined ? vars[k] : match));
   phrase = harmoniseArticles(phrase);
+  phrase = accordePluriel(phrase, nb);
   if (nb <= 1) {
     phrase = phrase.replace(/\bces images\b/gi, "cette image");
     phrase = phrase.replace(/\bCes images\b/gi, "Cette image");
@@ -149,9 +158,6 @@ function genererPhraseMission(type, mode, vars = {}) {
   }
   return phrase;
 }
-
-
-
 
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   resetAffichageEtape();
@@ -195,12 +201,13 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     || etape.description
     || "[Aucune consigne définie]";
   phraseMission = harmoniseArticles(phraseMission);
+  phraseMission = accordePluriel(phraseMission, vars.nb || 1);
 
-  // Sous-consignes : si consignes est un tableau non vide, on les affiche en liste
+  // Sous-consignes : si consignes est un tableau non vide, on les affiche en liste
   let sousConsignesHtml = "";
   if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length > 0) {
     sousConsignesHtml = `<ul style="margin: 8px 0 0 0; padding-left: 24px;">` +
-      etape.params.consignes.map(c => c ? `<li>${c}</li>` : '').join('') +
+      etape.params.consignes.map(c => c ? `<li>${accordePluriel(harmoniseArticles(c), vars.nb || 1)}</li>` : '').join('') +
       `</ul>`;
   }
 
@@ -256,12 +263,14 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
   for (let i = 0; i < nb; i++) {
     let label = document.createElement('label');
     label.style.display = "inline-flex";
+    label.style.flexDirection = "column";
     label.style.alignItems = "center";
+    label.style.justifyContent = "flex-start";
     label.style.marginRight = "18px";
     label.style.marginBottom = "12px";
     label.innerHTML = getUploadIcon(type);
 
-    // Label court
+    // Label court sous le logo
     let court = "";
     if (type === "photo") court = `Photo ${i+1}`;
     else if (type === "audio") court = `Audio ${i+1}`;
@@ -286,7 +295,7 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
     // Affichage du nom du fichier sélectionné
     let filenameDiv = document.createElement("div");
     filenameDiv.id = `filename-upload-${type}-${i}`;
-    filenameDiv.style = "font-size:0.97em;color:#e0c185;text-align:right;min-height:1.2em;max-width:180px;overflow-x:auto;margin-left:6px;";
+    filenameDiv.style = "font-size:0.97em;color:#e0c185;text-align:center;min-height:1.2em;max-width:180px;overflow-x:auto;margin-top:2px;";
     label.appendChild(filenameDiv);
 
     row.appendChild(label);
