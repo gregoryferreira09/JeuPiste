@@ -109,18 +109,14 @@ function buildVars(etape) {
 function getUploadIcon(type) {
   switch(type) {
     case "photo":
-    case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="9" y="5" width="6" height="3" rx="1" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <circle cx="12" cy="12.5" r="3" fill="#231d1d"/>
-      </svg>`;
+case "photo_inconnus":
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
+    <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+  </svg>`;
     case "video":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="4" y="7" width="12" height="10" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <polygon points="13,10 18,12.5 13,15" fill="#231d1d"/>
-        <circle cx="7" cy="12" r="1" fill="#231d1d"/>
-      </svg>`;
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
+    <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
+  </svg>`;
     case "audio":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
         <rect x="8" y="13" width="8" height="5" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
@@ -148,11 +144,9 @@ function getUploadIcon(type) {
 }
 // Et pour la boussole GPS :
 function getGpsIcon() {
-  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-  <circle cx="12" cy="12" r="10" stroke="#e0c185" stroke-width="2" fill="#231d1d"/>
-  <polygon points="12,7 16,17 12,15 8,17" fill="#e0c185"/>
-  <circle cx="12" cy="12" r="2" fill="#231d1d"/>
-</svg>`;
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/>
+  </svg>`;
 }
 
 function genererPhraseMission(type, mode, vars = {}) {
