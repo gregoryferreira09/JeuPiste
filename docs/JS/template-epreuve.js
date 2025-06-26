@@ -73,25 +73,47 @@ function harmoniseArticles(phrase) {
   return phrase;
 }
 
-// AJOUT : Fonction pour obtenir le SVG harmonisé selon le type d'upload
+// Fonction pour obtenir le SVG harmonisé selon le type d'upload
 function getUploadIcon(type) {
   switch(type) {
     case "photo":
+    case "photo_inconnus":
       return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
     case "audio":
       return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v7a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 14 0z"/></svg>`;
     case "video":
       return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
+    case "collecte_objet":
+      // Icône de boîte ou valise pour objet
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M3 7a2 2 0 0 1 2-2h2V3a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v2H3V7zm2 0v2h14V7H5zm0 4v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7H5zm4-8v2h6V3H9z"/></svg>`;
     default:
       return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5V9h5.5L13 3.5z"/></svg>`;
   }
 }
 
-// AJOUT : Logo boussole harmonisé
+// Logo boussole harmonisé
 function getGpsIcon() {
   return `<svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;">
     <path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.93-6.36l-5.66 2.36c-.34.14-.68-.2-.54-.54l2.36-5.66a.5.5 0 0 1 .9 0l2.36 5.66c.14.34-.2.68-.54.54z"/>
   </svg>`;
+}
+
+// Reset affichage de l'étape pour éviter les résidus
+function resetAffichageEtape() {
+  // Vide et masque tous les principaux blocs
+  ['titre-quete', 'metaphore-quete', 'mission-label', 'mission-text',
+   'upload-row', 'upload-feedback'].forEach(id => {
+    let el = document.getElementById(id);
+    if (el) el.innerHTML = "";
+  });
+  // Masque tous les blocs principaux
+  ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
+    let el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  // Supprime le bouton GPS dynamique si présent
+  let oldGpsBtn = document.getElementById('gps-upload-btn');
+  if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
 
 // Récupère le mode de l’étape, sinon mode global du scénario, sinon "arthurien"
@@ -102,7 +124,7 @@ function getModeScenario(etape) {
   return 'arthurien';
 }
 
-// Nouvelle génération de phrase mission : choix singulier/pluriel intelligent
+// Génération de phrase mission : choix singulier/pluriel intelligent
 function genererPhraseMission(type, mode, vars = {}) {
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
   let textes = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
@@ -145,6 +167,8 @@ function genererPhraseMission(type, mode, vars = {}) {
 
 // Affichage harmonisé d’une épreuve
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
+  resetAffichageEtape();
+
   const typeMission = etape.type || "photo";
   const modeMission = getModeScenario(etape) || "arthurien";
 
@@ -166,7 +190,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
   document.getElementById('defi-text').textContent = etape.params?.defi || '';
 
-  // AJOUT : bouton GPS harmonisé si coords GPS présentes
+  // Bouton GPS harmonisé si coords GPS présentes
   let gpsValue = etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length ? etape.params.points[0] : null);
   let gpsContainer = document.getElementById('gps-upload-btn');
   if (gpsContainer) gpsContainer.remove(); // nettoyage si déjà présent
@@ -235,7 +259,7 @@ function afficherBlocGPS(etape, callback, testMode = false) {
   };
 }
 
-// Affichage de la mission (consigne) avec accord automatique
+// Affichage de la mission (consigne) avec accord automatique et harmonisation pour tous types
 function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
@@ -280,16 +304,41 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
 
   document.getElementById('mission-text').innerHTML = phraseMission;
 
-  if (["photo", "photo_inconnus", "audio", "collecte_objet", "video"].includes(etape.type)) {
+  // Harmonisé pour tous les types d'upload
+  const typesUpload = ["photo", "photo_inconnus", "audio", "collecte_objet", "video", "fichier"];
+  if (typesUpload.includes(etape.type)) {
+    let labelUpload;
+    switch(etape.type) {
+      case "photo":
+      case "photo_inconnus":
+        labelUpload = "Photo à envoyer";
+        break;
+      case "audio":
+        labelUpload = "Audio à envoyer";
+        break;
+      case "video":
+        labelUpload = "Vidéo à envoyer";
+        break;
+      case "collecte_objet":
+        labelUpload = "Photo de l’objet à envoyer";
+        break;
+      case "fichier":
+        labelUpload = "Fichier à envoyer";
+        break;
+      default:
+        labelUpload = "Fichier à envoyer";
+    }
     afficherBlocUpload(etape.type, stepIndex, 0, () => {
       document.getElementById('next-quest').style.display = '';
       document.getElementById('next-quest').disabled = false;
       if (testMode) {
         document.getElementById('next-quest').onclick = () => showToast("En mode test, ce bouton ne valide rien 😉");
       }
-    }, testMode);
+    }, testMode, labelUpload);
     return;
   }
+
+  // Bloc réponse pour les types textuels/enigmes
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
     const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
@@ -320,30 +369,30 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
   document.getElementById('next-quest').disabled = false;
 }
 
-// Bloc upload : AJOUT LOGOS HARMONISÉS
-function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false) {
+// Bloc upload : AJOUT LOGOS HARMONISÉS et label personnalisé
+function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false, labelUpload = null) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
   row.innerHTML = '';
   bloc.style.display = '';
 
-  // LOGO HARMONISÉ pour chaque type
   let label = document.createElement('label');
+  let defaultLabel =
+    type === "audio" ? "Audio à envoyer" :
+    type === "photo" || type === "photo_inconnus" ? "Photo à envoyer" :
+    type === "video" ? "Vidéo à envoyer" :
+    type === "collecte_objet" ? "Photo de l’objet à envoyer" :
+    "Fichier à envoyer";
   label.innerHTML =
     getUploadIcon(type) +
-    `<span style="margin-left:8px;">${
-      type === "audio" ? "Audio à envoyer" :
-      type === "photo" ? "Photo à envoyer" :
-      type === "video" ? "Vidéo à envoyer" :
-      "Fichier à envoyer"
-    }</span>`;
+    `<span style="margin-left:8px;">${labelUpload ? labelUpload : defaultLabel}</span>`;
 
   let input = document.createElement('input');
   input.type = "file";
   input.className = "visually-hidden";
   input.accept =
     type === "audio" ? "audio/*" :
-    type === "photo" ? "image/*" :
+    type === "photo" || type === "photo_inconnus" || type === "collecte_objet" ? "image/*" :
     type === "video" ? "video/*" :
     "*/*";
   input.id = `upload-file-${type}-${idxMission}`;
@@ -397,15 +446,13 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
     let mode = scenarioTest.mode || "arthurien";
     let currentStep = 0;
     function showStep(idx) {
+      resetAffichageEtape();
       const etape = scenarioTest.scenario[idx];
       if (!etape) {
         document.getElementById('main-content').innerHTML =
           "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
         return;
       }
-      ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
-        const el = document.getElementById(id); if(el) el.style.display = 'none';
-      });
       document.getElementById('next-quest').style.display = 'none';
       afficherEtapeHarmonisee(etape, idx, mode, true);
 
@@ -451,14 +498,12 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
     db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
       const step = snapStep.val() || 0;
       db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
+        resetAffichageEtape();
         const etape = snapEpreuve.val();
         if (!etape) {
           document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
           return;
         }
-        ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
-          const el = document.getElementById(id); if(el) el.style.display = 'none';
-        });
         document.getElementById('next-quest').style.display = 'none';
         afficherEtapeHarmonisee(etape, step, getModeScenario(etape), false);
         document.getElementById('next-quest').onclick = validerEtape;
