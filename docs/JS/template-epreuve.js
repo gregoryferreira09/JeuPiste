@@ -102,19 +102,19 @@ function getUploadIcon(type) {
   switch(type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2[...]`;
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
     case "audio":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v7a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 14 [...]`;
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><circle cx="12" cy="12" r="10" fill="#e0c185"/><rect x="10" y="8" width="4" height="8" fill="#231d1d"/><rect x="8" y="10" width="8" height="4" fill="#231d1d"/></svg>`;
     case "video":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><rect x="3" y="5" width="18" height="14" rx="2" fill="#e0c185"/><polygon points="10,9 16,12 10,15" fill="#231d1d"/></svg>`;
     case "collecte_objet":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M3 7a2 2 0 0 1 2-2h2V3a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v2H3V7zm2 0v2h14V7H5zm0 4v7a2 2 0 0 0 2 2h10[...]`;
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><rect x="4" y="7" width="16" height="10" rx="2" fill="#e0c185"/><circle cx="12" cy="12" r="3" fill="#231d1d"/></svg>`;
     default:
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5V9h5.5L13 3.5z"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><rect x="6" y="2" width="12" height="20" rx="2" fill="#e0c185"/><rect x="9" y="8" width="6" height="8" fill="#231d1d"/></svg>`;
   }
 }
 function getGpsIcon() {
-  return `<svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s[...]`;
+  return `<svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;"><circle cx="12" cy="12" r="10" fill="#e0c185"/><path d="M12 6v6l4 2" stroke="#231d1d" stroke-width="2" fill="none"/></svg>`;
 }
 
 function genererPhraseMission(type, mode, vars = {}) {
@@ -174,7 +174,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     gpsContainer = document.createElement('div');
     gpsContainer.id = "gps-upload-btn";
     gpsContainer.style = "margin-bottom:18px; display:flex; justify-content:center; align-items:center;";
-    gpsContainer.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;col[...]`;
+    gpsContainer.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit;">${getGpsIcon()}<span>Voir sur la carte</span></a>`;
     const blocMission = document.getElementById('bloc-mission');
     blocMission.parentNode.insertBefore(gpsContainer, blocMission);
   }
@@ -212,7 +212,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
     const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
-    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"[...]`;
+    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input id="answer-field" type="text" class="input-answer-field"/></div>`;
     const input = document.getElementById("answer-field");
     const nextBtn = document.getElementById("next-quest");
     nextBtn.style.display = '';
