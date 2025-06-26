@@ -272,6 +272,16 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
     input.id = `upload-file-${type}-${i}`;
     label.appendChild(input);
 
+    if ((!titre || titre === etape.type) || !metaphore) {
+  if (typeof getRandomAtmosphere === "function") {
+    const random = getRandomAtmosphere(etape.type, mode || "arthurien");
+    if (!titre || titre === etape.type) titre = random.titre;
+    if (!metaphore) metaphore = random.phrase;
+  }
+  // Fallback ultime
+  if (!titre) titre = "Défi à relever";
+  if (!metaphore) metaphore = "Prépare-toi à l'aventure !";
+}
     // Affichage du nom du fichier sélectionné
     let filenameDiv = document.createElement("div");
     filenameDiv.id = `filename-upload-${type}-${i}`;
