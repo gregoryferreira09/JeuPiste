@@ -1,4 +1,4 @@
-// === Initialisation Firebase (toujours en tout début de fichier) ===
+// === Initialisation Firebase ===
 const firebaseConfig = {
   apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
   authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -13,28 +13,22 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// === Authentification anonyme AVANT tout accès ===
-firebase.auth().signInAnonymously().then(function() {
-  demarreJeuFirebase();
-}).catch(function(error) {
-  alert("Erreur d'authentification Firebase : " + error.message);
-  console.error("Erreur d'authentification Firebase :", error);
-});
+let scenarioModeGlobal = "arthurien"; // fallback
 
-function demarreJeuFirebase() {
+// === Récupération du mode global du scénario ===
+const salonCode = localStorage.getItem("salonCode");
+if (salonCode) {
+  db.ref(`parties/${salonCode}/scenario/mode`).once('value').then(snapMode => {
+    if (snapMode.exists()) scenarioModeGlobal = snapMode.val();
+  });
+}
 
+// Utilitaire : minuscule la première lettre
 function lowerFirst(str) {
   return str ? str.charAt(0).toLowerCase() + str.slice(1) : "";
 }
 
-// === Fonctions utilitaires minimales ===
-
-function getPrepDe(str) {
-  if (!str) return "";
-  if (/^[aeiouy]/i.test(str)) return "d’" + str;
-  return "de " + str;
-}
-
+// Utilitaire : liste naturelle en français
 function joinListPrep(list) {
   if (!Array.isArray(list) || list.length === 0) return "";
   if (list.length === 1) return list[0];
@@ -42,7 +36,15 @@ function joinListPrep(list) {
   return list.slice(0, -1).join(", ") + " et " + list[list.length - 1];
 }
 
-// Fonction genererPhraseMission DYNAMIQUE et robuste
+// Récupère le mode de l’étape, sinon mode global du scénario, sinon "arthurien"
+function getModeScenario(etape) {
+  if (etape && etape.mode) return etape.mode;
+  if (window.currentScenarioMode) return window.currentScenarioMode;
+  if (scenarioModeGlobal) return scenarioModeGlobal;
+  return 'arthurien';
+}
+
+// Fonction robuste pour générer la phrase mission avec injection [objet] / [objets]
 function genererPhraseMission(type, mode, vars = {}) {
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
   const textsMode = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
@@ -57,31 +59,19 @@ function genererPhraseMission(type, mode, vars = {}) {
   } else {
     return null;
   }
-  phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => {
-    if (vars[key]) return vars[key];
-    if (key === "objet" && vars.objet) return vars.objet;
-    if (key === "objets" && vars.objets) return vars.objets;
-    if (key === "consigne" && vars.consigne) return vars.consigne;
-    if (key === "lieu" && vars.lieu) return vars.lieu;
-    if (key === "nbPersonnes" && vars.nbPersonnes) return vars.nbPersonnes;
-    if (key === "critere" && vars.critere) return vars.critere;
-    return match;
-  });
+  // Remplacement dynamique de toutes les variables [xxx]
+  phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => (vars[key] !== undefined ? vars[key] : match));
   return phrase;
 }
 
-function getModeScenario(etape) {
-  if (etape && etape.mode) return etape.mode;
-  return 'arthurien';
-}
-
+// Affichage harmonisé d’une épreuve
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   const typeMission = etape.type || "photo";
-  const modeMission = mode || getModeScenario(etape) || "arthurien";
+  const modeMission = getModeScenario(etape) || "arthurien";
 
+  // Titre et métaphore (optionnels)
   let titre = etape.titre || etape.nom || "";
   let metaphore = etape.metaphore || "";
-
   if ((!titre || titre === typeMission) || !metaphore) {
     if (typeof getRandomAtmosphere === "function") {
       const random = getRandomAtmosphere(typeMission, modeMission);
@@ -98,14 +88,16 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
   document.getElementById('defi-text').textContent = etape.params?.defi || '';
 
+  // Gestion GPS
   let hasGPS = !!(etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length));
   if (hasGPS) {
-    afficherBlocGPS(etape, () => afficherMissionSuite(etape, stepIndex, mode, testMode), testMode);
+    afficherBlocGPS(etape, () => afficherMissionSuite(etape, stepIndex, modeMission, testMode), testMode);
   } else {
-    afficherMissionSuite(etape, stepIndex, mode, testMode);
+    afficherMissionSuite(etape, stepIndex, modeMission, testMode);
   }
 }
 
+// Bloc GPS (inchangé)
 function afficherBlocGPS(etape, callback, testMode = false) {
   const gps = etape.params.gps || etape.params.coord || etape.params.coordonnees || (Array.isArray(etape.params.points) ? etape.params.points[0] : null);
   if (!gps) { callback(); return; }
@@ -128,7 +120,7 @@ function afficherBlocGPS(etape, callback, testMode = false) {
         const R = 6378137;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
       }
@@ -146,58 +138,46 @@ function afficherBlocGPS(etape, callback, testMode = false) {
   };
 }
 
-function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
+function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
-
   let phraseMission = "";
+
+  // Robustification : gère consignes simple ou multiple
+  let vars = { ...etape.params };
+
+  // Cas consignes multiples (ex: photo, collecte_objet...)
   if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
     let liste = etape.params.consignes;
-    let variableKeySing = "objet";
-    let variableKeyPlur = "objets";
-    if (etape.type === "photo_inconnus") { variableKeySing = "personne"; variableKeyPlur = "personnes"; }
-    else if (etape.type === "collecte_objet") { variableKeySing = "objet"; variableKeyPlur = "objets"; }
-    else if (etape.type === "audio") { variableKeySing = "consigne"; variableKeyPlur = "consignes"; }
-    let vars = { ...etape.params };
-
-    // Remplissage des variables selon le nombre de consignes
     if (liste.length === 1) {
-      vars[variableKeySing] = lowerFirst(liste[0]);
+      vars.objet = lowerFirst(liste[0]); // Pour [objet]
+      vars.objets = lowerFirst(liste[0]); // Pour [objets] (si jamais utilisé)
       vars.nb = 1;
     } else {
-      const consignesLower = liste.map(lowerFirst);
-      vars[variableKeyPlur] = joinListPrep(consignesLower);
+      vars.objets = joinListPrep(liste.map(lowerFirst)); // Pour [objets]
+      vars.objet = lowerFirst(liste[0]); // Pour [objet], fallback sur le premier
       vars.nb = liste.length;
     }
-
-    // Patch sécurité pour garantir le remplacement [objet]/[objets]
-    if (!vars.objet && Array.isArray(liste) && liste.length === 1) {
-      vars.objet = lowerFirst(liste[0]);
-    }
-    if (!vars.objets && Array.isArray(liste) && liste.length > 1) {
-      vars.objets = joinListPrep(liste.map(lowerFirst));
-    }
-
-    phraseMission =
-      genererPhraseMission(etape.type, mode, vars) ||
-      etape.params?.consigne ||
-      etape.params?.objectif ||
-      etape.params?.enigme ||
-      etape.params?.question ||
-      etape.description ||
-      "[Aucune consigne définie]";
-  } else {
-    phraseMission =
-      genererPhraseMission(etape.type, mode, etape.params) ||
-      etape.params?.consigne ||
-      etape.params?.objectif ||
-      etape.params?.enigme ||
-      etape.params?.question ||
-      etape.description ||
-      "[Aucune consigne définie]";
   }
+
+  // Fallback pour les types avec un seul champ "consigne"
+  if (!vars.objet && etape.params?.consigne) {
+    vars.objet = etape.params.consigne;
+  }
+
+  // Génère la phrase mission
+  phraseMission =
+    genererPhraseMission(etape.type, modeMission, vars) ||
+    etape.params?.consigne ||
+    etape.params?.objectif ||
+    etape.params?.enigme ||
+    etape.params?.question ||
+    etape.description ||
+    "[Aucune consigne définie]";
+
   document.getElementById('mission-text').innerHTML = phraseMission;
 
+  // Gère les uploads, réponses, etc. (inchangé)
   if (["photo", "photo_inconnus", "audio", "collecte_objet"].includes(etape.type)) {
     afficherBlocUpload(etape.type, stepIndex, 0, () => {
       document.getElementById('next-quest').style.display = '';
@@ -208,9 +188,8 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     }, testMode);
     return;
   }
-
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
-    const blocAnswer = document.getElementById('bloc-answer');
+    const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
     blocAnswer.innerHTML = `
       <div class="input-answer-wrapper">
@@ -235,11 +214,11 @@ function afficherMissionSuite(etape, stepIndex, mode, testMode = false) {
     };
     return;
   }
-
   document.getElementById('next-quest').style.display = '';
   document.getElementById('next-quest').disabled = false;
 }
 
+// Bloc upload (inchangé, adapté à ton infra)
 function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
@@ -286,7 +265,22 @@ function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = 
   }
 }
 
-// --- Mode test ---
+// Toast (inchangé)
+function showToast(msg) {
+  let toast = document.getElementById('toast-message');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast-message';
+    toast.className = 'modal-toast';
+    toast.setAttribute('role', 'alert');
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  setTimeout(() => { toast.classList.remove('visible'); }, 2200);
+}
+
+// === Mode test (inchangé) ===
 if (typeof isTestMode !== 'undefined' && isTestMode) {
   const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
   if (scenarioTest && Array.isArray(scenarioTest.scenario) && scenarioTest.scenario.length > 0) {
@@ -390,20 +384,4 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
           });
       });
   }
-}
-
-} // Fin de demarreJeuFirebase
-
-function showToast(msg) {
-  let toast = document.getElementById('toast-message');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast-message';
-    toast.className = 'modal-toast';
-    toast.setAttribute('role', 'alert');
-    document.body.appendChild(toast);
-  }
-  toast.textContent = msg;
-  toast.classList.add('visible');
-  setTimeout(() => { toast.classList.remove('visible'); }, 2200);
 }
