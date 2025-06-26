@@ -110,36 +110,39 @@ function getUploadIcon(type) {
   switch(type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+        <rect x="9" y="5" width="6" height="3" rx="1" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
         <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
         <circle cx="12" cy="12.5" r="3" fill="#231d1d"/>
       </svg>`;
     case "video":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="3" y="6" width="15" height="12" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <polygon points="13,10 18,13 13,16" fill="#231d1d"/>
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+        <rect x="4" y="7" width="12" height="10" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <polygon points="13,10 18,12.5 13,15" fill="#231d1d"/>
+        <circle cx="7" cy="12" r="1" fill="#231d1d"/>
       </svg>`;
     case "audio":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="7" y="10" width="2" height="7" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <rect x="15" y="10" width="2" height="7" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <rect x="11" y="7" width="2" height="10" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+        <rect x="8" y="13" width="8" height="5" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <ellipse cx="12" cy="11" rx="3" ry="4" fill="#231d1d"/>
+        <rect x="11" y="18" width="2" height="2" rx="1" fill="#231d1d"/>
       </svg>`;
     case "collecte_objet":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="6" y="7" width="12" height="10" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <circle cx="12" cy="12" r="3" fill="#231d1d"/>
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+        <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <circle cx="12" cy="12.5" r="4.5" fill="#231d1d"/>
       </svg>`;
     case "fichier":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="6" y="4" width="12" height="16" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <polyline points="10,14 12,16 14,14" fill="none" stroke="#231d1d" stroke-width="2"/>
-        <line x1="12" y1="8" x2="12" y2="16" stroke="#231d1d" stroke-width="2"/>
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+        <rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <rect x="6" y="5" width="4" height="3" rx="1" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <rect x="9" y="11" width="6" height="1" fill="#231d1d"/>
+        <rect x="9" y="13" width="6" height="1" fill="#231d1d"/>
       </svg>`;
     default:
-      // Icône générique (style fichier)
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="6" y="4" width="12" height="16" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+      // Icône générique : simple rectangle
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+        <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
       </svg>`;
   }
 }
