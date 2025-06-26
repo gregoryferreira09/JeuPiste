@@ -110,7 +110,7 @@ function getUploadIcon(type) {
   switch(type) {
     case "photo":
     case "photo_inconnus":
-      return `<<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
   <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
   <circle cx="12" cy="12.5" r="3" fill="#231d1d"/>
 </svg>`;
@@ -119,20 +119,20 @@ function getUploadIcon(type) {
   <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
   <polygon points="11,10 17,12.5 11,15" fill="#231d1d"/>
 </svg>`;
-      case "Boussole":
+      case "boussole":
      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
   <circle cx="12" cy="12" r="10" stroke="#e0c185" stroke-width="2" fill="#231d1d"/>
   <polygon points="12,8 15,16 12,13 9,16" fill="#e0c185"/>
 </svg>`;
     case "audio":
-      return `<<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
   <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
   <!-- micro stylisé au centre -->
   <rect x="11" y="10" width="2" height="5" rx="1" fill="#231d1d"/>
   <rect x="11.5" y="15.5" width="1" height="2" rx="0.5" fill="#231d1d"/>
 </svg>`;
     case "collecte_objet":
-      return `<<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
   <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
   <circle cx="12" cy="12.5" r="4" fill="#231d1d"/>
 </svg>`;
@@ -143,9 +143,9 @@ function getUploadIcon(type) {
 </svg>`;
     default:
       // Icône générique (style fichier)
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="6" y="4" width="12" height="16" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-      </svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+  <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+</svg>`;
   }
 }
 // Et pour la boussole GPS :
