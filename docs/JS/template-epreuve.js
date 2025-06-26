@@ -230,7 +230,31 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     }, testMode, labelUpload, etape.params?.consignes);
     return;
   }
+  
+// 5. Bloc réponse/énigme si besoin
+if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
+  const blocAnswer = document.getElementById("bloc-answer");
+  blocAnswer.style.display = '';
+  blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input id="answer-field" type="text" class="input-answer-field"/></div>`;
+  const input = document.getElementById("answer-field");
+  const nextBtn = document.getElementById("next-quest");
+  nextBtn.style.display = '';
+  nextBtn.disabled = true;
+  input.oninput = function () {
+    if (this.value.trim().length > 2) {
+      nextBtn.disabled = false;
+      nextBtn.classList.add('enabled');
+    } else {
+      nextBtn.disabled = true;
+      nextBtn.classList.remove('enabled');
+    }
+  };
+  return;
+}
 
+document.getElementById('next-quest').style.display = '';
+document.getElementById('next-quest').disabled = false;
+}
 
 function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
   const bloc = document.getElementById('bloc-upload');
