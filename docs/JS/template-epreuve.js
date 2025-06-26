@@ -38,18 +38,29 @@ function joinListPrep(list) {
 
 // Accord dynamique du texte selon le nombre d’objets
 function accorderTexteObjet(objets, baseSingulier, basePluriel) {
-  // objets : tableau d’objets (ex : ["objet en forme de cœur"])
   if (!Array.isArray(objets)) objets = [objets];
   if (objets.length === 1) {
     let obj = objets[0];
-    // baseSingulier = ex : "un objet en forme de cœur trouvé sur place"
     return baseSingulier.replace("objet", obj);
   } else if (objets.length > 1) {
     let objList = joinListPrep(objets);
-    // basePluriel = ex : "des objets en forme de cœur trouvés sur place"
     return basePluriel.replace("objets", objList);
   } else {
     return "";
+  }
+}
+
+// AJOUT : Fonction pour obtenir le SVG harmonisé selon le type d'upload
+function getUploadIcon(type) {
+  switch(type) {
+    case "photo":
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
+    case "audio":
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v7a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 14 0z"/></svg>`;
+    case "video":
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
+    default:
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5V9h5.5L13 3.5z"/></svg>`;
   }
 }
 
@@ -62,12 +73,9 @@ function getModeScenario(etape) {
 }
 
 // Fonction robuste pour générer la phrase mission avec injection [objet] / [objets]
-// Fonction robuste pour générer la phrase mission avec injection [objet] / [objets]
 function genererPhraseMission(type, mode, vars = {}) {
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
-  // On cherche le tableau de phrases pour le mode, ou fallback "arthurien"
   let textes = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
-  // Si ce n'est pas un tableau, on essaye d'aplatir l'objet éventuel
   if (!Array.isArray(textes)) {
     if (typeof textes === "object" && textes !== null) {
       textes = Object.values(textes).flat();
@@ -78,9 +86,7 @@ function genererPhraseMission(type, mode, vars = {}) {
     }
   }
   if (!textes.length) return null;
-  // Sélectionne une phrase au hasard
   let phrase = textes[Math.floor(Math.random() * textes.length)];
-  // Remplacement dynamique de toutes les variables [xxx]
   phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => (vars[key] !== undefined ? vars[key] : match));
   return phrase;
 }
@@ -90,7 +96,6 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   const typeMission = etape.type || "photo";
   const modeMission = getModeScenario(etape) || "arthurien";
 
-  // Titre et métaphore (optionnels)
   let titre = etape.titre || etape.nom || "";
   let metaphore = etape.metaphore || "";
   if ((!titre || titre === typeMission) || !metaphore) {
@@ -109,8 +114,27 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('defi-block').style.display = etape.params?.defi ? '' : 'none';
   document.getElementById('defi-text').textContent = etape.params?.defi || '';
 
-  // Gestion GPS
-  let hasGPS = !!(etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length));
+  // AJOUT : bouton GPS harmonisé si coords GPS présentes
+  let gpsValue = etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length ? etape.params.points[0] : null);
+  let gpsContainer = document.getElementById('gps-upload-btn');
+  if (gpsContainer) gpsContainer.remove(); // nettoyage si déjà présent
+  if (gpsValue) {
+    gpsContainer = document.createElement('div');
+    gpsContainer.id = "gps-upload-btn";
+    gpsContainer.style = "margin-bottom:18px; display:flex; justify-content:center; align-items:center;";
+    gpsContainer.innerHTML = `
+      <a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;color:#e0c185;font-size:1.1em;">
+        <svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/></svg>
+        <span>Ouvrir la boussole</span>
+      </a>
+    `;
+    // On l'insère juste avant la consigne
+    const blocMission = document.getElementById('bloc-mission');
+    blocMission.parentNode.insertBefore(gpsContainer, blocMission);
+  }
+
+  // Gestion GPS (bloc classique, inchangé)
+  let hasGPS = !!gpsValue;
   if (hasGPS) {
     afficherBlocGPS(etape, () => afficherMissionSuite(etape, stepIndex, modeMission, testMode), testMode);
   } else {
@@ -167,12 +191,10 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
 
   let vars = { ...etape.params };
 
-  // Gestion intelligente de l'accord pour l'objet/les objets
   if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
     let liste = etape.params.consignes.map(lowerFirst);
     vars.nb = liste.length;
 
-    // Exemple : cas spécial antidote (adapter le test à ton besoin réel)
     if (etape.type === "collecte_objet" && etape.params.specialAntidote) {
       phraseMission =
         "Un antidote ne pourra être conçu qu’avec la photo de " +
@@ -190,7 +212,6 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
     }
   }
 
-  // Génère la phrase mission standard si pas de cas spécial
   if (!phraseMission) {
     phraseMission =
       genererPhraseMission(etape.type, modeMission, vars) ||
@@ -204,8 +225,7 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
 
   document.getElementById('mission-text').innerHTML = phraseMission;
 
-  // Gère les uploads, réponses, etc. (inchangé)
-  if (["photo", "photo_inconnus", "audio", "collecte_objet"].includes(etape.type)) {
+  if (["photo", "photo_inconnus", "audio", "collecte_objet", "video"].includes(etape.type)) {
     afficherBlocUpload(etape.type, stepIndex, 0, () => {
       document.getElementById('next-quest').style.display = '';
       document.getElementById('next-quest').disabled = false;
@@ -245,24 +265,32 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
   document.getElementById('next-quest').disabled = false;
 }
 
-// Bloc upload (inchangé, adapté à ton infra)
+// Bloc upload : AJOUT LOGOS HARMONISÉS
 function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
   row.innerHTML = '';
   bloc.style.display = '';
+
+  // LOGO HARMONISÉ pour chaque type
   let label = document.createElement('label');
   label.innerHTML =
-    type === "audio"
-      ? '🎤 <span>Audio à envoyer</span>'
-      : `<svg viewBox="0 0 24 24" width="32" height="32" style="display:inline-block;vertical-align:middle;margin-right:8px;">
-          <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2[...]
-        </svg>
-        <span>Photo à envoyer</span>`;
+    getUploadIcon(type) +
+    `<span style="margin-left:8px;">${
+      type === "audio" ? "Audio à envoyer" :
+      type === "photo" ? "Photo à envoyer" :
+      type === "video" ? "Vidéo à envoyer" :
+      "Fichier à envoyer"
+    }</span>`;
+
   let input = document.createElement('input');
   input.type = "file";
   input.className = "visually-hidden";
-  input.accept = type === "audio" ? "audio/*" : "image/*";
+  input.accept =
+    type === "audio" ? "audio/*" :
+    type === "photo" ? "image/*" :
+    type === "video" ? "video/*" :
+    "*/*";
   input.id = `upload-file-${type}-${idxMission}`;
   label.appendChild(input);
   row.appendChild(label);
@@ -283,7 +311,7 @@ function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = 
         let url = await snapshot.ref.getDownloadURL();
         let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${idxMission}`);
         await ref.set(url);
-        document.getElementById('upload-feedback').textContent = (type === "audio" ? "Audio" : "Photo") + " envoyée !";
+        document.getElementById('upload-feedback').textContent = (type === "audio" ? "Audio" : type === "video" ? "Vidéo" : "Photo") + " envoyée !";
         onUploaded();
       } catch (e) {
         document.getElementById('upload-feedback').textContent = "Erreur upload !";
