@@ -150,6 +150,9 @@ function genererPhraseMission(type, mode, vars = {}) {
   return phrase;
 }
 
+
+
+
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   resetAffichageEtape();
 
@@ -179,7 +182,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     blocMission.parentNode.insertBefore(gpsContainer, blocMission);
   }
 
-  // 3. Consigne et upload harmonisés
+  // 3. Consigne et sous-consignes harmonisées
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
   let vars = buildVars(etape);
@@ -192,9 +195,18 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     || etape.description
     || "[Aucune consigne définie]";
   phraseMission = harmoniseArticles(phraseMission);
-  document.getElementById('mission-text').innerHTML = phraseMission;
 
-  // 4. Bloc upload (photo, audio, video, collecte_objet, fichier) harmonisé multi-upload
+  // Sous-consignes : si consignes est un tableau non vide, on les affiche en liste
+  let sousConsignesHtml = "";
+  if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length > 0) {
+    sousConsignesHtml = `<ul style="margin: 8px 0 0 0; padding-left: 24px;">` +
+      etape.params.consignes.map(c => c ? `<li>${c}</li>` : '').join('') +
+      `</ul>`;
+  }
+
+  document.getElementById('mission-text').innerHTML = phraseMission + sousConsignesHtml;
+
+  // 4. Bloc upload harmonisé multi-upload
   const typesUpload = Object.keys(MISSION_UPLOAD_LABELS);
   if (typesUpload.includes(etape.type)) {
     let labelUpload = MISSION_UPLOAD_LABELS[etape.type](vars);
@@ -233,16 +245,13 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('next-quest').disabled = false;
 }
 
-// Nouvelle fonction multi-upload
 function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
   row.innerHTML = '';
   bloc.style.display = '';
 
-  // Pour chaque fichier attendu, on génère un label/input séparé
   let uploadStates = Array.from({length: nb}, () => false);
-  let uploadedCount = 0;
 
   for (let i = 0; i < nb; i++) {
     let label = document.createElement('label');
@@ -252,17 +261,16 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
     label.style.marginBottom = "12px";
     label.innerHTML = getUploadIcon(type);
 
-    // Texte de consigne par fichier si fourni (ex: animal à prendre en photo)
-    let consigneLabel = "";
-    if (Array.isArray(consignes) && consignes[i]) consigneLabel = consignes[i];
-    else if (type === "photo" && nb > 1) consigneLabel = `Photo ${i+1}`;
-    else if (type === "audio" && nb > 1) consigneLabel = `Audio ${i+1}`;
-    else if (type === "video" && nb > 1) consigneLabel = `Vidéo ${i+1}`;
-    else if (type === "collecte_objet" && nb > 1) consigneLabel = `Objet ${i+1}`;
-    else if (type === "fichier" && nb > 1) consigneLabel = `Fichier ${i+1}`;
-    else consigneLabel = labelUpload;
+    // Label court
+    let court = "";
+    if (type === "photo") court = `Photo ${i+1}`;
+    else if (type === "audio") court = `Audio ${i+1}`;
+    else if (type === "video") court = `Vidéo ${i+1}`;
+    else if (type === "collecte_objet") court = `Objet ${i+1}`;
+    else if (type === "fichier") court = `Fichier ${i+1}`;
+    else court = labelUpload;
 
-    label.innerHTML += `<span style="margin-left:8px;">${consigneLabel}</span>`;
+    label.innerHTML += `<span style="margin-left:8px;min-width:70px;">${court}</span>`;
 
     let input = document.createElement('input');
     input.type = "file";
@@ -283,7 +291,6 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
 
     row.appendChild(label);
 
-    // Désactive input si test
     if (testMode) {
       input.disabled = true;
       filenameDiv.textContent = "Upload désactivé en mode test.";
@@ -301,8 +308,7 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
           await ref.set(url);
           filenameDiv.textContent = file.name;
           uploadStates[i] = true;
-          uploadedCount = uploadStates.filter(Boolean).length;
-          if (uploadedCount === nb) {
+          if (uploadStates.every(Boolean)) {
             document.getElementById('next-quest').disabled = false;
             document.getElementById('next-quest').classList.add('enabled');
             if (typeof onUploaded === "function") onUploaded();
@@ -313,11 +319,8 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
       };
     }
   }
-
-  // Désactive le bouton tant que tout n'est pas uploadé
   document.getElementById('next-quest').disabled = true;
   document.getElementById('next-quest').classList.remove('enabled');
-
   if (testMode && typeof onUploaded === "function") onUploaded();
 }
 
