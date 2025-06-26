@@ -36,6 +36,23 @@ function joinListPrep(list) {
   return list.slice(0, -1).join(", ") + " et " + list[list.length - 1];
 }
 
+// Accord dynamique du texte selon le nombre d’objets
+function accorderTexteObjet(objets, baseSingulier, basePluriel) {
+  // objets : tableau d’objets (ex : ["objet en forme de cœur"])
+  if (!Array.isArray(objets)) objets = [objets];
+  if (objets.length === 1) {
+    let obj = objets[0];
+    // baseSingulier = ex : "un objet en forme de cœur trouvé sur place"
+    return baseSingulier.replace("objet", obj);
+  } else if (objets.length > 1) {
+    let objList = joinListPrep(objets);
+    // basePluriel = ex : "des objets en forme de cœur trouvés sur place"
+    return basePluriel.replace("objets", objList);
+  } else {
+    return "";
+  }
+}
+
 // Récupère le mode de l’étape, sinon mode global du scénario, sinon "arthurien"
 function getModeScenario(etape) {
   if (etape && etape.mode) return etape.mode;
@@ -49,7 +66,7 @@ function genererPhraseMission(type, mode, vars = {}) {
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
   const textsMode = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
   let textes = textsMode;
-  if (Array.isArray(textsMode)) textes = textsMode;
+  if (Array.isArray(textsMode)) textes = textesMode;
   else if (textsMode && typeof textesMode === "object") textes = Object.values(textsMode).flat();
   let phrase = "";
   if (Array.isArray(textes) && textes.length > 0) {
@@ -138,42 +155,48 @@ function afficherBlocGPS(etape, callback, testMode = false) {
   };
 }
 
+// Affichage de la mission (consigne) avec accord automatique
 function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
   let phraseMission = "";
 
-  // Robustification : gère consignes simple ou multiple
   let vars = { ...etape.params };
 
-  // Cas consignes multiples (ex: photo, collecte_objet...)
+  // Gestion intelligente de l'accord pour l'objet/les objets
   if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
-    let liste = etape.params.consignes;
-    if (liste.length === 1) {
-      vars.objet = lowerFirst(liste[0]); // Pour [objet]
-      vars.objets = lowerFirst(liste[0]); // Pour [objets] (si jamais utilisé)
-      vars.nb = 1;
+    let liste = etape.params.consignes.map(lowerFirst);
+    vars.nb = liste.length;
+
+    // Exemple : cas spécial antidote (adapter le test à ton besoin réel)
+    if (etape.type === "collecte_objet" && etape.params.specialAntidote) {
+      phraseMission =
+        "Un antidote ne pourra être conçu qu’avec la photo de " +
+        accorderTexteObjet(
+          liste,
+          "un objet en forme de cœur trouvé sur place",
+          "des objets en forme de cœur trouvés sur place"
+        ) + ".";
+    } else if (liste.length === 1) {
+      vars.objet = liste[0];
+      vars.objets = liste[0];
     } else {
-      vars.objets = joinListPrep(liste.map(lowerFirst)); // Pour [objets]
-      vars.objet = lowerFirst(liste[0]); // Pour [objet], fallback sur le premier
-      vars.nb = liste.length;
+      vars.objet = liste[0];
+      vars.objets = joinListPrep(liste);
     }
   }
 
-  // Fallback pour les types avec un seul champ "consigne"
-  if (!vars.objet && etape.params?.consigne) {
-    vars.objet = etape.params.consigne;
+  // Génère la phrase mission standard si pas de cas spécial
+  if (!phraseMission) {
+    phraseMission =
+      genererPhraseMission(etape.type, modeMission, vars) ||
+      etape.params?.consigne ||
+      etape.params?.objectif ||
+      etape.params?.enigme ||
+      etape.params?.question ||
+      etape.description ||
+      "[Aucune consigne définie]";
   }
-
-  // Génère la phrase mission
-  phraseMission =
-    genererPhraseMission(etape.type, modeMission, vars) ||
-    etape.params?.consigne ||
-    etape.params?.objectif ||
-    etape.params?.enigme ||
-    etape.params?.question ||
-    etape.description ||
-    "[Aucune consigne définie]";
 
   document.getElementById('mission-text').innerHTML = phraseMission;
 
@@ -229,7 +252,7 @@ function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = 
     type === "audio"
       ? '🎤 <span>Audio à envoyer</span>'
       : `<svg viewBox="0 0 24 24" width="32" height="32" style="display:inline-block;vertical-align:middle;margin-right:8px;">
-          <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V[...]
+          <path fill="currentColor" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2[...]
         </svg>
         <span>Photo à envoyer</span>`;
   let input = document.createElement('input');
