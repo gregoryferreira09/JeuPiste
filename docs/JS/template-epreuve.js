@@ -50,6 +50,29 @@ function accorderTexteObjet(objets, baseSingulier, basePluriel) {
   }
 }
 
+// Harmonisation universelle des articles et élisions dans toutes les consignes/suggestions
+function harmoniseArticles(phrase) {
+  // d’un / d’une
+  phrase = phrase.replace(/\bde un ([aeiouyhAEIOUYH])/g, "d'un $1");
+  phrase = phrase.replace(/\bde une ([aeiouyhAEIOUYH])/g, "d'une $1");
+  phrase = phrase.replace(/\bde un /g, "d'un ");
+  phrase = phrase.replace(/\bde une /g, "d'une ");
+  // des/des
+  phrase = phrase.replace(/\bde des /g, "des ");
+  // du (de le) sauf "de les" => "des"
+  phrase = phrase.replace(/\bde le /g, "du ");
+  phrase = phrase.replace(/\bde les /g, "des ");
+  // à le → au, à les → aux
+  phrase = phrase.replace(/\bà le /g, "au ");
+  phrase = phrase.replace(/\bà les /g, "aux ");
+  // sur le/la/les, dans le/la/les : on laisse (pas d’élision)
+  // Nettoyage double espaces
+  phrase = phrase.replace(/  +/g, " ");
+  // Correction de la majuscule après élision si besoin
+  phrase = phrase.replace(/d'([A-Z])/, function (m, p1) { return "d'" + p1.toLowerCase(); });
+  return phrase;
+}
+
 // AJOUT : Fonction pour obtenir le SVG harmonisé selon le type d'upload
 function getUploadIcon(type) {
   switch(type) {
@@ -62,6 +85,13 @@ function getUploadIcon(type) {
     default:
       return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5V9h5.5L13 3.5z"/></svg>`;
   }
+}
+
+// AJOUT : Logo boussole harmonisé
+function getGpsIcon() {
+  return `<svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;">
+    <path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.93-6.36l-5.66 2.36c-.34.14-.68-.2-.54-.54l2.36-5.66a.5.5 0 0 1 .9 0l2.36 5.66c.14.34-.2.68-.54.54z"/>
+  </svg>`;
 }
 
 // Récupère le mode de l’étape, sinon mode global du scénario, sinon "arthurien"
@@ -88,7 +118,7 @@ function genererPhraseMission(type, mode, vars = {}) {
   if (!textes.length) return null;
   let phrase = textes[Math.floor(Math.random() * textes.length)];
   phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => (vars[key] !== undefined ? vars[key] : match));
-  return phrase;
+  return harmoniseArticles(phrase); // Harmonisation automatique universelle
 }
 
 // Affichage harmonisé d’une épreuve
@@ -123,8 +153,9 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     gpsContainer.id = "gps-upload-btn";
     gpsContainer.style = "margin-bottom:18px; display:flex; justify-content:center; align-items:center;";
     gpsContainer.innerHTML = `
-      <a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;color:#e0c185;font-size:1.1em;">
-        <svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/></svg>
+      <a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener"
+        style="display:inline-flex;align-items:center;text-decoration:none;color:#e0c185;font-size:1.1em;font-weight:bold;">
+        ${getGpsIcon()}
         <span>Ouvrir la boussole</span>
       </a>
     `;
@@ -203,6 +234,7 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
           "un objet en forme de cœur trouvé sur place",
           "des objets en forme de cœur trouvés sur place"
         ) + ".";
+      phraseMission = harmoniseArticles(phraseMission);
     } else if (liste.length === 1) {
       vars.objet = liste[0];
       vars.objets = liste[0];
@@ -221,6 +253,7 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
       etape.params?.question ||
       etape.description ||
       "[Aucune consigne définie]";
+    phraseMission = harmoniseArticles(phraseMission);
   }
 
   document.getElementById('mission-text').innerHTML = phraseMission;
