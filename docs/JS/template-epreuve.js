@@ -270,7 +270,7 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
     else if (type === "fichier") court = `Fichier ${i+1}`;
     else court = labelUpload;
 
-    label.innerHTML += `<span style="margin-left:8px;min-width:70px;">${court}</span>`;
+    label.innerHTML += `<div style="display:block;text-align:center;font-size:0.98em;margin-top:4px;">${court}</div>`;
 
     let input = document.createElement('input');
     input.type = "file";
