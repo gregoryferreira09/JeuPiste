@@ -96,19 +96,19 @@ function getUploadIcon(type) {
   switch(type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5...`;
     case "audio":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v7a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 14 0z"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v7a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 ...`;
     case "video":
       return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
     case "collecte_objet":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M3 7a2 2 0 0 1 2-2h2V3a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v2H3V7zm2 0v2h14V7H5zm0 4v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7H5zm4-8v2h6V3H9z"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M3 7a2 2 0 0 1 2-2h2V3a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v2H3V7zm2 0v2h14V7H5zm0 4v7a2 2 0 0 0 2...`;
     default:
       return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5V9h5.5L13 3.5z"/></svg>`;
   }
 }
 function getGpsIcon() {
-  return `<svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.93-6.36l-5.66 2.36c-.34.14-.68-.2-.54-.54l2.36-5.66a.5.5 0 0 1 .9 0l2.36 5.66c.14.34-.2.68-.54.54z"/></svg>`;
+  return `<svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59...`;
 }
 
 function genererPhraseMission(type, mode, vars = {}) {
@@ -168,7 +168,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     gpsContainer = document.createElement('div');
     gpsContainer.id = "gps-upload-btn";
     gpsContainer.style = "margin-bottom:18px; display:flex; justify-content:center; align-items:center;";
-    gpsContainer.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;color:#e0c185;font-size:1.1em;font-weight:bold;">${getGpsIcon()}<span>Ouvrir la boussole</span></a>`;
+    gpsContainer.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:non...`;
     const blocMission = document.getElementById('bloc-mission');
     blocMission.parentNode.insertBefore(gpsContainer, blocMission);
   }
@@ -192,13 +192,14 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   const typesUpload = Object.keys(MISSION_UPLOAD_LABELS);
   if (typesUpload.includes(etape.type)) {
     let labelUpload = MISSION_UPLOAD_LABELS[etape.type](vars);
-    afficherBlocUpload(etape.type, stepIndex, 0, () => {
+    // MODIFICATION : on gère le nombre de fichiers à envoyer ici 
+    afficherBlocUpload(etape.type, stepIndex, vars.nb || 1, () => {
       document.getElementById('next-quest').style.display = '';
       document.getElementById('next-quest').disabled = false;
       if (testMode) {
         document.getElementById('next-quest').onclick = () => showToast("En mode test, ce bouton ne valide rien 😉");
       }
-    }, testMode, labelUpload);
+    }, testMode, labelUpload, vars.nb || 1);
     return;
   }
 
@@ -206,7 +207,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
     const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
-    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input type="text" id="answer-field" class="input-answer-field" autocomplete="off" placeholder="Tapez ici…"></div>`;
+    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse...`;
     const input = document.getElementById("answer-field");
     const nextBtn = document.getElementById("next-quest");
     nextBtn.style.display = '';
@@ -227,49 +228,62 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('next-quest').disabled = false;
 }
 
-function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false, labelUpload = null) {
+// MODIFICATION PRINCIPALE CI-DESSOUS
+function afficherBlocUpload(type, stepIndex, nbUpload, onUploaded, testMode = false, labelUpload = null, nbForType = 1) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
   row.innerHTML = '';
   bloc.style.display = '';
 
-  let label = document.createElement('label');
-  label.innerHTML = getUploadIcon(type) + `<span style="margin-left:8px;">${labelUpload}</span>`;
+  // Si plusieurs fichiers attendus (ex: 2 photos), alors on génère plusieurs inputs/logo côte-à-côte
+  let uploadsToDo = nbForType || 1;
+  let uploadsDone = 0;
 
-  let input = document.createElement('input');
-  input.type = "file";
-  input.className = "visually-hidden";
-  input.accept =
-    type === "audio" ? "audio/*" :
-    type === "photo" || type === "photo_inconnus" || type === "collecte_objet" ? "image/*" :
-    type === "video" ? "video/*" :
-    "*/*";
-  input.id = `upload-file-${type}-${idxMission}`;
-  label.appendChild(input);
-  row.appendChild(label);
+  const feedback = document.getElementById('upload-feedback');
+  if (feedback) feedback.textContent = "";
 
-  if (testMode) {
-    input.disabled = true;
-    document.getElementById('upload-feedback').textContent = "Upload désactivé en mode test.";
-    if (typeof onUploaded === "function") onUploaded();
-  } else {
-    input.onchange = async function () {
-      if (!this.files || !this.files[0]) return;
-      const salonCode = localStorage.getItem("salonCode");
-      const equipeNum = localStorage.getItem("equipeNum");
-      const file = this.files[0];
-      const storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${type}${idxMission}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
-      try {
-        let snapshot = await storage.ref(storagePath).put(file);
-        let url = await snapshot.ref.getDownloadURL();
-        let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${idxMission}`);
-        await ref.set(url);
-        document.getElementById('upload-feedback').textContent = (type === "audio" ? "Audio" : type === "video" ? "Vidéo" : "Photo") + " envoyée !";
-        onUploaded();
-      } catch (e) {
-        document.getElementById('upload-feedback').textContent = "Erreur upload !";
-      }
-    };
+  for (let i = 0; i < uploadsToDo; i++) {
+    let label = document.createElement('label');
+    label.style = "display:inline-block;margin-right:18px;cursor:pointer;";
+    label.innerHTML = getUploadIcon(type) + `<span style="margin-left:8px;">${labelUpload}${uploadsToDo > 1 ? " " + (i+1) : ""}</span>`;
+
+    let input = document.createElement('input');
+    input.type = "file";
+    input.className = "visually-hidden";
+    input.accept =
+      type === "audio" ? "audio/*" :
+      type === "photo" || type === "photo_inconnus" || type === "collecte_objet" ? "image/*" :
+      type === "video" ? "video/*" :
+      "*/*";
+    input.id = `upload-file-${type}-${i}`;
+    label.appendChild(input);
+    row.appendChild(label);
+
+    if (testMode) {
+      input.disabled = true;
+      if (feedback) feedback.textContent = "Upload désactivé en mode test.";
+      if (typeof onUploaded === "function") onUploaded();
+    } else {
+      input.onchange = async function () {
+        if (!this.files || !this.files[0]) return;
+        const salonCode = localStorage.getItem("salonCode");
+        const equipeNum = localStorage.getItem("equipeNum");
+        const file = this.files[0];
+        const storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${type}${i}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
+        try {
+          let snapshot = await storage.ref(storagePath).put(file);
+          let url = await snapshot.ref.getDownloadURL();
+          let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${i}`);
+          await ref.set(url);
+          uploadsDone++;
+          if (feedback) feedback.textContent = (type === "audio" ? "Audio" : type === "video" ? "Vidéo" : "Photo") + ` ${i+1}/${uploadsToDo} envoyée !`;
+          // On ne valide qu'après tous les uploads si plusieurs attendus
+          if (uploadsDone >= uploadsToDo && typeof onUploaded === "function") onUploaded();
+        } catch (e) {
+          if (feedback) feedback.textContent = "Erreur upload !";
+        }
+      };
+    }
   }
 }
 
