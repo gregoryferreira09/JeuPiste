@@ -148,10 +148,11 @@ function getUploadIcon(type) {
 }
 // Et pour la boussole GPS :
 function getGpsIcon() {
-  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="12" r="10" stroke="#e0c185" stroke-width="2" fill="#231d1d"/>
-    <polygon points="12,7 15,17 12,14 9,17" fill="#e0c185"/>
-  </svg>`;
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+  <circle cx="12" cy="12" r="10" stroke="#e0c185" stroke-width="2" fill="#231d1d"/>
+  <polygon points="12,7 16,17 12,15 8,17" fill="#e0c185"/>
+  <circle cx="12" cy="12" r="2" fill="#231d1d"/>
+</svg>`;
 }
 
 function genererPhraseMission(type, mode, vars = {}) {
