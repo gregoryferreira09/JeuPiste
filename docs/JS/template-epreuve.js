@@ -62,20 +62,24 @@ function getModeScenario(etape) {
 }
 
 // Fonction robuste pour générer la phrase mission avec injection [objet] / [objets]
+// Fonction robuste pour générer la phrase mission avec injection [objet] / [objets]
 function genererPhraseMission(type, mode, vars = {}) {
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
-  const textsMode = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
-  let textes = textsMode;
-  if (Array.isArray(textsMode)) textes = textesMode;
-  else if (textsMode && typeof textesMode === "object") textes = Object.values(textsMode).flat();
-  let phrase = "";
-  if (Array.isArray(textes) && textes.length > 0) {
-    phrase = textes[Math.floor(Math.random() * textes.length)];
-  } else if (typeof textes === "string") {
-    phrase = textes;
-  } else {
-    return null;
+  // On cherche le tableau de phrases pour le mode, ou fallback "arthurien"
+  let textes = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
+  // Si ce n'est pas un tableau, on essaye d'aplatir l'objet éventuel
+  if (!Array.isArray(textes)) {
+    if (typeof textes === "object" && textes !== null) {
+      textes = Object.values(textes).flat();
+    } else if (typeof textes === "string") {
+      textes = [textes];
+    } else {
+      textes = [];
+    }
   }
+  if (!textes.length) return null;
+  // Sélectionne une phrase au hasard
+  let phrase = textes[Math.floor(Math.random() * textes.length)];
   // Remplacement dynamique de toutes les variables [xxx]
   phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => (vars[key] !== undefined ? vars[key] : match));
   return phrase;
