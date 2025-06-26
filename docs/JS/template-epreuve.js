@@ -124,10 +124,13 @@ case "photo_inconnus":
     <rect x="11" y="14" width="2" height="4" rx="1" fill="#231d1d"/>
   </svg>`;
     case "collecte_objet":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <circle cx="12" cy="12.5" r="4.5" fill="#231d1d"/>
-      </svg>`;
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+    <rect x="4" y="7" width="16" height="11" rx="2" fill="none" stroke="#e0c185" stroke-width="2"/>
+    <ellipse cx="12" cy="15" rx="5" ry="2.2" fill="#231d1d"/>
+    <path d="M7 15 Q12 6 17 15" stroke="#231d1d" stroke-width="2" fill="none"/>
+    <path d="M9.5 14.8 Q12 13.7 14.5 14.8" stroke="#e0c185" stroke-width="1.1" fill="none"/>
+    <path d="M10.5 15.2 Q12 14.5 13.5 15.2" stroke="#e0c185" stroke-width="1" fill="none"/>
+  </svg>`;
     case "fichier":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
         <rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
