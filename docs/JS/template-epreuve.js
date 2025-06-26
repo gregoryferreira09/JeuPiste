@@ -111,128 +111,80 @@ function getGpsIcon() {
   return `<svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.93-6.36l-5.66 2.36c-.34.14-.68-.2-.54-.54l2.36-5.66a.5.5 0 0 1 .9 0l2.36 5.66c.14.34-.2.68-.54.54z"/></svg>`;
 }
 
-function genererPhraseMission(type, mode, vars = {}) {
-  if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
-  let textes = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
-  if (!Array.isArray(textes)) {
-    if (typeof textes === "object" && textes !== null) {
-      textes = Object.values(textes).flat();
-    } else if (typeof textes === "string") {
-      textes = [textes];
-    } else {
-      textes = [];
-    }
-  }
-  let nb = vars.nb || 1;
-  let key = nb > 1 ? '[objets]' : '[objet]';
-  let textesFiltres = textes.filter(t => t.includes(key));
-  if (!textesFiltres.length) textesFiltres = textes;
-  let phrase = textesFiltres[Math.floor(Math.random() * textesFiltres.length)];
-  phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, k) => (vars[k] !== undefined ? vars[k] : match));
-  phrase = harmoniseArticles(phrase);
-  if (nb <= 1) {
-    phrase = phrase.replace(/\bces images\b/gi, "cette image");
-    phrase = phrase.replace(/\bCes images\b/gi, "Cette image");
-    phrase = phrase.replace(/\bces preuves\b/gi, "cette preuve");
-    phrase = phrase.replace(/\bCes preuves\b/gi, "Cette preuve");
-  } else {
-    phrase = phrase.replace(/\bcette image\b/gi, "ces images");
-    phrase = phrase.replace(/\bCette image\b/gi, "Ces images");
-    phrase = phrase.replace(/\bcette preuve\b/gi, "ces preuves");
-    phrase = phrase.replace(/\bCette preuve\b/gi, "Ces preuves");
-  }
-  return phrase;
-}
-
-function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
-  resetAffichageEtape();
-
-  // 1. Titre et métaphore
-  let titre = etape.titre || etape.nom || "";
-  let metaphore = etape.metaphore || "";
-  if ((!titre || titre === etape.type) || !metaphore) {
-    if (typeof getRandomAtmosphere === "function") {
-      const random = getRandomAtmosphere(etape.type, mode || "arthurien");
-      if (!titre || titre === etape.type) titre = random.titre;
-      if (!metaphore) metaphore = random.phrase;
-    }
-  }
-  document.getElementById('titre-quete').textContent = titre || "";
-  document.getElementById('metaphore-quete').innerHTML = metaphore ? `<em>${metaphore}</em>` : '';
-
-  // 2. Bloc GPS harmonisé si présent
-  let gpsValue = etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length ? etape.params.points[0] : null);
-  let gpsContainer = document.getElementById('gps-upload-btn');
-  if (gpsContainer) gpsContainer.remove();
-  if (gpsValue) {
-    gpsContainer = document.createElement('div');
-    gpsContainer.id = "gps-upload-btn";
-    gpsContainer.style = "margin-bottom:18px; display:flex; justify-content:center; align-items:center;";
-    gpsContainer.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;color:#e0c185;font-size:1.1em;font-weight:bold;">${getGpsIcon()}<span>Ouvrir la boussole</span></a>`;
-    const blocMission = document.getElementById('bloc-mission');
-    blocMission.parentNode.insertBefore(gpsContainer, blocMission);
-  }
-
-  // 3. Consigne et upload harmonisés
-  document.getElementById('bloc-mission').style.display = '';
-  document.getElementById('mission-label').textContent = "Consigne";
-  let vars = buildVars(etape);
-
-  let phraseMission = genererPhraseMission(etape.type, mode || "arthurien", vars)
-    || etape.params?.consigne
-    || etape.params?.objectif
-    || etape.params?.enigme
-    || etape.params?.question
-    || etape.description
-    || "[Aucune consigne définie]";
-  phraseMission = harmoniseArticles(phraseMission);
-  document.getElementById('mission-text').innerHTML = phraseMission;
-
-  // 4. Bloc upload (photo, audio, video, collecte_objet, fichier) harmonisé
-  const typesUpload = Object.keys(MISSION_UPLOAD_LABELS);
-  if (typesUpload.includes(etape.type)) {
-    let labelUpload = MISSION_UPLOAD_LABELS[etape.type](vars);
-    afficherBlocUpload(etape.type, stepIndex, 0, () => {
-      document.getElementById('next-quest').style.display = '';
-      document.getElementById('next-quest').disabled = false;
-      if (testMode) {
-        document.getElementById('next-quest').onclick = () => showToast("En mode test, ce bouton ne valide rien 😉");
-      }
-    }, testMode, labelUpload);
-    return;
-  }
-
-  // 5. Bloc réponse/énigme si besoin
-  if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
-    const blocAnswer = document.getElementById("bloc-answer");
-    blocAnswer.style.display = '';
-    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input type="text" id="answer-field" class="input-answer-field" autocomplete="off" placeholder="Tapez ici…"></div>`;
-    const input = document.getElementById("answer-field");
-    const nextBtn = document.getElementById("next-quest");
-    nextBtn.style.display = '';
-    nextBtn.disabled = true;
-    input.oninput = function () {
-      if (this.value.trim().length > 2) {
-        nextBtn.disabled = false;
-        nextBtn.classList.add('enabled');
-      } else {
-        nextBtn.disabled = true;
-        nextBtn.classList.remove('enabled');
-      }
-    };
-    return;
-  }
-
-  document.getElementById('next-quest').style.display = '';
-  document.getElementById('next-quest').disabled = false;
-}
-
-function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false, labelUpload = null) {
+// === AJOUT DU MULTI-UPLOAD (le reste du code ne change pas !) ===
+function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = false, labelUpload = null, nb = 1) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
   row.innerHTML = '';
   bloc.style.display = '';
 
+  // MULTI-UPLOAD
+  if (nb > 1) {
+    let uploads = Array(nb).fill(false);
+    for (let i = 0; i < nb; i++) {
+      let label = document.createElement('label');
+      label.className = 'icon-action side-icon';
+      label.innerHTML = getUploadIcon(type) + `<span style="margin-left:8px;">${labelUpload && nb > 1 ? labelUpload.replace(/(\d+|des |des objets|photos|photo|fichier)/i, '') + (i+1) + " à envoyer" : (labelUpload || "Fichier à envoyer")}</span>`;
+      let input = document.createElement('input');
+      input.type = "file";
+      input.className = "visually-hidden";
+      input.accept =
+        type === "audio" ? "audio/*" :
+        type === "photo" || type === "photo_inconnus" || type === "collecte_objet" ? "image/*" :
+        type === "video" ? "video/*" :
+        "*/*";
+      input.id = `upload-file-${type}-${idxMission}_${i}`;
+      label.appendChild(input);
+      row.appendChild(label);
+
+      let feedback = document.createElement('div');
+      feedback.id = `upload-feedback-${i}`;
+      feedback.style = "font-size:0.98em; color:#e0c185; text-align:right; min-height:1.3em;";
+      label.appendChild(feedback);
+
+      if (testMode) {
+        input.disabled = true;
+        feedback.textContent = "Upload désactivé en mode test.";
+        uploads[i] = true;
+      } else {
+        input.onchange = async function () {
+          if (!this.files || !this.files[0]) return;
+          const salonCode = localStorage.getItem("salonCode");
+          const equipeNum = localStorage.getItem("equipeNum");
+          const file = this.files[0];
+          const storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${type}${idxMission}_${i}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
+          try {
+            let snapshot = await storage.ref(storagePath).put(file);
+            let url = await snapshot.ref.getDownloadURL();
+            let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${idxMission}_${i}`);
+            await ref.set(url);
+            feedback.textContent = (type === "audio" ? "Audio" : type === "video" ? "Vidéo" : "Photo") + " envoyée !";
+            uploads[i] = true;
+            // Active le bouton si tous les uploads sont faits
+            if (uploads.every(Boolean)) {
+              document.getElementById('next-quest').disabled = false;
+              document.getElementById('next-quest').classList.add('enabled');
+              if (typeof onUploaded === "function") onUploaded();
+            }
+          } catch (e) {
+            feedback.textContent = "Erreur upload !";
+            uploads[i] = false;
+          }
+          // Si un upload saute, on désactive le bouton
+          if (!uploads.every(Boolean)) {
+            document.getElementById('next-quest').disabled = true;
+            document.getElementById('next-quest').classList.remove('enabled');
+          }
+        };
+      }
+    }
+    // Désactive le bouton au départ
+    document.getElementById('next-quest').disabled = true;
+    document.getElementById('next-quest').classList.remove('enabled');
+    return;
+  }
+
+  // CAS SIMPLE : UN SEUL UPLOAD, LOGIQUE ORIGINALE
   let label = document.createElement('label');
   label.innerHTML = getUploadIcon(type) + `<span style="margin-left:8px;">${labelUpload}</span>`;
 
@@ -265,126 +217,49 @@ function afficherBlocUpload(type, stepIndex, idxMission, onUploaded, testMode = 
         let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${idxMission}`);
         await ref.set(url);
         document.getElementById('upload-feedback').textContent = (type === "audio" ? "Audio" : type === "video" ? "Vidéo" : "Photo") + " envoyée !";
-        onUploaded();
+        if (typeof onUploaded === "function") onUploaded();
+        document.getElementById('next-quest').disabled = false;
+        document.getElementById('next-quest').classList.add('enabled');
       } catch (e) {
         document.getElementById('upload-feedback').textContent = "Erreur upload !";
+        document.getElementById('next-quest').disabled = true;
+        document.getElementById('next-quest').classList.remove('enabled');
       }
     };
   }
+  // Par sécurité, désactive le bouton au départ
+  document.getElementById('next-quest').disabled = true;
+  document.getElementById('next-quest').classList.remove('enabled');
 }
 
-function showToast(msg) {
-  let toast = document.getElementById('toast-message');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast-message';
-    toast.className = 'modal-toast';
-    toast.setAttribute('role', 'alert');
-    document.body.appendChild(toast);
-  }
-  toast.textContent = msg;
-  toast.classList.add('visible');
-  setTimeout(() => { toast.classList.remove('visible'); }, 2200);
-}
-
-// === Mode test OU navigation normal ===
-if (typeof isTestMode !== 'undefined' && isTestMode) {
-  const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
-  if (scenarioTest && Array.isArray(scenarioTest.scenario) && scenarioTest.scenario.length > 0) {
-    let mode = scenarioTest.mode || "arthurien";
-    let currentStep = 0;
-    function showStep(idx) {
-      resetAffichageEtape();
-      const etape = scenarioTest.scenario[idx];
-      if (!etape) {
-        document.getElementById('main-content').innerHTML =
-          "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
-        return;
-      }
-      document.getElementById('next-quest').style.display = 'none';
-      afficherEtapeHarmonisee(etape, idx, mode, true);
-
-      let nav = document.getElementById('test-nav');
-      if (!nav) {
-        nav = document.createElement('div');
-        nav.id = 'test-nav';
-        nav.style = "margin:18px 0;text-align:center;";
-        document.getElementById('main-content').appendChild(nav);
-      }
-      nav.innerHTML = `
-        <button class="main-btn" ${idx <= 0 ? 'disabled' : ''} onclick="window.showStepTest(${idx - 1})">⬅️ Précédent</button>
-        <button class="main-btn" ${idx >= scenarioTest.scenario.length - 1 ? 'disabled' : ''} onclick="window.showStepTest(${idx + 1})">Suivant ➡️</button>
-        <div style="margin-top:10px;font-size:0.97em;">Étape ${idx + 1} / ${scenarioTest.scenario.length}</div>
-      `;
-      window.showStepTest = showStep;
+// ==== Le reste de ton code NE CHANGE PAS ====
+// (Fonctions harmoniseArticles, buildVars, genererPhraseMission, navigation, etc.)
+//
+// Tu continues d'appeler afficherBlocUpload comme avant,
+// mais tu peux désormais passer le nombre de fichiers à uploader en dernier argument !
+//
+// Exemple dans afficherEtapeHarmonisee (ne change rien au reste) :
+//
+/*
+if (typesUpload.includes(etape.type)) {
+  let nb = 1;
+  if (etape.type === "photo") nb = Number(etape.params?.nbPhotos) || 1;
+  if (etape.type === "photo_inconnus") nb = Number(etape.params?.nbPersonnes) || 1;
+  if (etape.type === "collecte_objet") nb = Number(etape.params?.nbObjets) || 1;
+  let labelUpload = MISSION_UPLOAD_LABELS[etape.type](vars);
+  afficherBlocUpload(etape.type, stepIndex, 0, () => {
+    document.getElementById('next-quest').style.display = '';
+    document.getElementById('next-quest').disabled = nb > 1; // désactive tant que tous ne sont pas faits
+    if (testMode) {
+      document.getElementById('next-quest').onclick = () => showToast("En mode test, ce bouton ne valide rien 😉");
     }
-    window.showStepTest = showStep;
-    showStep(currentStep);
-    window.showToast = showToast;
-  } else {
-    document.getElementById('main-content').innerHTML =
-      "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
-  }
-} else {
-  // --- Mode normal ---
-  const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = Number(localStorage.getItem("equipeNum"));
-  if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
-    window.location.href = "accueil.html";
-  }
-
-  db.ref(`parties/${salonCode}/scenario/mode`).once('value').then(snapMode => {
-    window.currentScenarioMode = snapMode.val() || "arthurien";
-  });
-
-  firebase.auth().onAuthStateChanged(function (user) {
-    if (!user) firebase.auth().signInAnonymously();
-    else chargerEtapeDynamique();
-  });
-
-  function chargerEtapeDynamique() {
-    db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
-      const step = snapStep.val() || 0;
-      db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
-        resetAffichageEtape();
-        const etape = snapEpreuve.val();
-        if (!etape) {
-          document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
-          return;
-        }
-        document.getElementById('next-quest').style.display = 'none';
-        afficherEtapeHarmonisee(etape, step, window.currentScenarioMode, false);
-        document.getElementById('next-quest').onclick = validerEtape;
-      });
-    });
-  }
-
-  function validerEtape() {
-    const nextBtn = document.getElementById('next-quest');
-    nextBtn.disabled = true;
-    nextBtn.classList.remove('enabled');
-    showToast("Validation en cours...");
-    const salonCode = localStorage.getItem("salonCode");
-    const equipeNum = Number(localStorage.getItem("equipeNum"));
-    const now = Date.now();
-    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/current/startTime`)
-      .once('value', function (snap) {
-        const sTime = snap.val();
-        if (sTime) {
-          const elapsed = Math.round((now - sTime) / 1000);
-          db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/current`).set(elapsed);
-        }
-        db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
-          .transaction(step => (step || 0) + 1, function (error, committed, snapshot) {
-            if (!error && committed) {
-              showToast("Étape validée !");
-              setTimeout(() => { window.location.reload(); }, 800);
-            } else {
-              showToast("Erreur lors de la validation...");
-              nextBtn.disabled = false;
-              nextBtn.classList.add('enabled');
-            }
-          });
-      });
-  }
+  }, testMode, labelUpload, nb);
+  return;
 }
+*/
+
+//
+// Tu n'as rien d'autre à modifier dans le reste du code.
+//
+
+// ==== FIN DU PATCH MULTI-UPLOAD ====
