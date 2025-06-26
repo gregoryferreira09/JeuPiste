@@ -13,23 +13,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const storage = firebase.storage();
 
-const MISSION_UPLOAD_FIELDS = {
-  photo: etape => Number(etape.params?.nbPhotos) || 1,
-  photo_inconnus: etape => Number(etape.params?.nbPersonnes) || 1,
-  collecte_objet: etape => Number(etape.params?.nbObjets) || 1,
-  audio: () => 1,
-  video: () => 1,
-  fichier: () => 1,
-};
-
-const MISSION_UPLOAD_LABELS = {
-  photo: (idx, etape) => `Photo ${idx + 1} à envoyer`,
-  photo_inconnus: (idx, etape) => `Photo ${idx + 1} à envoyer`,
-  collecte_objet: (idx, etape) => `Photo de l’objet ${idx + 1} à envoyer`,
-  audio: () => `Audio à envoyer`,
-  video: (idx, etape) => `Vidéo ${idx + 1} à envoyer`,
-  fichier: (idx, etape) => `Fichier à envoyer`,
-};
+// --- Fonctions utilitaires et harmonisées ---
 
 function getUploadIcon(type) {
   switch(type) {
@@ -73,16 +57,20 @@ function showToast(msg) {
   setTimeout(() => { toast.classList.remove('visible'); }, 2200);
 }
 
+// === MULTI-UPLOAD LOGIQUE pour photo/audio/collecte_objet/video ===
 function afficherBlocUploadMulti(etape, stepIndex, type, onAllUploaded, testMode = false) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
   row.innerHTML = '';
   bloc.style.display = '';
 
-  const nb = MISSION_UPLOAD_FIELDS[type] ? MISSION_UPLOAD_FIELDS[type](etape) : 1;
+  let nb = 1;
+  if (type === "photo") nb = Number(etape.params?.nbPhotos) || 1;
+  if (type === "photo_inconnus") nb = Number(etape.params?.nbPersonnes) || 1;
+  if (type === "collecte_objet") nb = Number(etape.params?.nbObjets) || 1;
+  if (type === "audio" || type === "video" || type === "fichier") nb = 1;
+
   let uploaded = Array(nb).fill(false);
-  let fileNames = Array(nb).fill('');
-  let uploadedUrls = Array(nb).fill('');
 
   for (let i = 0; i < nb; i++) {
     let iconDiv = document.createElement('div');
@@ -90,7 +78,13 @@ function afficherBlocUploadMulti(etape, stepIndex, type, onAllUploaded, testMode
 
     let label = document.createElement('label');
     label.setAttribute('for', `upload-file-${type}-${i}`);
-    label.innerHTML = getUploadIcon(type) + `<span>${MISSION_UPLOAD_LABELS[type](i, etape) || "Fichier à envoyer"}</span>`;
+    label.innerHTML = getUploadIcon(type) + `<span>${
+      type === "photo" || type === "photo_inconnus" ? `Photo ${i+1} à envoyer` :
+      type === "collecte_objet" ? `Photo de l’objet ${i+1} à envoyer` :
+      type === "audio" ? "Audio à envoyer" :
+      type === "video" ? `Vidéo ${i+1} à envoyer` :
+      "Fichier à envoyer"
+    }</span>`;
 
     let input = document.createElement('input');
     input.type = "file";
@@ -119,30 +113,25 @@ function afficherBlocUploadMulti(etape, stepIndex, type, onAllUploaded, testMode
         feedback.textContent = "Envoi en cours...";
         try {
           let snapshot = await storage.ref(storagePath).put(file);
-          let url = await snapshot.ref.getDownloadURL();
           uploaded[i] = true;
-          fileNames[i] = file.name;
-          uploadedUrls[i] = url;
           feedback.textContent = "Fichier sélectionné : " + file.name;
           label.classList.add('grayed');
         } catch (e) {
           feedback.textContent = "Erreur upload !";
           uploaded[i] = false;
-          fileNames[i] = "";
-          uploadedUrls[i] = "";
         }
         // Vérifie si tous sont uploadés
+        const nextBtn = document.getElementById('next-quest');
         if (uploaded.every(Boolean)) {
-          document.getElementById('next-quest').disabled = false;
-          document.getElementById('next-quest').classList.add('enabled');
-          if (typeof onAllUploaded === "function") onAllUploaded(uploadedUrls);
+          nextBtn.disabled = false;
+          nextBtn.classList.add('enabled');
+          if (typeof onAllUploaded === "function") onAllUploaded();
         } else {
-          document.getElementById('next-quest').disabled = true;
-          document.getElementById('next-quest').classList.remove('enabled');
+          nextBtn.disabled = true;
+          nextBtn.classList.remove('enabled');
         }
       });
     }
-
     label.appendChild(input);
     iconDiv.appendChild(label);
     iconDiv.appendChild(feedback);
@@ -150,20 +139,26 @@ function afficherBlocUploadMulti(etape, stepIndex, type, onAllUploaded, testMode
   }
 
   // Au départ : bouton grisé
-  document.getElementById('next-quest').disabled = true;
-  document.getElementById('next-quest').classList.remove('enabled');
+  const nextBtn = document.getElementById('next-quest');
+  nextBtn.disabled = true;
+  nextBtn.classList.remove('enabled');
 }
 
+// === FONCTION PRINCIPALE D'AFFICHAGE D'ÉTAPE (EXISTANTE) ===
+// Ajoute la gestion multi-upload, sinon ne change rien à l'existant !
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   resetAffichageEtape();
 
-  // 1. Titre & métaphore
+  // 1. Titre et métaphore
   let titre = etape.titre || etape.nom || "";
   let metaphore = etape.metaphore || "";
   document.getElementById('titre-quete').textContent = titre || "";
   document.getElementById('metaphore-quete').innerHTML = metaphore ? `<em>${metaphore}</em>` : '';
 
-  // 2. Consigne
+  // 2. Bloc GPS si besoin (inchangé)
+  // (ton code GPS ici...)
+
+  // 3. Consigne/mission
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
   let phraseMission =
@@ -175,16 +170,13 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     "[Aucune consigne définie]";
   document.getElementById('mission-text').innerHTML = phraseMission;
 
-  // 3. Bloc upload harmonisé multi-fichiers
-  const typesUpload = Object.keys(MISSION_UPLOAD_FIELDS);
-  if (typesUpload.includes(etape.type)) {
-    afficherBlocUploadMulti(etape, stepIndex, etape.type, (urls) => {
-      // callback à la fin de tous les uploads (vide ici)
-    }, testMode);
+  // 4. Bloc multi-upload harmonisé
+  if (["photo", "photo_inconnus", "collecte_objet", "audio", "video", "fichier"].includes(etape.type)) {
+    afficherBlocUploadMulti(etape, stepIndex, etape.type, function(){}, testMode);
     return;
   }
 
-  // 4. Bloc réponse classique (énigme…)
+  // 5. Bloc réponse/énigme si besoin (inchangé)
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
     const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
@@ -205,14 +197,14 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     return;
   }
 
-  // Sinon, bouton activé direct (rare, pour étape sans upload ni champ)
+  // 6. Sinon, bouton activé direct (rare)
   document.getElementById('next-quest').disabled = false;
   document.getElementById('next-quest').classList.add('enabled');
 }
 
-// === Mode test OU navigation normal ===
+// === NAVIGATION ET LOGIQUE DE VALIDATION (EXISTANT, NE PAS TOUCHER) ===
 if (typeof isTestMode !== 'undefined' && isTestMode) {
-  // ... (logique test, à compléter si besoin) ...
+  // ... (ta logique de mode test ici, inchangée)
 } else {
   // --- Mode normal ---
   const salonCode = localStorage.getItem("salonCode");
