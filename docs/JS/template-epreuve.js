@@ -110,19 +110,45 @@ function getUploadIcon(type) {
   switch(type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><path fill="#e0c185" d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
-    case "audio":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><circle cx="12" cy="12" r="10" fill="#e0c185"/><rect x="10" y="8" width="4" height="8" fill="#231d1d"/><rect x="8" y="10" width="8" height="4" fill="#231d1d"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <circle cx="12" cy="12.5" r="3" fill="#231d1d"/>
+      </svg>`;
     case "video":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><rect x="3" y="5" width="18" height="14" rx="2" fill="#e0c185"/><polygon points="10,9 16,12 10,15" fill="#231d1d"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="6" width="15" height="12" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <polygon points="13,10 18,13 13,16" fill="#231d1d"/>
+      </svg>`;
+    case "audio":
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="7" y="10" width="2" height="7" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <rect x="15" y="10" width="2" height="7" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <rect x="11" y="7" width="2" height="10" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+      </svg>`;
     case "collecte_objet":
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><rect x="4" y="7" width="16" height="10" rx="2" fill="#e0c185"/><circle cx="12" cy="12" r="3" fill="#231d1d"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="7" width="12" height="10" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <circle cx="12" cy="12" r="3" fill="#231d1d"/>
+      </svg>`;
+    case "fichier":
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="4" width="12" height="16" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <polyline points="10,14 12,16 14,14" fill="none" stroke="#231d1d" stroke-width="2"/>
+        <line x1="12" y1="8" x2="12" y2="16" stroke="#231d1d" stroke-width="2"/>
+      </svg>`;
     default:
-      return `<svg viewBox="0 0 24 24" width="32" height="32"><rect x="6" y="2" width="12" height="20" rx="2" fill="#e0c185"/><rect x="9" y="8" width="6" height="8" fill="#231d1d"/></svg>`;
+      // Icône générique (style fichier)
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="4" width="12" height="16" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+      </svg>`;
   }
 }
+// Et pour la boussole GPS :
 function getGpsIcon() {
-  return `<svg width="34" height="34" viewBox="0 0 24 24" style="margin-right:10px;"><circle cx="12" cy="12" r="10" fill="#e0c185"/><path d="M12 6v6l4 2" stroke="#231d1d" stroke-width="2" fill="none"/></svg>`;
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" stroke="#e0c185" stroke-width="2" fill="#231d1d"/>
+    <polygon points="12,7 15,17 12,14 9,17" fill="#e0c185"/>
+  </svg>`;
 }
 
 function genererPhraseMission(type, mode, vars = {}) {
