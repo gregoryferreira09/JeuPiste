@@ -160,6 +160,9 @@ function genererPhraseMission(type, mode, vars = {}) {
   return phrase;
 }
 
+
+
+
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   resetAffichageEtape();
 
@@ -227,6 +230,113 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     }, testMode, labelUpload, etape.params?.consignes);
     return;
   }
+
+  // 5. Bloc réponse/énigme si besoin
+  if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
+    const blocAnswer = document.getElementById("bloc-answer");
+    blocAnswer.style.display = '';
+    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input id="answer-field" type="text" class="input-answer-field"/></div>`;
+    const input = document.getElementById("answer-field");
+    const nextBtn = document.getElementById("next-quest");
+    nextBtn.style.display = '';
+    nextBtn.disabled = true;
+    input.oninput = function () {
+      if (this.value.trim().length > 2) {
+        nextBtn.disabled = false;
+        nextBtn.classList.add('enabled');
+      } else {
+        nextBtn.disabled = true;
+        nextBtn.classList.remove('enabled');
+      }
+    };
+    return;
+  }
+
+  document.getElementById('next-quest').style.display = '';
+  document.getElementById('next-quest').disabled = false;
+}
+
+function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
+  const bloc = document.getElementById('bloc-upload');
+  const row = document.getElementById('upload-row');
+  row.innerHTML = '';
+  bloc.style.display = '';
+
+  let uploadStates = Array.from({length: nb}, () => false);
+
+  for (let i = 0; i < nb; i++) {
+    let label = document.createElement('label');
+    label.style.display = "inline-flex";
+    label.style.flexDirection = "column";
+    label.style.alignItems = "center";
+    label.style.justifyContent = "flex-start";
+    label.style.marginRight = "18px";
+    label.style.marginBottom = "12px";
+    label.innerHTML = getUploadIcon(type);
+
+    // Label court sous le logo
+    let court = "";
+    if (type === "photo") court = `Photo ${i+1}`;
+    else if (type === "audio") court = `Audio ${i+1}`;
+    else if (type === "video") court = `Vidéo ${i+1}`;
+    else if (type === "collecte_objet") court = `Objet ${i+1}`;
+    else if (type === "fichier") court = `Fichier ${i+1}`;
+    else court = labelUpload;
+
+    label.innerHTML += `<div style="display:block;text-align:center;font-size:0.98em;margin-top:4px;">${court}</div>`;
+
+    let input = document.createElement('input');
+    input.type = "file";
+    input.className = "visually-hidden";
+    input.accept =
+      type === "audio" ? "audio/*" :
+      type === "photo" || type === "photo_inconnus" || type === "collecte_objet" ? "image/*" :
+      type === "video" ? "video/*" :
+      "*/*";
+    input.id = `upload-file-${type}-${i}`;
+    label.appendChild(input);
+
+    // Affichage du nom du fichier sélectionné
+    let filenameDiv = document.createElement("div");
+    filenameDiv.id = `filename-upload-${type}-${i}`;
+    filenameDiv.style = "font-size:0.97em;color:#e0c185;text-align:center;min-height:1.2em;max-width:180px;overflow-x:auto;margin-top:2px;";
+    label.appendChild(filenameDiv);
+
+    row.appendChild(label);
+
+    if (testMode) {
+      input.disabled = true;
+      filenameDiv.textContent = "Upload désactivé en mode test.";
+    } else {
+      input.onchange = async function () {
+        if (!this.files || !this.files[0]) return;
+        const salonCode = localStorage.getItem("salonCode");
+        const equipeNum = localStorage.getItem("equipeNum");
+        const file = this.files[0];
+        const storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${type}${i}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
+        try {
+          let snapshot = await storage.ref(storagePath).put(file);
+          let url = await snapshot.ref.getDownloadURL();
+          let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${i}`);
+          await ref.set(url);
+          filenameDiv.textContent = file.name;
+          uploadStates[i] = true;
+          if (uploadStates.every(Boolean)) {
+            document.getElementById('next-quest').disabled = false;
+            document.getElementById('next-quest').classList.add('enabled');
+            if (typeof onUploaded === "function") onUploaded();
+          }
+        } catch (e) {
+          filenameDiv.textContent = "Erreur upload !";
+        }
+      };
+    }
+  }
+  document.getElementById('next-quest').disabled = true;
+  document.getElementById('next-quest').classList.remove('enabled');
+  if (testMode && typeof onUploaded === "function") onUploaded();
+}
+
 
   // 5. Bloc réponse/énigme si besoin
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
