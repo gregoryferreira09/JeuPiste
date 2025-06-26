@@ -151,6 +151,7 @@ function getGpsIcon() {
   </svg>`;
 }
 
+
 function genererPhraseMission(type, mode, vars = {}) {
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
   let textes = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
