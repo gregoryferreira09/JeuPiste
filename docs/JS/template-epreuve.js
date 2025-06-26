@@ -145,7 +145,6 @@ function afficherBlocUploadMulti(etape, stepIndex, type, onAllUploaded, testMode
 }
 
 // === FONCTION PRINCIPALE D'AFFICHAGE D'ÉTAPE (EXISTANTE) ===
-// Ajoute la gestion multi-upload, sinon ne change rien à l'existant !
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   resetAffichageEtape();
 
