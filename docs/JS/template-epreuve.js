@@ -37,7 +37,7 @@ function resetAffichageEtape() {
   if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
 
-// Corrige les articles et contractions françaises
+// Corrige les articles/contractions françaises
 function harmoniseArticles(phrase) {
   phrase = phrase.replace(/\bde un ([aeiouyhAEIOUYH])/g, "d'un $1");
   phrase = phrase.replace(/\bde une ([aeiouyhAEIOUYH])/g, "d'une $1");
@@ -55,6 +55,7 @@ function harmoniseArticles(phrase) {
 
 // Corrige les pluriels dynamiques type "personne[s]" --> "personne"/"personnes"
 function accordePluriel(phrase, nb) {
+  // mots[s] -> mot (si nb=1), mots (si nb>1)
   return phrase.replace(/([a-zA-ZéèêëàâîïôöùûüçÉÈÊËÀÂÎÏÔÖÙÛÜÇ]+)\[s\]/g, function(_, mot) {
     return nb > 1 ? mot + "s" : mot;
   });
@@ -213,7 +214,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
 
   document.getElementById('mission-text').innerHTML = phraseMission + sousConsignesHtml;
 
-  // 4. Bloc upload harmonisé multi-upload
+  // 4. Bloc upload harmonisé multi-upload pour tous les types
   const typesUpload = Object.keys(MISSION_UPLOAD_LABELS);
   if (typesUpload.includes(etape.type)) {
     let labelUpload = MISSION_UPLOAD_LABELS[etape.type](vars);
