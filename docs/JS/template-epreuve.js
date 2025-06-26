@@ -109,39 +109,40 @@ function buildVars(etape) {
 function getUploadIcon(type) {
   switch(type) {
     case "photo":
-case "photo_inconnus":
-  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
-    <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-  </svg>`;
+    case "photo_inconnus":
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
+        <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+      </svg>`;
     case "video":
-  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
-    <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
-  </svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
+        <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
+      </svg>`;
     case "audio":
-  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
-    <path d="M12 17a4 4 0 0 0 4-4V8a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4zm5-4a1 1 0 0 1 2 0 7 7 0 0 1-14 0 1 1 0 0 1 2 0 5 5 0 0 0 10 0zm-5 4v3" stroke="#231d1d" stroke-width="2" fill="none"/>
-    <rect x="9" y="4" width="6" height="10" rx="3" fill="#231d1d"/>
-    <rect x="11" y="14" width="2" height="4" rx="1" fill="#231d1d"/>
-  </svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+        <rect x="9" y="4" width="6" height="10" rx="3" fill="#e0c185"/>
+        <rect x="11" y="14" width="2" height="4" rx="1" fill="#e0c185"/>
+        <path d="M8 19a4 4 0 0 0 8 0" stroke="#e0c185" stroke-width="2" fill="none"/>
+      </svg>`;
     case "collecte_objet":
-  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-    <rect x="4" y="7" width="16" height="11" rx="2" fill="none" stroke="#e0c185" stroke-width="2"/>
-    <ellipse cx="12" cy="15" rx="5" ry="2.2" fill="#231d1d"/>
-    <path d="M7 15 Q12 6 17 15" stroke="#231d1d" stroke-width="2" fill="none"/>
-    <path d="M9.5 14.8 Q12 13.7 14.5 14.8" stroke="#e0c185" stroke-width="1.1" fill="none"/>
-    <path d="M10.5 15.2 Q12 14.5 13.5 15.2" stroke="#e0c185" stroke-width="1" fill="none"/>
-  </svg>`;
+      // Panier (harmonisé)
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+        <rect x="4" y="7" width="16" height="11" rx="2" fill="none" stroke="#e0c185" stroke-width="2"/>
+        <ellipse cx="12" cy="15" rx="5" ry="2.2" fill="#e0c185"/>
+        <path d="M7 15 Q12 6 17 15" stroke="#e0c185" stroke-width="2" fill="none"/>
+        <path d="M9.5 14.8 Q12 13.7 14.5 14.8" stroke="#e0c185" stroke-width="1.1" fill="none"/>
+        <path d="M10.5 15.2 Q12 14.5 13.5 15.2" stroke="#e0c185" stroke-width="1" fill="none"/>
+      </svg>`;
     case "fichier":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <rect x="6" y="5" width="4" height="3" rx="1" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
-        <rect x="9" y="11" width="6" height="1" fill="#231d1d"/>
-        <rect x="9" y="13" width="6" height="1" fill="#231d1d"/>
+        <rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/>
+        <rect x="6" y="5" width="4" height="3" rx="1" fill="#e0c185" stroke="#e0c185" stroke-width="2"/>
+        <rect x="9" y="11" width="6" height="1" fill="#e0c185"/>
+        <rect x="9" y="13" width="6" height="1" fill="#e0c185"/>
       </svg>`;
     default:
-      // Icône générique : simple rectangle
+      // Icône générique
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#231d1d" stroke-width="2"/>
+        <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/>
       </svg>`;
   }
 }
