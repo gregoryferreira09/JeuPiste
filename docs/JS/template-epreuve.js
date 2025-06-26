@@ -124,14 +124,12 @@ function getUploadIcon(type) {
         <path d="M8 19a4 4 0 0 0 8 0" stroke="#e0c185" stroke-width="2" fill="none"/>
       </svg>`;
     case "collecte_objet":
-      // Panier (harmonisé)
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="4" y="7" width="16" height="11" rx="2" fill="none" stroke="#e0c185" stroke-width="2"/>
-        <ellipse cx="12" cy="15" rx="5" ry="2.2" fill="#e0c185"/>
-        <path d="M7 15 Q12 6 17 15" stroke="#e0c185" stroke-width="2" fill="none"/>
-        <path d="M9.5 14.8 Q12 13.7 14.5 14.8" stroke="#e0c185" stroke-width="1.1" fill="none"/>
-        <path d="M10.5 15.2 Q12 14.5 13.5 15.2" stroke="#e0c185" stroke-width="1" fill="none"/>
-      </svg>`;
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
+    <rect x="4" y="7" width="16" height="11" rx="2" fill="none" stroke="#e0c185" stroke-width="2"/>
+    <rect x="8" y="11" width="8" height="5" rx="2.5" fill="#e0c185"/>
+    <path d="M16 13a2 2 0 1 1 2 2" stroke="#e0c185" stroke-width="2" fill="none"/>
+    <ellipse cx="12" cy="17" rx="5" ry="1.2" fill="#e0c185"/>
+  </svg>`;
     case "fichier":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
         <rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/>
