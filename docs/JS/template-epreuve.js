@@ -24,7 +24,6 @@ const MISSION_UPLOAD_LABELS = {
   fichier: () => "Fichier à envoyer",
 };
 
-// Reset affichage de l'étape pour éviter les résidus
 function resetAffichageEtape() {
   ['titre-quete', 'metaphore-quete', 'mission-label', 'mission-text', 'upload-row', 'upload-feedback'].forEach(id => {
     let el = document.getElementById(id);
@@ -38,7 +37,6 @@ function resetAffichageEtape() {
   if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
 
-// Harmonisation universelle des articles et élisions
 function harmoniseArticles(phrase) {
   phrase = phrase.replace(/\bde un ([aeiouyhAEIOUYH])/g, "d'un $1");
   phrase = phrase.replace(/\bde une ([aeiouyhAEIOUYH])/g, "d'une $1");
@@ -54,7 +52,6 @@ function harmoniseArticles(phrase) {
   return phrase;
 }
 
-// Accord universel pour tous les types
 function buildVars(etape) {
   let vars = {...etape.params};
   let nb = 1;
@@ -95,7 +92,6 @@ function buildVars(etape) {
   return vars;
 }
 
-// Icônes harmonisées
 function getUploadIcon(type) {
   switch(type) {
     case "photo":
@@ -291,7 +287,104 @@ function showToast(msg) {
   setTimeout(() => { toast.classList.remove('visible'); }, 2200);
 }
 
-// === Navigation, mode test et mode normal inchangés (reprends ta logique existante) ===
-// (par souci de lisibilité, je ne recopie pas ici toute la gestion navigation/test/validerEtape qui reste inchangée)
+// === Mode test OU navigation normal ===
+if (typeof isTestMode !== 'undefined' && isTestMode) {
+  const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
+  if (scenarioTest && Array.isArray(scenarioTest.scenario) && scenarioTest.scenario.length > 0) {
+    let mode = scenarioTest.mode || "arthurien";
+    let currentStep = 0;
+    function showStep(idx) {
+      resetAffichageEtape();
+      const etape = scenarioTest.scenario[idx];
+      if (!etape) {
+        document.getElementById('main-content').innerHTML =
+          "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
+        return;
+      }
+      document.getElementById('next-quest').style.display = 'none';
+      afficherEtapeHarmonisee(etape, idx, mode, true);
 
-// Place ce code en lieu et place de ton template-epreuve.js actuel, il harmonise TOUT pour tous les types de missions.
+      let nav = document.getElementById('test-nav');
+      if (!nav) {
+        nav = document.createElement('div');
+        nav.id = 'test-nav';
+        nav.style = "margin:18px 0;text-align:center;";
+        document.getElementById('main-content').appendChild(nav);
+      }
+      nav.innerHTML = `
+        <button class="main-btn" ${idx <= 0 ? 'disabled' : ''} onclick="window.showStepTest(${idx - 1})">⬅️ Précédent</button>
+        <button class="main-btn" ${idx >= scenarioTest.scenario.length - 1 ? 'disabled' : ''} onclick="window.showStepTest(${idx + 1})">Suivant ➡️</button>
+        <div style="margin-top:10px;font-size:0.97em;">Étape ${idx + 1} / ${scenarioTest.scenario.length}</div>
+      `;
+      window.showStepTest = showStep;
+    }
+    window.showStepTest = showStep;
+    showStep(currentStep);
+    window.showToast = showToast;
+  } else {
+    document.getElementById('main-content').innerHTML =
+      "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
+  }
+} else {
+  // --- Mode normal ---
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = Number(localStorage.getItem("equipeNum"));
+  if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+    window.location.href = "accueil.html";
+  }
+
+  db.ref(`parties/${salonCode}/scenario/mode`).once('value').then(snapMode => {
+    window.currentScenarioMode = snapMode.val() || "arthurien";
+  });
+
+  firebase.auth().onAuthStateChanged(function (user) {
+    if (!user) firebase.auth().signInAnonymously();
+    else chargerEtapeDynamique();
+  });
+
+  function chargerEtapeDynamique() {
+    db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
+      const step = snapStep.val() || 0;
+      db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
+        resetAffichageEtape();
+        const etape = snapEpreuve.val();
+        if (!etape) {
+          document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
+          return;
+        }
+        document.getElementById('next-quest').style.display = 'none';
+        afficherEtapeHarmonisee(etape, step, window.currentScenarioMode, false);
+        document.getElementById('next-quest').onclick = validerEtape;
+      });
+    });
+  }
+
+  function validerEtape() {
+    const nextBtn = document.getElementById('next-quest');
+    nextBtn.disabled = true;
+    nextBtn.classList.remove('enabled');
+    showToast("Validation en cours...");
+    const salonCode = localStorage.getItem("salonCode");
+    const equipeNum = Number(localStorage.getItem("equipeNum"));
+    const now = Date.now();
+    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/current/startTime`)
+      .once('value', function (snap) {
+        const sTime = snap.val();
+        if (sTime) {
+          const elapsed = Math.round((now - sTime) / 1000);
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/current`).set(elapsed);
+        }
+        db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
+          .transaction(step => (step || 0) + 1, function (error, committed, snapshot) {
+            if (!error && committed) {
+              showToast("Étape validée !");
+              setTimeout(() => { window.location.reload(); }, 800);
+            } else {
+              showToast("Erreur lors de la validation...");
+              nextBtn.disabled = false;
+              nextBtn.classList.add('enabled');
+            }
+          });
+      });
+  }
+}
