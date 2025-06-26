@@ -227,13 +227,8 @@
 
       // Gestion des pseudos d'origine pour affichage temporaire
       let monPseudo = localStorage.getItem("pseudo") || "invité";
-      let pseudoOrigine = monPseudo;
-      if (!localStorage.getItem("pseudoOrigine")) {
-        localStorage.setItem("pseudoOrigine", pseudoOrigine);
-      } else {
-        pseudoOrigine = localStorage.getItem("pseudoOrigine");
-      }
-      pseudoAffiche.textContent = pseudoOrigine;
+      pseudoAffiche.textContent = monPseudo;
+      
       let jeSuisCreateur = false;
       let countdownInterval = null;
       let lancementAutomatiqueDemarre = false;
