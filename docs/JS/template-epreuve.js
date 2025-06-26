@@ -102,7 +102,7 @@ function getModeScenario(etape) {
   return 'arthurien';
 }
 
-// Fonction robuste pour générer la phrase mission avec injection [objet] / [objets]
+// Nouvelle génération de phrase mission : choix singulier/pluriel intelligent
 function genererPhraseMission(type, mode, vars = {}) {
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
   let textes = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
@@ -115,10 +115,32 @@ function genererPhraseMission(type, mode, vars = {}) {
       textes = [];
     }
   }
-  if (!textes.length) return null;
-  let phrase = textes[Math.floor(Math.random() * textes.length)];
-  phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, key) => (vars[key] !== undefined ? vars[key] : match));
-  return harmoniseArticles(phrase); // Harmonisation automatique universelle
+  let nb = vars.nb || 1;
+  let key = nb > 1 ? '[objets]' : '[objet]';
+
+  // Filtrer les phrases selon le contexte (singulier/pluriel)
+  let textesFiltres = textes.filter(t => t.includes(key));
+  if (!textesFiltres.length) textesFiltres = textes;
+  let phrase = textesFiltres[Math.floor(Math.random() * textesFiltres.length)];
+
+  // Remplacement dynamique et harmonisation des articles
+  phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, k) => (vars[k] !== undefined ? vars[k] : match));
+  phrase = harmoniseArticles(phrase);
+
+  // Harmonisation image(s)/preuve(s) si besoin (optionnel)
+  if (nb <= 1) {
+    phrase = phrase.replace(/\bces images\b/gi, "cette image");
+    phrase = phrase.replace(/\bCes images\b/gi, "Cette image");
+    phrase = phrase.replace(/\bces preuves\b/gi, "cette preuve");
+    phrase = phrase.replace(/\bCes preuves\b/gi, "Cette preuve");
+  } else {
+    phrase = phrase.replace(/\bcette image\b/gi, "ces images");
+    phrase = phrase.replace(/\bCette image\b/gi, "Ces images");
+    phrase = phrase.replace(/\bcette preuve\b/gi, "ces preuves");
+    phrase = phrase.replace(/\bCette preuve\b/gi, "Ces preuves");
+  }
+
+  return phrase;
 }
 
 // Affichage harmonisé d’une épreuve
@@ -159,7 +181,6 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
         <span>Ouvrir la boussole</span>
       </a>
     `;
-    // On l'insère juste avant la consigne
     const blocMission = document.getElementById('bloc-mission');
     blocMission.parentNode.insertBefore(gpsContainer, blocMission);
   }
@@ -222,6 +243,7 @@ function afficherMissionSuite(etape, stepIndex, modeMission, testMode = false) {
 
   let vars = { ...etape.params };
 
+  // Gestion intelligente de l'accord pour l'objet/les objets
   if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length) {
     let liste = etape.params.consignes.map(lowerFirst);
     vars.nb = liste.length;
