@@ -915,3 +915,14 @@ body {
   width: 100%;
   box-sizing: border-box;
 }
+
+#upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+#upload-row label {
+  min-width: 100px;
+  max-width: 120px;
+}
