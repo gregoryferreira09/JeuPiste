@@ -203,6 +203,14 @@
       const cancelModalBtn = document.getElementById("cancelModalBtn");
       const alertSalonSupprime = document.getElementById("alertSalonSupprime");
 
+      // Récupère le pseudo à afficher depuis le localStorage
+      let monPseudo = localStorage.getItem("pseudo") || "invité";
+      pseudoAffiche.textContent = monPseudo;
+
+      let jeSuisCreateur = false;
+      let countdownInterval = null;
+      let lancementAutomatiqueDemarre = false;
+
       // Afficher le nom du scénario dans le salon
       db.ref('parties/' + salonCode + '/parametres/scenarioCode').once('value', snap => {
         const scenarioCode = snap.val();
@@ -225,17 +233,9 @@
         }
       });
 
-      // Gestion des pseudos d'origine pour affichage temporaire
-      let monPseudo = localStorage.getItem("pseudo") || "invité";
-      pseudoAffiche.textContent = monPseudo;
-      
-      let jeSuisCreateur = false;
-      let countdownInterval = null;
-      let lancementAutomatiqueDemarre = false;
-
       // Gestion boutons selon créateur
       db.ref('parties/' + salonCode + '/parametres/createur').once('value', snap => {
-        if (snap.exists() && snap.val().pseudo === pseudoOrigine) {
+        if (snap.exists() && snap.val().pseudo === monPseudo) {
           jeSuisCreateur = true;
           cloturerSalonBtn.style.display = "inline-block";
           quitterSalonBtn.style.display = "none";
@@ -261,9 +261,6 @@
       confirmModalBtn.addEventListener("click", function() {
         if(currentAction === "cloture") {
           db.ref('parties/' + salonCode).remove().then(() => {
-            // Fin de partie : restauration pseudo
-            localStorage.setItem("pseudo", pseudoOrigine);
-            localStorage.removeItem("pseudoOrigine");
             localStorage.removeItem("salonCode");
             localStorage.removeItem("enCours");
             window.location.href = "creer-partie.html";
@@ -271,15 +268,12 @@
         } else if(currentAction === "quitter") {
           db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
             snap.forEach(child => {
-              if(child.val().pseudo === monPseudo || child.val().pseudo === pseudoOrigine) {
+              if(child.val().pseudo === monPseudo) {
                 db.ref('parties/' + salonCode + '/joueurs/' + child.key).remove();
               }
             });
           });
           setTimeout(() => {
-            // Restaure pseudo à la sortie du salon
-            localStorage.setItem("pseudo", pseudoOrigine);
-            localStorage.removeItem("pseudoOrigine");
             localStorage.removeItem("salonCode");
             localStorage.removeItem("enCours");
             window.location.href = "rejoindre-partie.html";
@@ -306,8 +300,6 @@
         const etatPartie = snapshot.child('etat').val();
         if (etatPartie === 'en_cours') {
           localStorage.setItem("enCours", "1");
-          localStorage.setItem("pseudo", pseudoOrigine);
-          localStorage.removeItem("pseudoOrigine");
           window.location.href = "lancement-partie.html";
           return;
         }
@@ -316,16 +308,12 @@
           if (localStorage.getItem("enCours") !== "1") {
             alertSalonSupprime.style.display = "block";
             setTimeout(() => {
-              localStorage.setItem("pseudo", pseudoOrigine);
-              localStorage.removeItem("pseudoOrigine");
               localStorage.removeItem("salonCode");
               localStorage.removeItem("enCours");
               window.location.href = "rejoindre-partie.html";
             }, 2000);
           } else {
             // Si la partie était en cours, redirection silencieuse
-            localStorage.setItem("pseudo", pseudoOrigine);
-            localStorage.removeItem("pseudoOrigine");
             localStorage.removeItem("salonCode");
             localStorage.removeItem("enCours");
             window.location.href = "rejoindre-partie.html";
@@ -379,14 +367,11 @@
         }
       });
 
-      // Suppression automatique si le créateur ferme l'onglet
-      // *** ON NE SUPPRIME PLUS salonCode ICI ***
+      // Suppression automatique si le créateur ferme l'onglet (désactivé)
       // window.addEventListener("beforeunload", function () {
       //   if (jeSuisCreateur) {
       //     db.ref('parties/' + salonCode).remove();
       //   }
-      //   localStorage.setItem("pseudo", pseudoOrigine);
-      //   localStorage.removeItem("pseudoOrigine");
       //   localStorage.removeItem("salonCode");
       //   localStorage.removeItem("enCours");
       // });
