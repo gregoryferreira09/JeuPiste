@@ -124,19 +124,19 @@ function getUploadIcon(type) {
         <path d="M8 19a4 4 0 0 0 8 0" stroke="#e0c185" stroke-width="2" fill="none"/>
       </svg>`;
     case "collecte_objet":
-  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-    <line x1="5" y1="21" x2="16" y2="7" stroke="#e0c185" stroke-width="2" stroke-linecap="round"/>
-    <ellipse cx="17.5" cy="6" rx="4" ry="2" fill="none" stroke="#e0c185" stroke-width="2"/>
-    <path d="M13.5 9 Q16 7 20 7.5" stroke="#e0c185" stroke-width="1" fill="none"/>
-    <path d="M13.5 8 Q16 6 20 6.5" stroke="#e0c185" stroke-width="0.8" fill="none"/>
-    <circle cx="19" cy="3.5" r="0.5" fill="#e0c185"/>
-    <circle cx="21" cy="5" r="0.6" fill="#e0c185"/>
-    <circle cx="17" cy="2.7" r="0.4" fill="#e0c185"/>
-    <circle cx="14" cy="4" r="0.5" fill="#e0c185"/>
-    <circle cx="22" cy="8" r="0.3" fill="#e0c185"/>
-    <circle cx="18" cy="11" r="0.4" fill="#e0c185"/>
-    <circle cx="20.5" cy="10" r="0.35" fill="#e0c185"/>
-    <circle cx="15.5" cy="11.5" r="0.3" fill="#e0c185"/>
+  return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none">
+    <line x1="8" y1="30" x2="28" y2="12" stroke="#e0c185" stroke-width="2.2" stroke-linecap="round"/>
+    <ellipse cx="30" cy="10" rx="7" ry="4.5" fill="none" stroke="#e0c185" stroke-width="2.1"/>
+    <path d="M24.3 13 Q28 9.5 35 13" stroke="#e0c185" stroke-width="1" fill="none"/>
+    <path d="M25.5 11 Q29 8.5 34 11.5" stroke="#e0c185" stroke-width="0.9" fill="none"/>
+    <circle cx="31" cy="3.5" r="0.8" fill="#e0c185"/>
+    <circle cx="35.2" cy="7.5" r="0.7" fill="#e0c185"/>
+    <circle cx="28.5" cy="5" r="0.7" fill="#e0c185"/>
+    <circle cx="22" cy="8" r="0.6" fill="#e0c185"/>
+    <circle cx="36" cy="15" r="0.5" fill="#e0c185"/>
+    <circle cx="32" cy="18" r="0.6" fill="#e0c185"/>
+    <circle cx="29" cy="20.5" r="0.5" fill="#e0c185"/>
+    <circle cx="35" cy="22" r="0.4" fill="#e0c185"/>
   </svg>`;
     case "fichier":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
