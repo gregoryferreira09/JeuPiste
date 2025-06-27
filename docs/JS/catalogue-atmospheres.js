@@ -811,7 +811,7 @@ const ATMOSPHERE_QUESTS = {
       "Chaque minute compte pour la science."
     ]
   }
-},
+}
 
   
 // Utilitaire pour tirer au hasard un titre/ambiance :
