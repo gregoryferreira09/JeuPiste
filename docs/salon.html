@@ -208,15 +208,12 @@
       pseudoAffiche.textContent = monPseudo;
 
       // Met à jour mon pseudo dans la liste des joueurs si besoin
-const salonCode = localStorage.getItem("salonCode");
-if (salonCode && monPseudo) {
+// Correction universelle : met à jour tous les "Anonyme" ou "invité" trouvés par mon pseudo local
+if (salonCode && monPseudo && monPseudo !== "Anonyme" && monPseudo !== "invité") {
   db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
     snap.forEach(child => {
-      if (child.val().uid === localStorage.getItem("uid")) {
-        // On a trouvé mon entrée, on vérifie le pseudo
-        if (child.val().pseudo !== monPseudo) {
-          db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(monPseudo);
-        }
+      if (child.val().pseudo === "Anonyme" || child.val().pseudo === "invité") {
+        db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(monPseudo);
       }
     });
   });
