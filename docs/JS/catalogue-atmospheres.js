@@ -812,3 +812,16 @@ const ATMOSPHERE_QUESTS = {
     ]
   }
 },
+
+  
+// Utilitaire pour tirer au hasard un titre/ambiance :
+function getRandomAtmosphere(type, mode) {
+  const titres = ATMOSPHERE_QUESTS?.[type]?.[mode]?.titres || [];
+  const phrases = ATMOSPHERE_QUESTS?.[type]?.[mode]?.phrases || [];
+  const titre = titres.length ? titres[Math.floor(Math.random() * titres.length)] : "";
+  const phrase = phrases.length ? phrases[Math.floor(Math.random() * phrases.length)] : "";
+  return { titre, phrase };
+}
+
+window.ATMOSPHERE_QUESTS = ATMOSPHERE_QUESTS;
+window.getRandomAtmosphere = getRandomAtmosphere;
