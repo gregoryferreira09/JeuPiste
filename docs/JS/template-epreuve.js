@@ -125,18 +125,23 @@ function getUploadIcon(type) {
       </svg>`;
     case "collecte_objet":
   return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none">
-    <line x1="8" y1="30" x2="28" y2="12" stroke="#e0c185" stroke-width="2.2" stroke-linecap="round"/>
-    <ellipse cx="30" cy="10" rx="7" ry="4.5" fill="none" stroke="#e0c185" stroke-width="2.1"/>
-    <path d="M24.3 13 Q28 9.5 35 13" stroke="#e0c185" stroke-width="1" fill="none"/>
-    <path d="M25.5 11 Q29 8.5 34 11.5" stroke="#e0c185" stroke-width="0.9" fill="none"/>
-    <circle cx="31" cy="3.5" r="0.8" fill="#e0c185"/>
-    <circle cx="35.2" cy="7.5" r="0.7" fill="#e0c185"/>
-    <circle cx="28.5" cy="5" r="0.7" fill="#e0c185"/>
-    <circle cx="22" cy="8" r="0.6" fill="#e0c185"/>
-    <circle cx="36" cy="15" r="0.5" fill="#e0c185"/>
-    <circle cx="32" cy="18" r="0.6" fill="#e0c185"/>
-    <circle cx="29" cy="20.5" r="0.5" fill="#e0c185"/>
-    <circle cx="35" cy="22" r="0.4" fill="#e0c185"/>
+    <line x1="7" y1="32" x2="25" y2="10" stroke="#e0c185" stroke-width="2.3" stroke-linecap="round"/>
+    <ellipse cx="29.5" cy="7.5" rx="7" ry="4.5" fill="none" stroke="#e0c185" stroke-width="2"/>
+    <path d="M25.2 10.7 Q29.5 7.5 34.1 9.5" stroke="#e0c185" stroke-width="1" fill="none"/>
+    <path d="M26.5 9 Q29.5 7.5 33 7" stroke="#e0c185" stroke-width="0.8" fill="none"/>
+    <path d="M24.5 8.5 Q29.5 7.5 35 6" stroke="#e0c185" stroke-width="0.7" fill="none"/>
+    <circle cx="29" cy="1.7" r="0.8" fill="#e0c185"/>
+    <circle cx="34" cy="5" r="0.85" fill="#e0c185"/>
+    <circle cx="26" cy="4" r="0.7" fill="#e0c185"/>
+    <circle cx="22.5" cy="8" r="0.7" fill="#e0c185"/>
+    <circle cx="36" cy="13" r="0.5" fill="#e0c185"/>
+    <circle cx="31" cy="16" r="0.7" fill="#e0c185"/>
+    <circle cx="27.5" cy="17.5" r="0.5" fill="#e0c185"/>
+    <circle cx="34" cy="19.5" r="0.5" fill="#e0c185"/>
+    <circle cx="24" cy="15" r="0.4" fill="#e0c185"/>
+    <circle cx="21" cy="12" r="0.4" fill="#e0c185"/>
+    <circle cx="19" cy="19" r="0.35" fill="#e0c185"/>
+    <circle cx="15" cy="25" r="0.3" fill="#e0c185"/>
   </svg>`;
     case "fichier":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
