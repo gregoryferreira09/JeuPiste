@@ -273,14 +273,12 @@
       pseudoDisplay.textContent = pseudo;
 
       pseudoDisplay.addEventListener("input", function() {
-        // Nettoyage XSS très basique
-        this.textContent = this.textContent.replace(/[<>]/g, "");
-        if (this.textContent.trim().length < 1) {
-          pseudoFeedback.textContent = "Le pseudo ne peut pas être vide.";
-        } else {
-          pseudoFeedback.textContent = "";
-        }
-      });
+  if (this.textContent.trim().length < 1) {
+    pseudoFeedback.textContent = "Le pseudo ne peut pas être vide.";
+  } else {
+    pseudoFeedback.textContent = "";
+  }
+});
 
       pseudoDisplay.addEventListener("keydown", function(e) {
         if (e.key === "Enter") {
