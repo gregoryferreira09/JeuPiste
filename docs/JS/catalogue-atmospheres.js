@@ -809,10 +809,16 @@ const ATMOSPHERE_QUESTS = {
       "Un archéologue pressé trouve plus d’artefacts.",
       "Le chrono de la fouille est lancé.",
       "Chaque minute compte pour la science."
-    ]
-  }
-}
+   ]
+    }
+    // ... autres modes si besoin
+  },
 
+  // Ajoute ici tous les autres types de missions, toujours sur la même logique :
+  // mot_de_passe, anagramme, puzzle_visuel, gps, audio, duel, chrono, defi_collectif, observation, etc.
+  // Pour chaque type, crée un objet "mode" (arthurien, pirate, etc.), avec 5 titres et 5 phrases.
+
+};
   
 // Utilitaire pour tirer au hasard un titre/ambiance :
 function getRandomAtmosphere(type, mode) {
