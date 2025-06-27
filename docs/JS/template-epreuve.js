@@ -125,23 +125,17 @@ function getUploadIcon(type) {
       </svg>`;
     case "collecte_objet":
   return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none">
-    <line x1="7" y1="32" x2="25" y2="10" stroke="#e0c185" stroke-width="2.3" stroke-linecap="round"/>
-    <ellipse cx="29.5" cy="7.5" rx="7" ry="4.5" fill="none" stroke="#e0c185" stroke-width="2"/>
-    <path d="M25.2 10.7 Q29.5 7.5 34.1 9.5" stroke="#e0c185" stroke-width="1" fill="none"/>
-    <path d="M26.5 9 Q29.5 7.5 33 7" stroke="#e0c185" stroke-width="0.8" fill="none"/>
-    <path d="M24.5 8.5 Q29.5 7.5 35 6" stroke="#e0c185" stroke-width="0.7" fill="none"/>
-    <circle cx="29" cy="1.7" r="0.8" fill="#e0c185"/>
-    <circle cx="34" cy="5" r="0.85" fill="#e0c185"/>
-    <circle cx="26" cy="4" r="0.7" fill="#e0c185"/>
-    <circle cx="22.5" cy="8" r="0.7" fill="#e0c185"/>
-    <circle cx="36" cy="13" r="0.5" fill="#e0c185"/>
-    <circle cx="31" cy="16" r="0.7" fill="#e0c185"/>
-    <circle cx="27.5" cy="17.5" r="0.5" fill="#e0c185"/>
-    <circle cx="34" cy="19.5" r="0.5" fill="#e0c185"/>
-    <circle cx="24" cy="15" r="0.4" fill="#e0c185"/>
-    <circle cx="21" cy="12" r="0.4" fill="#e0c185"/>
-    <circle cx="19" cy="19" r="0.35" fill="#e0c185"/>
-    <circle cx="15" cy="25" r="0.3" fill="#e0c185"/>
+    <!-- Corps de la bourse -->
+    <ellipse cx="19" cy="25" rx="8" ry="9" fill="#e0c185"/>
+    <!-- Lien de fermeture -->
+    <path d="M11 20 Q19 18 27 20" stroke="#e0c185" stroke-width="2" fill="none"/>
+    <!-- Haut resserré de la bourse -->
+    <ellipse cx="19" cy="17" rx="5" ry="2.5" fill="#e0c185"/>
+    <!-- Nœud -->
+    <ellipse cx="19" cy="19" rx="2.1" ry="1" fill="#e0c185"/>
+    <!-- Cordons qui tombent -->
+    <path d="M16.5 19 Q15 22 17.5 23" stroke="#e0c185" stroke-width="1.2" fill="none"/>
+    <path d="M21.5 19 Q23 22 20.5 23" stroke="#e0c185" stroke-width="1.2" fill="none"/>
   </svg>`;
       
     case "fichier":
