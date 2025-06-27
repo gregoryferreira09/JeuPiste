@@ -125,35 +125,18 @@ function getUploadIcon(type) {
       </svg>`;
     case "collecte_objet":
   return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-    <rect x="11" y="14" width="10" height="2" rx="1" fill="#e0c185" transform="rotate(-24 11 14)"/>
-    <ellipse cx="8" cy="8" rx="4" ry="6" fill="none" stroke="#e0c185" stroke-width="2"/>
-    <path d="M5 3.5 Q8 8 11 13" stroke="#e0c185" stroke-width="1" fill="none"/>
-    <path d="M4 8 H12" stroke="#e0c185" stroke-width="1" fill="none"/>
-    <path d="M5.5 13 Q8 8 10.5 3.5" stroke="#e0c185" stroke-width="1" fill="none"/>
-    <g>
-      <ellipse cx="3.5" cy="3.5" rx="0.7" ry="0.4" fill="#e0c185"/>
-      <ellipse cx="2.7" cy="4.1" rx="0.3" ry="0.6" fill="#e0c185"/>
-      <ellipse cx="4.3" cy="4.1" rx="0.3" ry="0.6" fill="#e0c185"/>
-      <rect x="3.25" y="3.7" width="0.5" height="0.8" rx="0.2" fill="#e0c185"/>
-    </g>
-    <g>
-      <ellipse cx="13.5" cy="2.8" rx="0.7" ry="0.4" fill="#e0c185"/>
-      <ellipse cx="12.7" cy="3.2" rx="0.3" ry="0.6" fill="#e0c185"/>
-      <ellipse cx="14.3" cy="3.2" rx="0.3" ry="0.6" fill="#e0c185"/>
-      <rect x="13.25" y="2.9" width="0.5" height="0.8" rx="0.2" fill="#e0c185"/>
-    </g>
-    <g>
-      <ellipse cx="4.2" cy="16" rx="0.6" ry="0.3" fill="#e0c185"/>
-      <ellipse cx="3.7" cy="16.6" rx="0.2" ry="0.4" fill="#e0c185"/>
-      <ellipse cx="4.7" cy="16.6" rx="0.2" ry="0.4" fill="#e0c185"/>
-      <rect x="4.05" y="16.2" width="0.3" height="0.4" rx="0.1" fill="#e0c185"/>
-    </g>
-    <g>
-      <ellipse cx="15.5" cy="17.5" rx="0.7" ry="0.4" fill="#e0c185"/>
-      <ellipse cx="15" cy="18.1" rx="0.3" ry="0.6" fill="#e0c185"/>
-      <ellipse cx="16" cy="18.1" rx="0.3" ry="0.6" fill="#e0c185"/>
-      <rect x="15.25" y="17.7" width="0.5" height="0.8" rx="0.2" fill="#e0c185"/>
-    </g>
+    <line x1="5" y1="21" x2="16" y2="7" stroke="#e0c185" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="17.5" cy="6" rx="4" ry="2" fill="none" stroke="#e0c185" stroke-width="2"/>
+    <path d="M13.5 9 Q16 7 20 7.5" stroke="#e0c185" stroke-width="1" fill="none"/>
+    <path d="M13.5 8 Q16 6 20 6.5" stroke="#e0c185" stroke-width="0.8" fill="none"/>
+    <circle cx="19" cy="3.5" r="0.5" fill="#e0c185"/>
+    <circle cx="21" cy="5" r="0.6" fill="#e0c185"/>
+    <circle cx="17" cy="2.7" r="0.4" fill="#e0c185"/>
+    <circle cx="14" cy="4" r="0.5" fill="#e0c185"/>
+    <circle cx="22" cy="8" r="0.3" fill="#e0c185"/>
+    <circle cx="18" cy="11" r="0.4" fill="#e0c185"/>
+    <circle cx="20.5" cy="10" r="0.35" fill="#e0c185"/>
+    <circle cx="15.5" cy="11.5" r="0.3" fill="#e0c185"/>
   </svg>`;
     case "fichier":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
