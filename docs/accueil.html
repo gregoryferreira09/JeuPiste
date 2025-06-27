@@ -113,7 +113,7 @@
       <h1>Jeu de piste</h1>
       <h2>Course à la montre en équipe bancale</h2>
       <div class="bienvenue-message">
-        Bienvenue <span id="pseudoAffiche"></span>
+        Bonjour <span id="pseudoAffiche"></span>
       </div>
       <div class="menu-buttons" role="group" aria-label="Actions principales">
         <button class="main-btn" type="button" onclick="window.location.href='creer-partie.html'">🎮 Créer une partie</button>
@@ -131,20 +131,31 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+
   <script>
     // Effet d'ouverture fadeIn
     document.addEventListener("DOMContentLoaded", function() {
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
     });
-  
-    // Affichage du pseudo dans le message de bienvenue
-    document.addEventListener("DOMContentLoaded", function() {
+
+    // Fonction pour afficher le pseudo
+    function afficherPseudoAccueil() {
       var pseudo = localStorage.getItem("pseudo");
-      if (pseudo && pseudo.trim().length > 0) {
+      if (pseudo && pseudo.trim().length > 0 && pseudo !== "Anonyme" && pseudo !== "invité") {
         document.getElementById("pseudoAffiche").textContent = pseudo;
       } else {
         document.getElementById("pseudoAffiche").textContent = "invité";
+      }
+    }
+
+    // Affichage initial du pseudo
+    document.addEventListener("DOMContentLoaded", afficherPseudoAccueil);
+
+    // Mise à jour dynamique si le pseudo change dans un autre onglet ou après retour du profil
+    window.addEventListener("storage", function(event) {
+      if (event.key === "pseudo") {
+        afficherPseudoAccueil();
       }
     });
 
@@ -152,7 +163,7 @@
     localStorage.removeItem("salonCode");
   </script>
   <script src="JS/security-enhance.js"></script>
-<script src="JS/ux-enhance.js"></script>
-<script src="JS/scalability.js"></script>
+  <script src="JS/ux-enhance.js"></script>
+  <script src="JS/scalability.js"></script>
 </body>
 </html>
