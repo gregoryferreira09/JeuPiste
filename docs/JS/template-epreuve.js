@@ -143,6 +143,7 @@ function getUploadIcon(type) {
     <circle cx="19" cy="19" r="0.35" fill="#e0c185"/>
     <circle cx="15" cy="25" r="0.3" fill="#e0c185"/>
   </svg>`;
+      
     case "fichier":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
         <rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/>
