@@ -125,17 +125,12 @@ function getUploadIcon(type) {
       </svg>`;
     case "collecte_objet":
   return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none">
-    <!-- Corps de la bourse -->
-    <ellipse cx="19" cy="25" rx="8" ry="9" fill="#e0c185"/>
-    <!-- Lien de fermeture -->
-    <path d="M11 20 Q19 18 27 20" stroke="#e0c185" stroke-width="2" fill="none"/>
-    <!-- Haut resserré de la bourse -->
-    <ellipse cx="19" cy="17" rx="5" ry="2.5" fill="#e0c185"/>
-    <!-- Nœud -->
-    <ellipse cx="19" cy="19" rx="2.1" ry="1" fill="#e0c185"/>
-    <!-- Cordons qui tombent -->
-    <path d="M16.5 19 Q15 22 17.5 23" stroke="#e0c185" stroke-width="1.2" fill="none"/>
-    <path d="M21.5 19 Q23 22 20.5 23" stroke="#e0c185" stroke-width="1.2" fill="none"/>
+    <!-- Cercle de la loupe -->
+    <circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/>
+    <!-- Manche de la loupe -->
+    <rect x="23.5" y="23.5" width="8" height="2.5" rx="1.2" fill="#e0c185" transform="rotate(45 23.5 23.5)"/>
+    <!-- Reflets pour le style -->
+    <path d="M13 15 Q15 13 17 13" stroke="#e0c185" stroke-width="1.2" fill="none"/>
   </svg>`;
       
     case "fichier":
