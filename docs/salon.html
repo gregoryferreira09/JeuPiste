@@ -207,6 +207,20 @@
       let monPseudo = localStorage.getItem("pseudo") || "invité";
       pseudoAffiche.textContent = monPseudo;
 
+      // Met à jour mon pseudo dans la liste des joueurs si besoin
+const salonCode = localStorage.getItem("salonCode");
+if (salonCode && monPseudo) {
+  db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
+    snap.forEach(child => {
+      if (child.val().uid === localStorage.getItem("uid")) {
+        // On a trouvé mon entrée, on vérifie le pseudo
+        if (child.val().pseudo !== monPseudo) {
+          db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(monPseudo);
+        }
+      }
+    });
+  });
+}
       let jeSuisCreateur = false;
       let countdownInterval = null;
       let lancementAutomatiqueDemarre = false;
