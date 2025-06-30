@@ -406,17 +406,6 @@ actionsRow.appendChild(boussoleBtn);
   }
   renderGpsPoints();
 
-  addBtn.onclick = function() {
-    openMapPicker({
-      value: "",
-      set value(val) {
-        if(val) {
-          gpsPoints.push(val);
-          renderGpsPoints();
-        }
-      }
-    });
-  };
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
   const SUGG_TYPES = Object.keys(SUGGESTIONS);
