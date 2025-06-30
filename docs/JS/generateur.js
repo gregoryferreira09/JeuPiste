@@ -430,8 +430,8 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   };
 
   // === Bloc multi-consigne moderne (photo, photo_inconnus, collecte_objet) ===
-  const MULTI_CONSIGNE_TYPES = ["photo", "photo_inconnus", "collecte_objet"];
-  if (MULTI_CONSIGNE_TYPES.includes(quest.id) && quest.parametres.some(p => p.type === "number")) {
+  const SUGG_TYPES = Object.keys(SUGGESTIONS);
+if (SUGG_TYPES.includes(quest.id)) {
     const qtyParam = quest.parametres.find(p => p.type === "number");
     let consigneList = Array.isArray(values.consignes) ? [...values.consignes] : [''];
 
