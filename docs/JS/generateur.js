@@ -22,9 +22,6 @@ firebase.auth().signInAnonymously().catch(function(error) {
 // === GENERATEUR DE FORMULAIRES ET DE SCENARIO MULTI-ETAPES AVEC CONSIGNES INDIVIDUELLES ===
 let scenario = [];
 let dragSrcIdx = null;
-let mapTargetInput = null;
-let mapSearchTimeout = null;
-let searchMarker = null;
 let currentGameMode = "arthurien"; // valeur par défaut
 
 document.addEventListener("DOMContentLoaded", function() {
