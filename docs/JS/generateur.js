@@ -441,17 +441,6 @@ window['_deleteGpsPoint_' + uniqueId] = function(idx) {
   refreshGpsMarkers();
   refreshGpsList();
 };
-window['_removeModernEndPoint_' + gpsMapDiv.id] = function() {
-  endPoint = null;
-  endCoordField.value = "";
-  refreshGpsMarkers();
-};
-
-endBtn.onclick = function() {
-  endMode = true;
-  endBtn.textContent = "Cliquez sur la carte pour placer la zone de fin…";
-  endBtn.disabled = true;
-};
   
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
