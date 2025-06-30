@@ -339,23 +339,29 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   form.className = 'quest-form';
 
   // Bloc multi-points GPS façon boussole harmonisée + bouton ajouter
-  let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
-  let gpsZone = document.createElement('div');
+
+let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
+let gpsZone = document.createElement('div');
 gpsZone.className = 'form-field';
 gpsZone.style.display = "flex";
 gpsZone.style.flexDirection = "column";
 gpsZone.style.gap = "8px";
 gpsZone.style.marginBottom = "20px";
 
+// Bloc liste GPS
 let gpsListDiv = document.createElement('div');
 gpsListDiv.id = "gpsPointsList";
 gpsZone.appendChild(gpsListDiv);
 
+// Ligne action bouton boussole harmonisé
 let actionsRow = document.createElement('div');
-actionsRow.style.display = "flex";
-actionsRow.style.alignItems = "center";
-actionsRow.style.gap = "16px";
-actionsRow.style.marginTop = "4px";
+actionsRow.className = "actions-row-horizontal";
+actionsRow.style.margin = "12px 0 0 0";
+
+// ---- Boussole harmonisée ----
+let iconDiv = document.createElement('div');
+iconDiv.className = "icon-action";
+iconDiv.style.width = "90px";
 
 let boussoleBtn = document.createElement('button');
 boussoleBtn.type = 'button';
@@ -366,30 +372,31 @@ boussoleBtn.style.alignItems = "center";
 boussoleBtn.style.background = "none";
 boussoleBtn.style.border = "none";
 boussoleBtn.style.cursor = "pointer";
-boussoleBtn.style.marginLeft = "2px";
-
+boussoleBtn.style.padding = "0";
 boussoleBtn.innerHTML = `
-  <svg style="width:48px;height:48px;" viewBox="0 0 24 24">
+  <svg viewBox="0 0 24 24" width="38" height="38">
     <path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5
     2.5-7 7-2.5-2.5 7z"/>
   </svg>
-  <span style="margin-top:6px; color:#222; font-size:1.08em; font-weight:bold;">
+  <span style="margin-top:6px; color:#ffeecb; font-family: 'Cormorant Garamond', serif; font-size:1.09em; font-weight:600; text-shadow: 1px 1px 2px #000;">
     Emplacement de l'épreuve
   </span>
 `;
 
-actionsRow.appendChild(boussoleBtn);
+iconDiv.appendChild(boussoleBtn);
+actionsRow.appendChild(iconDiv);
 gpsZone.appendChild(actionsRow);
 form.appendChild(gpsZone);
 
-// --- CORRECTIF: tout dans une fonction ---
+// ---- Fonction d'affichage des points GPS ----
 function renderGpsPoints() {
   gpsListDiv.innerHTML = '';
   gpsPoints.forEach((pt, idx) => {
     let row = document.createElement('div');
-
-    // Si tu veux un logo, décommente la ligne suivante et adapte :
-    // row.appendChild(logo);
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.gap = "8px";
+    row.style.margin = "5px 0";
 
     let input = document.createElement('input');
     input.type = "text";
@@ -413,7 +420,28 @@ function renderGpsPoints() {
     gpsListDiv.appendChild(row);
   });
 }
-renderGpsPoints(); // <-- On appelle la fonction pour afficher au chargement
+renderGpsPoints();
+
+// --- Action bouton boussole : ouverture du sélecteur GPS ---
+boussoleBtn.onclick = function() {
+  openMapPicker({
+    value: "",
+    set value(val) {
+      if(val) {
+        gpsPoints.push(val);
+        renderGpsPoints();
+      }
+    }
+  });
+};
+  
+
+// --- CORRECTIF: tout dans une fonction ---
+function renderGpsPoints() {
+  gpsListDiv.innerHTML = '';
+  gpsPoints.forEach((pt, idx) => {
+    let row = document.createElement('div');
+
 
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
