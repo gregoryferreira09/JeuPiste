@@ -397,25 +397,6 @@ function initMap() {
   refreshGpsList();
 }
 
-function refreshGpsList() {
-  gpsListDiv.innerHTML = "<b>Points ajoutés :</b><br>";
-  if (gpsPoints.length === 0) {
-    gpsListDiv.innerHTML += "<em>Aucun point ajouté.</em>";
-  } else {
-    gpsListDiv.innerHTML += "<ul style='margin:0 0 8px 0;'>";
-    gpsPoints.forEach((pt, idx) => {
-      gpsListDiv.innerHTML += `
-        <li>
-          Point ${idx + 1} : ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-          <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
-        </li>
-      `;
-    });
-    gpsListDiv.innerHTML += "</ul>";
-  }
-  recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
-}
-
 
 function refreshGpsList() {
   gpsListDiv.innerHTML = "<b>Points ajoutés :</b><br>";
