@@ -796,8 +796,10 @@ function closeMapModal() {
   document.getElementById('mapModal').style.display = 'none';
   if (window.map) {
     window.map.off();
-    setTimeout(() => window.map.remove(), 300);
-    window.map = null;
+    setTimeout(() => {
+      window.map.remove();
+      window.map = null; // Remis ici, APRES remove()
+    }, 300);
     searchMarker = null;
   }
 }
