@@ -395,13 +395,14 @@ actionsRow.appendChild(boussoleBtn);
       delBtn.className = "main-btn";
       delBtn.textContent = "❌";
       delBtn.style.padding = "0 10px";
-      delBtn.onclick = function() {
-        gpsPoints.splice(idx, 1);
-        renderGpsPoints();
-        }; 
-      row.appendChild(delBtn);
+     
+  delBtn.onclick = function() {
+  gpsPoints.splice(idx, 1);
+  renderGpsPoints();
+};
+row.appendChild(delBtn);
 
-      gpsListDiv.appendChild(row);
+gpsListDiv.appendChild(row);
     });
   }
   renderGpsPoints();
