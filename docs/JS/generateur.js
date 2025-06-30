@@ -235,11 +235,6 @@ function handleDragEnd(e) {
 
 // Exporter le scénario
 function exporterScenario() {
-  const coordEnd = document.getElementById('coordEnd') ? document.getElementById('coordEnd').value : "";
-  if (!coordEnd) {
-    alert("Veuillez renseigner la ou les coordonnées d'arrivée !");
-    return;
-  }
   if (scenario.length < 1) {
     alert("Il faut au moins 1 épreuve pour générer un scénario !");
     return;
@@ -294,26 +289,6 @@ function afficherBoutonSalon() {
 
 // Sauvegarde du scénario et génération d'un code de salon
 function genererSalon() {
-  const coordEnd = document.getElementById('coordEnd') ? document.getElementById('coordEnd').value : "";
-  if (!coordEnd) {
-    alert("Veuillez renseigner la ou les coordonnées d'arrivée !");
-    return;
-  }
-  if (scenario.length < 4) {
-    alert("Il faut au moins 4 épreuves pour générer un code salon !");
-    return;
-  }
-  const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
-  firebase.database().ref('scenarios/' + codeSalon).set({
-    mode: currentGameMode,
-    coordEnd,
-    scenario
-  }).then(() => {
-    alert("Code de salon généré : " + codeSalon + "\nTu peux le partager pour rejouer ce scénario !");
-    navigator.clipboard && navigator.clipboard.writeText(codeSalon);
-  });
-}
-
 // ===================
 // Formulaire dynamique
 // ===================
