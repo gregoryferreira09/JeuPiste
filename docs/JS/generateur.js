@@ -340,14 +340,12 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   
     
-  
+    
 
-
   
-// Bloc GPS moderne (corrigé, sans doublons)
+// Bloc GPS multi-points, mode simple (zone de jeu = tous les points placés)
 
 let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
-let endPoint = values.fin || null;
 let gpsZone = document.createElement('div');
 gpsZone.className = 'form-field';
 gpsZone.style.display = "flex";
@@ -357,7 +355,8 @@ gpsZone.style.marginBottom = "20px";
 
 // Carte interactive
 let gpsMapDiv = document.createElement('div');
-gpsMapDiv.id = 'gpsMapModern_' + Date.now();
+let uniqueId = 'gpsMap_' + Date.now();
+gpsMapDiv.id = uniqueId;
 gpsMapDiv.style = 'width:100%;max-width:510px;height:280px;margin:0 auto 12px auto;border-radius:10px;overflow:hidden;';
 gpsZone.appendChild(gpsMapDiv);
 
@@ -380,30 +379,14 @@ undoBtn.onclick = function() {
 undoBtn.style = "margin: 0 0 14px 0;";
 gpsZone.appendChild(undoBtn);
 
-// Zone de fin
-let endBtn = document.createElement('button');
-endBtn.type = "button";
-endBtn.textContent = "Définir la zone de fin sur la carte";
-endBtn.className = "main-btn";
-endBtn.style = "margin-left: 14px; margin-bottom:10px;";
-gpsZone.appendChild(endBtn);
-
-let endCoordField = document.createElement('input');
-endCoordField.type = "text";
-endCoordField.placeholder = "Coordonnée de fin (lat, lng)";
-endCoordField.readOnly = true;
-endCoordField.style = "width:220px;margin-left:8px;text-align:center;";
-gpsZone.appendChild(endCoordField);
+form.appendChild(gpsZone);
 
 let recapDiv = document.createElement('div');
 recapDiv.style = "margin: 8px 0 10px 0; color:#ffeecb;";
 gpsZone.appendChild(recapDiv);
 
-form.appendChild(gpsZone);
-
 // --- Initialisation Leaflet ---
-let map, markersLayer, endMarker;
-let endMode = false;
+let map, markersLayer;
 function loadLeafletAndInit() {
   if (!window.leafletLoaded) {
     let link = document.createElement('link');
@@ -423,20 +406,11 @@ loadLeafletAndInit();
 
 function initMap() {
   if (map) { map.remove(); map = null; }
-  map = L.map(gpsMapDiv.id).setView([47.478419, -0.563166], 13);
+  map = L.map(uniqueId).setView([47.478419, -0.563166], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
   markersLayer = L.layerGroup().addTo(map);
 
   map.on('click', function(e) {
-    if (endMode) {
-      endPoint = { lat: e.latlng.lat, lng: e.latlng.lng };
-      endCoordField.value = `${endPoint.lat.toFixed(6)}, ${endPoint.lng.toFixed(6)}`;
-      endMode = false;
-      endBtn.textContent = "Définir la zone de fin sur la carte";
-      endBtn.disabled = false;
-      refreshGpsMarkers();
-      return;
-    }
     gpsPoints.push({ lat: e.latlng.lat, lng: e.latlng.lng });
     refreshGpsMarkers();
     refreshGpsList();
@@ -455,24 +429,10 @@ function refreshGpsMarkers() {
     marker.bindPopup(`
       <b>Point ${idx + 1}</b><br>
       ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-      <br><button type="button" onclick="window._deleteModernGpsPoint_${gpsMapDiv.id}(${idx});">Supprimer</button>
+      <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
     `);
   });
-  if (endPoint) {
-    if (endMarker) { markersLayer.removeLayer(endMarker); }
-    endMarker = L.marker([endPoint.lat, endPoint.lng], {
-      icon: L.icon({
-        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-red.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        iconAnchor: [12, 41]
-      }),
-      title: "Zone de fin",
-      draggable: false
-    }).addTo(markersLayer);
-    endMarker.bindPopup(`<b>Zone de fin</b><br>${endPoint.lat.toFixed(6)}, ${endPoint.lng.toFixed(6)}
-      <br><button type="button" onclick="window._removeModernEndPoint_${gpsMapDiv.id}();">Supprimer</button>`);
-  }
-  recapDiv.textContent = `Total : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""} | Zone de fin : ${endPoint ? endPoint.lat.toFixed(6) + ", " + endPoint.lng.toFixed(6) : "non définie"}`;
+  recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
 }
 
 function refreshGpsList() {
@@ -485,16 +445,16 @@ function refreshGpsList() {
       gpsListDiv.innerHTML += `
         <li>
           Point ${idx + 1} : ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-          <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteModernGpsPoint_${gpsMapDiv.id}(${idx});">Supprimer</button>
+          <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
         </li>
       `;
     });
     gpsListDiv.innerHTML += "</ul>";
   }
-  recapDiv.textContent = `Total : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""} | Zone de fin : ${endPoint ? endPoint.lat.toFixed(6) + ", " + endPoint.lng.toFixed(6) : "non définie"}`;
+  recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
 }
 
-window['_deleteModernGpsPoint_' + gpsMapDiv.id] = function(idx) {
+window['_deleteGpsPoint_' + uniqueId] = function(idx) {
   gpsPoints.splice(idx, 1);
   refreshGpsMarkers();
   refreshGpsList();
