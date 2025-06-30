@@ -75,9 +75,9 @@ document.addEventListener("DOMContentLoaded", function() {
       }
 
       localStorage.setItem('scenarioTest', JSON.stringify({
-  mode: currentGameMode,
-  scenario: scenario
-}));
+        mode: currentGameMode,
+        scenario: scenario
+      }));
       
       window.open('template-epreuve.html?test=1', '_blank');
     };
@@ -247,10 +247,10 @@ function exporterScenario() {
     date: Date.now()
   })
   .then(() => {
-firebase.database().ref('scenarios/' + codeSalon).set({
-  mode: currentGameMode,
-  scenario
-});
+    firebase.database().ref('scenarios/' + codeSalon).set({
+      mode: currentGameMode,
+      scenario
+    });
   })
   .then(() => {
     localStorage.setItem("dernierScenarioCree", codeSalon);
@@ -284,11 +284,7 @@ function afficherBoutonSalon() {
   }
 }
 
-// Sauvegarde du scénario et génération d'un code de salon
-function genererSalon() {
-// ===================
-// Formulaire dynamique
-// ===================
+// Formulaire dynamique (génération d'épreuves)
 function generateQuestForm(questTypeId, containerId, values = {}) {
   const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
   if (!quest) return;
@@ -300,110 +296,136 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   let form = document.createElement('form');
   form.className = 'quest-form';
 
-  
-    
-    
+  // Bloc GPS multi-points, mode simple (zone de jeu = tous les points placés)
+  let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
+  let gpsZone = document.createElement('div');
+  gpsZone.className = 'form-field';
+  gpsZone.style.display = "flex";
+  gpsZone.style.flexDirection = "column";
+  gpsZone.style.gap = "8px";
+  gpsZone.style.marginBottom = "20px";
 
-  
-// Bloc GPS multi-points, mode simple (zone de jeu = tous les points placés)
+  // Carte interactive
+  let gpsMapDiv = document.createElement('div');
+  let uniqueId = 'gpsMap_' + Date.now();
+  gpsMapDiv.id = uniqueId;
+  gpsMapDiv.style = 'width:100%;max-width:510px;height:280px;margin:0 auto 12px auto;border-radius:10px;overflow:hidden;';
+  gpsZone.appendChild(gpsMapDiv);
 
-let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
-let gpsZone = document.createElement('div');
-gpsZone.className = 'form-field';
-gpsZone.style.display = "flex";
-gpsZone.style.flexDirection = "column";
-gpsZone.style.gap = "8px";
-gpsZone.style.marginBottom = "20px";
+  // Liste des points
+  let gpsListDiv = document.createElement('div');
+  gpsZone.appendChild(gpsListDiv);
 
-// Carte interactive
-let gpsMapDiv = document.createElement('div');
-let uniqueId = 'gpsMap_' + Date.now();
-gpsMapDiv.id = uniqueId;
-gpsMapDiv.style = 'width:100%;max-width:510px;height:280px;margin:0 auto 12px auto;border-radius:10px;overflow:hidden;';
-gpsZone.appendChild(gpsMapDiv);
+  form.appendChild(gpsZone);
 
-// Liste des points
-let gpsListDiv = document.createElement('div');
-gpsZone.appendChild(gpsListDiv);
-
-form.appendChild(gpsZone);
-
-let recapDiv = document.createElement('div');
-recapDiv.style = "margin: 8px 0 10px 0; color:#ffeecb;";
-gpsZone.appendChild(recapDiv);
+  let recapDiv = document.createElement('div');
+  recapDiv.style = "margin: 8px 0 10px 0; color:#ffeecb;";
+  gpsZone.appendChild(recapDiv);
 
   // Bouton annuler dernier point
-let undoBtn = document.createElement('button');
-undoBtn.type = "button";
-undoBtn.className = "main-btn";
-undoBtn.textContent = "Annuler le dernier point";
-undoBtn.onclick = function() {
-  if (gpsPoints.length > 0) {
-    gpsPoints.pop();
+  let undoBtn = document.createElement('button');
+  undoBtn.type = "button";
+  undoBtn.className = "main-btn";
+  undoBtn.textContent = "Annuler le dernier point";
+  undoBtn.onclick = function() {
+    if (gpsPoints.length > 0) {
+      gpsPoints.pop();
+      refreshGpsMarkers();
+      refreshGpsList();
+    }
+  };
+  undoBtn.style = "margin: 0 8px 14px 0;";
+  gpsZone.appendChild(undoBtn);
+
+  // BOUTON VIDER TOUS LES POINTS
+  let clearBtn = document.createElement('button');
+  clearBtn.type = "button";
+  clearBtn.className = "main-btn";
+  clearBtn.textContent = "Vider tous les points";
+  clearBtn.onclick = function() {
+    if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
+      gpsPoints.length = 0;
+      refreshGpsMarkers();
+      refreshGpsList();
+    }
+  };
+  clearBtn.style = "margin: 0 0 14px 0;";
+  gpsZone.appendChild(clearBtn);
+
+  // --- Initialisation Leaflet ---
+  let map, markersLayer;
+  function loadLeafletAndInit() {
+    if (!window.leafletLoaded) {
+      let link = document.createElement('link');
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      document.head.appendChild(link);
+      let script = document.createElement('script');
+      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.onload = initMap;
+      document.body.appendChild(script);
+      window.leafletLoaded = true;
+    } else {
+      initMap();
+    }
+  }
+  loadLeafletAndInit();
+
+  function initMap() {
+    if (map) { map.remove(); map = null; }
+    map = L.map(uniqueId).setView([47.478419, -0.563166], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+    markersLayer = L.layerGroup().addTo(map);
+
+    map.on('click', function(e) {
+      gpsPoints.push({ lat: e.latlng.lat, lng: e.latlng.lng });
+      refreshGpsMarkers();
+      refreshGpsList();
+    });
+
     refreshGpsMarkers();
     refreshGpsList();
   }
-};
-undoBtn.style = "margin: 0 8px 14px 0;";
-gpsZone.appendChild(undoBtn);
 
-// BOUTON VIDER TOUS LES POINTS
-let clearBtn = document.createElement('button');
-clearBtn.type = "button";
-clearBtn.className = "main-btn";
-clearBtn.textContent = "Vider tous les points";
-clearBtn.onclick = function() {
-  if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
-    gpsPoints.length = 0;
+  function refreshGpsMarkers() {
+    if (!markersLayer) return;
+    markersLayer.clearLayers();
+    gpsPoints.forEach((pt, idx) => {
+      let marker = L.marker([pt.lat, pt.lng], { draggable: false, title: `Point ${idx + 1}` });
+      marker.addTo(markersLayer);
+      marker.bindPopup(`
+        <b>Point ${idx + 1}</b><br>
+        ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
+        <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
+      `);
+    });
+    recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
+  }
+
+  function refreshGpsList() {
+    gpsListDiv.innerHTML = "<b>Points ajoutés :</b><br>";
+    if (gpsPoints.length === 0) {
+      gpsListDiv.innerHTML += "<em>Aucun point ajouté.</em>";
+    } else {
+      gpsListDiv.innerHTML += "<ul style='margin:0 0 8px 0;'>";
+      gpsPoints.forEach((pt, idx) => {
+        gpsListDiv.innerHTML += `
+          <li>
+            Point ${idx + 1} : ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
+            <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
+          </li>
+        `;
+      });
+      gpsListDiv.innerHTML += "</ul>";
+    }
+    recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
+  }
+
+  window['_deleteGpsPoint_' + uniqueId] = function(idx) {
+    gpsPoints.splice(idx, 1);
     refreshGpsMarkers();
     refreshGpsList();
-  }
-};
-clearBtn.style = "margin: 0 0 14px 0;";
-gpsZone.appendChild(clearBtn);
-
-// --- Initialisation Leaflet ---
-let map, markersLayer;
-function loadLeafletAndInit() {
-  if (!window.leafletLoaded) {
-    let link = document.createElement('link');
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(link);
-    let script = document.createElement('script');
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.onload = initMap;
-    document.body.appendChild(script);
-    window.leafletLoaded = true;
-  } else {
-    initMap();
-  }
-}
-loadLeafletAndInit();
-
-function initMap() {
-  if (map) { map.remove(); map = null; }
-  map = L.map(uniqueId).setView([47.478419, -0.563166], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-  markersLayer = L.layerGroup().addTo(map);
-
-  map.on('click', function(e) {
-    gpsPoints.push({ lat: e.latlng.lat, lng: e.latlng.lng });
-    refreshGpsMarkers();
-    refreshGpsList();
-  });
-
-  refreshGpsMarkers();
-  refreshGpsList();
-}
-
-
-window['_deleteGpsPoint_' + uniqueId] = function(idx) {
-  gpsPoints.splice(idx, 1);
-  refreshGpsMarkers();
-  refreshGpsList();
-};
-  
+  };
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
   const SUGG_TYPES = Object.keys(SUGGESTIONS);
