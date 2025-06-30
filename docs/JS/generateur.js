@@ -403,8 +403,8 @@ actionsRow.appendChild(boussoleBtn);
 row.appendChild(delBtn);
 
 gpsListDiv.appendChild(row);
-    });
-  }
+
+  
   renderGpsPoints();
 
 
