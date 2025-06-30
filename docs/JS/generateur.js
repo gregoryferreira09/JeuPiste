@@ -376,6 +376,7 @@ undoBtn.onclick = function() {
     refreshGpsList();
   }
 };
+  
 undoBtn.style = "margin: 0 0 14px 0;";
 gpsZone.appendChild(undoBtn);
 
