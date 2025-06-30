@@ -816,39 +816,3 @@ function resetMapContainer() {
   }
 }
 
-
- if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
-  mapSearchTimeout = setTimeout(() => {
-    resultsDiv.innerHTML = '<div>Recherche...</div>';
-    resultsDiv.style.display = 'block';
-    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=10`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.length === 0) {
-          resultsDiv.innerHTML = '<div>Aucun résultat</div>';
-          return;
-        }
-
-        resultsDiv.innerHTML = data.map(place =>
-          `<div data-lat="${place.lat}" data-lon="${place.lon}">
-            ${place.display_name}
-          </div>`
-        ).join('');
-        Array.from(resultsDiv.children).forEach(child => {
-          child.onclick = function() {
-            const lat = parseFloat(this.getAttribute('data-lat'));
-            const lon = parseFloat(this.getAttribute('data-lon'));
-            if (window.map) window.map.setView([lat, lon], 16);
-            if (searchMarker) searchMarker.setLatLng([lat, lon]);
-            else searchMarker = L.marker([lat, lon]).addTo(window.map);
-            resultsDiv.style.display = 'none';
-            resultsDiv.innerHTML = '';
-            if (mapTargetInput) mapTargetInput.value = lat + ", " + lon;
-            closeMapModal();
-          }
-        });
-      }).catch(() => {
-        resultsDiv.innerHTML = '<div>Erreur de recherche</div>';
-      });
-  }, 350);
-}
