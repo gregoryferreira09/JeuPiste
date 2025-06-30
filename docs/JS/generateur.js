@@ -57,16 +57,6 @@ document.addEventListener("DOMContentLoaded", function() {
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
 
-  // Champ coordonnée d'arrivée
-  const coordEnd = document.getElementById('coordEnd');
-  if (coordEnd) {
-    coordEnd.style.textAlign = "center";
-    coordEnd.style.width = "200px";
-    coordEnd.style.margin = "0 auto";
-    coordEnd.readOnly = true;
-    coordEnd.addEventListener('click', function() { openMapPicker(this); });
-  }
-
   // Fermeture carte
   const closeBtn = document.getElementById('closeMapBtn');
   if (closeBtn) closeBtn.addEventListener('click', closeMapModal);
