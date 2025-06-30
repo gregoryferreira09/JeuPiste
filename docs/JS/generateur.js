@@ -434,14 +434,6 @@ boussoleBtn.onclick = function() {
     }
   });
 };
-  
-
-// --- CORRECTIF: tout dans une fonction ---
-function renderGpsPoints() {
-  gpsListDiv.innerHTML = '';
-  gpsPoints.forEach((pt, idx) => {
-    let row = document.createElement('div');
-
 
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
