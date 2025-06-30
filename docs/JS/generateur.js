@@ -380,20 +380,6 @@ boussoleBtn.innerHTML = `
 
 actionsRow.appendChild(boussoleBtn);
 
-// Remplace l'ancien bouton
-// addBtn.onclick = function() { ... }
-boussoleBtn.onclick = function() {
-  openMapPicker({
-    value: "",
-    set value(val) {
-      if(val) {
-        gpsPoints.push(val);
-        renderGpsPoints();
-      }
-    }
-  });
-};
-
       row.appendChild(logo);
 
       let input = document.createElement('input');
