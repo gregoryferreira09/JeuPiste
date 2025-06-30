@@ -357,37 +357,43 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   actionsRow.style.gap = "16px";
   actionsRow.style.marginTop = "4px";
 
-  let addBtn = document.createElement('button');
-  addBtn.type = 'button';
-  addBtn.className = 'main-btn';
-  addBtn.textContent = 'Ajouter';
-  addBtn.style.marginLeft = "2px";
-  actionsRow.appendChild(addBtn);
+// Création du bouton SVG boussole
+let boussoleBtn = document.createElement('button');
+boussoleBtn.type = 'button';
+boussoleBtn.className = 'gps-add-btn';
+boussoleBtn.style.display = "flex";
+boussoleBtn.style.flexDirection = "column";
+boussoleBtn.style.alignItems = "center";
+boussoleBtn.style.background = "none";
+boussoleBtn.style.border = "none";
+boussoleBtn.style.cursor = "pointer";
+boussoleBtn.style.marginLeft = "2px";
 
-  gpsZone.appendChild(actionsRow);
-  form.appendChild(gpsZone);
+// SVG boussole harmonisée
+boussoleBtn.innerHTML = `
+  <svg style="width:48px;height:48px;" viewBox="0 0 24 24">
+    <path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5
+    2.5-7 7-2.5-2.5 7z"/>
+  </svg>
+  <span style="margin-top:6px; color:#222; font-size:1.08em; font-weight:bold;">Emplacement de la quête</span>
+`;
 
-  function renderGpsPoints() {
-    gpsListDiv.innerHTML = '';
-    gpsPoints.forEach((pt, idx) => {
-      let row = document.createElement('div');
-      row.style = "display: flex; align-items: center; gap: 12px; margin-bottom: 4px;";
-      // Icône boussole SVG harmonisée (comme sur les pages épreuves)
-      let logo = document.createElement('span');
-      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]`;
-      logo.title = "Choisir/modifier ce point GPS";
-      logo.style.cursor = "pointer";
-      logo.onclick = function() {
-        openMapPicker({
-          value: pt,
-          set value(val) {
-            if(val) {
-              gpsPoints[idx] = val;
-              renderGpsPoints();
-            }
-          }
-        });
-      };
+actionsRow.appendChild(boussoleBtn);
+
+// Remplace l'ancien bouton
+// addBtn.onclick = function() { ... }
+boussoleBtn.onclick = function() {
+  openMapPicker({
+    value: "",
+    set value(val) {
+      if(val) {
+        gpsPoints.push(val);
+        renderGpsPoints();
+      }
+    }
+  });
+};
+
       row.appendChild(logo);
 
       let input = document.createElement('input');
