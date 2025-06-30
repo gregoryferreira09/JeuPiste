@@ -812,6 +812,6 @@ function resetMapContainer() {
     oldContainer.innerHTML = '';
     if (oldContainer._leaflet_id) {
       delete oldContainer._leaflet_id;
-}
+    }
   }
 }
