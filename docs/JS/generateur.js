@@ -341,23 +341,22 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   // Bloc multi-points GPS façon boussole harmonisée + bouton ajouter
   let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
   let gpsZone = document.createElement('div');
-  gpsZone.className = 'form-field';
-  gpsZone.style.display = "flex";
-  gpsZone.style.flexDirection = "column";
-  gpsZone.style.gap = "8px";
-  gpsZone.style.marginBottom = "20px";
+gpsZone.className = 'form-field';
+gpsZone.style.display = "flex";
+gpsZone.style.flexDirection = "column";
+gpsZone.style.gap = "8px";
+gpsZone.style.marginBottom = "20px";
 
-  let gpsListDiv = document.createElement('div');
-  gpsListDiv.id = "gpsPointsList";
-  gpsZone.appendChild(gpsListDiv);
+let gpsListDiv = document.createElement('div');
+gpsListDiv.id = "gpsPointsList";
+gpsZone.appendChild(gpsListDiv);
 
-  let actionsRow = document.createElement('div');
-  actionsRow.style.display = "flex";
-  actionsRow.style.alignItems = "center";
-  actionsRow.style.gap = "16px";
-  actionsRow.style.marginTop = "4px";
+let actionsRow = document.createElement('div');
+actionsRow.style.display = "flex";
+actionsRow.style.alignItems = "center";
+actionsRow.style.gap = "16px";
+actionsRow.style.marginTop = "4px";
 
-// Création du bouton SVG boussole
 let boussoleBtn = document.createElement('button');
 boussoleBtn.type = 'button';
 boussoleBtn.className = 'gps-add-btn';
@@ -369,17 +368,19 @@ boussoleBtn.style.border = "none";
 boussoleBtn.style.cursor = "pointer";
 boussoleBtn.style.marginLeft = "2px";
 
-// SVG boussole harmonisée
-// SVG boussole harmonisée
 boussoleBtn.innerHTML = `
   <svg style="width:48px;height:48px;" viewBox="0 0 24 24">
     <path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5
     2.5-7 7-2.5-2.5 7z"/>
   </svg>
-  <span style="margin-top:6px; color:#222; font-size:1.08em; font-weight:bold;">Emplacement de la quête</span>
+  <span style="margin-top:6px; color:#222; font-size:1.08em; font-weight:bold;">
+    Emplacement de l'épreuve
+  </span>
 `;
 
 actionsRow.appendChild(boussoleBtn);
+gpsZone.appendChild(actionsRow);
+form.appendChild(gpsZone);
 
 // --- CORRECTIF: tout dans une fonction ---
 function renderGpsPoints() {
