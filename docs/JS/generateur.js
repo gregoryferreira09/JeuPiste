@@ -50,161 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   }
 
-
-  // === Bloc GPS multi-points, sélection intuitive sur la carte ===
-
-let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
-let markers = []; // Pour garder une référence sur chaque marker
-
-let gpsZone = document.createElement('div');
-gpsZone.className = 'form-field';
-gpsZone.style.display = "flex";
-gpsZone.style.flexDirection = "column";
-gpsZone.style.gap = "8px";
-gpsZone.style.marginBottom = "20px";
-
-// Carte interactive
-let gpsMapDiv = document.createElement('div');
-let uniqueId = 'gpsMap_' + Date.now();
-gpsMapDiv.id = uniqueId;
-gpsMapDiv.style = 'width:100%;max-width:510px;height:280px;margin:0 auto 12px auto;border-radius:10px;overflow:hidden;';
-gpsZone.appendChild(gpsMapDiv);
-
-// Liste des points
-let gpsListDiv = document.createElement('div');
-gpsZone.appendChild(gpsListDiv);
-
-form.appendChild(gpsZone);
-
-let recapDiv = document.createElement('div');
-recapDiv.style = "margin: 8px 0 10px 0; color:#ffeecb;";
-gpsZone.appendChild(recapDiv);
-
-// Bouton annuler dernier point
-let undoBtn = document.createElement('button');
-undoBtn.type = "button";
-undoBtn.className = "main-btn";
-undoBtn.textContent = "Annuler le dernier point";
-undoBtn.onclick = function() {
-  if (gpsPoints.length > 0) {
-    gpsPoints.pop();
-    removeLastMarker();
-    refreshGpsList();
-  }
-};
-undoBtn.style = "margin: 0 8px 14px 0;";
-gpsZone.appendChild(undoBtn);
-
-// BOUTON VIDER TOUS LES POINTS
-let clearBtn = document.createElement('button');
-clearBtn.type = "button";
-clearBtn.className = "main-btn";
-clearBtn.textContent = "Vider tous les points";
-clearBtn.onclick = function() {
-  if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
-    gpsPoints.length = 0;
-    removeAllMarkers();
-    refreshGpsList();
-  }
-};
-clearBtn.style = "margin: 0 0 14px 0;";
-gpsZone.appendChild(clearBtn);
-
-// --- Initialisation Leaflet ---
-let map, markersLayer;
-function loadLeafletAndInit() {
-  if (!window.leafletLoaded) {
-    let link = document.createElement('link');
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(link);
-    let script = document.createElement('script');
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.onload = initMap;
-    document.body.appendChild(script);
-    window.leafletLoaded = true;
-  } else {
-    initMap();
-  }
-}
-loadLeafletAndInit();
-
-function initMap() {
-  if (map) { map.remove(); map = null; }
-  map = L.map(uniqueId).setView([47.478419, -0.563166], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-  markersLayer = L.layerGroup().addTo(map);
-
-  // Ajout des points existants (édition)
-  gpsPoints.forEach((pt, idx) => {
-    addMarker(pt, idx);
-  });
-
-  map.on('click', function(e) {
-    const pt = { lat: e.latlng.lat, lng: e.latlng.lng };
-    gpsPoints.push(pt);
-    addMarker(pt, gpsPoints.length - 1);
-    refreshGpsList();
-  });
-
-  refreshGpsList();
-}
-
-function addMarker(pt, idx) {
-  let marker = L.marker([pt.lat, pt.lng], { draggable: false, title: `Point ${idx + 1}` });
-  marker.addTo(markersLayer);
-  marker.bindPopup(
-    `<b>Point ${idx + 1}</b><br>
-    ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-    <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>`
-  );
-  markers[idx] = marker;
-}
-
-function removeLastMarker() {
-  if (markers.length > 0) {
-    markersLayer.removeLayer(markers.pop());
-  }
-}
-
-function removeAllMarkers() {
-  markers.forEach(m => markersLayer.removeLayer(m));
-  markers = [];
-}
-
-function refreshMarkersAfterDelete() {
-  // Rebuild all markers (after delete)
-  removeAllMarkers();
-  gpsPoints.forEach((pt, i) => addMarker(pt, i));
-}
-
-// Pour suppression par bouton popup
-window['_deleteGpsPoint_' + uniqueId] = function(idx) {
-  gpsPoints.splice(idx, 1);
-  refreshMarkersAfterDelete();
-  refreshGpsList();
-};
-
-// Affichage de la liste des points
-function refreshGpsList() {
-  gpsListDiv.innerHTML = "<b>Points ajoutés :</b><br>";
-  if (gpsPoints.length === 0) {
-    gpsListDiv.innerHTML += "<em>Aucun point ajouté.</em>";
-  } else {
-    gpsListDiv.innerHTML += "<ul style='margin:0 0 8px 0;'>";
-    gpsPoints.forEach((pt, idx) => {
-      gpsListDiv.innerHTML += `
-        <li>
-          Point ${idx + 1} : ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-          <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
-        </li>
-      `;
-    });
-    gpsListDiv.innerHTML += "</ul>";
-  }
-  recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
-}
-  
   // FadeIn
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
@@ -238,51 +83,6 @@ function refreshGpsList() {
     };
   }
 });
-
-// 1. Afficher la carte dans une modale ou un conteneur visible
-
-// 2. Initialiser la carte avec Leaflet, centrer sur une zone par défaut
-
-let points = []; // tableau des points GPS sélectionnés
-
-function onMapClick(e) {
-  // Ajouter le point au tableau
-  points.push({lat: e.latlng.lat, lng: e.latlng.lng});
-
-  // Ajouter un marqueur sur la carte
-  let marker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
-
-  // Ajouter la fonctionnalité de suppression/déplacement si besoin
-  marker.bindPopup(
-    `<b>Point ${points.length}</b><br>
-    ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}
-    <br><button onclick="deletePoint(${points.length-1})">Supprimer</button>`
-  );
-
-  // Option : stocker le marker pour pouvoir le retirer plus tard (si suppression)
-  markers.push(marker);
-
-  // Rafraîchir la liste affichée des points
-  updatePointList();
-}
-
-map.on('click', onMapClick);
-
-// 3. Gérer la suppression
-function deletePoint(idx) {
-  points.splice(idx, 1);
-  // Retirer le marqueur de la carte
-  map.removeLayer(markers[idx]);
-  markers.splice(idx, 1);
-  updatePointList();
-}
-
-// 4. Afficher la liste des points sous la carte (optionnel)
-function updatePointList() {
-  // Met à jour la liste des points dans l’UI
-}
-
-// 5. Lorsque l’utilisateur valide ou ferme la modale, on conserve tous les points GPS sélectionnés
 
 // Accord dynamique de la règle du jeu
 function regleAccordee(brut, N) {
@@ -496,8 +296,11 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   let form = document.createElement('form');
   form.className = 'quest-form';
 
-  // Bloc GPS multi-points, mode simple (zone de jeu = tous les points placés)
+  // === Bloc GPS multi-points, sélection intuitive sur la carte ===
+
   let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
+  let markers = []; // Pour garder une référence sur chaque marker
+
   let gpsZone = document.createElement('div');
   gpsZone.className = 'form-field';
   gpsZone.style.display = "flex";
@@ -530,7 +333,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   undoBtn.onclick = function() {
     if (gpsPoints.length > 0) {
       gpsPoints.pop();
-      refreshGpsMarkers();
+      removeLastMarker();
       refreshGpsList();
     }
   };
@@ -545,7 +348,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   clearBtn.onclick = function() {
     if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
       gpsPoints.length = 0;
-      refreshGpsMarkers();
+      removeAllMarkers();
       refreshGpsList();
     }
   };
@@ -577,30 +380,53 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
     markersLayer = L.layerGroup().addTo(map);
 
+    // Ajout des points existants (édition)
+    gpsPoints.forEach((pt, idx) => {
+      addMarker(pt, idx);
+    });
+
     map.on('click', function(e) {
-      gpsPoints.push({ lat: e.latlng.lat, lng: e.latlng.lng });
-      refreshGpsMarkers();
+      const pt = { lat: e.latlng.lat, lng: e.latlng.lng };
+      gpsPoints.push(pt);
+      addMarker(pt, gpsPoints.length - 1);
       refreshGpsList();
     });
 
-    refreshGpsMarkers();
     refreshGpsList();
   }
 
-  function refreshGpsMarkers() {
-    if (!markersLayer) return;
-    markersLayer.clearLayers();
-    gpsPoints.forEach((pt, idx) => {
-      let marker = L.marker([pt.lat, pt.lng], { draggable: false, title: `Point ${idx + 1}` });
-      marker.addTo(markersLayer);
-      marker.bindPopup(`
-        <b>Point ${idx + 1}</b><br>
-        ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-        <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
-      `);
-    });
-    recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
+  function addMarker(pt, idx) {
+    let marker = L.marker([pt.lat, pt.lng], { draggable: false, title: `Point ${idx + 1}` });
+    marker.addTo(markersLayer);
+    marker.bindPopup(
+      `<b>Point ${idx + 1}</b><br>
+      ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
+      <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>`
+    );
+    markers[idx] = marker;
   }
+
+  function removeLastMarker() {
+    if (markers.length > 0) {
+      markersLayer.removeLayer(markers.pop());
+    }
+  }
+
+  function removeAllMarkers() {
+    markers.forEach(m => markersLayer.removeLayer(m));
+    markers = [];
+  }
+
+  function refreshMarkersAfterDelete() {
+    removeAllMarkers();
+    gpsPoints.forEach((pt, i) => addMarker(pt, i));
+  }
+
+  window['_deleteGpsPoint_' + uniqueId] = function(idx) {
+    gpsPoints.splice(idx, 1);
+    refreshMarkersAfterDelete();
+    refreshGpsList();
+  };
 
   function refreshGpsList() {
     gpsListDiv.innerHTML = "<b>Points ajoutés :</b><br>";
@@ -620,12 +446,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     }
     recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
   }
-
-  window['_deleteGpsPoint_' + uniqueId] = function(idx) {
-    gpsPoints.splice(idx, 1);
-    refreshGpsMarkers();
-    refreshGpsList();
-  };
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
   const SUGG_TYPES = Object.keys(SUGGESTIONS);
