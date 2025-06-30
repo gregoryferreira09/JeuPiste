@@ -841,7 +841,7 @@ function initLeafletMap() {
   const container = document.getElementById('mapContainer');
   if (container && container._leaflet_id) { delete container._leaflet_id; }
 
-  window.map = L.map('mapContainer').setView([48.858370, 2.294481], 13);
+  window.map = L.map('mapContainer').setView([47.478419, -0.563166], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
   }).addTo(window.map);
