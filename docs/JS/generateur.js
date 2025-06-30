@@ -398,7 +398,6 @@ actionsRow.appendChild(boussoleBtn);
       delBtn.onclick = function() {
         gpsPoints.splice(idx, 1);
         renderGpsPoints();
-      };
       row.appendChild(delBtn);
 
       gpsListDiv.appendChild(row);
