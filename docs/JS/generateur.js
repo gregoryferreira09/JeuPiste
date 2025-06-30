@@ -76,11 +76,12 @@ document.addEventListener("DOMContentLoaded", function() {
         alert("Ajoute au moins une épreuve pour tester !");
         return;
       }
+
       localStorage.setItem('scenarioTest', JSON.stringify({
-        mode: currentGameMode,
-        coordEnd: document.getElementById('coordEnd').value,
-        scenario: scenario
-      }));
+  mode: currentGameMode,
+  scenario: scenario
+}));
+      
       window.open('template-epreuve.html?test=1', '_blank');
     };
   }
@@ -254,11 +255,10 @@ function exporterScenario() {
     date: Date.now()
   })
   .then(() => {
-    firebase.database().ref('scenarios/' + codeSalon).set({
-      mode: currentGameMode,
-      coordEnd,
-      scenario
-    });
+firebase.database().ref('scenarios/' + codeSalon).set({
+  mode: currentGameMode,
+  scenario
+});
   })
   .then(() => {
     localStorage.setItem("dernierScenarioCree", codeSalon);
