@@ -84,6 +84,51 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
+// 1. Afficher la carte dans une modale ou un conteneur visible
+
+// 2. Initialiser la carte avec Leaflet, centrer sur une zone par défaut
+
+let points = []; // tableau des points GPS sélectionnés
+
+function onMapClick(e) {
+  // Ajouter le point au tableau
+  points.push({lat: e.latlng.lat, lng: e.latlng.lng});
+
+  // Ajouter un marqueur sur la carte
+  let marker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+
+  // Ajouter la fonctionnalité de suppression/déplacement si besoin
+  marker.bindPopup(
+    `<b>Point ${points.length}</b><br>
+    ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}
+    <br><button onclick="deletePoint(${points.length-1})">Supprimer</button>`
+  );
+
+  // Option : stocker le marker pour pouvoir le retirer plus tard (si suppression)
+  markers.push(marker);
+
+  // Rafraîchir la liste affichée des points
+  updatePointList();
+}
+
+map.on('click', onMapClick);
+
+// 3. Gérer la suppression
+function deletePoint(idx) {
+  points.splice(idx, 1);
+  // Retirer le marqueur de la carte
+  map.removeLayer(markers[idx]);
+  markers.splice(idx, 1);
+  updatePointList();
+}
+
+// 4. Afficher la liste des points sous la carte (optionnel)
+function updatePointList() {
+  // Met à jour la liste des points dans l’UI
+}
+
+// 5. Lorsque l’utilisateur valide ou ferme la modale, on conserve tous les points GPS sélectionnés
+
 // Accord dynamique de la règle du jeu
 function regleAccordee(brut, N) {
   let phrase = brut.replace("{N}", N);
