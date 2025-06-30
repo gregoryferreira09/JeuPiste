@@ -385,6 +385,36 @@ let recapDiv = document.createElement('div');
 recapDiv.style = "margin: 8px 0 10px 0; color:#ffeecb;";
 gpsZone.appendChild(recapDiv);
 
+  // Bouton annuler dernier point
+let undoBtn = document.createElement('button');
+undoBtn.type = "button";
+undoBtn.className = "main-btn";
+undoBtn.textContent = "Annuler le dernier point";
+undoBtn.onclick = function() {
+  if (gpsPoints.length > 0) {
+    gpsPoints.pop();
+    refreshGpsMarkers();
+    refreshGpsList();
+  }
+};
+undoBtn.style = "margin: 0 8px 14px 0;";
+gpsZone.appendChild(undoBtn);
+
+// BOUTON VIDER TOUS LES POINTS
+let clearBtn = document.createElement('button');
+clearBtn.type = "button";
+clearBtn.className = "main-btn";
+clearBtn.textContent = "Vider tous les points";
+clearBtn.onclick = function() {
+  if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
+    gpsPoints.length = 0;
+    refreshGpsMarkers();
+    refreshGpsList();
+  }
+};
+clearBtn.style = "margin: 0 0 14px 0;";
+gpsZone.appendChild(clearBtn);
+
 // --- Initialisation Leaflet ---
 let map, markersLayer;
 function loadLeafletAndInit() {
