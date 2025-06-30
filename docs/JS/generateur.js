@@ -404,8 +404,8 @@ row.appendChild(delBtn);
 
 gpsListDiv.appendChild(row);
 
-  
-  renderGpsPoints();
+  }); // <-- cette accolade et parenthèse ferment le forEach
+}
 
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
