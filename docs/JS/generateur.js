@@ -69,10 +69,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Fermeture carte
   const closeBtn = document.getElementById('closeMapBtn');
-  if (closeBtn) closeBtn.addEventListener('click', function() {
-    document.getElementById('mapModal').style.display = 'none';
-    if (window.map) setTimeout(()=>window.map.remove(),300);
-  });
+  if (closeBtn) closeBtn.addEventListener('click', closeMapModal);
 
   // Recherche adresse
   const mapSearchBar = document.getElementById('mapSearchBar');
@@ -125,9 +122,9 @@ function regleAccordee(brut, N) {
 function afficherLancementEtRegle() {
   let mode = currentGameMode;
   let nb = scenario.length || 1;
-  let lancementArray = LANCEMENT_TEXTE[mode] || [];
+  let lancementArray = (typeof LANCEMENT_TEXTE !== "undefined" && LANCEMENT_TEXTE[mode]) ? LANCEMENT_TEXTE[mode] : [];
   let lancement = lancementArray.length ? lancementArray[Math.floor(Math.random() * lancementArray.length)] : "";
-  let regles = REGLES_TEXTE[mode] || [];
+  let regles = (typeof REGLES_TEXTE !== "undefined" && REGLES_TEXTE[mode]) ? REGLES_TEXTE[mode] : [];
   let regleBrute = regles.length ? regles[Math.floor(Math.random() * regles.length)] : "";
   let regle = regleAccordee(regleBrute, nb);
 
@@ -806,6 +803,7 @@ function closeMapModal() {
 }
 
 function openMapPicker(targetInput) {
+  closeMapModal(); // Nettoie toute modale/carte précédente avant d'ouvrir
   mapTargetInput = targetInput;
   document.getElementById('mapModal').style.display = 'flex';
   document.getElementById('mapSearchBar').value = '';
@@ -854,9 +852,7 @@ function initLeafletMap() {
     if (searchMarker) searchMarker.setLatLng(e.latlng);
     else searchMarker = L.marker(e.latlng).addTo(window.map);
     if (mapTargetInput) mapTargetInput.value = lat + ", " + lng;
-    document.getElementById('mapModal').style.display = 'none';
-    window.map.off();
-    setTimeout(()=>window.map.remove(),300);
+    closeMapModal();
   });
 }
 
@@ -897,6 +893,7 @@ function handleMapSearch() {
             resultsDiv.style.display = 'none';
             resultsDiv.innerHTML = '';
             if (mapTargetInput) mapTargetInput.value = lat + ", " + lon;
+            closeMapModal();
           }
         });
       }).catch(() => {
