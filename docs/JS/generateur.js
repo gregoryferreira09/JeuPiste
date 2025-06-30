@@ -795,6 +795,16 @@ function resetMapContainer() {
   }
 }
 
+function closeMapModal() {
+  document.getElementById('mapModal').style.display = 'none';
+  if (window.map) {
+    window.map.off();
+    setTimeout(() => window.map.remove(), 300);
+    window.map = null;
+    searchMarker = null;
+  }
+}
+
 function openMapPicker(targetInput) {
   mapTargetInput = targetInput;
   document.getElementById('mapModal').style.display = 'flex';
