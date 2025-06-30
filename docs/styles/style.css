@@ -926,3 +926,12 @@ body {
   min-width: 100px;
   max-width: 120px;
 }
+
+
+/* Forcer le texte des popups et résultats de recherche sur la carte Leaflet à être noir */
+.leaflet-popup-content,
+.leaflet-tooltip,
+#mapSearchResults,
+#mapSearchResults div {
+  color: #111 !important;
+}
