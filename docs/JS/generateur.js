@@ -404,7 +404,6 @@ row.appendChild(delBtn);
 
 gpsListDiv.appendChild(row);
 
-  }); // <-- cette accolade et parenthèse ferment le forEach
 }
 
 
