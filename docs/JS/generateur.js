@@ -404,7 +404,7 @@ row.appendChild(delBtn);
 
 gpsListDiv.appendChild(row);
 
-}
+});
 
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
