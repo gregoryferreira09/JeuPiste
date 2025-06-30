@@ -370,6 +370,7 @@ boussoleBtn.style.cursor = "pointer";
 boussoleBtn.style.marginLeft = "2px";
 
 // SVG boussole harmonisée
+// SVG boussole harmonisée
 boussoleBtn.innerHTML = `
   <svg style="width:48px;height:48px;" viewBox="0 0 24 24">
     <path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5
@@ -380,31 +381,38 @@ boussoleBtn.innerHTML = `
 
 actionsRow.appendChild(boussoleBtn);
 
-      row.appendChild(logo);
+// --- CORRECTIF: tout dans une fonction ---
+function renderGpsPoints() {
+  gpsListDiv.innerHTML = '';
+  gpsPoints.forEach((pt, idx) => {
+    let row = document.createElement('div');
 
-      let input = document.createElement('input');
-      input.type = "text";
-      input.value = pt;
-      input.style.width = "150px";
-      input.style.textAlign = "center";
-      input.readOnly = true;
-      row.appendChild(input);
+    // Si tu veux un logo, décommente la ligne suivante et adapte :
+    // row.appendChild(logo);
 
-      let delBtn = document.createElement('button');
-      delBtn.type = "button";
-      delBtn.className = "main-btn";
-      delBtn.textContent = "❌";
-      delBtn.style.padding = "0 10px";
-     
-  delBtn.onclick = function() {
-  gpsPoints.splice(idx, 1);
-  renderGpsPoints();
-};
-row.appendChild(delBtn);
+    let input = document.createElement('input');
+    input.type = "text";
+    input.value = pt;
+    input.style.width = "150px";
+    input.style.textAlign = "center";
+    input.readOnly = true;
+    row.appendChild(input);
 
-gpsListDiv.appendChild(row);
+    let delBtn = document.createElement('button');
+    delBtn.type = "button";
+    delBtn.className = "main-btn";
+    delBtn.textContent = "❌";
+    delBtn.style.padding = "0 10px";
+    delBtn.onclick = function() {
+      gpsPoints.splice(idx, 1);
+      renderGpsPoints();
+    };
+    row.appendChild(delBtn);
 
-});
+    gpsListDiv.appendChild(row);
+  });
+}
+renderGpsPoints(); // <-- On appelle la fonction pour afficher au chargement
 
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
