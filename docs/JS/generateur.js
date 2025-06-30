@@ -819,83 +819,8 @@ function resetMapContainer() {
   }
 }
 
-function closeMapModal() {
-  document.getElementById('mapModal').style.display = 'none';
-  if (window.map) {
-    window.map.off();
-    setTimeout(() => {
-      window.map.remove();
-      window.map = null; // Remis ici, APRES remove()
-    }, 300);
-    searchMarker = null;
-  }
-}
 
-function openMapPicker(targetInput) {
-  closeMapModal(); // Nettoie toute modale/carte précédente avant d'ouvrir
-  mapTargetInput = targetInput;
-  document.getElementById('mapModal').style.display = 'flex';
-  document.getElementById('mapSearchBar').value = '';
-  document.getElementById('mapSearchResults').style.display = 'none';
-
-  function afterLeafletLoaded() {
-    initLeafletMap(targetInput);
-  }
-
-  if (!window.leafletLoaded) {
-    let link = document.createElement('link');
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(link);
-    let script = document.createElement('script');
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.onload = afterLeafletLoaded;
-    document.body.appendChild(script);
-    window.leafletLoaded = true;
-  } else {
-    afterLeafletLoaded();
-  }
-}
-
-function initLeafletMap() {
-  if (window.map) {
-    window.map.off();
-    window.map.remove();
-    window.map = null;
-  }
-  resetMapContainer();
-
-  const container = document.getElementById('mapContainer');
-  if (container && container._leaflet_id) { delete container._leaflet_id; }
-
-  window.map = L.map('mapContainer').setView([47.478419, -0.563166], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-  }).addTo(window.map);
-
-  searchMarker = null;
-
-  window.map.on('click', function(e) {
-    let lat = e.latlng.lat.toFixed(6);
-    let lng = e.latlng.lng.toFixed(6);
-    if (searchMarker) searchMarker.setLatLng(e.latlng);
-    else searchMarker = L.marker(e.latlng).addTo(window.map);
-    if (mapTargetInput) mapTargetInput.value = lat + ", " + lng;
-    closeMapModal();
-  });
-}
-
-function handleMapSearch() {
-  const searchBar = document.getElementById('mapSearchBar');
-  const resultsDiv = document.getElementById('mapSearchResults');
-  const query = searchBar.value.trim();
-  if (!query) {
-    resultsDiv.style.display = 'none';
-    resultsDiv.innerHTML = '';
-    return;
-  }
-
-  if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
+ if (mapSearchTimeout) clearTimeout(mapSearchTimeout);
   mapSearchTimeout = setTimeout(() => {
     resultsDiv.innerHTML = '<div>Recherche...</div>';
     resultsDiv.style.display = 'block';
