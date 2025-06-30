@@ -364,22 +364,6 @@ gpsZone.appendChild(gpsMapDiv);
 let gpsListDiv = document.createElement('div');
 gpsZone.appendChild(gpsListDiv);
 
-// Bouton annuler dernier point
-let undoBtn = document.createElement('button');
-undoBtn.type = "button";
-undoBtn.className = "main-btn";
-undoBtn.textContent = "Annuler le dernier point";
-undoBtn.onclick = function() {
-  if (gpsPoints.length > 0) {
-    gpsPoints.pop();
-    refreshGpsMarkers();
-    refreshGpsList();
-  }
-};
-  
-undoBtn.style = "margin: 0 0 14px 0;";
-gpsZone.appendChild(undoBtn);
-
 form.appendChild(gpsZone);
 
 let recapDiv = document.createElement('div');
