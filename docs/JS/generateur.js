@@ -374,9 +374,8 @@ boussoleBtn.style.border = "none";
 boussoleBtn.style.cursor = "pointer";
 boussoleBtn.style.padding = "0";
 boussoleBtn.innerHTML = `
-  <svg viewBox="0 0 24 24" width="38" height="38">
-    <path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5
-    2.5-7 7-2.5-2.5 7z"/>
+  <svg viewBox="0 0 24 24" width="32" height="32" style="color:#e0c185;">
+    <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5 2.5.76-1.85-3.76-1.65V7z"/>
   </svg>
   <span style="margin-top:6px; color:#ffeecb; font-family: 'Cormorant Garamond', serif; font-size:1.09em; font-weight:600; text-shadow: 1px 1px 2px #000;">
     Emplacement de l'épreuve
