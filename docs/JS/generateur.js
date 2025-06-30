@@ -611,7 +611,6 @@ endBtn.onclick = function() {
         data[qtyParam.key] = result.filter(x => x).length;
         data.consignes = result.filter(x => x);
         data.points = [...gpsPoints];
-        data.fin = endPoint;
 
         if (data.consignes.length === 0) {
           alert("Merci de sélectionner au moins une mission valide !");
