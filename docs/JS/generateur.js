@@ -377,7 +377,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       row.style = "display: flex; align-items: center; gap: 12px; margin-bottom: 4px;";
       // Icône boussole SVG harmonisée (comme sur les pages épreuves)
       let logo = document.createElement('span');
-      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]
+      logo.innerHTML = `<svg style="width:32px;height:32px;cursor:pointer;" viewBox="0 0 24 24"><path fill="#e0c185" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4 14.5l-7 2.5[...]`;
       logo.title = "Choisir/modifier ce point GPS";
       logo.style.cursor = "pointer";
       logo.onclick = function() {
@@ -767,105 +767,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   form.onsubmit = function(e) {
     e.preventDefault();
     const data = {};
-    quest.parametres.forEach(param => {
-      if (param.type === 'file') {
-        data[param.key] = form.elements[param.key].files[0] || null;
-      } else if (!(param.key in data)) {
-        data[param.key] = form.elements[param.key].value;
-      }
-    });
-    data.points = [...gpsPoints];
-    ajouterEtapeAuScenario({ type: questTypeId, params: data });
-    form.reset();
-    container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-  };
-}
-
-  // === Autres champs standards ===
-  quest.parametres.forEach(param => {
-    // Sauter les champs déjà gérés dans le bloc multi-consigne
-    if (
-      (["photo", "photo_inconnus", "collecte_objet"].includes(quest.id))
-      && (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
-    ) return;
-
-    let fieldWrapper = document.createElement('div');
-    fieldWrapper.className = 'form-field';
-
-    let label = document.createElement('label');
-    label.textContent = param.label;
-    label.setAttribute('for', param.key);
-    fieldWrapper.appendChild(label);
-
-    let input = null;
-    switch (param.type) {
-      case 'number':
-        input = document.createElement('input');
-        input.type = 'number';
-        input.id = param.key;
-        input.name = param.key;
-        if (param.min !== undefined) input.min = param.min;
-        if (param.max !== undefined) input.max = param.max;
-        input.value = values[param.key] || param.default || param.min || 0;
-        break;
-      case 'text':
-        input = document.createElement('input');
-        input.type = 'text';
-        input.id = param.key;
-        input.name = param.key;
-        input.placeholder = param.placeholder || '';
-        input.value = values[param.key] || '';
-        break;
-      case 'textarea':
-        input = document.createElement('textarea');
-        input.id = param.key;
-        input.name = param.key;
-        input.placeholder = param.placeholder || '';
-        input.value = values[param.key] || '';
-        break;
-      case 'file':
-        input = document.createElement('input');
-        input.type = 'file';
-        input.id = param.key;
-        input.name = param.key;
-        break;
-      case 'select':
-        input = document.createElement('select');
-        input.id = param.key;
-        input.name = param.key;
-        (param.options || []).forEach(opt => {
-          let option = document.createElement('option');
-          option.value = opt;
-          option.textContent = opt;
-          input.appendChild(option);
-        });
-        input.value = values[param.key] || param.default || '';
-        break;
-      default:
-        input = document.createElement('input');
-        input.type = 'text';
-        input.id = param.key;
-        input.name = param.key;
-        input.value = values[param.key] || '';
-    }
-
-    fieldWrapper.appendChild(input);
-    form.appendChild(fieldWrapper);
-  });
-
-  // Bouton de validation
-  let submit = document.createElement('button');
-  submit.type = 'submit';
-  submit.textContent = 'Valider cette quête';
-  submit.className = 'gold-btn';
-  form.appendChild(submit);
-
-  container.appendChild(form);
-
-  form.onsubmit = function(e) {
-    e.preventDefault();
-    const data = {};
-    // Pour les types simples (audio, gps, etc)
     quest.parametres.forEach(param => {
       if (param.type === 'file') {
         data[param.key] = form.elements[param.key].files[0] || null;
