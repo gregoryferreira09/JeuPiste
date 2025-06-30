@@ -397,20 +397,25 @@ function initMap() {
   refreshGpsList();
 }
 
-function refreshGpsMarkers() {
-  if (!markersLayer) return;
-  markersLayer.clearLayers();
-  gpsPoints.forEach((pt, idx) => {
-    let marker = L.marker([pt.lat, pt.lng], { draggable: false, title: `Point ${idx + 1}` });
-    marker.addTo(markersLayer);
-    marker.bindPopup(`
-      <b>Point ${idx + 1}</b><br>
-      ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-      <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
-    `);
-  });
+function refreshGpsList() {
+  gpsListDiv.innerHTML = "<b>Points ajoutés :</b><br>";
+  if (gpsPoints.length === 0) {
+    gpsListDiv.innerHTML += "<em>Aucun point ajouté.</em>";
+  } else {
+    gpsListDiv.innerHTML += "<ul style='margin:0 0 8px 0;'>";
+    gpsPoints.forEach((pt, idx) => {
+      gpsListDiv.innerHTML += `
+        <li>
+          Point ${idx + 1} : ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
+          <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
+        </li>
+      `;
+    });
+    gpsListDiv.innerHTML += "</ul>";
+  }
   recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
 }
+
 
 function refreshGpsList() {
   gpsListDiv.innerHTML = "<b>Points ajoutés :</b><br>";
