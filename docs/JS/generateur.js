@@ -24,6 +24,12 @@ let scenario = [];
 let dragSrcIdx = null;
 let currentGameMode = "arthurien"; // valeur par défaut
 
+// === NOUVELLE ZONE GPS GLOBALE ===
+let gpsPoints = [];
+let gpsMarkers = []; // pour référence sur les marqueurs
+let gpsMap = null, gpsMarkersLayer = null;
+let gpsUniqueId = 'globalGpsMap_' + Date.now();
+
 document.addEventListener("DOMContentLoaded", function() {
   // Initialisation du select univers
   const modeSelect = document.getElementById('modeScenarioSelect');
@@ -62,6 +68,9 @@ document.addEventListener("DOMContentLoaded", function() {
   const mapSearchBar = document.getElementById('mapSearchBar');
   if (mapSearchBar) mapSearchBar.addEventListener('input', handleMapSearch);
 
+  // === AJOUTE LA CARTE GPS GLOBALE DANS LE GENERATEUR ===
+  afficherGpsGlobal();
+
   // Première mise à jour
   afficherScenario();
 
@@ -76,7 +85,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
       localStorage.setItem('scenarioTest', JSON.stringify({
         mode: currentGameMode,
-        scenario: scenario
+        scenario: scenario,
+        gpsPoints: gpsPoints
       }));
       
       window.open('template-epreuve.html?test=1', '_blank');
@@ -122,6 +132,9 @@ function afficherLancementEtRegle() {
 
 // Ajouter une étape au scénario
 function ajouterEtapeAuScenario(etape) {
+  // Injecte les points GPS globaux dans chaque étape
+  etape.params = etape.params || {};
+  etape.params.points = [...gpsPoints];
   scenario.push(etape);
   afficherScenario();
 }
@@ -249,7 +262,8 @@ function exporterScenario() {
   .then(() => {
     firebase.database().ref('scenarios/' + codeSalon).set({
       mode: currentGameMode,
-      scenario
+      scenario,
+      gpsPoints
     });
   })
   .then(() => {
@@ -284,42 +298,37 @@ function afficherBoutonSalon() {
   }
 }
 
-// Formulaire dynamique (génération d'épreuves)
-function generateQuestForm(questTypeId, containerId, values = {}) {
-  const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
-  if (!quest) return;
-  const container = document.getElementById(containerId);
-  if (!container) return;
+// === NOUVELLE CARTE GPS GLOBALE AU CHARGEMENT ===
+function afficherGpsGlobal() {
+  let gpsZone = document.getElementById('gpsGlobalZone');
+  if (!gpsZone) {
+    gpsZone = document.createElement('div');
+    gpsZone.id = 'gpsGlobalZone';
+    gpsZone.className = 'form-field';
+    gpsZone.style.display = "flex";
+    gpsZone.style.flexDirection = "column";
+    gpsZone.style.gap = "8px";
+    gpsZone.style.marginBottom = "20px";
 
-  container.innerHTML = `<h3>${quest.nom}</h3><p>${quest.description}</p>`;
-
-  let form = document.createElement('form');
-  form.className = 'quest-form';
-
-  // === Bloc GPS multi-points, sélection intuitive sur la carte ===
-
-  let gpsPoints = Array.isArray(values.points) ? [...values.points] : [];
-  let markers = []; // Pour garder une référence sur chaque marker
-
-  let gpsZone = document.createElement('div');
-  gpsZone.className = 'form-field';
-  gpsZone.style.display = "flex";
-  gpsZone.style.flexDirection = "column";
-  gpsZone.style.gap = "8px";
-  gpsZone.style.marginBottom = "20px";
+    // Place la carte à l'endroit voulu (à adapter selon ton HTML)
+    // Ici, on insère juste après le titre principal du générateur
+    let titre = document.querySelector('.titre-generateur') || document.body.children[0];
+    if (titre && titre.parentNode) {
+      titre.parentNode.insertBefore(gpsZone, titre.nextSibling);
+    } else {
+      document.body.insertBefore(gpsZone, document.body.firstChild);
+    }
+  }
 
   // Carte interactive
   let gpsMapDiv = document.createElement('div');
-  let uniqueId = 'gpsMap_' + Date.now();
-  gpsMapDiv.id = uniqueId;
+  gpsMapDiv.id = gpsUniqueId;
   gpsMapDiv.style = 'width:100%;max-width:510px;height:280px;margin:0 auto 12px auto;border-radius:10px;overflow:hidden;';
   gpsZone.appendChild(gpsMapDiv);
 
   // Liste des points
   let gpsListDiv = document.createElement('div');
   gpsZone.appendChild(gpsListDiv);
-
-  form.appendChild(gpsZone);
 
   let recapDiv = document.createElement('div');
   recapDiv.style = "margin: 8px 0 10px 0; color:#ffeecb;";
@@ -356,7 +365,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   gpsZone.appendChild(clearBtn);
 
   // --- Initialisation Leaflet ---
-  let map, markersLayer;
   function loadLeafletAndInit() {
     if (!window.leafletLoaded) {
       let link = document.createElement('link');
@@ -375,17 +383,17 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
   loadLeafletAndInit();
 
   function initMap() {
-    if (map) { map.remove(); map = null; }
-    map = L.map(uniqueId).setView([47.478419, -0.563166], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-    markersLayer = L.layerGroup().addTo(map);
+    if (gpsMap) { gpsMap.remove(); gpsMap = null; }
+    gpsMap = L.map(gpsUniqueId).setView([47.478419, -0.563166], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(gpsMap);
+    gpsMarkersLayer = L.layerGroup().addTo(gpsMap);
 
     // Ajout des points existants (édition)
     gpsPoints.forEach((pt, idx) => {
       addMarker(pt, idx);
     });
 
-    map.on('click', function(e) {
+    gpsMap.on('click', function(e) {
       const pt = { lat: e.latlng.lat, lng: e.latlng.lng };
       gpsPoints.push(pt);
       addMarker(pt, gpsPoints.length - 1);
@@ -397,24 +405,24 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   function addMarker(pt, idx) {
     let marker = L.marker([pt.lat, pt.lng], { draggable: false, title: `Point ${idx + 1}` });
-    marker.addTo(markersLayer);
+    marker.addTo(gpsMarkersLayer);
     marker.bindPopup(
       `<b>Point ${idx + 1}</b><br>
       ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-      <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>`
+      <br><button type="button" onclick="window._deleteGpsPoint_${gpsUniqueId}(${idx});">Supprimer</button>`
     );
-    markers[idx] = marker;
+    gpsMarkers[idx] = marker;
   }
 
   function removeLastMarker() {
-    if (markers.length > 0) {
-      markersLayer.removeLayer(markers.pop());
+    if (gpsMarkers.length > 0) {
+      gpsMarkersLayer.removeLayer(gpsMarkers.pop());
     }
   }
 
   function removeAllMarkers() {
-    markers.forEach(m => markersLayer.removeLayer(m));
-    markers = [];
+    gpsMarkers.forEach(m => gpsMarkersLayer.removeLayer(m));
+    gpsMarkers = [];
   }
 
   function refreshMarkersAfterDelete() {
@@ -422,14 +430,14 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     gpsPoints.forEach((pt, i) => addMarker(pt, i));
   }
 
-  window['_deleteGpsPoint_' + uniqueId] = function(idx) {
+  window['_deleteGpsPoint_' + gpsUniqueId] = function(idx) {
     gpsPoints.splice(idx, 1);
     refreshMarkersAfterDelete();
     refreshGpsList();
   };
 
   function refreshGpsList() {
-    gpsListDiv.innerHTML = "<b>Points ajoutés :</b><br>";
+    gpsListDiv.innerHTML = "<b>Points GPS globaux ajoutés :</b><br>";
     if (gpsPoints.length === 0) {
       gpsListDiv.innerHTML += "<em>Aucun point ajouté.</em>";
     } else {
@@ -438,7 +446,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
         gpsListDiv.innerHTML += `
           <li>
             Point ${idx + 1} : ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-            <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
+            <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${gpsUniqueId}(${idx});">Supprimer</button>
           </li>
         `;
       });
@@ -446,6 +454,21 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
     }
     recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
   }
+}
+
+// Formulaire dynamique (génération d'épreuves)
+function generateQuestForm(questTypeId, containerId, values = {}) {
+  const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
+  if (!quest) return;
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.innerHTML = `<h3>${quest.nom}</h3><p>${quest.description}</p>`;
+
+  let form = document.createElement('form');
+  form.className = 'quest-form';
+
+  // === SUPPRIME LE BLOC GPS DE CHAQUE EPREUVE ===
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
   const SUGG_TYPES = Object.keys(SUGGESTIONS);
@@ -608,12 +631,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
         // Nettoie les vides
         data[qtyParam.key] = result.filter(x => x).length;
         data.consignes = result.filter(x => x);
-        data.points = [...gpsPoints];
-
-        if (data.consignes.length === 0) {
-          alert("Merci de sélectionner au moins une mission valide !");
-          return;
-        }
 
         ajouterEtapeAuScenario({ type: questTypeId, params: data });
         // Réinitialisation propre
@@ -792,7 +809,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
         data[param.key] = form.elements[param.key].value;
       }
     });
-    data.points = [...gpsPoints];
     ajouterEtapeAuScenario({ type: questTypeId, params: data });
     form.reset();
     container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
