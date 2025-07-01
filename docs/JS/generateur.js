@@ -49,7 +49,7 @@ function renderMapsList() {
           <span
             class="gps-map-name${isSelected ? ' gps-map-name--selected' : ''}"
             data-mapname="${encodeURIComponent(name)}"
-            style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;${isSelected ? 'background:#ffeecb;color:#232832;border-radius:6px;padding:4px 12px;font-weight:bold;box-shadow:0[...]
+            style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;${isSelected ? 'background:#ffeecb;color:#232832;border-radius:6px;padding:4px 12px;font-weight:bold;box-shadow:0 0 0 2px #e0c185,0 0 8px #ffeecb88;' : ''}"
           >
             ${name} <span style="color:#aaa;font-size:0.95em;">(${points.length} point${points.length>1?'s':''})</span>
           </span>
@@ -204,14 +204,9 @@ function afficherLancementEtRegle() {
 
 // Ajouter une étape au scénario
 function ajouterEtapeAuScenario(etape) {
-  // Si le type est dans params, on le remonte à la racine
-  if (!etape.type && etape.params && etape.params.type) {
-    etape.type = etape.params.type;
-    delete etape.params.type;
-  }
   etape.params = etape.params || {};
   etape.params.points = [...gpsPoints];
-  scenario.push({ type: etape.type, params: etape.params });
+  scenario.push(etape);
   afficherScenario();
 }
 
@@ -336,27 +331,10 @@ function exporterScenario() {
     date: Date.now()
   })
   .then(() => {
-    // Nettoie le scénario pour que ce soit TOUJOURS un tableau d'objets {type, params}
-    const scenarioClean = Array.isArray(scenario)
-      ? scenario.map(s => {
-          // Si déjà {type, params}, on garde
-          if (s && typeof s === "object" && s.type && s.params) return { type: s.type, params: s.params };
-          // Sinon, on tente de convertir (très rare si généré avec ton générateur)
-          let params = {};
-          Object.entries(s).forEach(([k, v]) => {
-            if (k !== 'type') params[k] = v;
-          });
-          return { type: s.type || "undefined", params };
-        })
-      : [];
-
-    // Nettoie les points GPS au cas où
-    const gpsPointsClean = Array.isArray(gpsPoints) ? gpsPoints.slice() : [];
-
-    return firebase.database().ref('scenarios/' + codeSalon).set({
+    firebase.database().ref('scenarios/' + codeSalon).set({
       mode: currentGameMode,
-      scenario: scenarioClean,
-      gpsPoints: gpsPointsClean
+      scenario,
+      gpsPoints
     });
   })
   .then(() => {
