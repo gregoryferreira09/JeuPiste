@@ -10,31 +10,107 @@
   <style>
     .bandeau-gps-global {
       display: flex;
-      gap: 28px;
+      flex-wrap: wrap;
+      gap: 32px;
       align-items: flex-start;
-      margin-bottom: 24px;
-      background: #22272e;
-      border-radius: 10px;
-      padding: 16px 18px;
-      box-shadow: 0 1px 6px #0003;
+      margin-bottom: 26px;
+      background: #232832;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px #0005;
+      padding: 18px 22px;
     }
     #gpsMapBloc {
-      flex:1 0 320px;
-      max-width:510px;
+      flex: 1 0 330px;
+      min-width: 240px;
+      max-width: 500px;
+      margin-right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #gpsGlobalMap {
+      width: 100%;
+      min-width: 220px;
+      min-height: 240px;
+      height: 300px;
+      max-width: 450px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 6px #0002;
+      border: 1.5px solid #343947;
+      background: #20232a;
     }
     #gpsInfosBloc {
-      flex:1 1 320px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      min-width:220px;
+      flex: 1 1 330px;
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      justify-content: flex-start;
+      color: #ffeecb;
     }
-    #gpsListDiv ul { margin:0 0 8px 0; }
-    #gpsListDiv li { margin-bottom:4px; }
-    #gpsSavedMaps { max-width: 300px; }
-    @media (max-width: 900px) {
-      .bandeau-gps-global { flex-direction:column; gap:16px;}
-      #gpsMapBloc, #gpsInfosBloc { max-width:none; }
+    #gpsInfosBloc b { color: #f7d976; }
+    #gpsListDiv ul { margin: 0 0 8px 0; padding-left: 22px; }
+    #gpsListDiv li { margin-bottom: 5px; color: #fffac6; }
+    #gpsListDiv button { font-size: 1em; }
+    #gpsRecapDiv { color: #ffeecb; margin: 4px 0 10px 0; }
+    .gps-actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    #gpsSaveForm {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    #gpsMapName {
+      flex: 1;
+      min-width: 80px;
+      background: #2d3141;
+      border: 1px solid #4a5064;
+      color: #ffeecb;
+      font-size: 1em;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+    #gpsSaveForm button {
+      padding: 7px 12px;
+    }
+    #gpsSavedMaps {
+      width: 100%;
+      max-width: 300px;
+      background: #2d3141;
+      color: #ffeecb;
+      border: 1px solid #4a5064;
+      font-size: 1em;
+      border-radius: 6px;
+      padding: 7px 8px;
+    }
+    .main-btn {
+      background: linear-gradient(90deg,#ffe285,#eeb80b 55%,#ffe285 95%);
+      color: #332f1a;
+      border: none;
+      border-radius: 7px;
+      padding: 7px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 1px 4px #0002;
+      transition: background 0.15s;
+    }
+    .main-btn:hover {
+      background: linear-gradient(90deg,#fff5cc,#ffe285 60%,#ffe9a3 95%);
+    }
+    @media (max-width: 950px) {
+      .bandeau-gps-global { flex-direction: column; gap: 20px; }
+      #gpsMapBloc, #gpsInfosBloc { max-width: none; min-width: 0; }
+      #gpsGlobalMap { max-width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .bandeau-gps-global { padding: 7px 4vw; }
+      #gpsGlobalMap { min-height: 180px; height: 190px; }
     }
   </style>
 </head>
@@ -52,29 +128,25 @@
       <!-- BANDEAU GPS GLOBAL -->
       <div id="bandeau-gps-global" class="bandeau-gps-global">
         <div id="gpsMapBloc">
-          <div id="gpsGlobalMap" style="width:100%;height:280px;border-radius:10px;overflow:hidden;"></div>
+          <div id="gpsGlobalMap"></div>
         </div>
         <div id="gpsInfosBloc">
           <div>
-            <b>Points GPS globaux ajoutés :</b><br>
-            <div id="gpsListDiv"><em>Aucun point ajouté.</em></div>
+            <b>Points GPS globaux ajoutés :</b>
+            <div id="gpsListDiv" style="margin-top:8px;"><em>Aucun point ajouté.</em></div>
           </div>
-          <div id="gpsRecapDiv" style="color:#ffeecb;margin:4px 0 10px 0;">Zone de jeu : 0 point</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          <div id="gpsRecapDiv">Zone de jeu : 0 point</div>
+          <div class="gps-actions-row">
             <button id="gpsUndoBtn" class="main-btn" type="button">Annuler le dernier point</button>
             <button id="gpsClearBtn" class="main-btn" type="button">Vider tous les points</button>
           </div>
-          <div style="margin-bottom:12px;">
-            <form id="gpsSaveForm" style="display:flex;gap:8px;align-items:center;">
-              <input type="text" id="gpsMapName" placeholder="Nom de la carte" style="flex:1;min-width:100px;">
-              <button type="submit" class="main-btn">💾 Sauvegarder la map</button>
-            </form>
-          </div>
-          <div>
-            <select id="gpsSavedMaps" style="width:100%;max-width:300px;">
-              <option value="">-- Charger une map sauvegardée --</option>
-            </select>
-          </div>
+          <form id="gpsSaveForm">
+            <input type="text" id="gpsMapName" placeholder="Nom de la carte">
+            <button type="submit" class="main-btn">💾 Sauvegarder la map</button>
+          </form>
+          <select id="gpsSavedMaps">
+            <option value="">-- Charger une map sauvegardée --</option>
+          </select>
         </div>
       </div>
       <!-- FIN BANDEAU GPS GLOBAL -->
@@ -126,6 +198,5 @@
   <script src="JS/catalogue.js"></script>
   <script src="JS/catalogue-phrases.js"></script>
   <script src="JS/generateur.js"></script>
-
 </body>
 </html>
