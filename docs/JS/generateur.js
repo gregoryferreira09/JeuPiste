@@ -30,7 +30,10 @@ let gpsMarkers = [];
 let gpsMap = null, gpsMarkersLayer = null;
 let gpsMapUniqueId = 'gpsGlobalMap';
 
-// -- GESTION LISTE MAPS CUSTOM --
+// Pour savoir quelle map est sélectionnée (pour l'éclairage visuel)
+let selectedMapName = null;
+
+// -- GESTION LISTE MAPS CUSTOM (AVEC SÉLECTION) --
 function renderMapsList() {
   const gpsMapsList = document.getElementById('gpsMapsList');
   let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
@@ -40,30 +43,53 @@ function renderMapsList() {
   } else {
     html = '<ul style="list-style:none;padding:0;margin:0;">';
     Object.entries(allMaps).forEach(([name, points]) => {
+      const isSelected = selectedMapName === name;
       html += `
         <li style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;">
-          <span style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;" onclick="window.loadMapByName('${encodeURIComponent(name)}')">
+          <span
+            class="gps-map-name${isSelected ? ' gps-map-name--selected' : ''}"
+            data-mapname="${encodeURIComponent(name)}"
+            style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;${isSelected ? 'background:#ffeecb;color:#232832;border-radius:6px;padding:4px 12px;font-weight:bold;box-shadow:0 0 0 2px #e0c185,0 0 8px #ffeecb88;' : ''}"
+          >
             ${name} <span style="color:#aaa;font-size:0.95em;">(${points.length} point${points.length>1?'s':''})</span>
           </span>
-          <span class="gps-map-delete" title="Supprimer" style="cursor:pointer;color:#c00;font-size:1.2em;padding-left:12px;" onclick="window.deleteMapByName('${encodeURIComponent(name)}')">❌</span>
+          <span class="gps-map-delete" title="Supprimer" style="cursor:pointer;color:#c00;font-size:1.1em;padding-left:10px;" onclick="window.deleteMapByName('${encodeURIComponent(name)}')">❌</span>
         </li>
       `;
     });
     html += '</ul>';
   }
   gpsMapsList.innerHTML = html;
+
+  // Ajoute le gestionnaire de clic sur les noms de maps
+  document.querySelectorAll('.gps-map-name').forEach(el => {
+    el.onclick = function() {
+      const name = decodeURIComponent(this.getAttribute('data-mapname'));
+      handleMapClick(name, this);
+    };
+  });
 }
 
-// Charger une map au clic sur le nom
-window.loadMapByName = function(name) {
-  name = decodeURIComponent(name);
-  let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
-  if (allMaps[name]) {
+// Gestion sélection/désélection map
+function handleMapClick(name, element) {
+  if (selectedMapName === name) {
+    // Désélectionne et vide la carte
+    selectedMapName = null;
     gpsPoints.length = 0;
-    allMaps[name].forEach(pt => gpsPoints.push(pt));
     if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
     if (typeof refreshGpsList === 'function') refreshGpsList();
+  } else {
+    // Sélectionne et charge la map
+    let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+    if (allMaps[name]) {
+      selectedMapName = name;
+      gpsPoints.length = 0;
+      allMaps[name].forEach(pt => gpsPoints.push(pt));
+      if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
+      if (typeof refreshGpsList === 'function') refreshGpsList();
+    }
   }
+  renderMapsList(); // Pour mettre à jour l'état visuel
 }
 
 // Supprimer une map au clic sur la croix
@@ -73,6 +99,13 @@ window.deleteMapByName = function(name) {
   let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
   delete allMaps[name];
   localStorage.setItem('savedGpsMaps', JSON.stringify(allMaps));
+  // Si c'était la map sélectionnée, on désélectionne et vide la carte
+  if (selectedMapName === name) {
+    selectedMapName = null;
+    gpsPoints.length = 0;
+    if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
+    if (typeof refreshGpsList === 'function') refreshGpsList();
+  }
   renderMapsList();
 }
 
@@ -415,7 +448,7 @@ function initGpsBandeau() {
         html += `
   <div style="display:flex;align-items:center;gap:4px;font-weight:bold;margin-bottom:6px;min-width:95px;">
     <span>Point ${idx + 1}</span>
-    <span style="color:#b00;cursor:pointer;font-size:0.85em;line-height:1.1;" title="Supprimer" onclick="window._deleteGpsPoint_${uniqueId}(${idx})">&nbsp;❌</span>
+    <span style="color:#b00;cursor:pointer;font-size:0.8em;line-height:1.1;" title="Supprimer" onclick="window._deleteGpsPoint_${uniqueId}(${idx})">&nbsp;❌</span>
   </div>
 `;
       });
@@ -431,6 +464,8 @@ function initGpsBandeau() {
       gpsPoints.length = 0;
       removeAllMarkers();
       refreshGpsList();
+      selectedMapName = null; // aussi on désélectionne la map active visuellement
+      renderMapsList();
     }
   };
 
@@ -451,6 +486,8 @@ function initGpsBandeau() {
     renderMapsList(); // Mets à jour la liste après sauvegarde
     alert("Carte sauvegardée !");
     gpsMapName.value = '';
+    selectedMapName = name;
+    renderMapsList();
   };
 
   // Affiche la liste des maps sauvegardées au chargement
@@ -822,5 +859,3 @@ function resetMapContainer() {
     }
   }
 }
-
-// ... Place ici d'autres utilitaires ou extensions si tu en as besoin ...
