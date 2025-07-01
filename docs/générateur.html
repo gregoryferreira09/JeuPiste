@@ -4,30 +4,11 @@
   <meta charset="UTF-8">
   <title>Générateur de jeu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Polices harmonisées avec le reste du site -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
   <style>
-    .bandeau-gps-global {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 32px;
-      align-items: flex-start;
-      margin-bottom: 26px;
-      background: #232832;
-      border-radius: 14px;
-      box-shadow: 0 2px 14px #0005;
-      padding: 18px 22px;
-    }
-    #gpsMapBloc {
-      flex: 1 0 330px;
-      min-width: 240px;
-      max-width: 500px;
-      margin-right: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
+    /* Harmonisation spécifique carte et actions GPS */
     #gpsGlobalMap {
       width: 100%;
       min-width: 220px;
@@ -38,64 +19,68 @@
       overflow: hidden;
       box-shadow: 0 1px 6px #0002;
       border: 1.5px solid #343947;
+      background: none !important; /* PAS de fond */
       position: relative;
     }
+    .gps-map-actions,
+    #gpsMapName,
+    #gpsClearBtn,
+    #gpsSaveBtn {
+      font-family: 'Cormorant Garamond', serif;
+      color: #ffeecb;
+      font-size: 1.1em;
+    }
     .gps-map-actions {
-      /* Correction : on retire le positionnement absolu */
       width: 100%;
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      padding: 12px 10px 0 10px; /* Ajoute un peu d’espace au-dessus */
+      padding: 12px 10px 0 10px;
       background: none;
     }
-    .gps-map-actions > * {
-      pointer-events: all;
-    }
     #gpsClearBtn, #gpsSaveBtn {
-      font-size: 1.3em;
-      padding: 4px 13px;
+      background: #232832;
+      color: #e0c185;
+      border: 2px solid #e0c185;
+      border-radius: 50%;
+      padding: 8px 16px;
       min-width: 36px;
       min-height: 36px;
-      border-radius: 50%;
-      background: #ffe285;
-      color: #a36e00;
-      border: none;
       font-weight: bold;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1em;
       box-shadow: 0 1px 4px #0002;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
-      margin: 0;
+      transition: background 0.15s, color 0.15s, border 0.15s;
     }
     #gpsClearBtn:hover, #gpsSaveBtn:hover {
-      background: #fff5cc;
-      color: #cc8500;
-    }
-    #gpsSaveArea {
-      display: flex;
-      align-items: center;
-      gap: 0;
+      background: #3d2b1f;
+      color: #ffeecb;
+      border-color: #ffeecb;
     }
     #gpsMapName {
-      border-radius: 7px 0 0 7px;
-      border: 1px solid #bbb;
-      border-right: 0;
-      background: #2d3141;
+      background: #232832;
       color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 7px 0 0 7px;
+      border-right: 0;
       padding: 4px 9px 4px 12px;
-      height: 32px;
+      height: 31px;
       font-size: 1em;
       min-width: 70px;
       outline: none;
+      font-family: 'Cormorant Garamond', serif;
     }
     #gpsSaveBtn {
       border-radius: 0 7px 7px 0;
       border-left: 0;
       font-size: 1.25em;
       padding: 4px 13px 4px 10px;
+    }
+    #gpsSaveArea {
+      display: flex;
+      align-items: center;
+      gap: 0;
     }
     @media (max-width: 950px) {
       .bandeau-gps-global { flex-direction: column; gap: 20px; }
@@ -124,7 +109,7 @@
       <div id="bandeau-gps-global" class="bandeau-gps-global">
         <div id="gpsMapBloc">
           <div id="gpsGlobalMap"></div>
-          <!-- Actions SOUS la map, mais dans #gpsMapBloc -->
+          <!-- Actions SOUS la map, dans #gpsMapBloc -->
           <div class="gps-map-actions">
             <button id="gpsClearBtn" type="button" title="Vider tous les points">🗑️</button>
             <div id="gpsSaveArea">
