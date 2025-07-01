@@ -797,3 +797,32 @@ function resetMapContainer() {
     }
   }
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+  const selectMap = document.getElementById('gpsSavedMaps');
+  const btnDelete = document.getElementById('btnDeleteMap');
+  if (btnDelete && selectMap) {
+    btnDelete.onclick = function() {
+      const mapName = selectMap.value;
+      if (!mapName) {
+        alert('Sélectionne une map à supprimer.');
+        return;
+      }
+      if (!confirm('Supprimer définitivement la map "' + mapName + '" ?')) {
+        return;
+      }
+      let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+      delete allMaps[mapName];
+      localStorage.setItem('savedGpsMaps', JSON.stringify(allMaps));
+      // Recharge la liste
+      selectMap.innerHTML = '<option value="">-- Charger une map sauvegardée --</option>';
+      Object.entries(allMaps).forEach(([name, points]) => {
+        let opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name + ` (${points.length} point${points.length > 1 ? 's' : ''})`;
+        selectMap.appendChild(opt);
+      });
+      alert('Map supprimée !');
+    };
+  }
+});
