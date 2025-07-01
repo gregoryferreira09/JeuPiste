@@ -176,12 +176,9 @@ window.creerPartie = async function(formData) {
     // === LOGIQUE DE RÉPARTITION ALÉATOIRE DES POINTS GPS ET ÉPREUVES ===
 
     // 1. Récupérer la liste des points GPS et des épreuves à placer
-    // À ADAPTER selon la structure de TES scénarios personnalisés :
-    // Si scenarioToUse.pointsGPS et scenarioToUse.epreuves existent, utilise-les.
     let pointsGPS = scenarioToUse.pointsGPS || [];
     let epreuves = scenarioToUse.epreuves || [];
 
-    // Sinon, extrait à partir du champ scenario (toutes les étapes)
     if ((!pointsGPS || pointsGPS.length === 0) && Array.isArray(scenarioToUse.scenario)) {
       pointsGPS = scenarioToUse.scenario
         .filter(etape => etape.type === "gps" && etape.params && etape.params.gps)
@@ -192,8 +189,6 @@ window.creerPartie = async function(formData) {
         .filter(etape => etape.type !== "gps" && etape.type !== "revelation" && etape.type !== "malus");
     }
 
-    // 2. Détermine le nombre de points/épreuves à utiliser pour cette partie
-    // Tu peux récupérer ces valeurs depuis un formulaire ou config, sinon on utilise tout :
     const nombrePointsAGarder = parseInt(formData.get("nombrePointsGPS"), 10) || pointsGPS.length;
     const nombreEpreuvesAPlacer = parseInt(formData.get("nombreEpreuves"), 10) || epreuves.length;
 
@@ -220,22 +215,40 @@ window.creerPartie = async function(formData) {
       }
     });
 
-    // 5. Générer le point d'arrivée (parmi les points GPS restants, ou au hasard)
+    // 5. Générer le point d'arrivée (robuste ! jamais undefined)
     let arrivalPoint = null;
-    const pointsRestants = pointsGPS.filter(p => !pointsMelanges.includes(p));
+    // Cherche un point GPS qui n’a pas servi (hors des points de la partie)
+    const pointsRestants = pointsGPS.filter(p =>
+      !pointsMelanges.some(m => JSON.stringify(m) === JSON.stringify(p))
+    );
     if (pointsRestants.length > 0) {
       arrivalPoint = getRandomElements(pointsRestants, 1)[0];
-    } else {
+    }
+    // Si aucun point restant, reprend dans la sélection initiale
+    if (!arrivalPoint && pointsGPS.length > 0) {
       arrivalPoint = getRandomElements(pointsGPS, 1)[0];
     }
+    // Si tout est cassé, on évite undefined
+    if (!arrivalPoint) arrivalPoint = { gps: "0,0", consigne: "Arrivée manquante" };
 
-    // 6. Construire le scénario pour la partie
-    const scenarioJeu = {
-      repartition, // tableau de {point, type, epreuve}
-      arrivalPoint // point d'arrivée
-    };
+    // Nettoie toute valeur undefined dans l'objet envoyé à Firebase
+    function removeUndefined(obj) {
+      if (Array.isArray(obj)) return obj.map(removeUndefined);
+      if (obj && typeof obj === 'object') {
+        const clone = {};
+        for (let k in obj) {
+          if (typeof obj[k] !== 'undefined') clone[k] = removeUndefined(obj[k]);
+        }
+        return clone;
+      }
+      return obj;
+    }
 
-    // 7. Stocker la répartition/scénario dans la partie
+    const scenarioJeu = removeUndefined({
+      repartition,
+      arrivalPoint
+    });
+
     await db.ref('parties/' + salonCode + '/scenarioJeu').set(scenarioJeu);
 
     // Stocke aussi le scénario original pour référence
