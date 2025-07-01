@@ -1003,3 +1003,32 @@ body {
   font-size: 1.25em;
   padding: 4px 13px 4px 10px;
 }
+
+/* Centrage parfait de la liste des points GPS et du recap */
+#gpsListDiv {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 14px;
+  text-align: center;
+  margin: 0 auto 12px auto;
+}
+
+#gpsListDiv > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gpsRecapDiv {
+  text-align: center;
+  width: 100%;
+  margin: 0 auto 12px auto;
+}
+
+#gpsInfosBloc > div > b {
+  width: 100%;
+  display: block;
+  text-align: center;
+}
