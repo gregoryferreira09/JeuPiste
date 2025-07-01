@@ -154,6 +154,30 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+  const demarrerBtn = document.getElementById("demarrerBtn");
+  if (!demarrerBtn) return;
+
+  demarrerBtn.addEventListener("click", async function() {
+    // Récupère le salonCode
+    const salonCode = localStorage.getItem("salonCode");
+    if (!salonCode || typeof firebase === "undefined") {
+      window.location.href = "template-epreuve.html"; // fallback
+      return;
+    }
+    // Récupère le scenarioCode
+    const paramsSnap = await firebase.database().ref('parties/' + salonCode + '/parametres').once('value');
+    const params = paramsSnap.val() || {};
+    const scenarioCode = params.scenarioCode || "";
+
+    if (scenarioCode === "parc_saint_nicolas") {
+      window.location.href = "template-epreuve.html";
+    } else {
+      window.location.href = "page-jeu.html";
+    }
+  });
+});
+
 // === Effet fade-in pour afficher le contenu principal ===
 document.addEventListener("DOMContentLoaded", function() {
   var main = document.querySelector('.fadeIn');
