@@ -24,11 +24,11 @@ let scenario = [];
 let dragSrcIdx = null;
 let currentGameMode = "arthurien"; // valeur par défaut
 
-// === NOUVELLE ZONE GPS GLOBALE ===
+// === GPS GLOBAL DATA ===
 let gpsPoints = [];
-let gpsMarkers = []; // pour référence sur les marqueurs
+let gpsMarkers = [];
 let gpsMap = null, gpsMarkersLayer = null;
-let gpsUniqueId = 'globalGpsMap_' + Date.now();
+let gpsMapUniqueId = 'gpsGlobalMap';
 
 document.addEventListener("DOMContentLoaded", function() {
   // Initialisation du select univers
@@ -60,12 +60,8 @@ document.addEventListener("DOMContentLoaded", function() {
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
 
-  // Recherche adresse
-  const mapSearchBar = document.getElementById('mapSearchBar');
-  if (mapSearchBar) mapSearchBar.addEventListener('input', handleMapSearch);
-
-  // === AJOUTE LA CARTE GPS GLOBALE DANS LE GENERATEUR ===
-  afficherGpsGlobal();
+  // === GPS GLOBAL BANDEAU INITIALISATION ===
+  initGpsBandeau();
 
   // Première mise à jour
   afficherScenario();
@@ -78,13 +74,11 @@ document.addEventListener("DOMContentLoaded", function() {
         alert("Ajoute au moins une épreuve pour tester !");
         return;
       }
-
       localStorage.setItem('scenarioTest', JSON.stringify({
         mode: currentGameMode,
         scenario: scenario,
         gpsPoints: gpsPoints
       }));
-      
       window.open('template-epreuve.html?test=1', '_blank');
     };
   }
@@ -128,7 +122,6 @@ function afficherLancementEtRegle() {
 
 // Ajouter une étape au scénario
 function ajouterEtapeAuScenario(etape) {
-  // Injecte les points GPS globaux dans chaque étape
   etape.params = etape.params || {};
   etape.params.points = [...gpsPoints];
   scenario.push(etape);
@@ -294,71 +287,18 @@ function afficherBoutonSalon() {
   }
 }
 
-// === NOUVELLE CARTE GPS GLOBALE AU CHARGEMENT ===
-function afficherGpsGlobal() {
-  let gpsZone = document.getElementById('gpsGlobalZone');
-  if (!gpsZone) {
-    gpsZone = document.createElement('div');
-    gpsZone.id = 'gpsGlobalZone';
-    gpsZone.className = 'form-field';
-    gpsZone.style.display = "flex";
-    gpsZone.style.flexDirection = "column";
-    gpsZone.style.gap = "8px";
-    gpsZone.style.marginBottom = "20px";
-
-    // Place la carte à l'endroit voulu (à adapter selon ton HTML)
-    // Ici, on insère juste après le titre principal du générateur
-    let titre = document.querySelector('.titre-generateur') || document.body.children[0];
-    if (titre && titre.parentNode) {
-      titre.parentNode.insertBefore(gpsZone, titre.nextSibling);
-    } else {
-      document.body.insertBefore(gpsZone, document.body.firstChild);
-    }
-  }
-
-  // Carte interactive
-  let gpsMapDiv = document.createElement('div');
-  gpsMapDiv.id = gpsUniqueId;
-  gpsMapDiv.style = 'width:100%;max-width:510px;height:280px;margin:0 auto 12px auto;border-radius:10px;overflow:hidden;';
-  gpsZone.appendChild(gpsMapDiv);
-
-  // Liste des points
-  let gpsListDiv = document.createElement('div');
-  gpsZone.appendChild(gpsListDiv);
-
-  let recapDiv = document.createElement('div');
-  recapDiv.style = "margin: 8px 0 10px 0; color:#ffeecb;";
-  gpsZone.appendChild(recapDiv);
-
-  // Bouton annuler dernier point
-  let undoBtn = document.createElement('button');
-  undoBtn.type = "button";
-  undoBtn.className = "main-btn";
-  undoBtn.textContent = "Annuler le dernier point";
-  undoBtn.onclick = function() {
-    if (gpsPoints.length > 0) {
-      gpsPoints.pop();
-      removeLastMarker();
-      refreshGpsList();
-    }
-  };
-  undoBtn.style = "margin: 0 8px 14px 0;";
-  gpsZone.appendChild(undoBtn);
-
-  // BOUTON VIDER TOUS LES POINTS
-  let clearBtn = document.createElement('button');
-  clearBtn.type = "button";
-  clearBtn.className = "main-btn";
-  clearBtn.textContent = "Vider tous les points";
-  clearBtn.onclick = function() {
-    if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
-      gpsPoints.length = 0;
-      removeAllMarkers();
-      refreshGpsList();
-    }
-  };
-  clearBtn.style = "margin: 0 0 14px 0;";
-  gpsZone.appendChild(clearBtn);
+// =============== BANDEAU GPS GLOBAL ===============
+function initGpsBandeau() {
+  // Récupération des éléments HTML
+  const gpsMapDiv = document.getElementById('gpsGlobalMap');
+  const gpsListDiv = document.getElementById('gpsListDiv');
+  const gpsRecapDiv = document.getElementById('gpsRecapDiv');
+  const gpsUndoBtn = document.getElementById('gpsUndoBtn');
+  const gpsClearBtn = document.getElementById('gpsClearBtn');
+  const gpsSaveForm = document.getElementById('gpsSaveForm');
+  const gpsMapName = document.getElementById('gpsMapName');
+  const gpsSavedMaps = document.getElementById('gpsSavedMaps');
+  let uniqueId = 'gpsGlobalMap';
 
   // --- Initialisation Leaflet ---
   function loadLeafletAndInit() {
@@ -380,76 +320,120 @@ function afficherGpsGlobal() {
 
   function initMap() {
     if (gpsMap) { gpsMap.remove(); gpsMap = null; }
-    gpsMap = L.map(gpsUniqueId).setView([47.478419, -0.563166], 13);
+    gpsMap = L.map(uniqueId).setView([47.478419, -0.563166], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(gpsMap);
     gpsMarkersLayer = L.layerGroup().addTo(gpsMap);
-
-    // Ajout des points existants (édition)
-    gpsPoints.forEach((pt, idx) => {
-      addMarker(pt, idx);
-    });
-
+    gpsPoints.forEach((pt, idx) => addMarker(pt, idx));
     gpsMap.on('click', function(e) {
       const pt = { lat: e.latlng.lat, lng: e.latlng.lng };
       gpsPoints.push(pt);
       addMarker(pt, gpsPoints.length - 1);
       refreshGpsList();
     });
-
     refreshGpsList();
   }
-
   function addMarker(pt, idx) {
     let marker = L.marker([pt.lat, pt.lng], { draggable: false, title: `Point ${idx + 1}` });
     marker.addTo(gpsMarkersLayer);
-    marker.bindPopup(
-      `<b>Point ${idx + 1}</b><br>
-      ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-      <br><button type="button" onclick="window._deleteGpsPoint_${gpsUniqueId}(${idx});">Supprimer</button>`
-    );
+    marker.bindPopup(`<b>Point ${idx + 1}</b><br>${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
+      <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>`);
     gpsMarkers[idx] = marker;
   }
-
   function removeLastMarker() {
     if (gpsMarkers.length > 0) {
       gpsMarkersLayer.removeLayer(gpsMarkers.pop());
     }
   }
-
   function removeAllMarkers() {
     gpsMarkers.forEach(m => gpsMarkersLayer.removeLayer(m));
     gpsMarkers = [];
   }
-
   function refreshMarkersAfterDelete() {
     removeAllMarkers();
     gpsPoints.forEach((pt, i) => addMarker(pt, i));
   }
-
-  window['_deleteGpsPoint_' + gpsUniqueId] = function(idx) {
+  window['_deleteGpsPoint_' + uniqueId] = function(idx) {
     gpsPoints.splice(idx, 1);
     refreshMarkersAfterDelete();
     refreshGpsList();
   };
 
   function refreshGpsList() {
-    gpsListDiv.innerHTML = "<b>Points GPS globaux ajoutés :</b><br>";
+    gpsListDiv.innerHTML = '';
     if (gpsPoints.length === 0) {
-      gpsListDiv.innerHTML += "<em>Aucun point ajouté.</em>";
+      gpsListDiv.innerHTML = "<em>Aucun point ajouté.</em>";
     } else {
-      gpsListDiv.innerHTML += "<ul style='margin:0 0 8px 0;'>";
+      gpsListDiv.innerHTML = "<ul style='margin:0 0 8px 0;'>";
       gpsPoints.forEach((pt, idx) => {
         gpsListDiv.innerHTML += `
           <li>
             Point ${idx + 1} : ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-            <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${gpsUniqueId}(${idx});">Supprimer</button>
+            <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
           </li>
         `;
       });
       gpsListDiv.innerHTML += "</ul>";
     }
-    recapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
+    gpsRecapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
   }
+
+  // Gestion des boutons
+  gpsUndoBtn.onclick = function() {
+    if (gpsPoints.length > 0) {
+      gpsPoints.pop();
+      removeLastMarker();
+      refreshGpsList();
+    }
+  };
+  gpsClearBtn.onclick = function() {
+    if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
+      gpsPoints.length = 0;
+      removeAllMarkers();
+      refreshGpsList();
+    }
+  };
+
+  // --- Gestion sauvegarde et chargement de maps ---
+  function loadMaps() {
+    const allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+    gpsSavedMaps.innerHTML = '<option value="">-- Charger une map sauvegardée --</option>';
+    Object.entries(allMaps).forEach(([mapName, points]) => {
+      let opt = document.createElement('option');
+      opt.value = mapName;
+      opt.textContent = mapName + ` (${points.length} point${points.length>1?'s':''})`;
+      gpsSavedMaps.appendChild(opt);
+    });
+  }
+  gpsSaveForm.onsubmit = function(e) {
+    e.preventDefault();
+    let name = gpsMapName.value.trim();
+    if (!name) {
+      alert("Merci de donner un nom à la carte !");
+      return;
+    }
+    if (gpsPoints.length === 0) {
+      alert("Ajoutez au moins un point sur la carte !");
+      return;
+    }
+    let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+    allMaps[name] = [...gpsPoints];
+    localStorage.setItem('savedGpsMaps', JSON.stringify(allMaps));
+    loadMaps();
+    alert("Carte sauvegardée !");
+    gpsMapName.value = '';
+  };
+  gpsSavedMaps.onchange = function() {
+    let name = this.value;
+    if (!name) return;
+    let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+    if (allMaps[name]) {
+      gpsPoints.length = 0;
+      allMaps[name].forEach(pt => gpsPoints.push(pt));
+      refreshMarkersAfterDelete();
+      refreshGpsList();
+    }
+  };
+  loadMaps();
 }
 
 // Formulaire dynamique (génération d'épreuves)
@@ -613,7 +597,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
               result.push(pool[idx]);
               pool.splice(idx, 1);
             } else if (poolCopy.length > 0) {
-              // Tirage avec répétition si pool épuisé
               let idx = Math.floor(Math.random() * poolCopy.length);
               result.push(poolCopy[idx]);
             } else {
@@ -629,7 +612,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
         data.consignes = result.filter(x => x);
 
         ajouterEtapeAuScenario({ type: questTypeId, params: data });
-        // Réinitialisation propre
         form.reset();
         container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
       };
@@ -717,7 +699,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   // === Autres champs standards ===
   quest.parametres.forEach(param => {
-    // Ignore les champs déjà gérés dans le bloc suggestions
     if (
       (SUGG_TYPES.includes(quest.id)) &&
       (param.type === "number" || param.key === "consigne" || param.key === "critere" || param.key === "objet")
@@ -812,9 +793,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 }
 
 // =======================
-// Fonctions pour la carte
-// =======================
-
+// Fonctions pour la carte (reset hérité, pour compatibilité)
 function resetMapContainer() {
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
