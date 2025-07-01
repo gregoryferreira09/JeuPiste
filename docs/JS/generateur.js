@@ -204,7 +204,7 @@ function afficherLancementEtRegle() {
 
 // Ajouter une étape au scénario
 function ajouterEtapeAuScenario(etape) {
-  // Correction : on force {type, params} même si on reçoit {params: {type: ...}}
+  // Si le type est dans params, on le remonte à la racine
   if (!etape.type && etape.params && etape.params.type) {
     etape.type = etape.params.type;
     delete etape.params.type;
