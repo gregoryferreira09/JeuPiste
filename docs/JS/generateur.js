@@ -60,10 +60,6 @@ document.addEventListener("DOMContentLoaded", function() {
   var main = document.querySelector('.fadeIn');
   if (main) main.classList.add('visible');
 
-  // Fermeture carte
-  const closeBtn = document.getElementById('closeMapBtn');
-  if (closeBtn) closeBtn.addEventListener('click', closeMapModal);
-
   // Recherche adresse
   const mapSearchBar = document.getElementById('mapSearchBar');
   if (mapSearchBar) mapSearchBar.addEventListener('input', handleMapSearch);
