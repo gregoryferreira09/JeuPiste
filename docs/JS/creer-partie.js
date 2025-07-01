@@ -45,16 +45,6 @@ function getRandomElements(arr, n) {
   return shuffled.slice(0, n);
 }
 
-// Mélange un tableau (Fisher-Yates)
-function shuffle(array) {
-  let a = array.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 // Charge dynamiquement la liste des scénarios dans le sélecteur
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('scenarioSelect');
@@ -135,7 +125,7 @@ window.creerPartie = async function(formData) {
   };
 
   // Génère un code salon unique pour la partie (toujours nouveau)
-  const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
 
   // *** SUPPRESSION DE L'ANCIEN SALON SI EXISTANT ***
   await db.ref('parties/' + salonCode).remove();
@@ -153,10 +143,6 @@ window.creerPartie = async function(formData) {
       return;
     }
     scenarioToUse = SCENARIO_PAR_DEFAUT;
-
-    // Stocke le scénario dans la partie (inchangé)
-    await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
-
   } else {
     // On charge depuis Firebase
     const snap = await db.ref('scenarios/' + scenarioCode).once('value');
@@ -172,88 +158,10 @@ window.creerPartie = async function(formData) {
       alert("Le scénario est vide ou mal formé.");
       return;
     }
-
-    // === LOGIQUE DE RÉPARTITION ALÉATOIRE DES POINTS GPS ET ÉPREUVES ===
-
-    // 1. Récupérer la liste des points GPS et des épreuves à placer
-    let pointsGPS = scenarioToUse.pointsGPS || [];
-    let epreuves = scenarioToUse.epreuves || [];
-
-    if ((!pointsGPS || pointsGPS.length === 0) && Array.isArray(scenarioToUse.scenario)) {
-      pointsGPS = scenarioToUse.scenario
-        .filter(etape => etape.type === "gps" && etape.params && etape.params.gps)
-        .map(etape => ({ ...etape.params, type: "gps" }));
-    }
-    if ((!epreuves || epreuves.length === 0) && Array.isArray(scenarioToUse.scenario)) {
-      epreuves = scenarioToUse.scenario
-        .filter(etape => etape.type !== "gps" && etape.type !== "revelation" && etape.type !== "malus");
-    }
-
-    const nombrePointsAGarder = parseInt(formData.get("nombrePointsGPS"), 10) || pointsGPS.length;
-    const nombreEpreuvesAPlacer = parseInt(formData.get("nombreEpreuves"), 10) || epreuves.length;
-
-    if (pointsGPS.length < nombrePointsAGarder) {
-      alert("Ce scénario ne comporte pas assez de points GPS pour générer une partie.");
-      return;
-    }
-    if (epreuves.length < nombreEpreuvesAPlacer) {
-      alert("Ce scénario ne comporte pas assez d'épreuves pour générer une partie.");
-      return;
-    }
-
-    // 3. Sélectionner le sous-ensemble aléatoire demandé
-    const pointsPartie = getRandomElements(pointsGPS, nombrePointsAGarder);
-    const pointsMelanges = shuffle(pointsPartie);
-    const epreuvesMelangees = shuffle(getRandomElements(epreuves, nombreEpreuvesAPlacer));
-
-    // 4. Répartition sur les points : d'abord les épreuves, le reste en malus
-    const repartition = pointsMelanges.map((point, idx) => {
-      if (idx < epreuvesMelangees.length) {
-        return { point, epreuve: epreuvesMelangees[idx], type: "epreuve" };
-      } else {
-        return { point, epreuve: null, type: "malus" };
-      }
-    });
-
-    // 5. Générer le point d'arrivée (robuste ! jamais undefined)
-    let arrivalPoint = null;
-    // Cherche un point GPS qui n’a pas servi (hors des points de la partie)
-    const pointsRestants = pointsGPS.filter(p =>
-      !pointsMelanges.some(m => JSON.stringify(m) === JSON.stringify(p))
-    );
-    if (pointsRestants.length > 0) {
-      arrivalPoint = getRandomElements(pointsRestants, 1)[0];
-    }
-    // Si aucun point restant, reprend dans la sélection initiale
-    if (!arrivalPoint && pointsGPS.length > 0) {
-      arrivalPoint = getRandomElements(pointsGPS, 1)[0];
-    }
-    // Si tout est cassé, on évite undefined
-    if (!arrivalPoint) arrivalPoint = { gps: "0,0", consigne: "Arrivée manquante" };
-
-    // Nettoie toute valeur undefined dans l'objet envoyé à Firebase
-    function removeUndefined(obj) {
-      if (Array.isArray(obj)) return obj.map(removeUndefined);
-      if (obj && typeof obj === 'object') {
-        const clone = {};
-        for (let k in obj) {
-          if (typeof obj[k] !== 'undefined') clone[k] = removeUndefined(obj[k]);
-        }
-        return clone;
-      }
-      return obj;
-    }
-
-    const scenarioJeu = removeUndefined({
-      repartition,
-      arrivalPoint
-    });
-
-    await db.ref('parties/' + salonCode + '/scenarioJeu').set(scenarioJeu);
-
-    // Stocke aussi le scénario original pour référence
-    await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
   }
+
+  // Stocke le scénario dans la partie
+  await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
 
   // GÉNÉRATION DES PERSONNAGES (exemple simple)
   let persosObj = {};
