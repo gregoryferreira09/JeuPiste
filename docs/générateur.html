@@ -136,10 +136,14 @@
             <div id="gpsListDiv" style="margin-top:8px;"><em>Aucun point ajouté.</em></div>
           </div>
           <div id="gpsRecapDiv">Zone de jeu : 0 point</div>
-          <div class="gps-actions-row">
-            <button id="gpsUndoBtn" class="main-btn" type="button">Annuler le dernier point</button>
-            <button id="gpsClearBtn" class="main-btn" type="button">Vider tous les points</button>
-          </div>
+         <div class="gps-actions-row">
+  <button id="gpsUndoBtn" class="btn-gps-action" type="button" title="Annuler le dernier point">
+    ↶
+  </button>
+  <button id="gpsClearBtn" class="btn-gps-action" type="button" title="Vider tous les points">
+    <span style="margin-right:4px; font-size:1em;">🗑️</span>
+  </button>
+</div>
           <form id="gpsSaveForm">
             <input type="text" id="gpsMapName" placeholder="Nom de la carte">
             <button type="submit" class="main-btn">💾 Sauvegarder la map</button>
