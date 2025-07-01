@@ -358,24 +358,26 @@ function initGpsBandeau() {
     refreshGpsList();
   };
 
-  function refreshGpsList() {
-    gpsListDiv.innerHTML = '';
-    if (gpsPoints.length === 0) {
-      gpsListDiv.innerHTML = "<em>Aucun point ajouté.</em>";
-    } else {
-      gpsListDiv.innerHTML = "<ul style='margin:0 0 8px 0;'>";
-      gpsPoints.forEach((pt, idx) => {
-        gpsListDiv.innerHTML += `
-          <li>
-            Point ${idx + 1} : ${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-            <button type="button" style="margin-left:10px; color:#b00;" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>
-          </li>
-        `;
-      });
-      gpsListDiv.innerHTML += "</ul>";
-    }
-    gpsRecapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
+  
+function refreshGpsList() {
+  if (gpsPoints.length === 0) {
+    gpsListDiv.innerHTML = "<em>Aucun point ajouté.</em>";
+  } else {
+    // Affichage en lignes de deux
+    let html = '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    gpsPoints.forEach((pt, idx) => {
+      html += `
+        <div style="display:flex;align-items:center;gap:4px;background:#2d3141;border-radius:6px;padding:6px 10px 6px 12px;font-weight:bold;margin-bottom:6px;min-width:95px;">
+          <span>Point ${idx + 1}</span>
+          <span style="color:#b00;cursor:pointer;font-size:1.1em;line-height:1.1;" title="Supprimer" onclick="window._deleteGpsPoint_${uniqueId}(${idx})">&nbsp;❌</span>
+        </div>
+      `;
+    });
+    html += '</div>';
+    gpsListDiv.innerHTML = html;
   }
+  gpsRecapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
+}
 
   // Gestion des boutons
   gpsUndoBtn.onclick = function() {
