@@ -76,8 +76,8 @@ function handleMapClick(name, element) {
     // Désélection : carte vierge (plus de points ni de marqueurs)
     selectedMapName = null;
     gpsPoints.length = 0;
-    if (typeof removeAllMarkers === 'function') removeAllMarkers();
-    if (typeof refreshGpsList === 'function') refreshGpsList();
+    if (typeof window.removeAllMarkers === 'function') window.removeAllMarkers();
+    if (typeof window.refreshGpsList === 'function') window.refreshGpsList();
   } else {
     // Sélection : recharge la map sauvegardée (points + marqueurs)
     let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
@@ -85,8 +85,8 @@ function handleMapClick(name, element) {
       selectedMapName = name;
       gpsPoints.length = 0;
       allMaps[name].forEach(pt => gpsPoints.push(pt));
-      if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
-      if (typeof refreshGpsList === 'function') refreshGpsList();
+      if (typeof window.refreshMarkersAfterDelete === 'function') window.refreshMarkersAfterDelete();
+      if (typeof window.refreshGpsList === 'function') window.refreshGpsList();
     }
   }
   renderMapsList();
@@ -103,8 +103,8 @@ window.deleteMapByName = function(name) {
   if (selectedMapName === name) {
     selectedMapName = null;
     gpsPoints.length = 0;
-    if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
-    if (typeof refreshGpsList === 'function') refreshGpsList();
+    if (typeof window.removeAllMarkers === 'function') window.removeAllMarkers();
+    if (typeof window.refreshGpsList === 'function') window.refreshGpsList();
   }
   renderMapsList();
 }
@@ -433,12 +433,7 @@ function initGpsBandeau() {
     removeAllMarkers();
     gpsPoints.forEach((pt, i) => addMarker(pt, i));
   }
-  window['_deleteGpsPoint_' + uniqueId] = function(idx) {
-    gpsPoints.splice(idx, 1);
-    refreshMarkersAfterDelete();
-    refreshGpsList();
-  };
-
+  window.refreshMarkersAfterDelete = refreshMarkersAfterDelete;
   function refreshGpsList() {
     if (gpsPoints.length === 0) {
       gpsListDiv.innerHTML = "<em>Aucun point ajouté.</em>";
@@ -458,6 +453,7 @@ function initGpsBandeau() {
     }
     gpsRecapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
   }
+  window.refreshGpsList = refreshGpsList;
 
   // Gestion du bouton poubelle (vider tous les points)
   gpsClearBtn.onclick = function() {
