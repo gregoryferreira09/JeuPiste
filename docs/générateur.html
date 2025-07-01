@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Générateur de jeu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Harmonisation des polices avec le reste du site -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
   <style>
@@ -43,14 +42,13 @@
       position: relative;
     }
     .gps-map-actions {
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
+      /* Correction : on retire le positionnement absolu */
       width: 100%;
       display: flex;
       justify-content: space-between;
-      pointer-events: none;
-      z-index: 10;
-      padding: 0 10px 10px 10px;
+      gap: 12px;
+      padding: 12px 10px 0 10px; /* Ajoute un peu d’espace au-dessus */
+      background: none;
     }
     .gps-map-actions > * {
       pointer-events: all;
@@ -126,16 +124,16 @@
       <!-- BANDEAU GPS GLOBAL -->
       <div id="bandeau-gps-global" class="bandeau-gps-global">
         <div id="gpsMapBloc">
-  <div id="gpsGlobalMap"></div>
-  <!-- Actions SOUS la map -->
-  <div class="gps-map-actions">
-    <button id="gpsClearBtn" type="button" title="Vider tous les points">🗑️</button>
-    <div id="gpsSaveArea">
-      <input type="text" id="gpsMapName" placeholder="Nom de la carte">
-      <button type="button" id="gpsSaveBtn" title="Sauvegarder la map">💾</button>
-    </div>
-  </div>
-</div>
+          <div id="gpsGlobalMap"></div>
+          <!-- Actions SOUS la map, mais dans #gpsMapBloc -->
+          <div class="gps-map-actions">
+            <button id="gpsClearBtn" type="button" title="Vider tous les points">🗑️</button>
+            <div id="gpsSaveArea">
+              <input type="text" id="gpsMapName" placeholder="Nom de la carte">
+              <button type="button" id="gpsSaveBtn" title="Sauvegarder la map">💾</button>
+            </div>
+          </div>
+        </div>
         <div id="gpsInfosBloc">
           <div>
             <b>Points GPS globaux ajoutés :</b>
@@ -160,13 +158,9 @@
             <option value="super_heros">Super-héros</option>
             <option value="zombie">Zombie</option>
             <option value="archeologue">Archéologue</option>
-            <!-- Ajoute d’autres modes ici -->
           </select>
         </div>
-        
-        <!-- Liste des épreuves ajoutées -->
         <div id="scenarioList" style="margin-bottom:18px;"></div>
-
         <div class="form-field">
           <label for="questTypeSelect">Type d'épreuve :</label>
           <select id="questTypeSelect" name="questTypeSelect" required>
@@ -192,7 +186,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  
   <script src="JS/catalogue.js"></script>
   <script src="JS/catalogue-phrases.js"></script>
   <script src="JS/generateur.js"></script>
