@@ -95,21 +95,23 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script>
-    // --- Sécurité : redirection si pas de salonCode ---
+    // --- Sécurité : refuse l’accès si pas de salon OU pas de personnage ---
     const salonCode = localStorage.getItem("salonCode");
+    const persoNum = localStorage.getItem("persoNum");
     if (!salonCode) window.location.href = "accueil.html";
+    if (!persoNum) window.location.href = "personnages.html";
 
     // --- Initialisation Firebase ---
     const firebaseConfig = {
-  apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-  authDomain: "murder-party-ba8d1.firebaseapp.com",
-  databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.firebasestorage.app",
-  messagingSenderId: "20295055805",
-  appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-  measurementId: "G-KSBMBB7KMJ"
-};
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.appspot.com",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -120,12 +122,17 @@
     let map, markers = [];
     function afficherCarte(points) {
       if (map) { map.remove(); }
+      if (!points.length) {
+        document.getElementById('info').textContent = "Aucun point GPS défini pour ce scénario.";
+        return;
+      }
       const first = points[0].point || points[0];
       let lat = parseFloat(first.gps?.split(',')[0] || first.lat || 47.478), lng = parseFloat(first.gps?.split(',')[1] || first.lng || -0.563);
       map = L.map('map').setView([lat, lng], 15);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
       // Place tous les points du jeu
+      markers = [];
       points.forEach((pt, idx) => {
         const pos = pt.point || pt;
         let gps = pos.gps ? pos.gps.split(',') : [pos.lat, pos.lng];
@@ -171,7 +178,7 @@
           if (scenarioJeu.repartition[idx].type === "epreuve") {
             showModal(`<b>Bravo !</b><br><button class="gold-btn" onclick="goToEpreuve(${idx})">Accéder à l'épreuve</button>`);
           } else {
-            showModal(`<b style="color:#c00;">Perdu !</b>`, false, true);
+            showModal(`<b style="color:#c00;">Malus ou étape spéciale !</b>`, false, true);
           }
           renderArc();
         } else {
@@ -230,12 +237,18 @@
     // --- Démarrage : récupère le scénario et affiche la carte et les boutons ---
     db.ref('parties/' + salonCode + '/scenarioJeu').once('value').then(snap => {
       scenarioJeu = snap.val();
-      if (!scenarioJeu || !scenarioJeu.repartition) {
-        document.getElementById('info').textContent = "Scénario introuvable.";
+      if (!scenarioJeu) {
+        document.getElementById('info').textContent = "Aucun scénario n'a été généré ou la partie a été supprimée. Reviens à l'accueil ou demande à l'organisateur de relancer la partie.";
+        return;
+      }
+      if (!scenarioJeu.repartition || !Array.isArray(scenarioJeu.repartition) || scenarioJeu.repartition.length === 0) {
+        document.getElementById('info').textContent = "Aucun point GPS trouvé dans le scénario généré. Vérifie la création de la partie.";
         return;
       }
       afficherCarte(scenarioJeu.repartition);
       renderArc();
+    }).catch(e => {
+      document.getElementById('info').textContent = "Erreur de chargement du scénario : " + (e.message || e);
     });
   </script>
 </body>
