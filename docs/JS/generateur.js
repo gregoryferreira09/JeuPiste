@@ -30,6 +30,55 @@ let gpsMarkers = [];
 let gpsMap = null, gpsMarkersLayer = null;
 let gpsMapUniqueId = 'gpsGlobalMap';
 
+// -- GESTION LISTE MAPS CUSTOM --
+function renderMapsList() {
+  const gpsMapsList = document.getElementById('gpsMapsList');
+  let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+  let html = '';
+  if (Object.keys(allMaps).length === 0) {
+    html = '<em>Aucune map sauvegardée.</em>';
+  } else {
+    html = '<ul style="list-style:none;padding:0;margin:0;">';
+    Object.entries(allMaps).forEach(([name, points]) => {
+      html += `
+        <li style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;">
+          <span style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;" onclick="window.loadMapByName('${encodeURIComponent(name)}')">
+            ${name} <span style="color:#aaa;font-size:0.95em;">(${points.length} point${points.length>1?'s':''})</span>
+          </span>
+          <span class="gps-map-delete" title="Supprimer" style="cursor:pointer;color:#c00;font-size:1.2em;padding-left:12px;" onclick="window.deleteMapByName('${encodeURIComponent(name)}')">❌</span>
+        </li>
+      `;
+    });
+    html += '</ul>';
+  }
+  gpsMapsList.innerHTML = html;
+}
+
+// Charger une map au clic sur le nom
+window.loadMapByName = function(name) {
+  name = decodeURIComponent(name);
+  let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+  if (allMaps[name]) {
+    gpsPoints.length = 0;
+    allMaps[name].forEach(pt => gpsPoints.push(pt));
+    if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
+    if (typeof refreshGpsList === 'function') refreshGpsList();
+  }
+}
+
+// Supprimer une map au clic sur la croix
+window.deleteMapByName = function(name) {
+  name = decodeURIComponent(name);
+  if (!confirm('Supprimer définitivement la map "' + name + '" ?')) return;
+  let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+  delete allMaps[name];
+  localStorage.setItem('savedGpsMaps', JSON.stringify(allMaps));
+  renderMapsList();
+}
+
+// ===================
+// DOMContentLoaded principal
+// ===================
 document.addEventListener("DOMContentLoaded", function() {
   // Initialisation du select univers
   const modeSelect = document.getElementById('modeScenarioSelect');
@@ -296,7 +345,6 @@ function initGpsBandeau() {
   const gpsClearBtn = document.getElementById('gpsClearBtn');
   const gpsMapName = document.getElementById('gpsMapName');
   const gpsSaveBtn = document.getElementById('gpsSaveBtn');
-  const gpsSavedMaps = document.getElementById('gpsSavedMaps');
   let uniqueId = 'gpsGlobalMap';
 
   // --- Initialisation Leaflet ---
@@ -400,37 +448,16 @@ function initGpsBandeau() {
     let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
     allMaps[name] = [...gpsPoints];
     localStorage.setItem('savedGpsMaps', JSON.stringify(allMaps));
-    loadMaps();
+    renderMapsList(); // Mets à jour la liste après sauvegarde
     alert("Carte sauvegardée !");
     gpsMapName.value = '';
   };
 
-  // --- Gestion sauvegarde et chargement de maps ---
-  function loadMaps() {
-    const allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
-    gpsSavedMaps.innerHTML = '<option value="">-- Charger une map sauvegardée --</option>';
-    Object.entries(allMaps).forEach(([mapName, points]) => {
-      let opt = document.createElement('option');
-      opt.value = mapName;
-      opt.textContent = mapName + ` (${points.length} point${points.length>1?'s':''})`;
-      gpsSavedMaps.appendChild(opt);
-    });
-  }
-  gpsSavedMaps.onchange = function() {
-    let name = this.value;
-    if (!name) return;
-    let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
-    if (allMaps[name]) {
-      gpsPoints.length = 0;
-      allMaps[name].forEach(pt => gpsPoints.push(pt));
-      refreshMarkersAfterDelete();
-      refreshGpsList();
-    }
-  };
-  loadMaps();
+  // Affiche la liste des maps sauvegardées au chargement
+  renderMapsList();
 }
 
-// Formulaire dynamique (génération d'épreuves)
+// === Formulaire dynamique (génération d'épreuves) ===
 function generateQuestForm(questTypeId, containerId, values = {}) {
   const quest = QUESTS_CATALOGUE.find(q => q.id === questTypeId);
   if (!quest) return;
@@ -441,8 +468,6 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 
   let form = document.createElement('form');
   form.className = 'quest-form';
-
-  // === SUPPRIME LE BLOC GPS DE CHAQUE EPREUVE ===
 
   // === Bloc suggestions dynamique pour TOUS les types dans SUGGESTIONS ===
   const SUGG_TYPES = Object.keys(SUGGESTIONS);
@@ -787,7 +812,7 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
 }
 
 // =======================
-// Fonctions pour la carte (reset hérité, pour compatibilité)
+// Fonction pour reset carte (hérité pour compatibilité)
 function resetMapContainer() {
   const oldContainer = document.getElementById('mapContainer');
   if (oldContainer) {
@@ -798,81 +823,4 @@ function resetMapContainer() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  const selectMap = document.getElementById('gpsSavedMaps');
-  const btnDelete = document.getElementById('btnDeleteMap');
-  if (btnDelete && selectMap) {
-    btnDelete.onclick = function() {
-      const mapName = selectMap.value;
-      if (!mapName) {
-        alert('Sélectionne une map à supprimer.');
-        return;
-      }
-      if (!confirm('Supprimer définitivement la map "' + mapName + '" ?')) {
-        return;
-      }
-      let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
-      delete allMaps[mapName];
-      localStorage.setItem('savedGpsMaps', JSON.stringify(allMaps));
-      // Recharge la liste
-      selectMap.innerHTML = '<option value="">-- Charger une map sauvegardée --</option>';
-      Object.entries(allMaps).forEach(([name, points]) => {
-        let opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name + ` (${points.length} point${points.length > 1 ? 's' : ''})`;
-        selectMap.appendChild(opt);
-      });
-      alert('Map supprimée !');
-    };
-  }
-});
-
-
-function renderMapsList() {
-  const gpsMapsList = document.getElementById('gpsMapsList');
-  let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
-  let html = '';
-  if (Object.keys(allMaps).length === 0) {
-    html = '<em>Aucune map sauvegardée.</em>';
-  } else {
-    html = '<ul style="list-style:none;padding:0;margin:0;">';
-    Object.entries(allMaps).forEach(([name, points]) => {
-      html += `
-        <li style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;">
-          <span style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;" onclick="loadMapByName('${encodeURIComponent(name)}')">
-            ${name} <span style="color:#aaa;font-size:0.95em;">(${points.length} point${points.length>1?'s':''})</span>
-          </span>
-          <span class="gps-map-delete" title="Supprimer" style="cursor:pointer;color:#c00;font-size:1.2em;padding-left:12px;" onclick="deleteMapByName('${encodeURIComponent(name)}')">❌</span>
-        </li>
-      `;
-    });
-    html += '</ul>';
-  }
-  gpsMapsList.innerHTML = html;
-}
-
-// Charger une map au clic sur le nom
-function loadMapByName(name) {
-  name = decodeURIComponent(name);
-  let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
-  if (allMaps[name]) {
-    gpsPoints.length = 0;
-    allMaps[name].forEach(pt => gpsPoints.push(pt));
-    // refreshMarkersAfterDelete et refreshGpsList sont dans initGpsBandeau
-    if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
-    if (typeof refreshGpsList === 'function') refreshGpsList();
-  }
-}
-
-// Supprimer une map au clic sur la croix
-function deleteMapByName(name) {
-  name = decodeURIComponent(name);
-  if (!confirm('Supprimer définitivement la map "' + name + '" ?')) return;
-  let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
-  delete allMaps[name];
-  localStorage.setItem('savedGpsMaps', JSON.stringify(allMaps));
-  renderMapsList();
-}
-
-// À la fin de initGpsBandeau (ou après chaque sauvegarde/suppression), appelle :
-renderMapsList();
+// ... Place ici d'autres utilitaires ou extensions si tu en as besoin ...
