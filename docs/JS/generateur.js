@@ -49,7 +49,7 @@ function renderMapsList() {
           <span
             class="gps-map-name${isSelected ? ' gps-map-name--selected' : ''}"
             data-mapname="${encodeURIComponent(name)}"
-            style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;${isSelected ? 'background:#ffeecb;color:#232832;border-radius:6px;padding:4px 12px;font-weight:bold;box-shadow:0 0 0 2px #e0c185,0 0 8px #ffeecb88;' : ''}"
+            style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;${isSelected ? 'background:#ffeecb;color:#232832;border-radius:6px;padding:4px 12px;font-weight:bold;box-shadow:0[...]
           >
             ${name} <span style="color:#aaa;font-size:0.95em;">(${points.length} point${points.length>1?'s':''})</span>
           </span>
@@ -204,9 +204,14 @@ function afficherLancementEtRegle() {
 
 // Ajouter une étape au scénario
 function ajouterEtapeAuScenario(etape) {
+  // Correction : on force {type, params} même si on reçoit {params: {type: ...}}
+  if (!etape.type && etape.params && etape.params.type) {
+    etape.type = etape.params.type;
+    delete etape.params.type;
+  }
   etape.params = etape.params || {};
   etape.params.points = [...gpsPoints];
-  scenario.push(etape);
+  scenario.push({ type: etape.type, params: etape.params });
   afficherScenario();
 }
 
