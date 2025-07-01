@@ -413,11 +413,11 @@ function initGpsBandeau() {
       let html = '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
       gpsPoints.forEach((pt, idx) => {
         html += `
-          <div style="display:flex;align-items:center;gap:4px;background:#2d3141;border-radius:6px;padding:6px 10px 6px 12px;font-weight:bold;margin-bottom:6px;min-width:95px;">
-            <span>Point ${idx + 1}</span>
-            <span style="color:#b00;cursor:pointer;font-size:1.1em;line-height:1.1;" title="Supprimer" onclick="window._deleteGpsPoint_${uniqueId}(${idx})">&nbsp;❌</span>
-          </div>
-        `;
+  <div style="display:flex;align-items:center;gap:4px;font-weight:bold;margin-bottom:6px;min-width:95px;">
+    <span>Point ${idx + 1}</span>
+    <span style="color:#b00;cursor:pointer;font-size:0.85em;line-height:1.1;" title="Supprimer" onclick="window._deleteGpsPoint_${uniqueId}(${idx})">&nbsp;❌</span>
+  </div>
+`;
       });
       html += '</div>';
       gpsListDiv.innerHTML = html;
