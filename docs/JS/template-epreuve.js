@@ -110,48 +110,18 @@ function getUploadIcon(type) {
   switch(type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
-        <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-      </svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
     case "video":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
-        <path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/>
-      </svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
     case "audio":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="9" y="4" width="6" height="10" rx="3" fill="#e0c185"/>
-        <rect x="11" y="14" width="2" height="4" rx="1" fill="#e0c185"/>
-        <path d="M8 19a4 4 0 0 0 8 0" stroke="#e0c185" stroke-width="2" fill="none"/>
-      </svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="9" y="4" width="6" height="10" rx="3" fill="#e0c185"/><rect x="11" y="14" width="2" height="4" rx="1" fill="#e0c185"/><path d="M8 19a4 4 0 0 0 8 0" stroke="#e0c185" stroke-width="2" fill="none"/></svg>`;
     case "collecte_objet":
-  return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none">
-    <!-- Cercle de la loupe -->
-    <circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/>
-    <!-- Manche de la loupe -->
-    <rect x="23.5" y="23.5" width="8" height="2.5" rx="1.2" fill="#e0c185" transform="rotate(45 23.5 23.5)"/>
-    <!-- Reflets pour le style -->
-    <path d="M13 15 Q15 13 17 13" stroke="#e0c185" stroke-width="1.2" fill="none"/>
-  </svg>`;
-      
+      return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.2" fill="#e0c185" transform="rotate(45 23.5 23.5)"/><path d="M13 15 Q15 13 17 13" stroke="#e0c185" stroke-width="1.2" fill="none"/></svg>`;
     case "fichier":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/>
-        <rect x="6" y="5" width="4" height="3" rx="1" fill="#e0c185" stroke="#e0c185" stroke-width="2"/>
-        <rect x="9" y="11" width="6" height="1" fill="#e0c185"/>
-        <rect x="9" y="13" width="6" height="1" fill="#e0c185"/>
-      </svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" height="3" rx="1" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="9" y="11" width="6" height="1" fill="#e0c185"/><rect x="9" y="13" width="6" height="1" fill="#e0c185"/></svg>`;
     default:
-      // Icône générique
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none">
-        <rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/>
-      </svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/></svg>`;
   }
-}
-// Et pour la boussole GPS :
-function getGpsIcon() {
-  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5.25 3.15.77-1.28-4.02-2.37V7z"/>
-  </svg>`;
 }
 
 function genererPhraseMission(type, mode, vars = {}) {
@@ -200,7 +170,6 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
       if (!titre || titre === etape.type) titre = random.titre;
       if (!metaphore) metaphore = random.phrase;
     }
-    // Fallback ultime
     if (!titre) titre = "Défi à relever";
     if (!metaphore) metaphore = "Prépare-toi à l'aventure !";
   }
@@ -215,7 +184,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     gpsContainer = document.createElement('div');
     gpsContainer.id = "gps-upload-btn";
     gpsContainer.style = "margin-bottom:18px; display:flex; justify-content:center; align-items:center;";
-    gpsContainer.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit;">${getGpsIcon()}<span>Voir sur la carte</span></a>`;
+    gpsContainer.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;color:#e0c185;font-weight:bold;">${getUploadIcon('photo')} <span style="margin-left:8px;">Voir le lieu</span></a>`;
     const blocMission = document.getElementById('bloc-mission');
     blocMission.parentNode.insertBefore(gpsContainer, blocMission);
   }
@@ -263,7 +232,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
     const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
-    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input id="answer-field" type="text" class="input-answer-field"/></div>`;
+    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input type="text" id="answer-field" class="input-answer"></div>`;
     const input = document.getElementById("answer-field");
     const nextBtn = document.getElementById("next-quest");
     nextBtn.style.display = '';
@@ -419,107 +388,110 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
   }
 } else {
   // --- Mode normal ---
-const salonCode = localStorage.getItem("salonCode");
-const equipeNum = Number(localStorage.getItem("equipeNum"));
-if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
-  window.location.href = "accueil.html";
-}
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = Number(localStorage.getItem("equipeNum"));
+  if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+    window.location.href = "accueil.html";
+  }
 
-let scenarioCode = null;
-let repartitionLength = null;
+  let scenarioCode = null;
+  let repartitionLength = null;
 
-// Récupère le scenarioCode au chargement
-db.ref(`parties/${salonCode}/parametres/scenarioCode`).once('value').then(snapCode => {
-  scenarioCode = snapCode.val();
-
-  // Récupère aussi le mode (pour le texte/affichage)
-  db.ref(`parties/${salonCode}/scenario/mode`).once('value').then(snapMode => {
-    window.currentScenarioMode = snapMode.val() || "arthurien";
-  });
-
+  // On attend l'authentification AVANT toute écriture
   firebase.auth().onAuthStateChanged(function (user) {
-    if (!user) firebase.auth().signInAnonymously();
-    else chargerEtapeDynamique();
-  });
+    if (!user) {
+      firebase.auth().signInAnonymously();
+      return;
+    }
 
-  function chargerEtapeDynamique() {
-    db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
-      const step = snapStep.val() || 0;
+    db.ref(`parties/${salonCode}/parametres/scenarioCode`).once('value').then(snapCode => {
+      scenarioCode = snapCode.val();
 
-      if (scenarioCode === "parc_saint_nicolas") {
-        // Ancienne logique : étapes fixes dans scenario/scenario
-        db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
-          resetAffichageEtape();
-          const etape = snapEpreuve.val();
-          if (!etape) {
-            document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
-            return;
-          }
-          document.getElementById('next-quest').style.display = 'none';
-          afficherEtapeHarmonisee(etape, step, window.currentScenarioMode, false);
-          document.getElementById('next-quest').onclick = validerEtape;
-        });
-      } else {
-        // Nouvelle logique : étapes dynamiques dans scenarioJeu/repartition
-        db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-          const repartition = snapRep.val() || [];
-          repartitionLength = repartition.length;
-
-          // Si on a dépassé toutes les étapes, on affiche le point d'arrivée
-          if (step >= repartition.length) {
-            db.ref(`parties/${salonCode}/scenarioJeu/arrivalPoint`).once('value').then(snapArrival => {
-              const arrival = snapArrival.val();
-              document.getElementById('main-content').innerHTML =
-                `<div style="color:#2a4;font-weight:bold;">Bravo, vous avez terminé toutes les épreuves !</div>` +
-                (arrival
-                  ? `<div style="margin-top:16px;font-size:1.15em;"><b>Point d'arrivée :</b><br>${arrival.gps ? `GPS : ${arrival.gps}` : ''}</div>`
-                  : '');
-            });
-            return;
-          }
-
-          // Sinon, on affiche l'étape courante
-          const etape = repartition[step];
-          resetAffichageEtape();
-          if (!etape) {
-            document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
-            return;
-          }
-          document.getElementById('next-quest').style.display = 'none';
-          // On passe etape.epreuve si type = epreuve, sinon l'objet entier (malus ou autre)
-          afficherEtapeHarmonisee(etape.epreuve || etape, step, window.currentScenarioMode, false);
-          document.getElementById('next-quest').onclick = validerEtape;
-        });
-      }
-    });
-  }
-});
-  function validerEtape() {
-    const nextBtn = document.getElementById('next-quest');
-    nextBtn.disabled = true;
-    nextBtn.classList.remove('enabled');
-    showToast("Validation en cours...");
-    const salonCode = localStorage.getItem("salonCode");
-    const equipeNum = Number(localStorage.getItem("equipeNum"));
-    const now = Date.now();
-    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/current/startTime`)
-      .once('value', function (snap) {
-        const sTime = snap.val();
-        if (sTime) {
-          const elapsed = Math.round((now - sTime) / 1000);
-          db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/current`).set(elapsed);
-        }
-        db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
-          .transaction(step => (step || 0) + 1, function (error, committed, snapshot) {
-            if (!error && committed) {
-              showToast("Étape validée !");
-              setTimeout(() => { window.location.reload(); }, 800);
-            } else {
-              showToast("Erreur lors de la validation...");
-              nextBtn.disabled = false;
-              nextBtn.classList.add('enabled');
-            }
-          });
+      // Récupère aussi le mode (pour le texte/affichage)
+      db.ref(`parties/${salonCode}/scenario/mode`).once('value').then(snapMode => {
+        window.currentScenarioMode = snapMode.val() || "arthurien";
       });
-  }
+
+      chargerEtapeDynamique();
+    });
+
+    function chargerEtapeDynamique() {
+      db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
+        const step = snapStep.val() || 0;
+
+        if (scenarioCode === "parc_saint_nicolas") {
+          // Ancienne logique : étapes fixes dans scenario/scenario
+          db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
+            resetAffichageEtape();
+            const etape = snapEpreuve.val();
+            if (!etape) {
+              document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
+              return;
+            }
+            document.getElementById('next-quest').style.display = 'none';
+            afficherEtapeHarmonisee(etape, step, window.currentScenarioMode, false);
+            document.getElementById('next-quest').onclick = () => validerEtape(step);
+          });
+        } else {
+          // Nouvelle logique : étapes dynamiques dans scenarioJeu/repartition
+          db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+            const repartition = snapRep.val() || [];
+            repartitionLength = repartition.length;
+
+            // Si on a dépassé toutes les étapes, on affiche le point d'arrivée
+            if (step >= repartition.length) {
+              db.ref(`parties/${salonCode}/scenarioJeu/arrivalPoint`).once('value').then(snapArrival => {
+                const arrival = snapArrival.val();
+                document.getElementById('main-content').innerHTML =
+                  `<div style="color:#2a4;font-weight:bold;">Bravo, vous avez terminé toutes les épreuves !</div>` +
+                  (arrival
+                    ? `<div style="margin-top:16px;font-size:1.15em;"><b>Point d'arrivée :</b><br>${arrival.gps ? `GPS : ${arrival.gps}` : ''}</div>`
+                    : '');
+              });
+              return;
+            }
+
+            // Sinon, on affiche l'étape courante
+            const etape = repartition[step];
+            resetAffichageEtape();
+            if (!etape) {
+              document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
+              return;
+            }
+            document.getElementById('next-quest').style.display = 'none';
+            afficherEtapeHarmonisee(etape.epreuve || etape, step, window.currentScenarioMode, false);
+            document.getElementById('next-quest').onclick = () => validerEtape(step);
+          });
+        }
+      });
+    }
+
+    function validerEtape(step) {
+      const nextBtn = document.getElementById('next-quest');
+      nextBtn.disabled = true;
+      nextBtn.classList.remove('enabled');
+      showToast("Validation en cours...");
+      const now = Date.now();
+      // On utilise bien le numéro d'étape (step), pas "current"
+      db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${step}/startTime`)
+        .once('value', function (snap) {
+          const sTime = snap.val();
+          if (sTime) {
+            const elapsed = Math.round((now - sTime) / 1000);
+            db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${step}`).set(elapsed);
+          }
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
+            .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
+              if (!error && committed) {
+                showToast("Étape validée !");
+                setTimeout(() => { window.location.reload(); }, 800);
+              } else {
+                showToast("Erreur lors de la validation...");
+                nextBtn.disabled = false;
+                nextBtn.classList.add('enabled');
+              }
+            });
+        });
+    }
+  });
 }
