@@ -57,29 +57,47 @@
       color: #ffeecb;
       border-color: #ffeecb;
     }
-    #gpsMapName {
-      background: #232832;
-      color: #ffeecb;
-      border: 2px solid #e0c185;
-      border-radius: 7px 0 0 7px;
-      border-right: 0;
-      padding: 4px 9px 4px 12px;
-      height: 31px;
-      font-size: 1em;
-      min-width: 70px;
-      outline: none;
-    }
-    #gpsSaveBtn {
-      border-radius: 0 7px 7px 0;
-      border-left: 0;
-      font-size: 1.25em;
-      padding: 4px 13px 4px 10px;
-    }
-    #gpsSaveArea {
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
+   #gpsMapName, #gpsSaveBtn {
+  height: 38px; /* même hauteur pour le champ et le bouton */
+  box-sizing: border-box;
+  font-size: 1.1em;
+}
+#gpsMapName {
+  background: #232832;
+  color: #ffeecb;
+  border: 2px solid #e0c185;
+  border-radius: 7px 0 0 7px;
+  border-right: 0;
+  padding: 0 9px 0 12px; /* on enlève du padding vertical */
+  min-width: 120px;
+  outline: none;
+  display: block;
+}
+#gpsSaveBtn {
+  border-radius: 0 7px 7px 0;
+  border-left: 0;
+  background: #232832;
+  color: #e0c185;
+  border: 2px solid #e0c185;
+  width: 48px;
+  padding: 0;
+  font-size: 1.25em;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 1px 4px #0002;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+  display: block;
+}
+#gpsSaveBtn:hover {
+  background: #3d2b1f;
+  color: #ffeecb;
+  border-color: #ffeecb;
+}
+#gpsSaveArea {
+  display: flex;
+  align-items: stretch; /* bien aligner sur la hauteur */
+  gap: 0;
+}
     /* Harmonisation du select et du bouton charger */
     #gpsSavedMaps {
       font-family: 'Cormorant Garamond', serif;
