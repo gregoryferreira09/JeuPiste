@@ -293,10 +293,9 @@ function initGpsBandeau() {
   const gpsMapDiv = document.getElementById('gpsGlobalMap');
   const gpsListDiv = document.getElementById('gpsListDiv');
   const gpsRecapDiv = document.getElementById('gpsRecapDiv');
-  const gpsUndoBtn = document.getElementById('gpsUndoBtn');
   const gpsClearBtn = document.getElementById('gpsClearBtn');
-  const gpsSaveForm = document.getElementById('gpsSaveForm');
   const gpsMapName = document.getElementById('gpsMapName');
+  const gpsSaveBtn = document.getElementById('gpsSaveBtn');
   const gpsSavedMaps = document.getElementById('gpsSavedMaps');
   let uniqueId = 'gpsGlobalMap';
 
@@ -358,35 +357,27 @@ function initGpsBandeau() {
     refreshGpsList();
   };
 
-  
-function refreshGpsList() {
-  if (gpsPoints.length === 0) {
-    gpsListDiv.innerHTML = "<em>Aucun point ajouté.</em>";
-  } else {
-    // Affichage en lignes de deux
-    let html = '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
-    gpsPoints.forEach((pt, idx) => {
-      html += `
-        <div style="display:flex;align-items:center;gap:4px;background:#2d3141;border-radius:6px;padding:6px 10px 6px 12px;font-weight:bold;margin-bottom:6px;min-width:95px;">
-          <span>Point ${idx + 1}</span>
-          <span style="color:#b00;cursor:pointer;font-size:1.1em;line-height:1.1;" title="Supprimer" onclick="window._deleteGpsPoint_${uniqueId}(${idx})">&nbsp;❌</span>
-        </div>
-      `;
-    });
-    html += '</div>';
-    gpsListDiv.innerHTML = html;
-  }
-  gpsRecapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
-}
-
-  // Gestion des boutons
-  gpsUndoBtn.onclick = function() {
-    if (gpsPoints.length > 0) {
-      gpsPoints.pop();
-      removeLastMarker();
-      refreshGpsList();
+  function refreshGpsList() {
+    if (gpsPoints.length === 0) {
+      gpsListDiv.innerHTML = "<em>Aucun point ajouté.</em>";
+    } else {
+      // Affichage en lignes de deux
+      let html = '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      gpsPoints.forEach((pt, idx) => {
+        html += `
+          <div style="display:flex;align-items:center;gap:4px;background:#2d3141;border-radius:6px;padding:6px 10px 6px 12px;font-weight:bold;margin-bottom:6px;min-width:95px;">
+            <span>Point ${idx + 1}</span>
+            <span style="color:#b00;cursor:pointer;font-size:1.1em;line-height:1.1;" title="Supprimer" onclick="window._deleteGpsPoint_${uniqueId}(${idx})">&nbsp;❌</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+      gpsListDiv.innerHTML = html;
     }
-  };
+    gpsRecapDiv.textContent = `Zone de jeu : ${gpsPoints.length} point${gpsPoints.length > 1 ? "s" : ""}`;
+  }
+
+  // Gestion du bouton poubelle (vider tous les points)
   gpsClearBtn.onclick = function() {
     if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
       gpsPoints.length = 0;
@@ -395,19 +386,8 @@ function refreshGpsList() {
     }
   };
 
-  // --- Gestion sauvegarde et chargement de maps ---
-  function loadMaps() {
-    const allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
-    gpsSavedMaps.innerHTML = '<option value="">-- Charger une map sauvegardée --</option>';
-    Object.entries(allMaps).forEach(([mapName, points]) => {
-      let opt = document.createElement('option');
-      opt.value = mapName;
-      opt.textContent = mapName + ` (${points.length} point${points.length>1?'s':''})`;
-      gpsSavedMaps.appendChild(opt);
-    });
-  }
-  gpsSaveForm.onsubmit = function(e) {
-    e.preventDefault();
+  // Gestion du bouton sauvegarde (disquette)
+  gpsSaveBtn.onclick = function() {
     let name = gpsMapName.value.trim();
     if (!name) {
       alert("Merci de donner un nom à la carte !");
@@ -424,6 +404,18 @@ function refreshGpsList() {
     alert("Carte sauvegardée !");
     gpsMapName.value = '';
   };
+
+  // --- Gestion sauvegarde et chargement de maps ---
+  function loadMaps() {
+    const allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
+    gpsSavedMaps.innerHTML = '<option value="">-- Charger une map sauvegardée --</option>';
+    Object.entries(allMaps).forEach(([mapName, points]) => {
+      let opt = document.createElement('option');
+      opt.value = mapName;
+      opt.textContent = mapName + ` (${points.length} point${points.length>1?'s':''})`;
+      gpsSavedMaps.appendChild(opt);
+    });
+  }
   gpsSavedMaps.onchange = function() {
     let name = this.value;
     if (!name) return;
