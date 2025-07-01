@@ -25,7 +25,8 @@
     .gps-map-actions,
     #gpsMapName,
     #gpsClearBtn,
-    #gpsSaveBtn {
+    #gpsSaveBtn,
+    #btnLoadMap {
       font-family: 'Cormorant Garamond', serif;
       color: #ffeecb;
       font-size: 1.1em;
@@ -47,8 +48,6 @@
       min-width: 36px;
       min-height: 36px;
       font-weight: bold;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1em;
       box-shadow: 0 1px 4px #0002;
       cursor: pointer;
       transition: background 0.15s, color 0.15s, border 0.15s;
@@ -69,7 +68,6 @@
       font-size: 1em;
       min-width: 70px;
       outline: none;
-      font-family: 'Cormorant Garamond', serif;
     }
     #gpsSaveBtn {
       border-radius: 0 7px 7px 0;
@@ -82,6 +80,47 @@
       align-items: center;
       gap: 0;
     }
+    /* Harmonisation du select et du bouton charger */
+    #gpsSavedMaps {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1em;
+      color: #2c1b1b;
+      background: #fff;
+      border: 2px solid #e0c185;
+      border-radius: 7px;
+      padding: 10px 8px;
+      margin-bottom: 0;
+      width: auto;
+      box-sizing: border-box;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg fill='goldenrod' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat;
+      background-position-x: 98%;
+      background-position-y: 50%;
+      background-size: 22px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    #btnLoadMap {
+      background: #1b1b1b;
+      color: #e0c185;
+      border: 2px solid #e0c185;
+      border-radius: 8px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1em;
+      padding: 8px 22px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+      width: auto;
+      font-weight: bold;
+    }
+    #btnLoadMap:hover, #btnLoadMap:focus {
+      background: #3d2b1f;
+      color: #ffeecb;
+      box-shadow: 0 0 8px #e0c18588;
+      outline: 2px solid #e0c185;
+      outline-offset: 2px;
+    }
     @media (max-width: 950px) {
       .bandeau-gps-global { flex-direction: column; gap: 20px; }
       #gpsMapBloc, #gpsInfosBloc { max-width: none; min-width: 0; }
@@ -91,6 +130,7 @@
       .bandeau-gps-global { padding: 7px 4vw; }
       #gpsGlobalMap { min-height: 180px; height: 190px; }
       .gps-map-actions { padding: 0 2px 6px 2px; }
+      #gpsSavedMaps { min-width: 0; font-size: 1em; }
     }
   </style>
 </head>
@@ -101,7 +141,7 @@
 
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <!-- Ajout des blocs pour lancement et règle du jeu -->
+      <!-- Lancement et règle du jeu -->
       <div id="lancement-jeu" style="font-weight:bold; font-size:1.15em; margin-bottom:6px;"></div>
       <div id="regle-jeu" style="font-style:italic; margin-bottom:18px;"></div>
 
@@ -124,9 +164,13 @@
             <div id="gpsListDiv" style="margin-top:8px;"><em>Aucun point ajouté.</em></div>
           </div>
           <div id="gpsRecapDiv">Zone de jeu : 0 point</div>
-          <select id="gpsSavedMaps" style="margin-top:12px;">
-            <option value="">-- Charger une map sauvegardée --</option>
-          </select>
+          <!-- Harmonisation du select + bouton charger -->
+          <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
+            <select id="gpsSavedMaps">
+              <option value="">-- Charger une map sauvegardée --</option>
+            </select>
+            <button type="button" id="btnLoadMap">Charger</button>
+          </div>
         </div>
       </div>
       <!-- FIN BANDEAU GPS GLOBAL -->
@@ -167,11 +211,30 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
+  <!-- Librairies et scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="JS/catalogue.js"></script>
   <script src="JS/catalogue-phrases.js"></script>
   <script src="JS/generateur.js"></script>
+  <script>
+    // Harmonisation bouton "Charger"
+    document.addEventListener("DOMContentLoaded", function() {
+      const selectMap = document.getElementById('gpsSavedMaps');
+      const btnLoad = document.getElementById('btnLoadMap');
+      if (btnLoad && selectMap) {
+        btnLoad.onclick = function() {
+          if (!selectMap.value) {
+            alert('Choisissez une map à charger.');
+            return;
+          }
+          // Déclenche le onchange si défini (logique de chargement déjà présente dans generateur.js)
+          const event = new Event('change');
+          selectMap.dispatchEvent(event);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
