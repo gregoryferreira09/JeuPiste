@@ -1037,3 +1037,41 @@ body {
     flex: 1 1 auto;
   }
 }
+
+
+#gpsInfosBloc > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+#gpsListDiv {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 14px;
+  text-align: center;
+  margin: 0 auto 12px auto;
+  width: 100%;
+}
+
+#gpsListDiv em {
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+#gpsRecapDiv {
+  text-align: center;
+  width: 100%;
+  margin: 0 auto 12px auto;
+}
+
+#gpsInfosBloc > div > b {
+  width: 100%;
+  display: block;
+  text-align: center;
+}
