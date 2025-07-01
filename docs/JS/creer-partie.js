@@ -182,35 +182,36 @@ window.creerPartie = async function(formData) {
     let epreuves = scenarioToUse.epreuves || [];
 
     // Sinon, extrait à partir du champ scenario (toutes les étapes)
-    if ((!pointsGPS || pointsGPS.length < 10) && Array.isArray(scenarioToUse.scenario)) {
+    if ((!pointsGPS || pointsGPS.length === 0) && Array.isArray(scenarioToUse.scenario)) {
       pointsGPS = scenarioToUse.scenario
         .filter(etape => etape.type === "gps" && etape.params && etape.params.gps)
         .map(etape => ({ ...etape.params, type: "gps" }));
     }
-    if ((!epreuves || epreuves.length < 1) && Array.isArray(scenarioToUse.scenario)) {
+    if ((!epreuves || epreuves.length === 0) && Array.isArray(scenarioToUse.scenario)) {
       epreuves = scenarioToUse.scenario
         .filter(etape => etape.type !== "gps" && etape.type !== "revelation" && etape.type !== "malus");
     }
 
-    if (pointsGPS.length < 10) {
+    // 2. Détermine le nombre de points/épreuves à utiliser pour cette partie
+    // Tu peux récupérer ces valeurs depuis un formulaire ou config, sinon on utilise tout :
+    const nombrePointsAGarder = parseInt(formData.get("nombrePointsGPS"), 10) || pointsGPS.length;
+    const nombreEpreuvesAPlacer = parseInt(formData.get("nombreEpreuves"), 10) || epreuves.length;
+
+    if (pointsGPS.length < nombrePointsAGarder) {
       alert("Ce scénario ne comporte pas assez de points GPS pour générer une partie.");
       return;
     }
-    if (epreuves.length < 6) {
+    if (epreuves.length < nombreEpreuvesAPlacer) {
       alert("Ce scénario ne comporte pas assez d'épreuves pour générer une partie.");
       return;
     }
 
-    // 2. Sélectionner 10 points GPS aléatoirement parmi les 15
-    const pointsPartie = getRandomElements(pointsGPS, 10);
-
-    // 3. Mélanger les 10 points sélectionnés
+    // 3. Sélectionner le sous-ensemble aléatoire demandé
+    const pointsPartie = getRandomElements(pointsGPS, nombrePointsAGarder);
     const pointsMelanges = shuffle(pointsPartie);
+    const epreuvesMelangees = shuffle(getRandomElements(epreuves, nombreEpreuvesAPlacer));
 
-    // 4. Mélanger les épreuves (6 à placer)
-    const epreuvesMelangees = shuffle(getRandomElements(epreuves, 6));
-
-    // 5. Répartition: 6 points avec épreuve, 4 malus
+    // 4. Répartition sur les points : d'abord les épreuves, le reste en malus
     const repartition = pointsMelanges.map((point, idx) => {
       if (idx < epreuvesMelangees.length) {
         return { point, epreuve: epreuvesMelangees[idx], type: "epreuve" };
@@ -219,7 +220,7 @@ window.creerPartie = async function(formData) {
       }
     });
 
-    // 6. Générer le point d'arrivée (11e point GPS)
+    // 5. Générer le point d'arrivée (parmi les points GPS restants, ou au hasard)
     let arrivalPoint = null;
     const pointsRestants = pointsGPS.filter(p => !pointsMelanges.includes(p));
     if (pointsRestants.length > 0) {
@@ -228,13 +229,13 @@ window.creerPartie = async function(formData) {
       arrivalPoint = getRandomElements(pointsGPS, 1)[0];
     }
 
-    // 7. Construire le scénario pour la partie
+    // 6. Construire le scénario pour la partie
     const scenarioJeu = {
-      repartition, // tableau de 10 objets {point, type, epreuve}
-      arrivalPoint // le point d'arrivée
+      repartition, // tableau de {point, type, epreuve}
+      arrivalPoint // point d'arrivée
     };
 
-    // 8. Stocker la répartition/scénario dans la partie
+    // 7. Stocker la répartition/scénario dans la partie
     await db.ref('parties/' + salonCode + '/scenarioJeu').set(scenarioJeu);
 
     // Stocke aussi le scénario original pour référence
