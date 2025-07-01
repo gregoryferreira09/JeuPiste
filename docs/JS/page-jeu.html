@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Jeu de piste - Carte & Épreuves</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Polices et styles globaux -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    body { background: #231d1d; color:#ffeecb; }
+    .site-title { text-align:center; margin-top:18px; }
+    #map { width: 100%; max-width: 650px; height: 350px; margin: 0 auto; border-radius: 14px; box-shadow: 0 2px 16px #0005; }
+    .epreuves-arc {
+      display: flex;
+      justify-content: center;
+      margin: 34px 0 18px 0;
+      position: relative;
+      height: 110px;
+    }
+    .epreuve-btn {
+      background: #ffeecb;
+      color: #231d1d;
+      font-family: 'Cinzel Decorative', serif;
+      border: 3px solid #e0c185;
+      border-radius: 50%;
+      width: 62px;
+      height: 62px;
+      font-size: 1.7em;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 13px;
+      box-shadow: 0 1px 8px #0002;
+      cursor: pointer;
+      position: absolute;
+      transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;
+      z-index: 2;
+    }
+    .epreuve-btn.validated { background: #e0c185; color: #fff; border-color: #ffeecb; opacity: 0.65; cursor:default; }
+    .epreuve-btn.current { border: 3.5px solid #ffd700; box-shadow: 0 0 16px #ffd70055; }
+    .epreuve-btn.malus { background: #c00; color: #ffeecb; border-color: #ffeecb; }
+    .epreuve-btn.malus.validated { background: #8c2222; color: #fff; border-color: #ffd700; }
+    .epreuve-btn.locked { opacity: 0.5; pointer-events: none; }
+    .epreuve-btn .num { font-size:1.1em;}
+    .modal-bg {
+      position:fixed; left:0;top:0;right:0;bottom:0;
+      background:rgba(20,12,2,0.65); display:flex;align-items:center;justify-content:center;z-index:999;
+    }
+    .modal-box {
+      background:#231d1d; color:#ffeecb; border:2.5px solid #e0c185; border-radius:12px;
+      min-width:220px; max-width:90vw; padding:32px 22px;text-align:center;box-shadow:0 4px 32px #000d;
+      font-size:1.24em;position:relative;
+    }
+    .gold-btn {
+      background: linear-gradient(90deg, #e0c185 70%, #ffd700 100%);
+      color: #231d1d;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.15em;
+      padding: 10px 36px;
+      margin-top: 18px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #ffd70055;
+      transition: background 0.15s, color 0.15s;
+    }
+    .gold-btn:active { background: #ffeecb; color: #a68c35;}
+    @media (max-width: 700px) {
+      #map { height: 210px; }
+      .epreuves-arc { height: 70px; }
+      .epreuve-btn { width:38px;height:38px;font-size:1.1em; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="site-title">Jeu de piste</h1>
+  </header>
+  <main style="max-width:800px;margin:0 auto;">
+    <div id="map"></div>
+    <section class="epreuves-arc" id="epreuvesArc"></section>
+    <div id="info" style="text-align:center;font-size:1.08em;margin-bottom:28px;"></div>
+  </main>
+
+  <!-- Modal pour Perdu ou accès à épreuve -->
+  <div id="modal" style="display:none;"></div>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Firebase (pour lecture des données de partie) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    // --- Récupération des infos de partie ---
+    const salonCode = localStorage.getItem("salonCode");
+    if (!salonCode) window.location.href = "accueil.html";
+    // Firebase config (remets la tienne si besoin)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let scenarioJeu = null;
+    let validated = JSON.parse(localStorage.getItem("validatedPoints") || "[]");
+
+    // Initialisation de la carte
+    let map, markers = [];
+    function afficherCarte(points) {
+      if (map) { map.remove(); }
+      const first = points[0].point || points[0];
+      let lat = parseFloat(first.gps?.split(',')[0] || first.lat || 47.478), lng = parseFloat(first.gps?.split(',')[1] || first.lng || -0.563);
+      map = L.map('map').setView([lat, lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+      // Place tous les points du jeu
+      points.forEach((pt, idx) => {
+        const pos = pt.point || pt;
+        let gps = pos.gps ? pos.gps.split(',') : [pos.lat, pos.lng];
+        let marker = L.marker([parseFloat(gps[0]), parseFloat(gps[1])]);
+        marker.addTo(map);
+        marker.on('click', function() {
+          showMarkerPopup(idx, marker, pos);
+        });
+        markers.push(marker);
+      });
+    }
+
+    function showMarkerPopup(idx, marker, pos) {
+      // Si déjà validé, pas de bouton
+      if (validated.includes(idx)) {
+        marker.bindPopup("<b>Déjà validé !</b>", {closeButton:true}).openPopup();
+        return;
+      }
+      marker.bindPopup(`<button class="gold-btn" style="padding:7px 18px;font-size:1em;" onclick="checkPosition(${idx})">J'y suis !</button>`, {closeButton:true}).openPopup();
+    }
+
+    // Calcul de distance
+    function distanceMetres(lat1, lon1, lat2, lon2) {
+      const R = 6371e3, toRad = x => x * Math.PI / 180;
+      const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // Check GPS
+    window.checkPosition = function(idx) {
+      const pt = scenarioJeu.repartition[idx].point;
+      let gps = pt.gps ? pt.gps.split(',') : [pt.lat, pt.lng];
+      let lat = parseFloat(gps[0]), lng = parseFloat(gps[1]);
+      if (!navigator.geolocation) return showModal("La géolocalisation n'est pas supportée.");
+      showModal("Vérification de ta position...", true);
+      navigator.geolocation.getCurrentPosition(pos => {
+        const d = distanceMetres(pos.coords.latitude, pos.coords.longitude, lat, lng);
+        if (d < 10) {
+          validated.push(idx);
+          localStorage.setItem("validatedPoints", JSON.stringify(validated));
+          // Si épreuve
+          if (scenarioJeu.repartition[idx].type === "epreuve") {
+            showModal(`<b>Bravo !</b><br><button class="gold-btn" onclick="goToEpreuve(${idx})">Accéder à l'épreuve</button>`);
+          } else {
+            showModal(`<b style="color:#c00;">Perdu !</b>`, false, true);
+          }
+          renderArc();
+        } else {
+          showModal(`Tu es trop loin du point GPS !<br>(${Math.round(d)} m)`);
+        }
+      }, err => showModal("Impossible d'obtenir la position GPS : " + err.message));
+    }
+
+    window.goToEpreuve = function(idx) {
+      // Stocke l'étape à jouer dans le localStorage
+      localStorage.setItem("currentEpreuveIndex", idx);
+      window.location.href = "template-epreuve.html";
+    }
+
+    // Arc de cercle des boutons épreuve/malus
+    function renderArc() {
+      const arc = document.getElementById('epreuvesArc');
+      arc.innerHTML = "";
+      const N = scenarioJeu.repartition.length;
+      const radius = (window.innerWidth < 700 ? 90 : 180);
+      const centerX = window.innerWidth/2 - 34;
+      const angleStep = Math.PI / (N+1);
+      for (let i=0; i<N; i++) {
+        const angle = Math.PI + (i+1)*angleStep - angleStep/2;
+        const x = centerX + radius * Math.cos(angle);
+        const y = radius * Math.sin(angle) + 90;
+        const rep = scenarioJeu.repartition[i];
+        let btn = document.createElement("button");
+        btn.className = "epreuve-btn" + (rep.type === "malus" ? " malus" :"") + (validated.includes(i) ? " validated" : "");
+        btn.style.left = `${20 + i*70}px`;
+        btn.style.top = `0px`;
+        btn.innerHTML = `<span class="num">${i+1}</span>`;
+        btn.title = rep.type === "malus" ? "Malus" : "Épreuve";
+        btn.onclick = () => {
+          // Centre la carte sur ce point et affiche le popup
+          const pt = rep.point;
+          let gps = pt.gps ? pt.gps.split(',') : [pt.lat, pt.lng];
+          map.setView([parseFloat(gps[0]), parseFloat(gps[1])], 17);
+          markers[i].fire('click');
+        };
+        arc.appendChild(btn);
+      }
+    }
+
+    function showModal(html, loader=false, isMalus=false) {
+      const modal = document.getElementById('modal');
+      modal.style.display = "flex";
+      modal.innerHTML = `<div class="modal-bg"><div class="modal-box">
+        <div>${html}${loader ? '<div style="margin-top:11px;"><span class="loader"></span></div>':''}</div>
+        <button class="gold-btn" style="margin-top:18px;" onclick="closeModal()">${isMalus ? 'Fermer' : 'OK'}</button>
+      </div></div>`;
+    }
+    window.closeModal = function() {
+      document.getElementById('modal').style.display = "none";
+    }
+
+    // ----------- Démarrage -------------
+    db.ref('parties/' + salonCode + '/scenarioJeu').once('value').then(snap => {
+      scenarioJeu = snap.val();
+      if (!scenarioJeu || !scenarioJeu.repartition) {
+        document.getElementById('info').textContent = "Scénario introuvable.";
+        return;
+      }
+      afficherCarte(scenarioJeu.repartition);
+      renderArc();
+    });
+  </script>
+</body>
+</html>
