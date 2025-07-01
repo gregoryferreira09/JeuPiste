@@ -19,14 +19,9 @@
       <div id="lancement-jeu" style="font-weight:bold; font-size:1.15em; margin-bottom:6px;"></div>
       <div id="regle-jeu" style="font-style:italic; margin-bottom:18px;"></div>
 
-      <form class="form-container" id="epreuveForm" autocomplete="off">
-        <div class="form-field" style="display: flex; gap: 32px; flex-wrap: wrap;">
-          <div style="flex:1; min-width:180px;">
-            <label for="coordEnd">Coordonnées d'arrivée :</label>
-            <input type="text" id="coordEnd" name="coordEnd" placeholder="Clique pour choisir" readonly>
-          </div>
-        </div>
+      <!-- La carte GPS globale sera insérée automatiquement ici par JS, juste sous le titre -->
 
+      <form class="form-container" id="epreuveForm" autocomplete="off">
         <div class="form-field">
           <label for="modeScenarioSelect">Univers du scénario :</label>
           <select id="modeScenarioSelect" name="modeScenarioSelect" required>
@@ -41,7 +36,7 @@
           </select>
         </div>
         
-        <!-- Liste des épreuves ajoutées, sous les coordonnées -->
+        <!-- Liste des épreuves ajoutées -->
         <div id="scenarioList" style="margin-bottom:18px;"></div>
 
         <div class="form-field">
@@ -59,17 +54,6 @@
         <button class="main-btn" type="button" id="testScenarioBtn">👀 Tester le scénario</button>
       </div>
     </main>
-  </div>
-
-  <!-- Modal carte -->
-  <div id="mapModal" style="display:none;">
-    <div class="modal-content">
-      <h3>Clique sur la carte pour choisir une position</h3>
-      <input type="text" id="mapSearchBar" placeholder="🔍 Rechercher une adresse ou un lieu..." autocomplete="off">
-      <div id="mapSearchResults"></div>
-      <div id="mapContainer"></div>
-      <button id="closeMapBtn">Annuler</button>
-    </div>
   </div>
 
   <footer class="footer">
