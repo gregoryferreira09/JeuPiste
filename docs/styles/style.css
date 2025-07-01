@@ -962,3 +962,44 @@ body {
 .btn-gps-action:hover {
   background: linear-gradient(90deg,#fff5cc,#ffe285 60%,#ffe9a3 95%);
 }
+
+.btn-gps-action {
+  font-size: 1.2em;
+  padding: 5px 12px;
+  min-width: 34px;
+  min-height: 34px;
+  border-radius: 50%;
+  background: #ffe285;
+  color: #a36e00;
+  border: none;
+  font-weight: bold;
+  box-shadow: 0 1px 2px #0002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.btn-gps-action:hover {
+  background: #fff5cc;
+  color: #cc8500;
+}
+
+#gpsMapName {
+  border-radius: 7px 0 0 7px;
+  border-right: 0;
+  background: #2d3141;
+  color: #ffeecb;
+  border: 1px solid #bbb;
+  padding: 4px 9px 4px 12px;
+  height: 31px;
+  font-size: 1em;
+  min-width: 70px;
+}
+
+#gpsSaveBtn {
+  border-radius: 0 7px 7px 0;
+  border-left: 0;
+  font-size: 1.25em;
+  padding: 4px 13px 4px 10px;
+}
