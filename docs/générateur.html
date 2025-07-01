@@ -27,6 +27,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
     }
     #gpsGlobalMap {
       width: 100%;
@@ -39,69 +40,65 @@
       box-shadow: 0 1px 6px #0002;
       border: 1.5px solid #343947;
       background: #20232a;
+      position: relative;
     }
-    #gpsInfosBloc {
-      flex: 1 1 330px;
-      min-width: 240px;
+    .gps-map-actions {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      width: 100%;
       display: flex;
-      flex-direction: column;
-      gap: 14px;
-      justify-content: flex-start;
-      color: #ffeecb;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 10;
+      padding: 0 10px 10px 10px;
     }
-    #gpsInfosBloc b { color: #f7d976; }
-    #gpsListDiv ul { margin: 0 0 8px 0; padding-left: 22px; }
-    #gpsListDiv li { margin-bottom: 5px; color: #fffac6; }
-    #gpsListDiv button { font-size: 1em; }
-    #gpsRecapDiv { color: #ffeecb; margin: 4px 0 10px 0; }
-    .gps-actions-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
+    .gps-map-actions > * {
+      pointer-events: all;
     }
-    #gpsSaveForm {
+    #gpsClearBtn, #gpsSaveBtn {
+      font-size: 1.3em;
+      padding: 4px 13px;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 50%;
+      background: #ffe285;
+      color: #a36e00;
+      border: none;
+      font-weight: bold;
+      box-shadow: 0 1px 4px #0002;
       display: flex;
-      gap: 8px;
       align-items: center;
-      margin-bottom: 6px;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+      margin: 0;
+    }
+    #gpsClearBtn:hover, #gpsSaveBtn:hover {
+      background: #fff5cc;
+      color: #cc8500;
+    }
+    #gpsSaveArea {
+      display: flex;
+      align-items: center;
+      gap: 0;
     }
     #gpsMapName {
-      flex: 1;
-      min-width: 80px;
-      background: #2d3141;
-      border: 1px solid #4a5064;
-      color: #ffeecb;
-      font-size: 1em;
-      padding: 6px 10px;
-      border-radius: 6px;
-    }
-    #gpsSaveForm button {
-      padding: 7px 12px;
-    }
-    #gpsSavedMaps {
-      width: 100%;
-      max-width: 300px;
+      border-radius: 7px 0 0 7px;
+      border: 1px solid #bbb;
+      border-right: 0;
       background: #2d3141;
       color: #ffeecb;
-      border: 1px solid #4a5064;
+      padding: 4px 9px 4px 12px;
+      height: 32px;
       font-size: 1em;
-      border-radius: 6px;
-      padding: 7px 8px;
+      min-width: 70px;
+      outline: none;
     }
-    .main-btn {
-      background: linear-gradient(90deg,#ffe285,#eeb80b 55%,#ffe285 95%);
-      color: #332f1a;
-      border: none;
-      border-radius: 7px;
-      padding: 7px 14px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 1px 4px #0002;
-      transition: background 0.15s;
-    }
-    .main-btn:hover {
-      background: linear-gradient(90deg,#fff5cc,#ffe285 60%,#ffe9a3 95%);
+    #gpsSaveBtn {
+      border-radius: 0 7px 7px 0;
+      border-left: 0;
+      font-size: 1.25em;
+      padding: 4px 13px 4px 10px;
     }
     @media (max-width: 950px) {
       .bandeau-gps-global { flex-direction: column; gap: 20px; }
@@ -111,6 +108,7 @@
     @media (max-width: 600px) {
       .bandeau-gps-global { padding: 7px 4vw; }
       #gpsGlobalMap { min-height: 180px; height: 190px; }
+      .gps-map-actions { padding: 0 2px 6px 2px; }
     }
   </style>
 </head>
@@ -129,6 +127,13 @@
       <div id="bandeau-gps-global" class="bandeau-gps-global">
         <div id="gpsMapBloc">
           <div id="gpsGlobalMap"></div>
+          <div class="gps-map-actions">
+            <button id="gpsClearBtn" type="button" title="Vider tous les points">🗑️</button>
+            <div id="gpsSaveArea">
+              <input type="text" id="gpsMapName" placeholder="Nom de la carte">
+              <button type="button" id="gpsSaveBtn" title="Sauvegarder la map">💾</button>
+            </div>
+          </div>
         </div>
         <div id="gpsInfosBloc">
           <div>
@@ -136,19 +141,7 @@
             <div id="gpsListDiv" style="margin-top:8px;"><em>Aucun point ajouté.</em></div>
           </div>
           <div id="gpsRecapDiv">Zone de jeu : 0 point</div>
-         <div class="gps-actions-row">
-  <button id="gpsUndoBtn" class="btn-gps-action" type="button" title="Annuler le dernier point">
-    ↶
-  </button>
-  <button id="gpsClearBtn" class="btn-gps-action" type="button" title="Vider tous les points">
-    <span style="margin-right:4px; font-size:1em;">🗑️</span>
-  </button>
-</div>
-          <form id="gpsSaveForm">
-            <input type="text" id="gpsMapName" placeholder="Nom de la carte">
-            <button type="submit" class="main-btn">💾 Sauvegarder la map</button>
-          </form>
-          <select id="gpsSavedMaps">
+          <select id="gpsSavedMaps" style="margin-top:12px;">
             <option value="">-- Charger une map sauvegardée --</option>
           </select>
         </div>
