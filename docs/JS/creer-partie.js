@@ -45,6 +45,16 @@ function getRandomElements(arr, n) {
   return shuffled.slice(0, n);
 }
 
+// Mélange un tableau (Fisher-Yates)
+function shuffle(array) {
+  let a = array.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // Charge dynamiquement la liste des scénarios dans le sélecteur
 document.addEventListener("DOMContentLoaded", function() {
   const select = document.getElementById('scenarioSelect');
@@ -125,7 +135,7 @@ window.creerPartie = async function(formData) {
   };
 
   // Génère un code salon unique pour la partie (toujours nouveau)
-const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+  const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
 
   // *** SUPPRESSION DE L'ANCIEN SALON SI EXISTANT ***
   await db.ref('parties/' + salonCode).remove();
@@ -143,6 +153,10 @@ const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
       return;
     }
     scenarioToUse = SCENARIO_PAR_DEFAUT;
+
+    // Stocke le scénario dans la partie (inchangé)
+    await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
+
   } else {
     // On charge depuis Firebase
     const snap = await db.ref('scenarios/' + scenarioCode).once('value');
@@ -158,10 +172,74 @@ const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
       alert("Le scénario est vide ou mal formé.");
       return;
     }
-  }
 
-  // Stocke le scénario dans la partie
-  await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
+    // === LOGIQUE DE RÉPARTITION ALÉATOIRE DES POINTS GPS ET ÉPREUVES ===
+
+    // 1. Récupérer la liste des points GPS et des épreuves à placer
+    // À ADAPTER selon la structure de TES scénarios personnalisés :
+    // Si scenarioToUse.pointsGPS et scenarioToUse.epreuves existent, utilise-les.
+    let pointsGPS = scenarioToUse.pointsGPS || [];
+    let epreuves = scenarioToUse.epreuves || [];
+
+    // Sinon, extrait à partir du champ scenario (toutes les étapes)
+    if ((!pointsGPS || pointsGPS.length < 10) && Array.isArray(scenarioToUse.scenario)) {
+      pointsGPS = scenarioToUse.scenario
+        .filter(etape => etape.type === "gps" && etape.params && etape.params.gps)
+        .map(etape => ({ ...etape.params, type: "gps" }));
+    }
+    if ((!epreuves || epreuves.length < 1) && Array.isArray(scenarioToUse.scenario)) {
+      epreuves = scenarioToUse.scenario
+        .filter(etape => etape.type !== "gps" && etape.type !== "revelation" && etape.type !== "malus");
+    }
+
+    if (pointsGPS.length < 10) {
+      alert("Ce scénario ne comporte pas assez de points GPS pour générer une partie.");
+      return;
+    }
+    if (epreuves.length < 6) {
+      alert("Ce scénario ne comporte pas assez d'épreuves pour générer une partie.");
+      return;
+    }
+
+    // 2. Sélectionner 10 points GPS aléatoirement parmi les 15
+    const pointsPartie = getRandomElements(pointsGPS, 10);
+
+    // 3. Mélanger les 10 points sélectionnés
+    const pointsMelanges = shuffle(pointsPartie);
+
+    // 4. Mélanger les épreuves (6 à placer)
+    const epreuvesMelangees = shuffle(getRandomElements(epreuves, 6));
+
+    // 5. Répartition: 6 points avec épreuve, 4 malus
+    const repartition = pointsMelanges.map((point, idx) => {
+      if (idx < epreuvesMelangees.length) {
+        return { point, epreuve: epreuvesMelangees[idx], type: "epreuve" };
+      } else {
+        return { point, epreuve: null, type: "malus" };
+      }
+    });
+
+    // 6. Générer le point d'arrivée (11e point GPS)
+    let arrivalPoint = null;
+    const pointsRestants = pointsGPS.filter(p => !pointsMelanges.includes(p));
+    if (pointsRestants.length > 0) {
+      arrivalPoint = getRandomElements(pointsRestants, 1)[0];
+    } else {
+      arrivalPoint = getRandomElements(pointsGPS, 1)[0];
+    }
+
+    // 7. Construire le scénario pour la partie
+    const scenarioJeu = {
+      repartition, // tableau de 10 objets {point, type, epreuve}
+      arrivalPoint // le point d'arrivée
+    };
+
+    // 8. Stocker la répartition/scénario dans la partie
+    await db.ref('parties/' + salonCode + '/scenarioJeu').set(scenarioJeu);
+
+    // Stocke aussi le scénario original pour référence
+    await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
+  }
 
   // GÉNÉRATION DES PERSONNAGES (exemple simple)
   let persosObj = {};
