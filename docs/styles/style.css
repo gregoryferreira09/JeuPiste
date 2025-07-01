@@ -937,30 +937,20 @@ body {
 }
 
 
-.gps-actions-row {
+.gps-map-actions {
+  width: 100%;
+  margin-top: 12px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  position: static; /* Surtout pas absolute ! */
 }
 
-.btn-gps-action {
-  font-size: 0.98em;
-  padding: 4px 10px 4px 10px;
-  min-width: 0;
-  border-radius: 6px;
-  box-shadow: 0 1px 2px #0002;
-  background: linear-gradient(90deg,#ffe285,#eeb80b 55%,#ffe285 95%);
-  color: #332f1a;
-  border: none;
-  font-weight: 500;
-  transition: background 0.15s;
+#gpsSaveArea {
   display: flex;
   align-items: center;
-  gap: 5px;
-}
-.btn-gps-action:hover {
-  background: linear-gradient(90deg,#fff5cc,#ffe285 60%,#ffe9a3 95%);
+  gap: 0;
 }
 
 .btn-gps-action {
@@ -1031,4 +1021,19 @@ body {
   width: 100%;
   display: block;
   text-align: center;
+}
+
+/* Responsive ajustement pour les actions sous la carte */
+@media (max-width: 650px) {
+  .gps-map-actions {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  #gpsSaveArea {
+    width: 100%;
+  }
+  #gpsMapName {
+    flex: 1 1 auto;
+  }
 }
