@@ -331,10 +331,27 @@ function exporterScenario() {
     date: Date.now()
   })
   .then(() => {
-    firebase.database().ref('scenarios/' + codeSalon).set({
+    // Nettoie le scénario pour que ce soit TOUJOURS un tableau d'objets {type, params}
+    const scenarioClean = Array.isArray(scenario)
+      ? scenario.map(s => {
+          // Si déjà {type, params}, on garde
+          if (s && typeof s === "object" && s.type && s.params) return { type: s.type, params: s.params };
+          // Sinon, on tente de convertir (très rare si généré avec ton générateur)
+          let params = {};
+          Object.entries(s).forEach(([k, v]) => {
+            if (k !== 'type') params[k] = v;
+          });
+          return { type: s.type || "undefined", params };
+        })
+      : [];
+
+    // Nettoie les points GPS au cas où
+    const gpsPointsClean = Array.isArray(gpsPoints) ? gpsPoints.slice() : [];
+
+    return firebase.database().ref('scenarios/' + codeSalon).set({
       mode: currentGameMode,
-      scenario,
-      gpsPoints
+      scenario: scenarioClean,
+      gpsPoints: gpsPointsClean
     });
   })
   .then(() => {
