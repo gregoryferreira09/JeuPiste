@@ -2,12 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Jeu de piste - Carte GPS seule</title>
+  <title>Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Polices et styles globaux -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     body { background: #231d1d; color:#ffeecb; }
     .site-title { text-align:center; margin-top:18px; }
@@ -22,34 +21,7 @@
     <h1 class="site-title">Jeu de piste</h1>
   </header>
   <main style="max-width:800px;margin:0 auto;">
-    <div id="map"></div>
+    <!-- Ici tu pourras ajouter ta carte, boutons, etc. -->
   </main>
-
-  <!-- Leaflet -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    // Liste de points GPS (exemple en dur, à remplacer plus tard par Firebase)
-    const points = [
-      { lat: 47.504127, lng: -0.587360 },
-      { lat: 47.504689, lng: -0.587774 },
-      { lat: 47.504761, lng: -0.586765 },
-      { lat: 47.504475, lng: -0.586309 },
-      { lat: 47.504178, lng: -0.588144 }
-    ];
-
-    // Centrage sur le premier point
-    const first = points[0];
-    const map = L.map('map').setView([first.lat, first.lng], 16);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    // Place chaque point sur la carte
-    points.forEach((pt, idx) => {
-      L.marker([pt.lat, pt.lng]).addTo(map)
-        .bindPopup("Point " + (idx + 1));
-    });
-  </script>
 </body>
 </html>
