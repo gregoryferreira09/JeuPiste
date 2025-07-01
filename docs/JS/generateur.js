@@ -73,13 +73,13 @@ function renderMapsList() {
 // Gestion sélection/désélection map
 function handleMapClick(name, element) {
   if (selectedMapName === name) {
-    // Si on clique déjà sur la map sélectionnée : désélection (MAP VIERGE)
+    // Désélection : carte vierge (plus de points ni de marqueurs)
     selectedMapName = null;
     gpsPoints.length = 0;
-    if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
+    if (typeof removeAllMarkers === 'function') removeAllMarkers();
     if (typeof refreshGpsList === 'function') refreshGpsList();
   } else {
-    // Si on clique sur un nouveau nom de map ou qu'on reclique après avoir désélectionné
+    // Sélection : recharge la map sauvegardée (points + marqueurs)
     let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
     if (allMaps[name]) {
       selectedMapName = name;
@@ -89,7 +89,7 @@ function handleMapClick(name, element) {
       if (typeof refreshGpsList === 'function') refreshGpsList();
     }
   }
-  renderMapsList(); // Pour mettre à jour l'état visuel
+  renderMapsList();
 }
 
 // Supprimer une map au clic sur la croix
@@ -428,6 +428,7 @@ function initGpsBandeau() {
     gpsMarkers.forEach(m => gpsMarkersLayer.removeLayer(m));
     gpsMarkers = [];
   }
+  window.removeAllMarkers = removeAllMarkers;
   function refreshMarkersAfterDelete() {
     removeAllMarkers();
     gpsPoints.forEach((pt, i) => addMarker(pt, i));
