@@ -8,10 +8,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <!-- CSS global harmonisé -->
   <link rel="stylesheet" href="styles/style.css">
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
-    /* Optionnel : fadeIn pour effet d'apparition, harmonisé */
-    .fadeIn { opacity: 0; transition: opacity 0.5s; }
-    .fadeIn.visible { opacity: 1; }
+    #mapJeu {
+      width: 100%;
+      max-width: 540px;
+      height: 330px;
+      margin: 0 auto 20px auto;
+      border-radius: 14px;
+      box-shadow: 0 2px 16px #0005;
+      z-index: 1;
+    }
+    @media (max-width: 700px) {
+      #mapJeu {
+        height: 210px;
+        max-width: 98vw;
+        min-width: 0;
+      }
+    }
+    .carte-message {
+      text-align: center;
+      color: #e0c185;
+      font-size: 1.13em;
+      margin: 18px 0 0 0;
+    }
   </style>
 </head>
 <body>
@@ -23,10 +44,11 @@
       <section class="main-accueil fadeIn" role="main" aria-live="polite">
         <div class="profile-banner" style="margin-bottom:32px;">
           <h1 style="margin:0; font-size:1.6em; color:#a67c13; letter-spacing:1px; text-shadow:0 2px 15px #ffeecb88;">
-            À compléter...
+            Carte du parcours
           </h1>
         </div>
-        <!-- Ici tu écriras ton contenu du jeu -->
+        <div id="mapJeu"></div>
+        <div id="carte-message" class="carte-message"></div>
       </section>
     </main>
   </div>
@@ -34,11 +56,83 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script>
-    // Optionnel : effet fade-in harmonisé (comme sur lancement-partie)
+    // Initialisation Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    firebase.auth().signInAnonymously();
+
+    function afficherCarteJeu(points) {
+      const mapDiv = document.getElementById('mapJeu');
+      if (!points.length) {
+        mapDiv.innerHTML = "";
+        document.getElementById('carte-message').textContent = "Aucun point GPS défini pour ce scénario.";
+        return;
+      }
+      document.getElementById('carte-message').textContent = "";
+      // Détruit la carte existante si besoin (pour éviter doublon Leaflet)
+      if (window._jeuLeafletMap) {
+        window._jeuLeafletMap.remove();
+        window._jeuLeafletMap = null;
+      }
+      // Centrage sur le premier point
+      const first = points[0];
+      window._jeuLeafletMap = L.map('mapJeu').setView([first.lat, first.lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(window._jeuLeafletMap);
+      // Ajoute les points
+      points.forEach((pt, idx) => {
+        L.marker([pt.lat, pt.lng]).addTo(window._jeuLeafletMap)
+          .bindPopup("Point " + (idx + 1));
+      });
+    }
+
+    // Récupère les points GPS du scénario sélectionné pour la partie
     document.addEventListener("DOMContentLoaded", function() {
+      // Effet fade in harmonisé
       var main = document.querySelector('.fadeIn');
       if (main) main.classList.add('visible');
+
+      // Sécurité : code salon obligatoire
+      const salonCode = localStorage.getItem("salonCode");
+      if (!salonCode) {
+        document.getElementById('carte-message').textContent = "Aucune partie active. Retournez à l'accueil.";
+        return;
+      }
+      // Va chercher le scénario dans la partie
+      firebase.database().ref('parties/' + salonCode + '/scenario/scenario').once('value').then(snap => {
+        const scenario = snap.val();
+        // On extrait tous les points de type GPS
+        const points = [];
+        if (scenario && Array.isArray(scenario)) {
+          scenario.forEach(etape => {
+            if (etape.type === "gps" && etape.params && etape.params.gps) {
+              const [lat, lng] = etape.params.gps.split(',').map(Number);
+              if (!isNaN(lat) && !isNaN(lng)) points.push({ lat, lng });
+            }
+          });
+        }
+        afficherCarteJeu(points);
+      }).catch(e => {
+        document.getElementById('carte-message').textContent = "Erreur de chargement du scénario.";
+      });
     });
   </script>
 </body>
