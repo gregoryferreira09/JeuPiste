@@ -938,13 +938,13 @@ body {
 
 
 .gps-map-actions {
+  /* Supprime position:absolute, left, right, bottom, z-index, pointer-events */
   width: 100%;
-  margin-top: 12px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 18px;
-  position: static; /* Surtout pas absolute ! */
+  gap: 12px;
+  padding: 12px 10px 0 10px; /* Padding top pour espacer de la carte */
+  background: none; /* ou background: transparent; */
 }
 
 #gpsSaveArea {
