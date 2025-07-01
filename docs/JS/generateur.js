@@ -73,13 +73,13 @@ function renderMapsList() {
 // Gestion sélection/désélection map
 function handleMapClick(name, element) {
   if (selectedMapName === name) {
-    // Désélectionne et vide la carte
+    // Si on clique déjà sur la map sélectionnée : désélection (MAP VIERGE)
     selectedMapName = null;
     gpsPoints.length = 0;
     if (typeof refreshMarkersAfterDelete === 'function') refreshMarkersAfterDelete();
     if (typeof refreshGpsList === 'function') refreshGpsList();
   } else {
-    // Sélectionne et charge la map
+    // Si on clique sur un nouveau nom de map ou qu'on reclique après avoir désélectionné
     let allMaps = JSON.parse(localStorage.getItem('savedGpsMaps') || '{}');
     if (allMaps[name]) {
       selectedMapName = name;
