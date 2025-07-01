@@ -419,12 +419,20 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
   }
 } else {
   // --- Mode normal ---
-  const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = Number(localStorage.getItem("equipeNum"));
-  if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
-    window.location.href = "accueil.html";
-  }
+const salonCode = localStorage.getItem("salonCode");
+const equipeNum = Number(localStorage.getItem("equipeNum"));
+if (!salonCode || isNaN(equipeNum) || equipeNum < 0) {
+  window.location.href = "accueil.html";
+}
 
+let scenarioCode = null;
+let repartitionLength = null;
+
+// Récupère le scenarioCode au chargement
+db.ref(`parties/${salonCode}/parametres/scenarioCode`).once('value').then(snapCode => {
+  scenarioCode = snapCode.val();
+
+  // Récupère aussi le mode (pour le texte/affichage)
   db.ref(`parties/${salonCode}/scenario/mode`).once('value').then(snapMode => {
     window.currentScenarioMode = snapMode.val() || "arthurien";
   });
@@ -437,20 +445,55 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
   function chargerEtapeDynamique() {
     db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
       const step = snapStep.val() || 0;
-      db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
-        resetAffichageEtape();
-        const etape = snapEpreuve.val();
-        if (!etape) {
-          document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
-          return;
-        }
-        document.getElementById('next-quest').style.display = 'none';
-        afficherEtapeHarmonisee(etape, step, window.currentScenarioMode, false);
-        document.getElementById('next-quest').onclick = validerEtape;
-      });
+
+      if (scenarioCode === "parc_saint_nicolas") {
+        // Ancienne logique : étapes fixes dans scenario/scenario
+        db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
+          resetAffichageEtape();
+          const etape = snapEpreuve.val();
+          if (!etape) {
+            document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
+            return;
+          }
+          document.getElementById('next-quest').style.display = 'none';
+          afficherEtapeHarmonisee(etape, step, window.currentScenarioMode, false);
+          document.getElementById('next-quest').onclick = validerEtape;
+        });
+      } else {
+        // Nouvelle logique : étapes dynamiques dans scenarioJeu/repartition
+        db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+          const repartition = snapRep.val() || [];
+          repartitionLength = repartition.length;
+
+          // Si on a dépassé toutes les étapes, on affiche le point d'arrivée
+          if (step >= repartition.length) {
+            db.ref(`parties/${salonCode}/scenarioJeu/arrivalPoint`).once('value').then(snapArrival => {
+              const arrival = snapArrival.val();
+              document.getElementById('main-content').innerHTML =
+                `<div style="color:#2a4;font-weight:bold;">Bravo, vous avez terminé toutes les épreuves !</div>` +
+                (arrival
+                  ? `<div style="margin-top:16px;font-size:1.15em;"><b>Point d'arrivée :</b><br>${arrival.gps ? `GPS : ${arrival.gps}` : ''}</div>`
+                  : '');
+            });
+            return;
+          }
+
+          // Sinon, on affiche l'étape courante
+          const etape = repartition[step];
+          resetAffichageEtape();
+          if (!etape) {
+            document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
+            return;
+          }
+          document.getElementById('next-quest').style.display = 'none';
+          // On passe etape.epreuve si type = epreuve, sinon l'objet entier (malus ou autre)
+          afficherEtapeHarmonisee(etape.epreuve || etape, step, window.currentScenarioMode, false);
+          document.getElementById('next-quest').onclick = validerEtape;
+        });
+      }
     });
   }
-
+});
   function validerEtape() {
     const nextBtn = document.getElementById('next-quest');
     nextBtn.disabled = true;
