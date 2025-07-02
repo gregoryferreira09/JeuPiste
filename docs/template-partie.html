@@ -173,20 +173,29 @@
 
 function genererJetonsArc(gpsPoints, missionsAssociation) {
   const overlay = document.getElementById('jetons-arc-overlay');
+  const container = overlay.parentElement;
   overlay.innerHTML = '';
 
   // Taille réelle du conteneur et du jeton
   const width = overlay.offsetWidth || 340;
-  const height = overlay.offsetHeight || 110;
   let jetonDiameter = (width >= 400) ? 48 : 34;
   if (gpsPoints.length > 10) jetonDiameter = (width >= 400) ? 38 : 28;
   const jetonRadius = jetonDiameter / 2;
   const MARGE = 8;
 
-  // Rayon max selon hauteur et largeur
-  const Rv = height - jetonRadius - MARGE; // vertical
-  const Rh = (width/2) - jetonRadius - MARGE; // horizontal
-  const R = Math.max(30, Math.min(Rv, Rh));
+  // Calcul dynamique de la hauteur MINIMALE pour garantir que tous les jetons tiennent en bas du cadre
+  let minArcHeight = Math.ceil(jetonDiameter + jetonRadius + MARGE + 8);
+  if (gpsPoints.length > 9) minArcHeight += 12;
+  if (gpsPoints.length > 13) minArcHeight += 8;
+
+  // Fixe la hauteur du container si besoin (s’adapte)
+  container.style.minHeight = minArcHeight + 'px';
+
+  // Calcul du rayon (doit rentrer dans largeur ET hauteur)
+  const height = overlay.offsetHeight || minArcHeight;
+  const Rv = height - jetonRadius - MARGE;
+  const Rh = (width/2) - jetonRadius - MARGE;
+  const R = Math.max(24, Math.min(Rv, Rh));
 
   // Centre Y = fond du container - jetonRadius - MARGE
   const cx = width / 2;
@@ -226,7 +235,6 @@ function genererJetonsArc(gpsPoints, missionsAssociation) {
     }
   }
 }
-
     // Enregistre ou récupère la disposition des missions (persistant pour la partie)
     function getOrCreateFixedMapping(salonCode, nbGPS, nbMissions) {
       return db.ref(`parties/${salonCode}/missionsMapping`).once('value').then(snap => {
