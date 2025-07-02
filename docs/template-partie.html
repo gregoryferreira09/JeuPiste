@@ -22,7 +22,7 @@
     .jetons-arc-container {
       position: relative;
       width: 100%;
-      max-width: 430px;
+      max-width: 520px; /* même largeur que .main-accueil */
       height: 110px;
       margin: 28px auto 8px auto;
       display: flex;
@@ -175,26 +175,28 @@
       const overlay = document.getElementById('jetons-arc-overlay');
       overlay.innerHTML = '';
 
-      // Responsive : largeur réelle du container
-const width = overlay.offsetWidth || 340;
-const jetonRadius = 24; // moitié de la largeur d'un jeton (48px)
-const minMargin = 8; // pour ne pas coller au bord
-const R = Math.max(60, (width/2) - jetonRadius - minMargin);
+      // Largeur réelle du conteneur (toujours même que le cadre)
+      const width = overlay.offsetWidth || 340;
+      // Taille jeton dynamique selon écran (css: 48px ou 34px)
+      const jetonRadius = (width >= 400) ? 24 : 17;
+      const minMargin = 6;
+      // Rayon pour ne jamais sortir du cadre (même avec beaucoup de points)
+      const R = Math.max(40, (width/2) - jetonRadius - minMargin);
+
       const cx = width/2;
       const cy = R + 12;
 
       const N = gpsPoints.length;
-      const angleStart = 200; // degrés, arc inférieur, un peu ouvert sur les côtés
+      const angleStart = 200;
       const angleEnd = -20;
       const angleStep = (angleEnd - angleStart) / (N-1 > 0 ? N-1 : 1);
 
       for(let i=0; i<N; i++){
         const angle = angleStart + i * angleStep;
         const rad = angle * Math.PI / 180;
-        const x = cx + R * Math.cos(rad) - 24;
-        const y = cy + R * Math.sin(rad) - 24;
+        const x = cx + R * Math.cos(rad) - jetonRadius;
+        const y = cy + R * Math.sin(rad) - jetonRadius;
         if(missionsAssociation[i] !== -1){
-          // Jeton mission (cliquable)
           const missionNum = missionsAssociation[i] + 1;
           const btn = document.createElement('button');
           btn.className = 'jeton mission';
@@ -205,12 +207,11 @@ const R = Math.max(60, (width/2) - jetonRadius - minMargin);
           btn.onclick = () => window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
           overlay.appendChild(btn);
         }else{
-          // Jeton GPS (gris)
           const div = document.createElement('div');
           div.className = 'jeton gps';
           div.textContent = i+1;
-          div.style.left = `${x+7}px`;
-          div.style.top = `${y+7}px`;
+          div.style.left = `${x}px`;
+          div.style.top = `${y}px`;
           overlay.appendChild(div);
         }
       }
