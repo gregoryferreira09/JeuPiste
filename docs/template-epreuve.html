@@ -17,15 +17,15 @@
     .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 24px; font-size:1.07em; z-index:1000;}
     .modal-toast.visible { display: block; animation: fadein 0.3s;}
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    /* Centrage et espacement du bouton retour */
-    .retour-jeu-wrapper {
+    /* Pour placer le bouton tout en bas et bien le séparer du footer */
+    .retour-jeu-bottom-wrapper {
       display: flex;
       justify-content: center;
-      margin-top: 40px;
+      margin-top: 48px;
       margin-bottom: 36px;
     }
     @media (max-width: 650px) {
-      .retour-jeu-wrapper { margin-top: 22px; margin-bottom: 22px;}
+      .retour-jeu-bottom-wrapper { margin-top: 24px; margin-bottom: 18px; }
     }
   </style>
 </head>
@@ -41,13 +41,6 @@
       <div class="presentation-jeu" style="margin-top:24px;">
         <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
       </div>
-      <!-- BOUTON RETOUR SOUS LE BANDEAU PHOTO -->
-      <div class="retour-jeu-wrapper">
-        <a href="template-partie.html" class="main-btn" style="min-width:140px;text-align:center;">
-          &#8592; Retour au jeu
-        </a>
-      </div>
-      <!-- /BANDEAU ET BOUTON RETOUR -->
 
       <div class="objectif-course" id="objectif-block" style="display:none;">
         <div class="objectif-label">Objectif</div>
@@ -92,6 +85,12 @@
       <!-- Bouton validation -->
       <button id="next-quest" class="main-btn" style="display:none;" disabled>Quête suivante</button>
     </main>
+    <!-- BOUTON RETOUR TOUT EN BAS AVANT LE FOOTER -->
+    <div class="retour-jeu-bottom-wrapper">
+      <a href="template-partie.html" class="main-btn" style="min-width:140px;text-align:center;">
+        &#8592; Retour au jeu
+      </a>
+    </div>
   </div>
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
