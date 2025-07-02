@@ -25,13 +25,24 @@
       flex-direction: column;
     }
     #jetons-ligne {
+      display: none !important;
+    }
+    #jetons-colonnes-wrapper {
       display: flex;
       flex-direction: row;
-      gap: 18px;
-      align-items: center;
-      justify-content: center;
       width: 100%;
-      padding: 0;
+      justify-content: space-between;
+      align-items: flex-start;
+      min-height: 140px;
+      margin-bottom: 10px;
+      gap: 0;
+    }
+    .jetons-colonne {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      min-width: 54px;
     }
     .jeton {
       border-radius: 50%;
@@ -103,9 +114,10 @@
       letter-spacing: 0.5px;
     }
     @media (max-width: 650px) {
-      #jetons-ligne { gap: 10px; padding: 0; }
+      .jetons-colonne { gap: 7px; }
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
       #svg-arrow { width: 60px; height: 80px; }
+      #jetons-colonnes-wrapper { min-height: 60px; }
     }
     /* ========= FIN CSS ========= */
   </style>
@@ -127,7 +139,11 @@
           Sélectionnez une mission pour commencer ou reprendre votre parcours.
         </div>
         <div class="jetons-arc-container">
-          <div id="jetons-ligne"></div>
+          <div id="jetons-colonnes-wrapper">
+            <div id="jetons-gauche" class="jetons-colonne"></div>
+            <div id="jetons-droite" class="jetons-colonne"></div>
+          </div>
+          <div id="jetons-ligne" style="display:none"></div>
           <div id="compass-arrow-container">
             <div id="compass-arrow">
               <!-- SVG Flèche Cupidon dorée allongée -->
@@ -212,10 +228,12 @@
       }
     }
 
-    // JETONS SUR UNE LIGNE + FLÈCHE CUPIDON + PAS + REDIRECTION
-    function genererJetonsLigne(gpsPoints, missionsAssociation) {
-      const ligne = document.getElementById('jetons-ligne');
-      ligne.innerHTML = '';
+    // JETONS EN COLONNES DE CHAQUE CÔTÉ
+    function genererJetonsColonnes(gpsPoints, missionsAssociation) {
+      const gauche = document.getElementById('jetons-gauche');
+      const droite = document.getElementById('jetons-droite');
+      gauche.innerHTML = '';
+      droite.innerHTML = '';
 
       let lastClicked = { idx: null, timeout: null };
 
@@ -223,6 +241,7 @@
       let jetonDiameter = (N > 10) ? 34 : 48;
 
       for(let i=0; i<N; i++) {
+        let jetonEl;
         if(missionsAssociation[i] !== -1) {
           const missionNum = missionsAssociation[i] + 1;
           const btn = document.createElement('button');
@@ -230,7 +249,6 @@
           btn.textContent = missionNum;
           btn.setAttribute('aria-label', `Mission ${missionNum}`);
           btn.style.width = btn.style.height = jetonDiameter + "px";
-          // Simple/double clic
           btn.onclick = (e) => {
             e.preventDefault();
             if (lastClicked.idx === i) {
@@ -251,13 +269,18 @@
             hideCompass();
             window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
           }
-          ligne.appendChild(btn);
+          jetonEl = btn;
         } else {
           const div = document.createElement('div');
           div.className = 'jeton gps';
           div.textContent = i+1;
           div.style.width = div.style.height = jetonDiameter + "px";
-          ligne.appendChild(div);
+          jetonEl = div;
+        }
+        if (i % 2 === 0) {
+          gauche.appendChild(jetonEl);
+        } else {
+          droite.appendChild(jetonEl);
         }
       }
     }
@@ -382,7 +405,7 @@
         db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
           const missions = snapMission.val() || [];
           getOrCreateFixedMapping(salonCode, points.length, missions.length).then(missionsAssociation => {
-            genererJetonsLigne(points, missionsAssociation);
+            genererJetonsColonnes(points, missionsAssociation);
           });
         });
       });
@@ -392,7 +415,7 @@
           const points = snap.val() || [];
           db.ref('parties/' + salonCode + '/missionsMapping').once('value').then(snapMap => {
             const missionsAssociation = snapMap.val() || [];
-            genererJetonsLigne(points, missionsAssociation);
+            genererJetonsColonnes(points, missionsAssociation);
           });
         });
       });
