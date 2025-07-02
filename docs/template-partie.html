@@ -4,44 +4,100 @@
   <meta charset="UTF-8">
   <title>Carte & Missions – Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Leaflet -->
+  <!-- Polices et styles principaux -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/style.css">
+  <!-- Leaflet pour la carte centrale -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="styles/style.css">
   <style>
-    #centralMap { width: 360px; height: 320px; border-radius: 12px; box-shadow: 0 2px 12px #e0c18588; margin: 0 auto 28px; }
-    .missions-list { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-    .mission-btn {
-      background: #e0c185; color: #231d1d; border: none; border-radius: 8px; padding: 11px 20px;
-      font-size: 1.2em; font-family: inherit; cursor: pointer; transition: background .2s;
+    /* Spécifique à la page partie mais harmonisé avec le reste */
+    #central-map-block { margin: 25px 0; display: flex; justify-content: center; }
+    #centralMap {
+      width: 360px; height: 320px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px #e0c18588;
+      background: #222;
     }
-    .mission-btn:hover { background: #ffeecb; }
+    .missions-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      align-items: center;
+      margin: 25px 0 8px 0;
+    }
+    .mission-btn {
+      background: #e0c185;
+      color: #231d1d;
+      border: none;
+      border-radius: 10px;
+      padding: 15px 26px;
+      font-size: 1.25em;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background .2s, color .2s, box-shadow .2s;
+      box-shadow: 0 2px 8px #0001;
+      margin-bottom: 10px;
+    }
+    .mission-btn:hover,
+    .mission-btn:focus {
+      background: #ffeecb;
+      color: #4b3714;
+      outline: 2px solid #e0c185;
+      outline-offset: 3px;
+    }
+    .titre-course {
+      font-family: 'Cinzel Decorative', serif;
+      color: #e0c185;
+      font-size: 1.3em;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-top: 8px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 650px) {
+      #centralMap { width: 98vw; height: 45vw; min-height: 200px; }
+      .main-accueil { padding: 12px 2vw; }
+      .mission-btn { font-size: 1em; padding: 13px 12px; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1 class="site-title">Jeu de piste – Carte & Missions</h1>
+    <h1 class="site-title">Jeu de piste</h1>
   </header>
-  <main>
-    <div style="display: flex; justify-content: center; margin: 30px 0;">
-      <div id="centralMap"></div>
-    </div>
-    <section>
-      <h2>Choisissez une mission</h2>
-      <div class="missions-list" id="missions-list">
-        <!-- Les boutons numérotés seront générés ici -->
+  <div class="center-wrapper">
+    <main class="main-accueil fadeIn" role="main">
+      <h2 class="titre-course">Carte & Missions</h2>
+      <!-- Bloc Carte centrale -->
+      <div id="central-map-block">
+        <div id="centralMap"></div>
       </div>
-    </section>
-  </main>
+      <!-- /Bloc Carte centrale -->
+
+      <section>
+        <div style="margin-bottom: 14px; color: #ffeecb; font-size: 1.12em;">
+          Sélectionnez une mission pour commencer ou reprendre votre parcours.
+        </div>
+        <div class="missions-list" id="missions-list">
+          <!-- Les boutons de mission seront générés ici -->
+        </div>
+      </section>
+    </main>
+  </div>
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- Scripts Firebase et App -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script>
-    // --- Initialisation Firebase (copie/colle celle de ton projet) ---
+    // Initialisation Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -55,7 +111,12 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // --- Auth anonyme
+    // Effet fadeIn harmonisé
+    document.addEventListener("DOMContentLoaded", function() {
+      var main = document.querySelector('.fadeIn');
+      if (main) setTimeout(() => main.classList.add('visible'), 50);
+    });
+
     firebase.auth().onAuthStateChanged(function(user) {
       if (!user) firebase.auth().signInAnonymously();
       else lancerAccueil();
@@ -97,8 +158,9 @@
         missionsList.innerHTML = "";
         for (let i = 0; i < missions.length; i++) {
           const btn = document.createElement('button');
-          btn.className = "mission-btn";
+          btn.className = "main-btn mission-btn";
           btn.textContent = (i + 1);
+          btn.setAttribute('aria-label', `Mission ${i + 1}`);
           btn.onclick = () => {
             window.location.href = `template-epreuve.html?idx=${i}`;
           };
