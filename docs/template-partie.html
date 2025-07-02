@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    /* ========= CSS SPÉCIFIQUE JETONS ET BOUSSOLE ========= */
+    /* ========= CSS SPÉCIFIQUE JETONS ET FLÈCHE CUPIDON ========= */
     .jetons-arc-container {
       background: none !important;
       border-radius: 0 !important;
@@ -73,8 +73,10 @@
     }
     #compass-arrow-container {
       display: none;
-      margin-top: 24px;
+      margin-top: 32px;
       width: 100%;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
     }
     #compass-arrow {
@@ -85,15 +87,25 @@
     #svg-arrow {
       transition: transform 0.25s cubic-bezier(0.4,1,0.2,1);
       will-change: transform;
-      width: 64px;
-      height: 64px;
+      width: 90px;
+      height: 70px;
+      filter: drop-shadow(0 2px 10px #d4af3760);
       display: block;
+    }
+    #steps-info {
+      color: #e0c185;
+      text-align: center;
+      font-family: "Cinzel Decorative", serif;
+      font-size: 1.15em;
+      margin-top: 10px;
+      font-weight: bold;
+      text-shadow: 0 2px 8px #0002;
+      letter-spacing: 0.5px;
     }
     @media (max-width: 650px) {
       #jetons-ligne { gap: 10px; padding: 0; }
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
-      #compass-arrow { margin-top: 16px; }
-      #svg-arrow { width: 44px; height: 44px; }
+      #svg-arrow { width: 60px; height: 48px; }
     }
     /* ========= FIN CSS SPÉCIFIQUE ========= */
   </style>
@@ -119,26 +131,27 @@
           <div id="jetons-ligne"></div>
           <div id="compass-arrow-container">
             <div id="compass-arrow">
-              <svg id="svg-arrow" width="90" height="70" viewBox="0 0 90 70" style="display:block;">
-  <defs>
-    <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fff7c4"/>
-      <stop offset="55%" stop-color="#e0c185"/>
-      <stop offset="100%" stop-color="#d4af37"/>
-    </linearGradient>
-  </defs>
-  <!-- Corps de la flèche -->
-  <rect x="39" y="10" width="12" height="40" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
-  <!-- Pointe -->
-  <polygon points="45,5 60,27 45,22 30,27" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
-  <!-- Empennage "cupidon" -->
-  <polyline points="45,50 30,65 45,60 60,65 45,50" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
-  <!-- Ombre douce -->
-  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-    <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
-  </filter>
-</svg>
+              <!-- SVG Flèche Cupidon dorée -->
+              <svg id="svg-arrow" width="90" height="70" viewBox="0 0 90 70">
+                <defs>
+                  <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#fff7c4"/>
+                    <stop offset="55%" stop-color="#e0c185"/>
+                    <stop offset="100%" stop-color="#d4af37"/>
+                  </linearGradient>
+                  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
+                  </filter>
+                </defs>
+                <!-- Corps -->
+                <rect x="39" y="10" width="12" height="40" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
+                <!-- Pointe -->
+                <polygon points="45,5 60,27 45,22 30,27" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
+                <!-- Empennage Cupidon -->
+                <polyline points="45,50 30,65 45,60 60,65 45,50" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
+              </svg>
             </div>
+            <div id="steps-info"></div>
           </div>
         </div>
       </section>
@@ -200,7 +213,7 @@
       }
     }
 
-    // JETONS SUR UNE LIGNE + GESTION COMPAS/REDIRECTION
+    // JETONS SUR UNE LIGNE + GESTION FLÈCHE CUPIDON + REDIRECTION
     function genererJetonsLigne(gpsPoints, missionsAssociation) {
       const ligne = document.getElementById('jetons-ligne');
       ligne.innerHTML = '';
@@ -250,11 +263,13 @@
       }
     }
 
-    // === Boussole dynamique ===
+    // === Flèche Cupidon dynamique & info pas ===
     let compassWatchId = null;
     function showCompass(targetGps) {
       const container = document.getElementById('compass-arrow-container');
       container.style.display = "flex";
+      const stepsInfo = document.getElementById('steps-info');
+      stepsInfo.textContent = "Recherche de la position...";
       if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
 
       function updateArrow(position) {
@@ -273,6 +288,22 @@
         let brng = Math.atan2(y, x);
         brng = (toDeg(brng) + 360) % 360;
 
+        // Calcul du nombre de pas
+        const R = 6371000; // rayon Terre en m
+        const dLat = toRad(targetLat - userLat);
+        const dLng = toRad(targetLng - userLng);
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(toRad(userLat)) * Math.cos(toRad(targetLat)) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c; // en mètres
+        const steps = Math.round(distance / 0.75);
+
+        stepsInfo.textContent = (distance < 5)
+          ? "Vous êtes arrivé !"
+          : `Environ ${steps} pas restants (${distance < 1000 ? distance.toFixed(0) + " m" : (distance/1000).toFixed(2) + " km"})`;
+
+        // Orientation (heading)
         let deviceHeading = 0;
         if (window.lastDeviceOrientation !== undefined) {
           deviceHeading = window.lastDeviceOrientation;
@@ -285,9 +316,11 @@
       if (navigator.geolocation) {
         compassWatchId = navigator.geolocation.watchPosition(
           updateArrow,
-          (err) => { alert("Impossible d'accéder à la position."); },
+          (err) => { stepsInfo.textContent = "Impossible d'accéder à la position."; },
           { enableHighAccuracy: true }
         );
+      } else {
+        stepsInfo.textContent = "Géolocalisation non supportée.";
       }
 
       // Suivi orientation device (mobile)
@@ -306,6 +339,8 @@
     function hideCompass() {
       const container = document.getElementById('compass-arrow-container');
       container.style.display = "none";
+      const stepsInfo = document.getElementById('steps-info');
+      stepsInfo.textContent = "";
       if (compassWatchId) {
         navigator.geolocation.clearWatch(compassWatchId);
         compassWatchId = null;
