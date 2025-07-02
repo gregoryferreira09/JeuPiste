@@ -17,37 +17,11 @@
     .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 24px; font-size:1.07em; z-index:1000;}
     .modal-toast.visible { display: block; animation: fadein 0.3s;}
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
-    /* Bouton retour */
-    #btn-retour {
-      position: absolute;
-      top: 18px;
-      left: 18px;
-      z-index: 100;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #e0c185;
-      font-size: 2.2em;
-      text-decoration: none;
-      font-family: 'Cinzel Decorative', serif;
-      padding: 4px 18px 4px 8px;
-      border-radius: 30px;
-      transition: color 0.2s, background 0.2s;
-    }
-    #btn-retour:hover {
-      background: #ffeecb22;
-      color: #ffeecb;
-      text-decoration: underline;
-    }
-    @media (max-width: 650px) {
-      #btn-retour { font-size:1.3em; left:2px; top:2px; padding:3px 6px 3px 3px;}
-    }
   </style>
 </head>
 <body>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
-    <a href="template-partie.html" id="btn-retour">&#8592; Retour</a>
   </header>
   <div class="center-wrapper">
     <main class="main-accueil" id="main-content" role="main">
@@ -57,7 +31,13 @@
       <div class="presentation-jeu" style="margin-top:24px;">
         <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
       </div>
-      <!-- /TITRE ET METAPHORE UNIQUES -->
+      <!-- BOUTON RETOUR EN BAS DU BANDEAU -->
+      <div style="display:flex; justify-content:center; margin: 0 0 32px 0;">
+        <a href="template-partie.html" class="main-btn" style="min-width:140px;text-align:center;">
+          &#8592; Retour au jeu
+        </a>
+      </div>
+      <!-- /BANDEAU ET BOUTON RETOUR -->
 
       <div class="objectif-course" id="objectif-block" style="display:none;">
         <div class="objectif-label">Objectif</div>
