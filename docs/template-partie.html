@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    /* ========= CSS SPÉCIFIQUE JETONS ET FLÈCHE CUPIDON ========= */
+    /* ========= CSS JETONS ET FLÈCHE CUPIDON ========= */
     .jetons-arc-container {
       background: none !important;
       border-radius: 0 !important;
@@ -85,10 +85,10 @@
       align-items: center;
     }
     #svg-arrow {
-      transition: transform 0.25s cubic-bezier(0.4,1,0.2,1);
+      transition: transform 1.3s cubic-bezier(0.33,1,0.68,1);
       will-change: transform;
       width: 90px;
-      height: 70px;
+      height: 110px;
       filter: drop-shadow(0 2px 10px #d4af3760);
       display: block;
     }
@@ -105,9 +105,9 @@
     @media (max-width: 650px) {
       #jetons-ligne { gap: 10px; padding: 0; }
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
-      #svg-arrow { width: 60px; height: 48px; }
+      #svg-arrow { width: 60px; height: 80px; }
     }
-    /* ========= FIN CSS SPÉCIFIQUE ========= */
+    /* ========= FIN CSS ========= */
   </style>
 </head>
 <body>
@@ -121,7 +121,6 @@
       <div id="central-map-block">
         <div id="centralMap"></div>
       </div>
-      <!-- /Bloc Carte centrale -->
 
       <section>
         <div style="margin-bottom: 14px; color: #ffeecb; font-size: 1.12em;">
@@ -131,8 +130,8 @@
           <div id="jetons-ligne"></div>
           <div id="compass-arrow-container">
             <div id="compass-arrow">
-              <!-- SVG Flèche Cupidon dorée -->
-              <svg id="svg-arrow" width="90" height="70" viewBox="0 0 90 70">
+              <!-- SVG Flèche Cupidon dorée allongée -->
+              <svg id="svg-arrow" width="90" height="110" viewBox="0 0 90 110">
                 <defs>
                   <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#fff7c4"/>
@@ -143,12 +142,12 @@
                     <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
                   </filter>
                 </defs>
-                <!-- Corps -->
-                <rect x="39" y="10" width="12" height="40" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
-                <!-- Pointe -->
-                <polygon points="45,5 60,27 45,22 30,27" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
-                <!-- Empennage Cupidon -->
-                <polyline points="45,50 30,65 45,60 60,65 45,50" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
+                <!-- Corps allongé -->
+                <rect x="39" y="20" width="12" height="60" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
+                <!-- Pointe allongée -->
+                <polygon points="45,8 65,47 45,35 25,47" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
+                <!-- Empennage Cupidon abaissé -->
+                <polyline points="45,80 25,105 45,95 65,105 45,80" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
               </svg>
             </div>
             <div id="steps-info"></div>
@@ -213,7 +212,7 @@
       }
     }
 
-    // JETONS SUR UNE LIGNE + GESTION FLÈCHE CUPIDON + REDIRECTION
+    // JETONS SUR UNE LIGNE + FLÈCHE CUPIDON + PAS + REDIRECTION
     function genererJetonsLigne(gpsPoints, missionsAssociation) {
       const ligne = document.getElementById('jetons-ligne');
       ligne.innerHTML = '';
@@ -263,14 +262,16 @@
       }
     }
 
-    // === Flèche Cupidon dynamique & info pas ===
+    // === Flèche Cupidon dynamique & info pas (filtrage précision) ===
     let compassWatchId = null;
+    let lastDistance = null; // Pour filtrer les petits mouvements GPS
     function showCompass(targetGps) {
       const container = document.getElementById('compass-arrow-container');
       container.style.display = "flex";
       const stepsInfo = document.getElementById('steps-info');
       stepsInfo.textContent = "Recherche de la position...";
       if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
+      lastDistance = null;
 
       function updateArrow(position) {
         const userLat = position.coords.latitude;
@@ -289,21 +290,27 @@
         brng = (toDeg(brng) + 360) % 360;
 
         // Calcul du nombre de pas
-        const R = 6371000; // rayon Terre en m
+        const R = 6371000;
         const dLat = toRad(targetLat - userLat);
         const dLng = toRad(targetLng - userLng);
         const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                   Math.cos(toRad(userLat)) * Math.cos(toRad(targetLat)) *
                   Math.sin(dLng/2) * Math.sin(dLng/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c; // en mètres
+        const distance = R * c;
+
+        // Filtre les variations <2m pour l'affichage des pas
+        if (lastDistance !== null && Math.abs(distance - lastDistance) < 2) {
+          return;
+        }
+        lastDistance = distance;
+
         const steps = Math.round(distance / 0.75);
 
         stepsInfo.textContent = (distance < 5)
           ? "Vous êtes arrivé !"
           : `Environ ${steps} pas restants (${distance < 1000 ? distance.toFixed(0) + " m" : (distance/1000).toFixed(2) + " km"})`;
 
-        // Orientation (heading)
         let deviceHeading = 0;
         if (window.lastDeviceOrientation !== undefined) {
           deviceHeading = window.lastDeviceOrientation;
@@ -345,6 +352,7 @@
         navigator.geolocation.clearWatch(compassWatchId);
         compassWatchId = null;
       }
+      lastDistance = null;
     }
 
     // === Données missions/points ===
