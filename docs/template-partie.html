@@ -107,14 +107,13 @@
       // Rayon max pour ne jamais sortir du cadre (ni en largeur ni en hauteur)
       const Rh = (width / 2) - jetonRadius - MARGE;
       let containerHeight = container.offsetHeight || Math.max(jetonDiameter + 16, 110);
-      // PAS besoin de recalculer containerHeight, le CSS min-height gère ça (bandeau plus grand)
-      const Rv = containerHeight - jetonRadius - MARGE;
+      const Rv = containerHeight - jetonDiameter - MARGE;
       const R = Math.min(Rh, Rv);
 
       // Centre horizontal du cercle
       const cx = width / 2;
-      // Centre vertical SOUS le bandeau (pour que l'arc soit posé sur le bas)
-      const cy = containerHeight + R - jetonRadius;
+      // Centre vertical : ATTENTION, on doit garder le centre du cercle dans le cadre !
+      const cy = containerHeight - jetonRadius - MARGE;
 
       // Arc inférieur : angles adaptés pour un arc horizontal posé bas
       let angleStart = 200, angleEnd = -20;
