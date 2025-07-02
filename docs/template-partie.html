@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    /* ========= CSS SPÉCIFIQUE BOUTONS RACCOURCIS SOUS LA CARTE ========= */
+    /* ========= CSS SPÉCIFIQUE JETONS ET BOUSSOLE ========= */
     .jetons-arc-container {
       background: none !important;
       border-radius: 0 !important;
@@ -22,6 +22,7 @@
       overflow: visible;
       margin: 0;
       width: 100%;
+      flex-direction: column;
     }
     #jetons-ligne {
       display: flex;
@@ -70,16 +71,29 @@
       font-weight: normal;
       box-shadow: none;
     }
+    #compass-arrow-container {
+      display: none;
+      margin-top: 24px;
+      width: 100%;
+      justify-content: center;
+    }
+    #compass-arrow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #svg-arrow {
+      transition: transform 0.25s cubic-bezier(0.4,1,0.2,1);
+      will-change: transform;
+      width: 64px;
+      height: 64px;
+      display: block;
+    }
     @media (max-width: 650px) {
-      #jetons-ligne {
-        gap: 10px;
-        padding: 0;
-      }
-      .jeton {
-        width: 34px;
-        height: 34px;
-        font-size: 0.98em;
-      }
+      #jetons-ligne { gap: 10px; padding: 0; }
+      .jeton { width: 34px; height: 34px; font-size: 0.98em; }
+      #compass-arrow { margin-top: 16px; }
+      #svg-arrow { width: 44px; height: 44px; }
     }
     /* ========= FIN CSS SPÉCIFIQUE ========= */
   </style>
@@ -103,6 +117,14 @@
         </div>
         <div class="jetons-arc-container">
           <div id="jetons-ligne"></div>
+          <div id="compass-arrow-container">
+            <div id="compass-arrow">
+              <svg id="svg-arrow" width="64" height="64" viewBox="0 0 64 64">
+                <polygon points="32,6 38,32 32,27 26,32" fill="#e0c185" stroke="#d4af37" stroke-width="2"/>
+                <circle cx="32" cy="32" r="30" fill="none" stroke="#e0c185" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -163,25 +185,47 @@
       }
     }
 
-    // NOUVELLE VERSION : TOUS LES BOUTONS SUR UNE LIGNE
+    // JETONS SUR UNE LIGNE + GESTION COMPAS/REDIRECTION
     function genererJetonsLigne(gpsPoints, missionsAssociation) {
       const ligne = document.getElementById('jetons-ligne');
       ligne.innerHTML = '';
 
+      let lastClicked = { idx: null, timeout: null };
+
       const N = gpsPoints.length;
       let jetonDiameter = (N > 10) ? 34 : 48;
 
-      for(let i=0; i<N; i++){
-        if(missionsAssociation[i] !== -1){
+      for(let i=0; i<N; i++) {
+        if(missionsAssociation[i] !== -1) {
           const missionNum = missionsAssociation[i] + 1;
           const btn = document.createElement('button');
           btn.className = 'jeton mission';
           btn.textContent = missionNum;
           btn.setAttribute('aria-label', `Mission ${missionNum}`);
           btn.style.width = btn.style.height = jetonDiameter + "px";
-          btn.onclick = () => window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
+          // Simple/double clic
+          btn.onclick = (e) => {
+            e.preventDefault();
+            if (lastClicked.idx === i) {
+              if (lastClicked.timeout) clearTimeout(lastClicked.timeout);
+              lastClicked.idx = null;
+              hideCompass();
+              window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
+            } else {
+              lastClicked.idx = i;
+              showCompass(gpsPoints[i]);
+              lastClicked.timeout = setTimeout(() => {
+                lastClicked.idx = null;
+              }, 500);
+            }
+          };
+          btn.ondblclick = (e) => {
+            e.preventDefault();
+            hideCompass();
+            window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
+          }
           ligne.appendChild(btn);
-        }else{
+        } else {
           const div = document.createElement('div');
           div.className = 'jeton gps';
           div.textContent = i+1;
@@ -191,7 +235,69 @@
       }
     }
 
-    // Enregistre ou récupère la disposition des missions (persistant pour la partie)
+    // === Boussole dynamique ===
+    let compassWatchId = null;
+    function showCompass(targetGps) {
+      const container = document.getElementById('compass-arrow-container');
+      container.style.display = "flex";
+      if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
+
+      function updateArrow(position) {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+        const targetLat = targetGps.lat;
+        const targetLng = targetGps.lng;
+
+        // Calcul de l’angle (bearing) entre user et cible
+        const toRad = deg => deg * Math.PI / 180;
+        const toDeg = rad => rad * 180 / Math.PI;
+        const dLon = toRad(targetLng - userLng);
+        const y = Math.sin(dLon) * Math.cos(toRad(targetLat));
+        const x = Math.cos(toRad(userLat)) * Math.sin(toRad(targetLat)) -
+                  Math.sin(toRad(userLat)) * Math.cos(toRad(targetLat)) * Math.cos(dLon);
+        let brng = Math.atan2(y, x);
+        brng = (toDeg(brng) + 360) % 360;
+
+        let deviceHeading = 0;
+        if (window.lastDeviceOrientation !== undefined) {
+          deviceHeading = window.lastDeviceOrientation;
+        }
+        const heading = brng - deviceHeading;
+
+        document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
+      }
+
+      if (navigator.geolocation) {
+        compassWatchId = navigator.geolocation.watchPosition(
+          updateArrow,
+          (err) => { alert("Impossible d'accéder à la position."); },
+          { enableHighAccuracy: true }
+        );
+      }
+
+      // Suivi orientation device (mobile)
+      window.addEventListener('deviceorientationabsolute', function(e) {
+        if (e.absolute && e.alpha !== null) {
+          window.lastDeviceOrientation = e.alpha;
+        }
+      }, true);
+      window.addEventListener('deviceorientation', function(e) {
+        if (e.webkitCompassHeading !== undefined) {
+          window.lastDeviceOrientation = e.webkitCompassHeading;
+        }
+      }, true);
+    }
+
+    function hideCompass() {
+      const container = document.getElementById('compass-arrow-container');
+      container.style.display = "none";
+      if (compassWatchId) {
+        navigator.geolocation.clearWatch(compassWatchId);
+        compassWatchId = null;
+      }
+    }
+
+    // === Données missions/points ===
     function getOrCreateFixedMapping(salonCode, nbGPS, nbMissions) {
       return db.ref(`parties/${salonCode}/missionsMapping`).once('value').then(snap => {
         let arr = snap.val();
