@@ -6,9 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
-  <!-- Leaflet pour la carte centrale -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px,1px,1px,1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
     .grayed { opacity: 0.5; pointer-events: none; }
@@ -17,7 +14,7 @@
     .actions-row-horizontal { display: flex; align-items: center; gap: 24px; margin: 24px 0; }
     .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
     .icon-action label, .icon-action a { cursor: pointer; }
-    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 24px; z-index: 9999;}
+    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 9999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw; }
     .modal-toast.visible { display: block; animation: fadein 0.3s;}
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
   </style>
@@ -35,12 +32,6 @@
         <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
       </div>
       <!-- /TITRE ET METAPHORE UNIQUES -->
-
-      <!-- Bloc Carte centrale -->
-      <div id="central-map-block" style="margin: 25px 0; display: flex; justify-content: center;">
-        <div id="centralMap" style="width: 360px; height: 320px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px #e0c18588;"></div>
-      </div>
-      <!-- /Bloc Carte centrale -->
 
       <div class="objectif-course" id="objectif-block" style="display:none;">
         <div class="objectif-label">Objectif</div>
