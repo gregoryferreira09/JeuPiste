@@ -53,36 +53,6 @@ function harmoniseArticles(phrase) {
   return phrase;
 }
 
-function afficherCarteCentraleTousPoints(points) {
-  let mapDiv = document.getElementById('centralMap');
-  if (!mapDiv) return;
-  if (window._centralLeafletMap) {
-    window._centralLeafletMap.remove();
-    window._centralLeafletMap = null;
-  }
-  let center = points && points.length ? [points[0].lat, points[0].lng] : [47.4784, -0.5631];
-  let map = L.map('centralMap').setView(center, 15);
-  window._centralLeafletMap = map;
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-  if (points && points.length) {
-    points.forEach((pt, idx) => {
-      if(pt.lat && pt.lng)
-        L.marker([pt.lat, pt.lng], { title: `Point ${idx + 1}` })
-          .addTo(map)
-          .bindPopup(`Point ${idx + 1}<br>${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}`);
-    });
-    let group = new L.featureGroup(points.filter(pt=>pt.lat&&pt.lng).map(pt=>L.marker([pt.lat, pt.lng])));
-    map.fitBounds(group.getBounds().pad(0.2));
-  }
-}
-
-// Puis à chaque épreuve
-const salonCode = localStorage.getItem("salonCode");
-db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
-  const points = snap.val() || [];
-  afficherCarteCentraleTousPoints(points);
-});
-
 // Corrige les pluriels dynamiques type "personne[s]" --> "personne"/"personnes"
 function accordePluriel(phrase, nb) {
   return phrase.replace(/([a-zA-ZéèêëàâîïôöùûüçÉÈÊËÀÂÎÏÔÖÙÛÜÇ]+)\[s\]/g, function(_, mot) {
