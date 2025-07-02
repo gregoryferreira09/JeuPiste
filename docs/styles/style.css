@@ -1080,13 +1080,14 @@ body {
 .jetons-arc-container {
   position: relative;
   width: 100%;
-  max-width: 520px; /* même largeur que .main-accueil */
-  height: 110px;
+  max-width: 520px;
+  min-height: 110px; /* était height: 110px */
   margin: 28px auto 8px auto;
   display: flex;
   justify-content: center;
   align-items: flex-end;
   z-index: 1;
+  transition: min-height 0.2s;
 }
 
 #jetons-arc-svg {
