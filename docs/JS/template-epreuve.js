@@ -308,11 +308,16 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
           await ref.set(url);
           filenameDiv.textContent = file.name;
           uploadStates[i] = true;
-          if (uploadStates.every(Boolean)) {
-            document.getElementById('next-quest').disabled = false;
-            document.getElementById('next-quest').classList.add('enabled');
-            if (typeof onUploaded === "function") onUploaded();
-          }
+if (uploadStates.every(Boolean)) {
+  document.getElementById('next-quest').disabled = false;
+  document.getElementById('next-quest').classList.add('enabled');
+  if (typeof onUploaded === "function") onUploaded();
+
+  // Redirection automatique après 2 secondes
+  setTimeout(() => {
+    window.location.href = "template-partie.html";
+  }, 2000);
+}
         } catch (e) {
           filenameDiv.textContent = "Erreur upload !";
         }
