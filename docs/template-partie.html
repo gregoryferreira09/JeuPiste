@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    /* ========= CSS JETONS ET FLÈCHE CUPIDON ========= */
     .jetons-arc-container {
       background: none !important;
       border-radius: 0 !important;
@@ -24,18 +23,14 @@
       width: 100%;
       flex-direction: column;
     }
-    #jetons-ligne {
-      display: none !important;
-    }
     #jetons-colonnes-wrapper {
       display: flex;
       flex-direction: row;
       width: 100%;
-      justify-content: space-between;
-      align-items: flex-start;
+      justify-content: center;
+      align-items: stretch;
       min-height: 140px;
       margin-bottom: 10px;
-      gap: 0;
     }
     .jetons-colonne {
       display: flex;
@@ -43,6 +38,16 @@
       gap: 12px;
       align-items: center;
       min-width: 54px;
+      flex: 1 1 0;
+    }
+    #colonne-fleche {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-width: 110px;
+      flex: 0 0 110px;
+      /* largeur fixe pour la colonne centrale */
     }
     .jeton {
       border-radius: 50%;
@@ -66,25 +71,25 @@
       width: 48px;
       height: 48px;
     }
-    .jeton.mission:hover, .jeton.mission:focus {
+    .jeton.has-mission {
       background: #ffeecb;
+      border-color: #d4af37;
+      color: #473714;
+      font-weight: bold;
+      animation: pulseMission 1.2s infinite alternate;
+    }
+    @keyframes pulseMission {
+      0% { box-shadow: 0 0 0 0 #d4af3740; }
+      100% { box-shadow: 0 0 12px 6px #d4af3755; }
+    }
+    .jeton:hover, .jeton:focus {
+      background: #fcedbe;
       border-color: #d4af37;
       color: #473714;
       transform: scale(1.09);
     }
-    .jeton.gps {
-      background: #3d2b1f;
-      color: #e0c185;
-      border: 2px solid #e0c185;
-      opacity: 0.72;
-      cursor: default;
-      pointer-events: none;
-      font-weight: normal;
-      box-shadow: none;
-    }
     #compass-arrow-container {
       display: none;
-      margin-top: 32px;
       width: 100%;
       flex-direction: column;
       align-items: center;
@@ -113,13 +118,54 @@
       text-shadow: 0 2px 8px #0002;
       letter-spacing: 0.5px;
     }
+    /* Modal perdu */
+    #modal-perdu {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      justify-content: center;
+      align-items: center;
+    }
+    #modal-perdu.active {
+      display: flex;
+    }
+    #modal-perdu-content {
+      background: #fff;
+      color: #473714;
+      border-radius: 16px;
+      padding: 38px 34px 20px 34px;
+      box-shadow: 0 4px 24px #0003;
+      font-size: 1.25em;
+      font-family: 'Cinzel Decorative', serif;
+      text-align: center;
+      position: relative;
+    }
+    #modal-perdu-content button {
+      margin-top: 22px;
+      font-size: 1em;
+      background: #e0c185;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Cinzel Decorative', serif;
+      color: #473714;
+      font-weight: bold;
+      box-shadow: 0 2px 8px #e0c18544;
+      transition: background 0.18s;
+    }
+    #modal-perdu-content button:hover {
+      background: #d4af37;
+      color: #fff;
+    }
     @media (max-width: 650px) {
       .jetons-colonne { gap: 7px; }
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
       #svg-arrow { width: 60px; height: 80px; }
       #jetons-colonnes-wrapper { min-height: 60px; }
     }
-    /* ========= FIN CSS ========= */
   </style>
 </head>
 <body>
@@ -133,44 +179,51 @@
       <div id="central-map-block">
         <div id="centralMap"></div>
       </div>
-
       <section>
         <div style="margin-bottom: 14px; color: #ffeecb; font-size: 1.12em;">
-          Sélectionnez une mission pour commencer ou reprendre votre parcours.
+          Sélectionnez un jeton sur la carte pour tenter de découvrir une épreuve.
         </div>
         <div class="jetons-arc-container">
           <div id="jetons-colonnes-wrapper">
             <div id="jetons-gauche" class="jetons-colonne"></div>
-            <div id="jetons-droite" class="jetons-colonne"></div>
-          </div>
-          <div id="jetons-ligne" style="display:none"></div>
-          <div id="compass-arrow-container">
-            <div id="compass-arrow">
-              <!-- SVG Flèche Cupidon dorée allongée -->
-              <svg id="svg-arrow" width="90" height="110" viewBox="0 0 90 110">
-                <defs>
-                  <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#fff7c4"/>
-                    <stop offset="55%" stop-color="#e0c185"/>
-                    <stop offset="100%" stop-color="#d4af37"/>
-                  </linearGradient>
-                  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
-                  </filter>
-                </defs>
-                <!-- Corps allongé -->
-                <rect x="39" y="20" width="12" height="60" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
-                <!-- Pointe allongée -->
-                <polygon points="45,8 65,47 45,35 25,47" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
-                <!-- Empennage Cupidon abaissé -->
-                <polyline points="45,80 25,105 45,95 65,105 45,80" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
-              </svg>
+            <div id="colonne-fleche">
+              <div id="compass-arrow-container">
+                <div id="compass-arrow">
+                  <!-- SVG Flèche Cupidon dorée allongée -->
+                  <svg id="svg-arrow" width="90" height="110" viewBox="0 0 90 110">
+                    <defs>
+                      <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#fff7c4"/>
+                        <stop offset="55%" stop-color="#e0c185"/>
+                        <stop offset="100%" stop-color="#d4af37"/>
+                      </linearGradient>
+                      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
+                      </filter>
+                    </defs>
+                    <!-- Corps allongé -->
+                    <rect x="39" y="20" width="12" height="60" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
+                    <!-- Pointe allongée -->
+                    <polygon points="45,8 65,47 45,35 25,47" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
+                    <!-- Empennage Cupidon abaissé -->
+                    <polyline points="45,80 25,105 45,95 65,105 45,80" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div id="steps-info"></div>
+              </div>
             </div>
-            <div id="steps-info"></div>
+            <div id="jetons-droite" class="jetons-colonne"></div>
           </div>
         </div>
       </section>
     </main>
+  </div>
+  <!-- Modal perdu -->
+  <div id="modal-perdu">
+    <div id="modal-perdu-content">
+      <div>Perdu !<br>Ce jeton ne cache pas d'épreuve.</div>
+      <button onclick="document.getElementById('modal-perdu').classList.remove('active')">Fermer</button>
+    </div>
   </div>
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
@@ -228,66 +281,79 @@
       }
     }
 
-    // JETONS EN COLONNES DE CHAQUE CÔTÉ
-    function genererJetonsColonnes(gpsPoints, missionsAssociation) {
+    // Répartition aléatoire des missions dans les jetons des points GPS
+    function getOrCreateMissionPlacement(salonCode, nbGPS, nbMissions) {
+      return db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => {
+        let arr = snap.val();
+        if (Array.isArray(arr) && arr.length === nbGPS) {
+          return arr;
+        } else {
+          let indices = [...Array(nbGPS).keys()];
+          // On mélange
+          for (let i = nbGPS-1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+          }
+          // Aucun point n'a de mission par défaut
+          let placement = Array(nbGPS).fill(-1);
+          // On place chaque mission dans un point GPS unique au hasard
+          for(let m=0; m<nbMissions; m++) placement[indices[m]] = m;
+          return db.ref(`parties/${salonCode}/jetonMissionsMapping`).set(placement).then(() => placement);
+        }
+      });
+    }
+
+    function genererJetonsColonnes(gpsPoints, jetonMissionsMapping) {
       const gauche = document.getElementById('jetons-gauche');
       const droite = document.getElementById('jetons-droite');
       gauche.innerHTML = '';
       droite.innerHTML = '';
-
       let lastClicked = { idx: null, timeout: null };
-
       const N = gpsPoints.length;
       let jetonDiameter = (N > 10) ? 34 : 48;
 
       for(let i=0; i<N; i++) {
-        let jetonEl;
-        if(missionsAssociation[i] !== -1) {
-          const missionNum = missionsAssociation[i] + 1;
-          const btn = document.createElement('button');
-          btn.className = 'jeton mission';
-          btn.textContent = missionNum;
-          btn.setAttribute('aria-label', `Mission ${missionNum}`);
-          btn.style.width = btn.style.height = jetonDiameter + "px";
-          btn.onclick = (e) => {
-            e.preventDefault();
-            if (lastClicked.idx === i) {
-              if (lastClicked.timeout) clearTimeout(lastClicked.timeout);
-              lastClicked.idx = null;
-              hideCompass();
-              window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
-            } else {
-              lastClicked.idx = i;
-              showCompass(gpsPoints[i]);
-              lastClicked.timeout = setTimeout(() => {
-                lastClicked.idx = null;
-              }, 500);
-            }
-          };
-          btn.ondblclick = (e) => {
-            e.preventDefault();
-            hideCompass();
-            window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
-          }
-          jetonEl = btn;
-        } else {
-          const div = document.createElement('div');
-          div.className = 'jeton gps';
-          div.textContent = i+1;
-          div.style.width = div.style.height = jetonDiameter + "px";
-          jetonEl = div;
+        const btn = document.createElement('button');
+        btn.className = 'jeton';
+        btn.textContent = i+1;
+        btn.setAttribute('aria-label', `Point GPS ${i+1}`);
+        btn.style.width = btn.style.height = jetonDiameter + "px";
+        if(jetonMissionsMapping[i] !== -1) {
+          btn.classList.add('has-mission');
         }
+
+        btn.onclick = (e) => {
+          e.preventDefault();
+          if (jetonMissionsMapping[i] !== -1) {
+            // Jeton qui a une mission : redirection directe
+            hideCompass();
+            window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
+          } else {
+            // Jeton sans mission : modale perdu
+            document.getElementById('modal-perdu').classList.add('active');
+          }
+        };
+
+        // Double clic = aussi accès direct épreuve si mission, sinon rien
+        btn.ondblclick = (e) => {
+          e.preventDefault();
+          if (jetonMissionsMapping[i] !== -1) {
+            hideCompass();
+            window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
+          }
+        };
+
         if (i % 2 === 0) {
-          gauche.appendChild(jetonEl);
+          gauche.appendChild(btn);
         } else {
-          droite.appendChild(jetonEl);
+          droite.appendChild(btn);
         }
       }
     }
 
     // === Flèche Cupidon dynamique & info pas (filtrage précision) ===
     let compassWatchId = null;
-    let lastDistance = null; // Pour filtrer les petits mouvements GPS
+    let lastDistance = null;
     function showCompass(targetGps) {
       const container = document.getElementById('compass-arrow-container');
       container.style.display = "flex";
@@ -302,7 +368,6 @@
         const targetLat = targetGps.lat;
         const targetLng = targetGps.lng;
 
-        // Calcul de l’angle (bearing) entre user et cible
         const toRad = deg => deg * Math.PI / 180;
         const toDeg = rad => rad * 180 / Math.PI;
         const dLon = toRad(targetLng - userLng);
@@ -312,7 +377,6 @@
         let brng = Math.atan2(y, x);
         brng = (toDeg(brng) + 360) % 360;
 
-        // Calcul du nombre de pas
         const R = 6371000;
         const dLat = toRad(targetLat - userLat);
         const dLng = toRad(targetLng - userLng);
@@ -322,7 +386,6 @@
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         const distance = R * c;
 
-        // Filtre les variations <2m pour l'affichage des pas
         if (lastDistance !== null && Math.abs(distance - lastDistance) < 2) {
           return;
         }
@@ -353,7 +416,6 @@
         stepsInfo.textContent = "Géolocalisation non supportée.";
       }
 
-      // Suivi orientation device (mobile)
       window.addEventListener('deviceorientationabsolute', function(e) {
         if (e.absolute && e.alpha !== null) {
           window.lastDeviceOrientation = e.alpha;
@@ -378,25 +440,6 @@
       lastDistance = null;
     }
 
-    // === Données missions/points ===
-    function getOrCreateFixedMapping(salonCode, nbGPS, nbMissions) {
-      return db.ref(`parties/${salonCode}/missionsMapping`).once('value').then(snap => {
-        let arr = snap.val();
-        if (Array.isArray(arr) && arr.length === nbGPS) {
-          return arr;
-        } else {
-          let indices = [...Array(nbGPS).keys()];
-          for (let i = nbGPS-1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [indices[i], indices[j]] = [indices[j], indices[i]];
-          }
-          let missionsAssociation = Array(nbGPS).fill(-1);
-          for(let m=0;m<nbMissions;m++) missionsAssociation[indices[m]] = m;
-          return db.ref(`parties/${salonCode}/missionsMapping`).set(missionsAssociation).then(() => missionsAssociation);
-        }
-      });
-    }
-
     function lancerAccueil() {
       const salonCode = localStorage.getItem("salonCode");
       db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
@@ -404,8 +447,8 @@
         afficherCarteCentraleTousPoints(points);
         db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
           const missions = snapMission.val() || [];
-          getOrCreateFixedMapping(salonCode, points.length, missions.length).then(missionsAssociation => {
-            genererJetonsColonnes(points, missionsAssociation);
+          getOrCreateMissionPlacement(salonCode, points.length, missions.length).then(jetonMissionsMapping => {
+            genererJetonsColonnes(points, jetonMissionsMapping);
           });
         });
       });
@@ -413,9 +456,9 @@
         const salonCode = localStorage.getItem("salonCode");
         db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
           const points = snap.val() || [];
-          db.ref('parties/' + salonCode + '/missionsMapping').once('value').then(snapMap => {
-            const missionsAssociation = snapMap.val() || [];
-            genererJetonsColonnes(points, missionsAssociation);
+          db.ref('parties/' + salonCode + '/jetonMissionsMapping').once('value').then(snapMap => {
+            const jetonMissionsMapping = snapMap.val() || [];
+            genererJetonsColonnes(points, jetonMissionsMapping);
           });
         });
       });
