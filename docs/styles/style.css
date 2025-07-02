@@ -1081,7 +1081,7 @@ body {
   position: relative;
   width: 100%;
   max-width: 520px;
-  min-height: 110px;
+  min-height: calc(110px + 3cm);
   margin: 28px auto 8px auto;
   display: flex;
   justify-content: center;
