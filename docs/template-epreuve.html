@@ -17,6 +17,16 @@
     .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 24px; font-size:1.07em; z-index:1000;}
     .modal-toast.visible { display: block; animation: fadein 0.3s;}
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+    /* Centrage et espacement du bouton retour */
+    .retour-jeu-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      margin-bottom: 36px;
+    }
+    @media (max-width: 650px) {
+      .retour-jeu-wrapper { margin-top: 22px; margin-bottom: 22px;}
+    }
   </style>
 </head>
 <body>
@@ -31,8 +41,8 @@
       <div class="presentation-jeu" style="margin-top:24px;">
         <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
       </div>
-      <!-- BOUTON RETOUR EN BAS DU BANDEAU -->
-      <div style="display:flex; justify-content:center; margin: 0 0 32px 0;">
+      <!-- BOUTON RETOUR SOUS LE BANDEAU PHOTO -->
+      <div class="retour-jeu-wrapper">
         <a href="template-partie.html" class="main-btn" style="min-width:140px;text-align:center;">
           &#8592; Retour au jeu
         </a>
