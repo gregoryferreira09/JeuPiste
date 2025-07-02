@@ -47,7 +47,6 @@
       align-items: center;
       min-width: 110px;
       flex: 0 0 110px;
-      /* largeur fixe pour la colonne centrale */
     }
     .jeton {
       border-radius: 50%;
@@ -118,7 +117,6 @@
       text-shadow: 0 2px 8px #0002;
       letter-spacing: 0.5px;
     }
-    /* Modal perdu */
     #modal-perdu {
       display: none;
       position: fixed;
@@ -289,71 +287,21 @@
           return arr;
         } else {
           let indices = [...Array(nbGPS).keys()];
-          // On mélange
           for (let i = nbGPS-1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [indices[i], indices[j]] = [indices[j], indices[i]];
           }
-          // Aucun point n'a de mission par défaut
           let placement = Array(nbGPS).fill(-1);
-          // On place chaque mission dans un point GPS unique au hasard
           for(let m=0; m<nbMissions; m++) placement[indices[m]] = m;
           return db.ref(`parties/${salonCode}/jetonMissionsMapping`).set(placement).then(() => placement);
         }
       });
     }
 
-    function genererJetonsColonnes(gpsPoints, jetonMissionsMapping) {
-      const gauche = document.getElementById('jetons-gauche');
-      const droite = document.getElementById('jetons-droite');
-      gauche.innerHTML = '';
-      droite.innerHTML = '';
-      let lastClicked = { idx: null, timeout: null };
-      const N = gpsPoints.length;
-      let jetonDiameter = (N > 10) ? 34 : 48;
-
-      for(let i=0; i<N; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'jeton';
-        btn.textContent = i+1;
-        btn.setAttribute('aria-label', `Point GPS ${i+1}`);
-        btn.style.width = btn.style.height = jetonDiameter + "px";
-        if(jetonMissionsMapping[i] !== -1) {
-          btn.classList.add('has-mission');
-        }
-
-        btn.onclick = (e) => {
-          e.preventDefault();
-          if (jetonMissionsMapping[i] !== -1) {
-            // Jeton qui a une mission : redirection directe
-            hideCompass();
-            window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-          } else {
-            // Jeton sans mission : modale perdu
-            document.getElementById('modal-perdu').classList.add('active');
-          }
-        };
-
-        // Double clic = aussi accès direct épreuve si mission, sinon rien
-        btn.ondblclick = (e) => {
-          e.preventDefault();
-          if (jetonMissionsMapping[i] !== -1) {
-            hideCompass();
-            window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-          }
-        };
-
-        if (i % 2 === 0) {
-          gauche.appendChild(btn);
-        } else {
-          droite.appendChild(btn);
-        }
-      }
-    }
-
-    // === Flèche Cupidon dynamique & info pas (filtrage précision) ===
+    // Flèche Cupidon dynamique & info pas
     let compassWatchId = null;
     let lastDistance = null;
+
     function showCompass(targetGps) {
       const container = document.getElementById('compass-arrow-container');
       container.style.display = "flex";
@@ -438,6 +386,54 @@
         compassWatchId = null;
       }
       lastDistance = null;
+    }
+
+    // Générer les jetons colonne avec logique : clic = flèche ; double-clic = épreuve/perdu
+    function genererJetonsColonnes(gpsPoints, jetonMissionsMapping) {
+      const gauche = document.getElementById('jetons-gauche');
+      const droite = document.getElementById('jetons-droite');
+      gauche.innerHTML = '';
+      droite.innerHTML = '';
+      let lastClicked = { idx: null, timeout: null };
+      const N = gpsPoints.length;
+      let jetonDiameter = (N > 10) ? 34 : 48;
+
+      for(let i=0; i<N; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'jeton';
+        btn.textContent = i+1;
+        btn.setAttribute('aria-label', `Point GPS ${i+1}`);
+        btn.style.width = btn.style.height = jetonDiameter + "px";
+        if(jetonMissionsMapping[i] !== -1) {
+          btn.classList.add('has-mission');
+        }
+
+        btn.onclick = (e) => {
+          e.preventDefault();
+          hideCompass();
+          showCompass(gpsPoints[i]);
+          lastClicked.idx = i;
+          // Pour éviter confusion si clic puis double-clic trop vite
+          if (lastClicked.timeout) clearTimeout(lastClicked.timeout);
+          lastClicked.timeout = setTimeout(() => { lastClicked.idx = null; }, 500);
+        };
+
+        btn.ondblclick = (e) => {
+          e.preventDefault();
+          hideCompass();
+          if (jetonMissionsMapping[i] !== -1) {
+            window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
+          } else {
+            document.getElementById('modal-perdu').classList.add('active');
+          }
+        };
+
+        if (i % 2 === 0) {
+          gauche.appendChild(btn);
+        } else {
+          droite.appendChild(btn);
+        }
+      }
     }
 
     function lancerAccueil() {
