@@ -176,9 +176,10 @@
       overlay.innerHTML = '';
 
       // Responsive : largeur réelle du container
-      const box = overlay.getBoundingClientRect();
-      const width = box.width || 340;
-      const R = Math.min(width/2.05, 140);
+const width = overlay.offsetWidth || 340;
+const jetonRadius = 24; // moitié de la largeur d'un jeton (48px)
+const minMargin = 8; // pour ne pas coller au bord
+const R = Math.max(60, (width/2) - jetonRadius - minMargin);
       const cx = width/2;
       const cy = R + 12;
 
