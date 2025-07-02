@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    #central-map-block { margin: 25px 0; display: flex; justify-content: center; }
+    #central-map-block { margin: 25px 0 15px 0; display: flex; justify-content: center; }
     #centralMap {
       width: 360px; height: 320px;
       border-radius: 12px;
@@ -22,18 +22,12 @@
     .jetons-arc-container {
       position: relative;
       width: 100%;
-      max-width: 500px;
-      height: 120px;
-      margin: 38px auto 12px auto;
+      max-width: 430px;
+      height: 110px;
+      margin: 28px auto 8px auto;
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      z-index: 1;
-    }
-    #jetons-arc-svg {
-      position: absolute;
-      left: 0; right: 0;
-      pointer-events: none;
       z-index: 1;
     }
     #jetons-arc-overlay {
@@ -43,46 +37,42 @@
       pointer-events: none;
       z-index: 2;
     }
-    .jeton-mission {
+    .jeton {
       position: absolute;
-      width: 56px; height: 56px;
+      width: 48px; height: 48px;
       border-radius: 50%;
       background: #e0c185;
       color: #231d1d;
-      border: 3px solid #e0c185;
+      border: 2.5px solid #e0c185;
       font-family: 'Cinzel Decorative', serif;
-      font-size: 1.45em;
+      font-size: 1.19em;
       font-weight: bold;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 8px #0003;
-      cursor: pointer;
-      transition: background 0.2s, border .2s, color .2s, transform .13s;
-      z-index: 10;
+      box-shadow: 0 2px 8px #0002;
       user-select: none;
+      transition: background 0.18s, border .18s, color .18s, transform .13s;
+      z-index: 10;
       pointer-events: auto;
+      outline: none;
+      cursor: pointer;
     }
-    .jeton-mission:hover, .jeton-mission:focus {
+    .jeton.gps {
+      background: #3d2b1f;
+      color: #e0c185;
+      border: 2px solid #e0c185;
+      opacity: 0.72;
+      cursor: default;
+      pointer-events: none;
+      font-weight: normal;
+      box-shadow: none;
+    }
+    .jeton.mission:hover, .jeton.mission:focus {
       background: #ffeecb;
       border-color: #d4af37;
       color: #473714;
       transform: scale(1.09);
       outline: 2px solid #d4af37;
       outline-offset: 2px;
-    }
-    .jeton-gps {
-      position: absolute;
-      width: 42px; height: 42px;
-      border-radius: 50%;
-      background: #3d2b1f;
-      color: #e0c185;
-      border: 2px solid #e0c185;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.08em;
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0.68;
-      pointer-events: none;
-      z-index: 5;
-      user-select: none;
     }
     .titre-course {
       font-family: 'Cinzel Decorative', serif;
@@ -94,11 +84,10 @@
       margin-bottom: 18px;
     }
     @media (max-width: 650px) {
-      #centralMap { width: 98vw; height: 45vw; min-height: 180px; }
+      #centralMap { width: 97vw; height: 45vw; min-height: 160px; }
       .main-accueil { padding: 12px 2vw; }
-      .jetons-arc-container { max-width: 99vw; height: 84px; }
-      .jeton-mission { width: 42px; height: 42px; font-size: 1em; }
-      .jeton-gps { width: 32px; height: 32px; font-size: 0.93em;}
+      .jetons-arc-container { max-width: 99vw; height: 77px; }
+      .jeton { width: 34px; height: 34px; font-size: 0.98em; }
     }
   </style>
 </head>
@@ -120,7 +109,6 @@
           Sélectionnez une mission pour commencer ou reprendre votre parcours.
         </div>
         <div class="jetons-arc-container">
-          <svg id="jetons-arc-svg" width="100%" height="120" style="overflow:visible;"></svg>
           <div id="jetons-arc-overlay"></div>
         </div>
       </section>
@@ -183,60 +171,32 @@
       }
     }
 
-    // Helpers pour l'arc de cercle SVG
-    function describeArc(cx, cy, r, startAngle, endAngle){
-      var start = polarToCartesian(cx, cy, r, endAngle);
-      var end = polarToCartesian(cx, cy, r, startAngle);
-      var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
-      var d = [
-        "M", start.x, start.y,
-        "A", r, r, 0, arcSweep, 0, end.x, end.y
-      ].join(" ");
-      return d;
-    }
-    function polarToCartesian(cx, cy, r, angleInDegrees){
-      var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-      return {
-        x: cx + (r * Math.cos(angleInRadians)),
-        y: cy + (r * Math.sin(angleInRadians))
-      };
-    }
-
     function genererJetonsArc(gpsPoints, nbMissions, missionsAssociation) {
-      const svg = document.getElementById('jetons-arc-svg');
       const overlay = document.getElementById('jetons-arc-overlay');
-      svg.innerHTML = '';
       overlay.innerHTML = '';
 
       // Responsive : largeur réelle du container
       const box = overlay.getBoundingClientRect();
-      const width = box.width || 400;
-      const R = Math.min(width/2.1, 180); // Rayon
+      const width = box.width || 340;
+      const R = Math.min(width/2.05, 140);
       const cx = width/2;
-      const cy = R + 10;
+      const cy = R + 12;
 
       const N = gpsPoints.length;
       const angleStart = 200; // degrés, arc inférieur, un peu ouvert sur les côtés
       const angleEnd = -20;
       const angleStep = (angleEnd - angleStart) / (N-1 > 0 ? N-1 : 1);
 
-      // SVG arc décoratif
-      const arcPath = describeArc(cx, cy, R, angleStart, angleEnd);
-      svg.setAttribute('height', String(cy + 38));
-      svg.setAttribute('width', String(width));
-      svg.innerHTML = `<path d="${arcPath}" fill="none" stroke="#e0c18555" stroke-width="3"/>`;
-
-      // Place jetons
       for(let i=0; i<N; i++){
         const angle = angleStart + i * angleStep;
         const rad = angle * Math.PI / 180;
-        const x = cx + R * Math.cos(rad) - 28;
-        const y = cy + R * Math.sin(rad) - 28;
+        const x = cx + R * Math.cos(rad) - 24;
+        const y = cy + R * Math.sin(rad) - 24;
         if(missionsAssociation[i] !== -1){
           // Jeton mission (cliquable)
           const missionNum = missionsAssociation[i] + 1;
           const btn = document.createElement('button');
-          btn.className = 'jeton-mission main-btn';
+          btn.className = 'jeton mission';
           btn.textContent = missionNum;
           btn.setAttribute('aria-label', `Mission ${missionNum}`);
           btn.style.left = `${x}px`;
@@ -246,7 +206,7 @@
         }else{
           // Jeton GPS (gris)
           const div = document.createElement('div');
-          div.className = 'jeton-gps';
+          div.className = 'jeton gps';
           div.textContent = i+1;
           div.style.left = `${x+7}px`;
           div.style.top = `${y+7}px`;
@@ -276,13 +236,12 @@
       });
       // Arc responsive sur resize
       window.addEventListener('resize', () => {
-        // Re-récupérer pour garder l'association actuelle
+        // Re-récupérer pour garder l'association actuelle (refait l'aléatoire à chaque resize)
         const salonCode = localStorage.getItem("salonCode");
         db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
           const points = snap.val() || [];
           db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
             const missions = snapMission.val() || [];
-            // Pour l'instant, refait une association aléatoire à chaque resize (peut être amélioré)
             const N = points.length, M = missions.length;
             let indices = [...Array(N).keys()];
             for (let i = N-1; i > 0; i--) {
