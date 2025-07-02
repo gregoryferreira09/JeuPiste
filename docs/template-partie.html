@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <title>Carte & Missions – Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices et styles principaux -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
-  <!-- Leaflet pour la carte centrale -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -79,6 +77,7 @@
       min-height: 34px;
       width: 48px;
       height: 48px;
+      position: relative;
     }
     .jeton.has-mission {
       background: #ffeecb;
@@ -87,11 +86,25 @@
       font-weight: bold;
       animation: pulseMission 1.2s infinite alternate;
     }
+    .jeton.validated {
+      background: #38b948 !important;
+      border-color: #1b6f25 !important;
+      color: #fff !important;
+      pointer-events: none !important;
+      cursor: default !important;
+      animation: none !important;
+    }
+    .jeton .svg-epreuve {
+      width: 30px;
+      height: 30px;
+      display: block;
+      margin: 0 auto;
+    }
     @keyframes pulseMission {
       0% { box-shadow: 0 0 0 0 #d4af3740; }
       100% { box-shadow: 0 0 12px 6px #d4af3755; }
     }
-    .jeton:hover, .jeton:focus {
+    .jeton:hover:not(.validated), .jeton:focus:not(.validated) {
       background: #fcedbe;
       border-color: #d4af37;
       color: #473714;
@@ -183,7 +196,6 @@
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
       <h2 class="titre-course">Carte & Missions</h2>
-      <!-- Bloc Carte centrale -->
       <div id="central-map-block">
         <div id="centralMap"></div>
       </div>
@@ -197,7 +209,6 @@
             <div id="colonne-fleche">
               <div id="compass-arrow-container">
                 <div id="compass-arrow">
-                  <!-- SVG Flèche Cupidon dorée allongée -->
                   <svg id="svg-arrow" width="90" height="110" viewBox="0 0 90 110">
                     <defs>
                       <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -209,11 +220,8 @@
                         <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
                       </filter>
                     </defs>
-                    <!-- Corps allongé -->
                     <rect x="39" y="20" width="12" height="60" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
-                    <!-- Pointe allongée -->
                     <polygon points="45,8 65,47 45,35 25,47" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
-                    <!-- Empennage Cupidon abaissé -->
                     <polyline points="45,80 25,105 45,95 65,105 45,80" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
                   </svg>
                 </div>
@@ -237,24 +245,36 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <!-- Scripts Firebase et App -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script>
-    // Initialisation Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
+    const firebaseConfig = { /* ... même config ... */ };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    // SVG d'icônes pour les missions (adapter selon tes besoins)
+    function getMissionSVG(type) {
+      if (type === "photo" || type === "photo_inconnus" || type === "collecte_objet") {
+        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5 10.5A2.5 2.5 0 1 0 10 13a2.5 2.5 0 0 0-2.5-2.5zm9.5 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>`;
+      }
+      if (type === "audio") {
+        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M12 3v10.55A4 4 0 1 0 14 17h1a5 5 0 0 1-5-5V3a1 1 0 1 1 2 0z"/></svg>`;
+      }
+      if (type === "video") {
+        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
+      }
+      if (type === "fichier") {
+        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" rx="1" fill="#38b948" /></svg>`;
+      }
+      // Default icon
+      return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="10" /></svg>`;
+    }
+
+    function getMissionTypeByIndex(missionIdx, missionsList) {
+      const mission = missionsList && missionsList[missionIdx];
+      return mission ? (mission.type || mission.epreuve?.type) : null;
+    }
 
     document.addEventListener("DOMContentLoaded", function() {
       var main = document.querySelector('.fadeIn');
@@ -289,7 +309,6 @@
       }
     }
 
-    // Répartition aléatoire des missions dans les jetons des points GPS
     function getOrCreateMissionPlacement(salonCode, nbGPS, nbMissions) {
       return db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => {
         let arr = snap.val();
@@ -352,11 +371,10 @@
         const steps = Math.round(distance / 0.75);
 
         if (distance < 5) {
-          stepsInfo.textContent = "Vous êtes arrivé !";
-        } else {
-          const stepsLimited = Math.min(steps, 300);
-          stepsInfo.textContent = stepsLimited + " pas restants";
-        }
+        stepsInfo.textContent = "Vous êtes arrivé !";
+       } else {
+  stepsInfo.textContent = steps + " pas restants";
+}
 
         let deviceHeading = 0;
         if (window.lastDeviceOrientation !== undefined) {
@@ -401,13 +419,12 @@
       lastDistance = null;
     }
 
-    // Générer les jetons colonne avec logique : clic = flèche ; double-clic = épreuve/perdu
-    function genererJetonsColonnes(gpsPoints, jetonMissionsMapping) {
+    // Ajout de la récupération des missions et statuts validés !
+    function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, validatedMissions) {
       const gauche = document.getElementById('jetons-gauche');
       const droite = document.getElementById('jetons-droite');
       gauche.innerHTML = '';
       droite.innerHTML = '';
-      let lastClicked = { idx: null, timeout: null };
       const N = gpsPoints.length;
       let jetonDiameter = (N > 10) ? 34 : 48;
 
@@ -417,28 +434,39 @@
         btn.textContent = i+1;
         btn.setAttribute('aria-label', `Point GPS ${i+1}`);
         btn.style.width = btn.style.height = jetonDiameter + "px";
-        if(jetonMissionsMapping[i] !== -1) {
+        let hasMission = jetonMissionsMapping[i] !== -1;
+        let isValidated = false;
+        let missionType = null;
+
+        if(hasMission) {
           btn.classList.add('has-mission');
+          const missionIdx = jetonMissionsMapping[i];
+          missionType = getMissionTypeByIndex(missionIdx, missionsList);
+          isValidated = validatedMissions && validatedMissions[missionIdx] && validatedMissions[missionIdx].validated;
+          if(isValidated) {
+            btn.classList.add('validated');
+            btn.innerHTML = getMissionSVG(missionType);
+            btn.disabled = true;
+            btn.style.cursor = "default";
+          }
         }
 
-        btn.onclick = (e) => {
-          e.preventDefault();
-          hideCompass();
-          showCompass(gpsPoints[i]);
-          lastClicked.idx = i;
-          if (lastClicked.timeout) clearTimeout(lastClicked.timeout);
-          lastClicked.timeout = setTimeout(() => { lastClicked.idx = null; }, 500);
-        };
-
-        btn.ondblclick = (e) => {
-          e.preventDefault();
-          hideCompass();
-          if (jetonMissionsMapping[i] !== -1) {
-            window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-          } else {
-            document.getElementById('modal-perdu').classList.add('active');
-          }
-        };
+        if(!btn.classList.contains('validated')) {
+          btn.onclick = (e) => {
+            e.preventDefault();
+            hideCompass();
+            showCompass(gpsPoints[i]);
+          };
+          btn.ondblclick = (e) => {
+            e.preventDefault();
+            hideCompass();
+            if (hasMission) {
+              window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
+            } else {
+              document.getElementById('modal-perdu').classList.add('active');
+            }
+          };
+        }
 
         if (i % 2 === 0) {
           gauche.appendChild(btn);
@@ -450,25 +478,27 @@
 
     function lancerAccueil() {
       const salonCode = localStorage.getItem("salonCode");
+      const equipeNum = localStorage.getItem("equipeNum");
+      // Récupère points GPS
       db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
         const points = snap.val() || [];
         afficherCarteCentraleTousPoints(points);
+
+        // Récupère missions du scénario
         db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
           const missions = snapMission.val() || [];
           getOrCreateMissionPlacement(salonCode, points.length, missions.length).then(jetonMissionsMapping => {
-            genererJetonsColonnes(points, jetonMissionsMapping);
+            // Récupère la validation des missions pour l'équipe
+            db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).once('value').then(snapStatus => {
+              const validatedMissions = snapStatus.val() || {};
+              genererJetonsColonnes(points, jetonMissionsMapping, missions, validatedMissions);
+            });
           });
         });
       });
+
       window.addEventListener('resize', () => {
-        const salonCode = localStorage.getItem("salonCode");
-        db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
-          const points = snap.val() || [];
-          db.ref('parties/' + salonCode + '/jetonMissionsMapping').once('value').then(snapMap => {
-            const jetonMissionsMapping = snapMap.val() || [];
-            genererJetonsColonnes(points, jetonMissionsMapping);
-          });
-        });
+        lancerAccueil(); // Pour forcer le redraw responsive
       });
     }
   </script>
