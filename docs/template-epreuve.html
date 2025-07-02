@@ -14,19 +14,45 @@
     .actions-row-horizontal { display: flex; align-items: center; gap: 24px; margin: 24px 0; }
     .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
     .icon-action label, .icon-action a { cursor: pointer; }
-    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 28px; font-size: 1.14em; z-index: 9999; box-shadow: 0 4px 22px #0006; text-align:center; max-width: 90vw; }
+    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 24px; font-size:1.07em; z-index:1000;}
     .modal-toast.visible { display: block; animation: fadein 0.3s;}
     @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+    /* Bouton retour */
+    #btn-retour {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      z-index: 100;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #e0c185;
+      font-size: 2.2em;
+      text-decoration: none;
+      font-family: 'Cinzel Decorative', serif;
+      padding: 4px 18px 4px 8px;
+      border-radius: 30px;
+      transition: color 0.2s, background 0.2s;
+    }
+    #btn-retour:hover {
+      background: #ffeecb22;
+      color: #ffeecb;
+      text-decoration: underline;
+    }
+    @media (max-width: 650px) {
+      #btn-retour { font-size:1.3em; left:2px; top:2px; padding:3px 6px 3px 3px;}
+    }
   </style>
 </head>
 <body>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
+    <a href="template-partie.html" id="btn-retour">&#8592; Retour</a>
   </header>
   <div class="center-wrapper">
     <main class="main-accueil" id="main-content" role="main">
 
-      <!-- TITRE ET METAPHORE UNIQUES (corrigé) -->
+      <!-- TITRE ET METAPHORE UNIQUES -->
       <h2 class="titre-course" id="titre-quete"></h2>
       <div class="presentation-jeu" style="margin-top:24px;">
         <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
@@ -40,24 +66,6 @@
       <div class="objectif-course" id="defi-block" style="display:none;background: #251a1a;">
         <div class="objectif-label" style="background:#cba55a; color:#231d1d;">Défi</div>
         <div class="objectif-text" id="defi-text"></div>
-      </div>
-      <!-- Bloc GPS -->
-      <div id="bloc-gps" style="display:none;">
-        <div class="actions-row-horizontal">
-          <div class="icon-action side-icon">
-            <a id="gps-link" href="#" target="_blank" rel="noopener">
-              <!-- SVG harmonisé -->
-              <svg viewBox="0 0 24 24" width="32" height="32">
-                <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5 2.5.76-1.85-3.76-1.65V7z"/>
-              </svg>
-              <span>Boussole</span>
-            </a>
-          </div>
-          <div style="flex:1;text-align:center;">
-            <button id="check-gps" class="main-btn" style="margin-top:10px;">Je suis arrivé !</button>
-            <div id="gps-feedback"></div>
-          </div>
-        </div>
       </div>
       <!-- Bloc Mission (consigne courante) -->
       <div id="bloc-mission" style="display:none;">
@@ -107,7 +115,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
   <!-- Catalogue des phrases -->
   <script src="JS/catalogue-phrases.js"></script>
-  <!-- Catalogue des atmosphères (à ajouter si ce n'est pas déjà fait) -->
+  <!-- Catalogue des atmosphères -->
   <script src="JS/catalogue-atmospheres.js"></script>
   <!-- Script principal de gestion de l'épreuve -->
   <script src="JS/template-epreuve.js"></script>
