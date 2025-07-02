@@ -1090,3 +1090,18 @@ body {
   box-shadow: 0 2px 12px #e0c18588;
   background: #222;
 }
+
+#btn-retour {
+  font-family: 'Cinzel Decorative', serif;
+  padding: 4px 18px 4px 8px;
+  border-radius: 30px;
+  transition: color 0.2s, background 0.2s;
+}
+#btn-retour:hover {
+  background: #ffeecb22;
+  color: #ffeecb;
+  text-decoration: underline;
+}
+@media (max-width: 650px) {
+  #btn-retour { font-size:1.3em; left:2px; top:2px; padding:3px 6px 3px 3px;}
+}
