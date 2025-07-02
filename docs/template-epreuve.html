@@ -2,123 +2,110 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title id="page-title">Quête - Jeu de piste</title>
+  <title>Carte & Missions – Jeu de piste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/style.css">
-  <!-- Leaflet pour la carte centrale -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="styles/style.css">
   <style>
-    .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px,1px,1px,1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
-    .grayed { opacity: 0.5; pointer-events: none; }
-    .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
-    .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
-    .actions-row-horizontal { display: flex; align-items: center; gap: 24px; margin: 24px 0; }
-    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
-    .icon-action label, .icon-action a { cursor: pointer; }
-    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 24px; z-index: 9999;}
-    .modal-toast.visible { display: block; animation: fadein 0.3s;}
-    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+    #centralMap { width: 360px; height: 320px; border-radius: 12px; box-shadow: 0 2px 12px #e0c18588; margin: 0 auto 28px; }
+    .missions-list { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .mission-btn {
+      background: #e0c185; color: #231d1d; border: none; border-radius: 8px; padding: 11px 20px;
+      font-size: 1.2em; font-family: inherit; cursor: pointer; transition: background .2s;
+    }
+    .mission-btn:hover { background: #ffeecb; }
   </style>
 </head>
 <body>
   <header>
-    <h1 class="site-title">Jeu de piste</h1>
+    <h1 class="site-title">Jeu de piste – Carte & Missions</h1>
   </header>
-  <div class="center-wrapper">
-    <main class="main-accueil" id="main-content" role="main">
-
-      <!-- TITRE ET METAPHORE UNIQUES (corrigé) -->
-      <h2 class="titre-course" id="titre-quete"></h2>
-      <div class="presentation-jeu" style="margin-top:24px;">
-        <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
+  <main>
+    <div style="display: flex; justify-content: center; margin: 30px 0;">
+      <div id="centralMap"></div>
+    </div>
+    <section>
+      <h2>Choisissez une mission</h2>
+      <div class="missions-list" id="missions-list">
+        <!-- Les boutons numérotés seront générés ici -->
       </div>
-      <!-- /TITRE ET METAPHORE UNIQUES -->
-
-      <!-- Bloc Carte centrale -->
-      <div id="central-map-block" style="margin: 25px 0; display: flex; justify-content: center;">
-        <div id="centralMap" style="width: 360px; height: 320px; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px #e0c18588;"></div>
-      </div>
-      <!-- /Bloc Carte centrale -->
-
-      <div class="objectif-course" id="objectif-block" style="display:none;">
-        <div class="objectif-label">Objectif</div>
-        <div class="objectif-text" id="objectif-text"></div>
-      </div>
-      <div class="objectif-course" id="defi-block" style="display:none;background: #251a1a;">
-        <div class="objectif-label" style="background:#cba55a; color:#231d1d;">Défi</div>
-        <div class="objectif-text" id="defi-text"></div>
-      </div>
-      <!-- Bloc GPS -->
-      <div id="bloc-gps" style="display:none;">
-        <div class="actions-row-horizontal">
-          <div class="icon-action side-icon">
-            <a id="gps-link" href="#" target="_blank" rel="noopener">
-              <!-- SVG harmonisé -->
-              <svg viewBox="0 0 24 24" width="32" height="32">
-                <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-13h-2v6l5 2.5.76-1.85-3.76-1.65V7z"/>
-              </svg>
-              <span>Boussole</span>
-            </a>
-          </div>
-          <div style="flex:1;text-align:center;">
-            <button id="check-gps" class="main-btn" style="margin-top:10px;">Je suis arrivé !</button>
-            <div id="gps-feedback"></div>
-          </div>
-        </div>
-      </div>
-      <!-- Bloc Mission (consigne courante) -->
-      <div id="bloc-mission" style="display:none;">
-        <div class="objectif-course">
-          <div class="objectif-label" id="mission-label">Mission</div>
-          <div class="objectif-text" id="mission-text"></div>
-        </div>
-      </div>
-      <!-- Bloc Upload (photo, audio, etc) -->
-      <div id="bloc-upload" style="display:none;">
-        <div class="actions-row-horizontal" id="upload-row"></div>
-        <div id="upload-feedback"></div>
-      </div>
-      <!-- Bloc Réponse (input pour anagramme, réponse libre, etc) -->
-      <div id="bloc-answer" style="display:none;"></div>
-      <!-- Bloc Indice (modale) -->
-      <div id="bloc-indice" style="display:none;">
-        <button id="show-indice" type="button">Voir l’indice</button>
-        <div id="indice-modal" style="display:none;">
-          <div class="modal-img-wrapper">
-            <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
-            <img id="indice-img" src="" alt="Indice visuel" style="display:none;">
-            <div id="indice-text" style="margin-top:12px;"></div>
-          </div>
-        </div>
-      </div>
-      <!-- Bloc Chrono (si besoin) -->
-      <div id="bloc-chrono" style="display:none;">
-        <span class="chrono-timer" id="timer"></span>
-        <span class="chrono-message" id="chrono-message"></span>
-      </div>
-      <!-- Bloc Pendu (mini-jeu) -->
-      <div id="bloc-pendu" style="display:none;"></div>
-      <!-- Bouton validation -->
-      <button id="next-quest" class="main-btn" style="display:none;" disabled>Quête suivante</button>
-    </main>
-  </div>
+    </section>
+  </main>
   <footer class="footer">
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
-  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-  <!-- Catalogue des phrases -->
-  <script src="JS/catalogue-phrases.js"></script>
-  <!-- Catalogue des atmosphères (à ajouter si ce n'est pas déjà fait) -->
-  <script src="JS/catalogue-atmospheres.js"></script>
-  <!-- Script principal de gestion de l'épreuve -->
-  <script src="JS/template-epreuve.js"></script>
+  <script>
+    // --- Initialisation Firebase (copie/colle celle de ton projet) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // --- Auth anonyme
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) firebase.auth().signInAnonymously();
+      else lancerAccueil();
+    });
+
+    function afficherCarteCentraleTousPoints(points) {
+      let mapDiv = document.getElementById('centralMap');
+      if (!mapDiv) return;
+      if (window._centralLeafletMap) {
+        window._centralLeafletMap.remove();
+        window._centralLeafletMap = null;
+      }
+      let center = points && points.length ? [points[0].lat, points[0].lng] : [47.4784, -0.5631];
+      let map = L.map('centralMap').setView(center, 15);
+      window._centralLeafletMap = map;
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+      if (points && points.length) {
+        points.forEach((pt, idx) => {
+          if(pt.lat && pt.lng)
+            L.marker([pt.lat, pt.lng], { title: `Point ${idx + 1}` })
+              .addTo(map)
+              .bindPopup(`Point ${idx + 1}<br>${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}`);
+        });
+        let group = new L.featureGroup(points.filter(pt=>pt.lat&&pt.lng).map(pt=>L.marker([pt.lat, pt.lng])));
+        map.fitBounds(group.getBounds().pad(0.2));
+      }
+    }
+
+    function lancerAccueil() {
+      const salonCode = localStorage.getItem("salonCode");
+      db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
+        const points = snap.val() || [];
+        afficherCarteCentraleTousPoints(points);
+      });
+
+      db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snap => {
+        const missions = snap.val() || [];
+        const missionsList = document.getElementById('missions-list');
+        missionsList.innerHTML = "";
+        for (let i = 0; i < missions.length; i++) {
+          const btn = document.createElement('button');
+          btn.className = "mission-btn";
+          btn.textContent = (i + 1);
+          btn.onclick = () => {
+            window.location.href = `template-epreuve.html?idx=${i}`;
+          };
+          missionsList.appendChild(btn);
+        }
+      });
+    }
+  </script>
 </body>
 </html>
