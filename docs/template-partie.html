@@ -171,7 +171,7 @@
       }
     }
 
-    function genererJetonsArc(gpsPoints, nbMissions, missionsAssociation) {
+    function genererJetonsArc(gpsPoints, missionsAssociation) {
       const overlay = document.getElementById('jetons-arc-overlay');
       overlay.innerHTML = '';
 
@@ -215,6 +215,27 @@
       }
     }
 
+    // Enregistre ou récupère la disposition des missions (persistant pour la partie)
+    function getOrCreateFixedMapping(salonCode, nbGPS, nbMissions) {
+      return db.ref(`parties/${salonCode}/missionsMapping`).once('value').then(snap => {
+        let arr = snap.val();
+        if (Array.isArray(arr) && arr.length === nbGPS) {
+          return arr;
+        } else {
+          // Générer nouvelle association aléatoire
+          let indices = [...Array(nbGPS).keys()];
+          for (let i = nbGPS-1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+          }
+          let missionsAssociation = Array(nbGPS).fill(-1);
+          for(let m=0;m<nbMissions;m++) missionsAssociation[indices[m]] = m;
+          // Enregistrer
+          return db.ref(`parties/${salonCode}/missionsMapping`).set(missionsAssociation).then(() => missionsAssociation);
+        }
+      });
+    }
+
     function lancerAccueil() {
       const salonCode = localStorage.getItem("salonCode");
       db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
@@ -222,35 +243,19 @@
         afficherCarteCentraleTousPoints(points);
         db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
           const missions = snapMission.val() || [];
-          // Mélange et association mission <-> point GPS
-          const N = points.length, M = missions.length;
-          let indices = [...Array(N).keys()];
-          for (let i = N-1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [indices[i], indices[j]] = [indices[j], indices[i]];
-          }
-          let missionsAssociation = Array(N).fill(-1);
-          for(let m=0;m<M;m++) missionsAssociation[indices[m]] = m;
-          genererJetonsArc(points, M, missionsAssociation);
+          getOrCreateFixedMapping(salonCode, points.length, missions.length).then(missionsAssociation => {
+            genererJetonsArc(points, missionsAssociation);
+          });
         });
       });
-      // Arc responsive sur resize
+      // Arc responsive sur resize (la disposition NE change PAS)
       window.addEventListener('resize', () => {
-        // Re-récupérer pour garder l'association actuelle (refait l'aléatoire à chaque resize)
         const salonCode = localStorage.getItem("salonCode");
         db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
           const points = snap.val() || [];
-          db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
-            const missions = snapMission.val() || [];
-            const N = points.length, M = missions.length;
-            let indices = [...Array(N).keys()];
-            for (let i = N-1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1));
-              [indices[i], indices[j]] = [indices[j], indices[i]];
-            }
-            let missionsAssociation = Array(N).fill(-1);
-            for(let m=0;m<M;m++) missionsAssociation[indices[m]] = m;
-            genererJetonsArc(points, M, missionsAssociation);
+          db.ref('parties/' + salonCode + '/missionsMapping').once('value').then(snapMap => {
+            const missionsAssociation = snapMap.val() || [];
+            genererJetonsArc(points, missionsAssociation);
           });
         });
       });
