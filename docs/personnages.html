@@ -396,7 +396,9 @@ firebase.auth().onAuthStateChanged(function(user) {
             // REDIRECTION VERS LA 1ère ÉNIGME DU BON PARCOURS
             const parametres = JSON.parse(localStorage.getItem("parametresPartie") || '{}');
 const scenarioCode = parametres.scenarioCode || "parc_saint_nicolas";
-if (scenarioCode === "parc_saint_nicolas") {
+
+            
+ if (scenarioCode === "parc_saint_nicolas") {
   // -- LOGIQUE STATIQUE POUR SAINT NICOLAS --
   const equipeNum = localStorage.getItem("equipeNum");
   db.ref('parties/' + salonCode + '/cheminsParEquipe').once('value', snap => {
@@ -424,11 +426,19 @@ if (scenarioCode === "parc_saint_nicolas") {
       alert("Erreur : aucun scénario trouvé pour cette partie.");
       return;
     }
-    // Redirige vers la page de la première épreuve dynamique (adapte selon ton template)
-    // Par exemple : epreuve.html?idx=0
-    window.location.href = `template-epreuve.html?idx=0`;
+    // On copie le tableau dans scenarioJeu/repartition pour le gameflow dynamique
+    db.ref('parties/' + salonCode + '/scenarioJeu/repartition').set(scenarioArray)
+      .then(() => {
+        // Puis on redirige seulement quand c'est écrit !
+        window.location.href = `template-epreuve.html?idx=0`;
+      });
   });
 }
+
+
+
+
+            
           }, 600);
         }
       }
