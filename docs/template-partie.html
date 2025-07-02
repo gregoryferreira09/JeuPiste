@@ -13,78 +13,74 @@
   <style>
     /* ========= CSS SPÉCIFIQUE BOUTONS RACCOURCIS SOUS LA CARTE ========= */
     .jetons-arc-container {
-      background: #e0c185;
-      border-radius: 16px;
-      min-height: 3cm; /* allongé de 3cm */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      margin-top: 16px;
-      margin-bottom: 16px;
-      width: 100%;
-    }
-    #jetons-ligne {
-      display: flex;
-      flex-direction: row;
-      gap: 18px;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      padding: 24px 0;
-    }
-    .jeton {
-      border-radius: 50%;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.19em;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      box-shadow: 0 2px 8px #0002;
-      outline: none;
-      pointer-events: auto;
-      transition: background 0.18s, border .18s, color .18s, transform .13s;
-      cursor: pointer;
-      border: 2.5px solid #e0c185;
-      background: #fff;
-      color: #231d1d;
-      min-width: 34px;
-      min-height: 34px;
-      width: 48px;
-      height: 48px;
-    }
-    .jeton.mission:hover, .jeton.mission:focus {
-      background: #ffeecb;
-      border-color: #d4af37;
-      color: #473714;
-      transform: scale(1.09);
-    }
-    .jeton.gps {
-      background: #3d2b1f;
-      color: #e0c185;
-      border: 2px solid #e0c185;
-      opacity: 0.72;
-      cursor: default;
-      pointer-events: none;
-      font-weight: normal;
-      box-shadow: none;
-    }
-    @media (max-width: 650px) {
-      .jetons-arc-container {
-        min-height: 2cm;
-      }
-      #jetons-ligne {
-        gap: 10px;
-        padding: 10px 0;
-      }
-      .jeton {
-        width: 34px;
-        height: 34px;
-        font-size: 0.98em;
-      }
-    }
+  background: none !important;  /* Pas de fond doré */
+  border-radius: 0 !important;  /* Pas d’arrondi */
+  min-height: 0 !important;     /* Hauteur auto */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  margin: 0;
+  width: 100%;
+}
+#jetons-ligne {
+  display: flex;
+  flex-direction: row;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+}
+.jeton {
+  border-radius: 50%;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.19em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  box-shadow: 0 2px 8px #0002;
+  outline: none;
+  pointer-events: auto;
+  transition: background 0.18s, border .18s, color .18s, transform .13s;
+  cursor: pointer;
+  border: 2.5px solid #e0c185;
+  background: #fff;
+  color: #231d1d;
+  min-width: 34px;
+  min-height: 34px;
+  width: 48px;
+  height: 48px;
+}
+.jeton.mission:hover, .jeton.mission:focus {
+  background: #ffeecb;
+  border-color: #d4af37;
+  color: #473714;
+  transform: scale(1.09);
+}
+.jeton.gps {
+  background: #3d2b1f;
+  color: #e0c185;
+  border: 2px solid #e0c185;
+  opacity: 0.72;
+  cursor: default;
+  pointer-events: none;
+  font-weight: normal;
+  box-shadow: none;
+}
+@media (max-width: 650px) {
+  #jetons-ligne {
+    gap: 10px;
+    padding: 0;
+  }
+  .jeton {
+    width: 34px;
+    height: 34px;
+    font-size: 0.98em;
+  }
+}
     /* ========= FIN CSS SPÉCIFIQUE ========= */
   </style>
 </head>
