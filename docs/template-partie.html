@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Carte & Missions – Jeu de piste</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="styles/style.css">
+  <style>
+    #centralMap { width: 360px; height: 320px; border-radius: 12px; box-shadow: 0 2px 12px #e0c18588; margin: 0 auto 28px; }
+    .missions-list { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .mission-btn {
+      background: #e0c185; color: #231d1d; border: none; border-radius: 8px; padding: 11px 20px;
+      font-size: 1.2em; font-family: inherit; cursor: pointer; transition: background .2s;
+    }
+    .mission-btn:hover { background: #ffeecb; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="site-title">Jeu de piste – Carte & Missions</h1>
+  </header>
+  <main>
+    <div style="display: flex; justify-content: center; margin: 30px 0;">
+      <div id="centralMap"></div>
+    </div>
+    <section>
+      <h2>Choisissez une mission</h2>
+      <div class="missions-list" id="missions-list">
+        <!-- Les boutons numérotés seront générés ici -->
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <p>© 2025 Jeu de piste. Tous droits réservés.</p>
+    <a href="mentions-legales.html">Mentions légales</a>
+  </footer>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script>
+    // --- Initialisation Firebase (copie/colle celle de ton projet) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // --- Auth anonyme
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) firebase.auth().signInAnonymously();
+      else lancerAccueil();
+    });
+
+    function afficherCarteCentraleTousPoints(points) {
+      let mapDiv = document.getElementById('centralMap');
+      if (!mapDiv) return;
+      if (window._centralLeafletMap) {
+        window._centralLeafletMap.remove();
+        window._centralLeafletMap = null;
+      }
+      let center = points && points.length ? [points[0].lat, points[0].lng] : [47.4784, -0.5631];
+      let map = L.map('centralMap').setView(center, 15);
+      window._centralLeafletMap = map;
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+      if (points && points.length) {
+        points.forEach((pt, idx) => {
+          if(pt.lat && pt.lng)
+            L.marker([pt.lat, pt.lng], { title: `Point ${idx + 1}` })
+              .addTo(map)
+              .bindPopup(`Point ${idx + 1}<br>${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}`);
+        });
+        let group = new L.featureGroup(points.filter(pt=>pt.lat&&pt.lng).map(pt=>L.marker([pt.lat, pt.lng])));
+        map.fitBounds(group.getBounds().pad(0.2));
+      }
+    }
+
+    function lancerAccueil() {
+      const salonCode = localStorage.getItem("salonCode");
+      db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
+        const points = snap.val() || [];
+        afficherCarteCentraleTousPoints(points);
+      });
+
+      db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snap => {
+        const missions = snap.val() || [];
+        const missionsList = document.getElementById('missions-list');
+        missionsList.innerHTML = "";
+        for (let i = 0; i < missions.length; i++) {
+          const btn = document.createElement('button');
+          btn.className = "mission-btn";
+          btn.textContent = (i + 1);
+          btn.onclick = () => {
+            window.location.href = `template-epreuve.html?idx=${i}`;
+          };
+          missionsList.appendChild(btn);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
