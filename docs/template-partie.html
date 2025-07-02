@@ -22,13 +22,15 @@
     .jetons-arc-container {
       position: relative;
       width: 100%;
-      max-width: 520px; /* même largeur que .main-accueil */
-      height: 110px;
+      max-width: 520px;
+      min-height: 110px; /* min, mais sera ajusté dynamiquement */
       margin: 28px auto 8px auto;
       display: flex;
       justify-content: center;
       align-items: flex-end;
       z-index: 1;
+      transition: min-height 0.2s;
+      /* Pour debug : border: 1px dashed red; */
     }
     #jetons-arc-overlay {
       position: absolute;
@@ -86,7 +88,7 @@
     @media (max-width: 650px) {
       #centralMap { width: 97vw; height: 45vw; min-height: 160px; }
       .main-accueil { padding: 12px 2vw; }
-      .jetons-arc-container { max-width: 99vw; height: 77px; }
+      .jetons-arc-container { max-width: 99vw; min-height: 77px; }
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
     }
   </style>
@@ -137,7 +139,6 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Effet fadeIn harmonisé
     document.addEventListener("DOMContentLoaded", function() {
       var main = document.querySelector('.fadeIn');
       if (main) setTimeout(() => main.classList.add('visible'), 50);
@@ -171,70 +172,86 @@
       }
     }
 
-function genererJetonsArc(gpsPoints, missionsAssociation) {
-  const overlay = document.getElementById('jetons-arc-overlay');
-  const container = overlay.parentElement;
-  overlay.innerHTML = '';
+    function genererJetonsArc(gpsPoints, missionsAssociation) {
+      const overlay = document.getElementById('jetons-arc-overlay');
+      const container = overlay.parentElement;
+      overlay.innerHTML = '';
 
-  // Taille réelle du conteneur et du jeton
-  const width = overlay.offsetWidth || 340;
-  let jetonDiameter = (width >= 400) ? 48 : 34;
-  if (gpsPoints.length > 10) jetonDiameter = (width >= 400) ? 38 : 28;
-  const jetonRadius = jetonDiameter / 2;
-  const MARGE = 8;
+      // Largeur réelle du cadre
+      const width = overlay.offsetWidth || 340;
+      let jetonDiameter = (width >= 400) ? 48 : 34;
+      if (gpsPoints.length > 12) jetonDiameter = (width >= 400) ? 36 : 26;
+      const jetonRadius = jetonDiameter / 2;
+      const MARGE = 4;
 
-  // Calcul dynamique de la hauteur MINIMALE pour garantir que tous les jetons tiennent en bas du cadre
-  let minArcHeight = Math.ceil(jetonDiameter + jetonRadius + MARGE + 8);
-  if (gpsPoints.length > 9) minArcHeight += 12;
-  if (gpsPoints.length > 13) minArcHeight += 8;
+      // Arc dynamique selon le nombre de points
+      let N = gpsPoints.length;
+      let arcSpanDeg = 220; // arc total en degrés
+      if (N > 8) arcSpanDeg = 250;
+      if (N > 12) arcSpanDeg = 270;
+      if (N > 18) arcSpanDeg = 295;
+      const angleStart = 180 + arcSpanDeg/2;
+      const angleEnd = 180 - arcSpanDeg/2;
+      const angleStep = (angleEnd - angleStart) / (N-1 > 0 ? N-1 : 1);
 
-  // Fixe la hauteur du container si besoin (s’adapte)
-  container.style.minHeight = minArcHeight + 'px';
+      // Rayon horizontal max
+      const Rh = (width/2) - jetonRadius - MARGE;
 
-  // Calcul du rayon (doit rentrer dans largeur ET hauteur)
-  const height = overlay.offsetHeight || minArcHeight;
-  const Rv = height - jetonRadius - MARGE;
-  const Rh = (width/2) - jetonRadius - MARGE;
-  const R = Math.max(24, Math.min(Rv, Rh));
+      // Calcul dynamique de la hauteur nécessaire
+      let minArcHeight = Math.ceil(jetonDiameter + jetonRadius + MARGE + 8);
+      let R = Rh;
+      let success = false;
+      let containerHeight = minArcHeight;
+      while (!success && containerHeight < 900) { // sécurité
+        const Rv = containerHeight - jetonRadius - MARGE;
+        R = Math.min(Rh, Rv);
+        const cy = containerHeight - jetonRadius - MARGE;
+        let ok = true;
+        for(let i=0; i<N; i++){
+          const angle = angleStart + i * angleStep;
+          const rad = angle * Math.PI / 180;
+          const y = cy + R * Math.sin(rad) - jetonRadius;
+          if (y + jetonDiameter > containerHeight || y < 0) {
+            ok = false;
+            break;
+          }
+        }
+        if (ok) { success = true; }
+        else { containerHeight += 10; }
+      }
+      container.style.minHeight = containerHeight + 'px';
 
-  // Centre Y = fond du container - jetonRadius - MARGE
-  const cx = width / 2;
-  const cy = height - jetonRadius - MARGE;
-
-  const N = gpsPoints.length;
-  let angleStart = 200, angleEnd = -20;
-  if (N > 9) { angleStart = 220; angleEnd = -40; }
-  if (N > 13) { angleStart = 235; angleEnd = -55; }
-
-  const angleStep = (angleEnd - angleStart) / (N - 1 > 0 ? N - 1 : 1);
-
-  for(let i=0; i<N; i++){
-    const angle = angleStart + i * angleStep;
-    const rad = angle * Math.PI / 180;
-    const x = cx + R * Math.cos(rad) - jetonRadius;
-    const y = cy + R * Math.sin(rad) - jetonRadius;
-    if(missionsAssociation[i] !== -1){
-      const missionNum = missionsAssociation[i] + 1;
-      const btn = document.createElement('button');
-      btn.className = 'jeton mission';
-      btn.textContent = missionNum;
-      btn.setAttribute('aria-label', `Mission ${missionNum}`);
-      btn.style.width = btn.style.height = jetonDiameter + "px";
-      btn.style.left = `${x}px`;
-      btn.style.top = `${y}px`;
-      btn.onclick = () => window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
-      overlay.appendChild(btn);
-    }else{
-      const div = document.createElement('div');
-      div.className = 'jeton gps';
-      div.textContent = i+1;
-      div.style.width = div.style.height = jetonDiameter + "px";
-      div.style.left = `${x}px`;
-      div.style.top = `${y}px`;
-      overlay.appendChild(div);
+      // Placement des jetons
+      const cx = width / 2;
+      const cy = containerHeight - jetonRadius - MARGE;
+      for(let i=0; i<N; i++){
+        const angle = angleStart + i * angleStep;
+        const rad = angle * Math.PI / 180;
+        const x = cx + R * Math.cos(rad) - jetonRadius;
+        const y = cy + R * Math.sin(rad) - jetonRadius;
+        if(missionsAssociation[i] !== -1){
+          const missionNum = missionsAssociation[i] + 1;
+          const btn = document.createElement('button');
+          btn.className = 'jeton mission';
+          btn.textContent = missionNum;
+          btn.setAttribute('aria-label', `Mission ${missionNum}`);
+          btn.style.width = btn.style.height = jetonDiameter + "px";
+          btn.style.left = `${x}px`;
+          btn.style.top = `${y}px`;
+          btn.onclick = () => window.location.href = `template-epreuve.html?idx=${missionsAssociation[i]}`;
+          overlay.appendChild(btn);
+        }else{
+          const div = document.createElement('div');
+          div.className = 'jeton gps';
+          div.textContent = i+1;
+          div.style.width = div.style.height = jetonDiameter + "px";
+          div.style.left = `${x}px`;
+          div.style.top = `${y}px`;
+          overlay.appendChild(div);
+        }
+      }
     }
-  }
-}
+
     // Enregistre ou récupère la disposition des missions (persistant pour la partie)
     function getOrCreateFixedMapping(salonCode, nbGPS, nbMissions) {
       return db.ref(`parties/${salonCode}/missionsMapping`).once('value').then(snap => {
@@ -242,7 +259,6 @@ function genererJetonsArc(gpsPoints, missionsAssociation) {
         if (Array.isArray(arr) && arr.length === nbGPS) {
           return arr;
         } else {
-          // Générer nouvelle association aléatoire
           let indices = [...Array(nbGPS).keys()];
           for (let i = nbGPS-1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -250,7 +266,6 @@ function genererJetonsArc(gpsPoints, missionsAssociation) {
           }
           let missionsAssociation = Array(nbGPS).fill(-1);
           for(let m=0;m<nbMissions;m++) missionsAssociation[indices[m]] = m;
-          // Enregistrer
           return db.ref(`parties/${salonCode}/missionsMapping`).set(missionsAssociation).then(() => missionsAssociation);
         }
       });
@@ -268,7 +283,6 @@ function genererJetonsArc(gpsPoints, missionsAssociation) {
           });
         });
       });
-      // Arc responsive sur resize (la disposition NE change PAS)
       window.addEventListener('resize', () => {
         const salonCode = localStorage.getItem("salonCode");
         db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
