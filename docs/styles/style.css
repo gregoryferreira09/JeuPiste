@@ -1076,54 +1076,134 @@ body {
   text-align: center;
 }
 
-/* === Conteneur des jetons en arc, doré, responsive, pas de débordement === */
+
 .jetons-arc-container {
   position: relative;
-  overflow: hidden; /* Masque tout ce qui dépasse */
   width: 100%;
+  max-width: 520px;
   min-height: 110px;
-  background: #e0c185; /* Doré */
-  border-radius: 16px;
+  margin: 28px auto 8px auto;
   display: flex;
-  align-items: flex-end;
   justify-content: center;
-  margin: 0 auto 18px auto;
+  align-items: flex-end;
+  z-index: 1;
+  transition: min-height 0.2s;
+  /* Pour débug : border: 1px dashed red; */
 }
 
-/* Overlay contenant les jetons (boutons) positionnés en absolu à l'intérieur du container */
+#jetons-arc-svg {
+  position: absolute;
+  left: 0; right: 0;
+  pointer-events: none;
+  z-index: 1;
+}
 #jetons-arc-overlay {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none; /* Les boutons enfants gèrent eux-mêmes les clicks */
+  left: 0; right: 0; top: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
   z-index: 2;
 }
+.jeton-mission {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e0c185;
+  color: #231d1d;
+  border: 3px solid #e0c185;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.55em;
+  font-weight: bold;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: 0 2px 8px #0003;
+  cursor: pointer;
+  transition: background 0.2s, border .2s, color .2s, transform .13s;
+  z-index: 10;
+  user-select: none;
+}
+.jeton-mission:hover, .jeton-mission.active {
+  background: #ffeecb;
+  border-color: #d4af37;
+  color: #473714;
+  transform: scale(1.09);
+}
+.jeton-gps {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #3d2b1f;
+  color: #e0c185;
+  border: 2px solid #e0c185;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.12em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 5;
+  user-select: none;
+}
 
-/* Style de base pour tous les jetons (boutons missions ou gps) */
+#central-map-block {
+  margin: 25px 0 15px 0;
+  display: flex;
+  justify-content: center;
+}
+#centralMap {
+  width: 360px;
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px #e0c18588;
+  background: #222;
+}
+.jetons-arc-container {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  min-height: calc(110px + 3cm); /* +3cm */
+  margin: 28px auto 8px auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 1;
+  transition: min-height 0.2s;
+}
+#jetons-arc-overlay {
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
 .jeton {
   position: absolute;
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  background: #e0c185;
+  color: #231d1d;
+  border: 2.5px solid #e0c185;
   font-family: 'Cinzel Decorative', serif;
   font-size: 1.19em;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  user-select: none;
   box-shadow: 0 2px 8px #0002;
-  outline: none;
+  user-select: none;
+  transition: background 0.18s, border .18s, color .18s, transform .13s;
   z-index: 10;
   pointer-events: auto;
-  transition: background 0.18s, border .18s, color .18s, transform .13s;
+  outline: none;
   cursor: pointer;
-  border: 2.5px solid #e0c185;
-  background: #e0c185;
-  color: #231d1d;
 }
-
-/* Variante visuelle pour les points GPS (non mission) */
 .jeton.gps {
   background: #3d2b1f;
   color: #e0c185;
@@ -1134,8 +1214,6 @@ body {
   font-weight: normal;
   box-shadow: none;
 }
-
-/* Variante interactive pour les missions */
 .jeton.mission:hover, .jeton.mission:focus {
   background: #ffeecb;
   border-color: #d4af37;
@@ -1144,16 +1222,18 @@ body {
   outline: 2px solid #d4af37;
   outline-offset: 2px;
 }
-
-/* Responsive : jetons plus petits sur mobile */
+.titre-course {
+  font-family: 'Cinzel Decorative', serif;
+  color: #e0c185;
+  font-size: 1.3em;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  margin-bottom: 18px;
+}
 @media (max-width: 650px) {
-  .jetons-arc-container {
-    max-width: 99vw;
-    min-height: 77px;
-  }
-  .jeton {
-    width: 34px;
-    height: 34px;
-    font-size: 0.98em;
-  }
+  #centralMap { width: 97vw; height: 45vw; min-height: 160px; }
+  .main-accueil { padding: 12px 2vw; }
+  .jetons-arc-container { max-width: 99vw; min-height: 77px; }
+  .jeton { width: 34px; height: 34px; font-size: 0.98em; }
 }
