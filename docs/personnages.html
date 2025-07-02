@@ -430,7 +430,7 @@ const scenarioCode = parametres.scenarioCode || "parc_saint_nicolas";
     db.ref('parties/' + salonCode + '/scenarioJeu/repartition').set(scenarioArray)
       .then(() => {
         // Puis on redirige seulement quand c'est écrit !
-        window.location.href = `template-epreuve.html?idx=0`;
+        window.location.href = `template-partie.html?idx=0`;
       });
   });
 }
