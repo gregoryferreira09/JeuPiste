@@ -19,19 +19,18 @@
       box-shadow: 0 2px 12px #e0c18588;
       background: #222;
     }
-    .jetons-arc-container {
-      position: relative;
-      width: 100%;
-      max-width: 520px;
-      min-height: 110px; /* min, mais sera ajusté dynamiquement */
-      margin: 28px auto 8px auto;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      z-index: 1;
-      transition: min-height 0.2s;
-      /* Pour debug : border: 1px dashed red; */
-    }
+.jetons-arc-container {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  min-height: calc(110px + 3cm); /* +3cm */
+  margin: 28px auto 8px auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 1;
+  transition: min-height 0.2s;
+}
     #jetons-arc-overlay {
       position: absolute;
       left: 0; right: 0; top: 0; bottom: 0;
