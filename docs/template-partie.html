@@ -27,18 +27,28 @@
       display: flex;
       flex-direction: row;
       width: 100%;
-      justify-content: center;
+      justify-content: space-between;
       align-items: stretch;
-      min-height: 140px;
+      min-height: 220px;
       margin-bottom: 10px;
+      padding-left: 32px;
+      padding-right: 32px;
+      box-sizing: border-box;
     }
     .jetons-colonne {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      align-items: center;
+      gap: 38px;
+      align-items: flex-start;
+      justify-content: flex-start;
       min-width: 54px;
-      flex: 1 1 0;
+      flex: 0 0 auto;
+    }
+    #jetons-gauche {
+      align-items: flex-start;
+    }
+    #jetons-droite {
+      align-items: flex-end;
     }
     #colonne-fleche {
       display: flex;
@@ -159,10 +169,10 @@
       color: #fff;
     }
     @media (max-width: 650px) {
-      .jetons-colonne { gap: 7px; }
+      .jetons-colonne { gap: 18px; }
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
       #svg-arrow { width: 60px; height: 80px; }
-      #jetons-colonnes-wrapper { min-height: 60px; }
+      #jetons-colonnes-wrapper { min-height: 60px; padding-left: 6px; padding-right: 6px; }
     }
   </style>
 </head>
@@ -341,9 +351,12 @@
 
         const steps = Math.round(distance / 0.75);
 
-        stepsInfo.textContent = (distance < 5)
-          ? "Vous êtes arrivé !"
-          : `Environ ${steps} pas restants (${distance < 1000 ? distance.toFixed(0) + " m" : (distance/1000).toFixed(2) + " km"})`;
+        if (distance < 5) {
+          stepsInfo.textContent = "Vous êtes arrivé !";
+        } else {
+          const stepsLimited = Math.min(steps, 300);
+          stepsInfo.textContent = stepsLimited + " pas restants";
+        }
 
         let deviceHeading = 0;
         if (window.lastDeviceOrientation !== undefined) {
@@ -413,7 +426,6 @@
           hideCompass();
           showCompass(gpsPoints[i]);
           lastClicked.idx = i;
-          // Pour éviter confusion si clic puis double-clic trop vite
           if (lastClicked.timeout) clearTimeout(lastClicked.timeout);
           lastClicked.timeout = setTimeout(() => { lastClicked.idx = null; }, 500);
         };
