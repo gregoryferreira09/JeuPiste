@@ -171,21 +171,26 @@
       }
     }
 
-    function genererJetonsArc(gpsPoints, missionsAssociation) {
+function genererJetonsArc(gpsPoints, missionsAssociation) {
   const overlay = document.getElementById('jetons-arc-overlay');
   overlay.innerHTML = '';
 
-  // Taille du jeton
+  // Taille réelle du conteneur et du jeton
   const width = overlay.offsetWidth || 340;
+  const height = overlay.offsetHeight || 110;
   let jetonDiameter = (width >= 400) ? 48 : 34;
   if (gpsPoints.length > 10) jetonDiameter = (width >= 400) ? 38 : 28;
   const jetonRadius = jetonDiameter / 2;
-  const containerHeight = overlay.offsetHeight || 110;
+  const MARGE = 8;
 
-  // Rayon pour que les jetons ne sortent pas du bas ni du haut du conteneur
-  const R = containerHeight - jetonDiameter - 6;
+  // Rayon max selon hauteur et largeur
+  const Rv = height - jetonRadius - MARGE; // vertical
+  const Rh = (width/2) - jetonRadius - MARGE; // horizontal
+  const R = Math.max(30, Math.min(Rv, Rh));
+
+  // Centre Y = fond du container - jetonRadius - MARGE
   const cx = width / 2;
-  const cy = containerHeight - jetonRadius - 4;
+  const cy = height - jetonRadius - MARGE;
 
   const N = gpsPoints.length;
   let angleStart = 200, angleEnd = -20;
