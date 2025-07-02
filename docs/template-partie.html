@@ -245,11 +245,21 @@
     <p>© 2025 Jeu de piste. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script>
-    const firebaseConfig = { /* ... même config ... */ };
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+      authDomain: "murder-party-ba8d1.firebaseapp.com",
+      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "murder-party-ba8d1",
+      storageBucket: "murder-party-ba8d1.firebasestorage.app",
+      messagingSenderId: "20295055805",
+      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
+      measurementId: "G-KSBMBB7KMJ"
+    };
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -346,13 +356,12 @@
         const targetLng = targetGps.lng;
 
         const toRad = deg => deg * Math.PI / 180;
-        const toDeg = rad => rad * 180 / Math.PI;
         const dLon = toRad(targetLng - userLng);
         const y = Math.sin(dLon) * Math.cos(toRad(targetLat));
         const x = Math.cos(toRad(userLat)) * Math.sin(toRad(targetLat)) -
                   Math.sin(toRad(userLat)) * Math.cos(toRad(targetLat)) * Math.cos(dLon);
         let brng = Math.atan2(y, x);
-        brng = (toDeg(brng) + 360) % 360;
+        brng = (brng * 180 / Math.PI + 360) % 360;
 
         const R = 6371000;
         const dLat = toRad(targetLat - userLat);
@@ -371,10 +380,10 @@
         const steps = Math.round(distance / 0.75);
 
         if (distance < 5) {
-        stepsInfo.textContent = "Vous êtes arrivé !";
-       } else {
-  stepsInfo.textContent = steps + " pas restants";
-}
+          stepsInfo.textContent = "Vous êtes arrivé !";
+        } else {
+          stepsInfo.textContent = steps + " pas restants";
+        }
 
         let deviceHeading = 0;
         if (window.lastDeviceOrientation !== undefined) {
@@ -419,7 +428,6 @@
       lastDistance = null;
     }
 
-    // Ajout de la récupération des missions et statuts validés !
     function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, validatedMissions) {
       const gauche = document.getElementById('jetons-gauche');
       const droite = document.getElementById('jetons-droite');
@@ -479,16 +487,13 @@
     function lancerAccueil() {
       const salonCode = localStorage.getItem("salonCode");
       const equipeNum = localStorage.getItem("equipeNum");
-      // Récupère points GPS
       db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
         const points = snap.val() || [];
         afficherCarteCentraleTousPoints(points);
 
-        // Récupère missions du scénario
         db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
           const missions = snapMission.val() || [];
           getOrCreateMissionPlacement(salonCode, points.length, missions.length).then(jetonMissionsMapping => {
-            // Récupère la validation des missions pour l'équipe
             db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).once('value').then(snapStatus => {
               const validatedMissions = snapStatus.val() || {};
               genererJetonsColonnes(points, jetonMissionsMapping, missions, validatedMissions);
