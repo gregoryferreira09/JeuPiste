@@ -176,18 +176,8 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('titre-quete').textContent = titre || "";
   document.getElementById('metaphore-quete').innerHTML = metaphore ? `<em>${metaphore}</em>` : '';
 
-  // 2. Bloc GPS harmonisé si présent
-  let gpsValue = etape.params?.gps || etape.params?.coord || etape.params?.coordonnees || (Array.isArray(etape.params?.points) && etape.params.points.length ? etape.params.points[0] : null);
-  let gpsContainer = document.getElementById('gps-upload-btn');
-  if (gpsContainer) gpsContainer.remove();
-  if (gpsValue) {
-    gpsContainer = document.createElement('div');
-    gpsContainer.id = "gps-upload-btn";
-    gpsContainer.style = "margin-bottom:18px; display:flex; justify-content:center; align-items:center;";
-    gpsContainer.innerHTML = `<a href="https://maps.google.com/?q=${encodeURIComponent(gpsValue)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none;color:#e0c185;font-weight:bold;">${getUploadIcon('photo')} <span style="margin-left:8px;">Voir le lieu</span></a>`;
-    const blocMission = document.getElementById('bloc-mission');
-    blocMission.parentNode.insertBefore(gpsContainer, blocMission);
-  }
+  // 2. (SUPPRIMÉ : Bloc GPS harmonisé si présent)
+  // => AUCUN lien Google Maps, AUCUN bouton/boussole/“Voir le lieu”
 
   // 3. Consigne et sous-consignes harmonisées
   document.getElementById('bloc-mission').style.display = '';
@@ -232,7 +222,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
     const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
-    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input type="text" id="answer-field" class="input-answer"></div>`;
+    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input id="answer-field" type="text" autocomplete="off" /></div>`;
     const input = document.getElementById("answer-field");
     const nextBtn = document.getElementById("next-quest");
     nextBtn.style.display = '';
