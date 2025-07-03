@@ -393,22 +393,48 @@ function getMissionSVG(type, gold = false) {
   let extraClass = gold ? ' gold' : '';
   switch (type) {
     case "photo":
-      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="${fillColor}">
+      // Appareil photo
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="none">
         <rect x="3" y="7" width="18" height="12" rx="2" fill="${fillColor}" stroke="#231d1d" stroke-width="1.5"/>
         <circle cx="12" cy="13" r="3" fill="#231d1d"/>
         <rect x="8" y="4" width="8" height="3" rx="1" fill="#231d1d"/>
       </svg>`;
+    case "audio":
+      // Microphone
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="none">
+        <rect x="9" y="4" width="6" height="10" rx="3" fill="${fillColor}" stroke="#231d1d" stroke-width="1.2"/>
+        <rect x="11" y="14" width="2" height="4" rx="1" fill="#231d1d"/>
+        <rect x="8" y="19" width="8" height="1.4" rx="0.7" fill="#231d1d"/>
+      </svg>`;
+    case "video":
+      // Caméra vidéo
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="none">
+        <rect x="4" y="7" width="12" height="9" rx="2" fill="${fillColor}" stroke="#231d1d" stroke-width="1.5"/>
+        <polygon points="16,9 21,7 21,17 16,15" fill="#231d1d"/>
+      </svg>`;
+    case "collecte_objet":
+      // Sac/boîte
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="none">
+        <rect x="6" y="8" width="12" height="10" rx="3" fill="${fillColor}" stroke="#231d1d" stroke-width="1.5"/>
+        <ellipse cx="12" cy="8" rx="4" ry="2" fill="#231d1d"/>
+      </svg>`;
+    case "fichier":
+      // Fichier/document
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="none">
+        <rect x="6" y="4" width="12" height="16" rx="2" fill="${fillColor}" stroke="#231d1d" stroke-width="1.5"/>
+        <polyline points="9,8 15,8" stroke="#231d1d" stroke-width="1.2"/>
+        <polyline points="9,12 15,12" stroke="#231d1d" stroke-width="1.2"/>
+      </svg>`;
     case "enigme":
-      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="${fillColor}">
+    case "mot_de_passe":
+      // Point d'interrogation
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="none">
         <circle cx="12" cy="12" r="10" fill="${fillColor}" stroke="#231d1d" stroke-width="1.5"/>
-        <text x="12" y="17" font-size="11" text-anchor="middle" fill="#231d1d" font-family="Arial" font-weight="bold">?</text>
+        <text x="12" y="18" font-size="11" text-anchor="middle" fill="#231d1d" font-family="Arial" font-weight="bold">?</text>
       </svg>`;
-    // Ajoute d'autres types ici...
     default:
-      // fallback : cercle doré ou blanc comme avant
-      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="${fillColor}">
-        <circle cx="12" cy="12" r="10"/>
-      </svg>`;
+      // Fallback : cercle doré ou blanc comme avant
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="${fillColor}"><circle cx="12" cy="12" r="10"/></svg>`;
   }
 }
 
