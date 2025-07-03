@@ -388,11 +388,29 @@ function getSkullSVG() {
 
 
     // Ajout gold param pour SVG épreuve
-    function getMissionSVG(type, gold = false) {
-      let fillColor = gold ? '#d4af37' : '#fff';
-      let extraClass = gold ? ' gold' : '';
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" fill="${fillColor}"><circle cx="12" cy="12" r="10" /></svg>`;
-    }
+function getMissionSVG(type, gold = false) {
+  let fillColor = gold ? '#d4af37' : '#fff';
+  let extraClass = gold ? ' gold' : '';
+  switch (type) {
+    case "photo":
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="${fillColor}">
+        <rect x="3" y="7" width="18" height="12" rx="2" fill="${fillColor}" stroke="#231d1d" stroke-width="1.5"/>
+        <circle cx="12" cy="13" r="3" fill="#231d1d"/>
+        <rect x="8" y="4" width="8" height="3" rx="1" fill="#231d1d"/>
+      </svg>`;
+    case "enigme":
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="${fillColor}">
+        <circle cx="12" cy="12" r="10" fill="${fillColor}" stroke="#231d1d" stroke-width="1.5"/>
+        <text x="12" y="17" font-size="11" text-anchor="middle" fill="#231d1d" font-family="Arial" font-weight="bold">?</text>
+      </svg>`;
+    // Ajoute d'autres types ici...
+    default:
+      // fallback : cercle doré ou blanc comme avant
+      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="${fillColor}">
+        <circle cx="12" cy="12" r="10"/>
+      </svg>`;
+  }
+}
 
     function getMissionTypeByIndex(missionIdx, missionsList) {
       const mission = missionsList && missionsList[missionIdx];
