@@ -73,6 +73,16 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
   let oldGpsBtn = document.getElementById('gps-upload-btn');
   if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
+
+    function fadeOutAndRedirect(nextUrl) {
+  var main = document.getElementById('main-content');
+  if (main) main.classList.add('fadeout');
+  setTimeout(function() {
+    window.location.href = nextUrl;
+  }, 850);
+}
+
+// ... (mets ici toutes tes autres fonctions utilitaires, comme afficherEtapeHarmonisee, etc.) ...
     
     function chargerEtapeDynamique() {
       // On récupère tout ce qu'il faut pour gérer le point final
