@@ -203,14 +203,14 @@
       var main = document.getElementById('main-content');
       main.classList.remove('visible');
       window.epreuveLoaderDisplayed = false;
-      setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 2000);
+      setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 500);
     });
     window.showContentAfterLoader = showContentAfterLoader;
     window.waitAndShowEpreuveContent = function() {
       if (window.epreuveLoaderDisplayed) {
         window.showContentAfterLoader();
       } else {
-        setTimeout(window.showContentAfterLoader, 2000);
+        setTimeout(window.showContentAfterLoader, 500);
       }
     };
   </script>
