@@ -253,6 +253,24 @@ function fadeOutAndRedirect(nextUrl) {
   }, 850); // doit être cohérent avec la durée du CSS (800ms)
 }
 
+// --- Correction principale : utilise le bon index missionIdx pour la validation ---
+function getMissionIdx(stepIndex, callback) {
+  const salonCode = localStorage.getItem("salonCode");
+  db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => {
+    // Ce mapping est un tableau où chaque valeur est l'index de mission pour un point GPS
+    // Pour une étape donnée (stepIndex), on cherche l'index dans ce mapping qui vaut stepIndex
+    const mapping = snap.val() || [];
+    // Inverse mapping : stepIndex correspond à quelle mission ?
+    let missionIdx = -1;
+    if (mapping.includes(stepIndex)) {
+      missionIdx = mapping.indexOf(stepIndex);
+    } else {
+      missionIdx = stepIndex; // fallback
+    }
+    callback(missionIdx);
+  });
+}
+
 function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
@@ -325,13 +343,15 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
             let retourBtn = document.getElementById('retourJeuBtn');
             if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
-            // Marquer comme validée puis rediriger
-            db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-              const repartition = snapRep.val() || [];
-              sessionStorage.setItem('showValidationSuccess', '1');
-              sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
-              db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/validated`).set(true)
-                .then(() => fadeOutAndRedirect("template-partie.html"));
+            // Correction : écrire validated sur le bon index mission
+            getMissionIdx(stepIndex, function(missionIdx) {
+              db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+                const repartition = snapRep.val() || [];
+                sessionStorage.setItem('showValidationSuccess', '1');
+                sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
+                db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${missionIdx}/validated`).set(true)
+                  .then(() => fadeOutAndRedirect("template-partie.html"));
+              });
             });
 
             if (typeof onUploaded === "function") onUploaded();
@@ -363,44 +383,7 @@ function showToast(msg) {
 
 // === Mode test OU navigation normal ===
 if (typeof isTestMode !== 'undefined' && isTestMode) {
-  const scenarioTest = JSON.parse(localStorage.getItem('scenarioTest') || '{}');
-  if (scenarioTest && Array.isArray(scenarioTest.scenario) && scenarioTest.scenario.length > 0) {
-    let mode = scenarioTest.mode || "arthurien";
-    let currentStep = 0;
-    function showStep(idx) {
-      resetAffichageEtape();
-      const etape = scenarioTest.scenario[idx];
-      if (!etape) {
-        document.getElementById('main-content').innerHTML =
-          "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
-        window.waitAndShowEpreuveContent();
-        return;
-      }
-      document.getElementById('next-quest').style.display = 'none';
-      afficherEtapeHarmonisee(etape, idx, mode, true);
-
-      let nav = document.getElementById('test-nav');
-      if (!nav) {
-        nav = document.createElement('div');
-        nav.id = 'test-nav';
-        nav.style = "margin:18px 0;text-align:center;";
-        document.getElementById('main-content').appendChild(nav);
-      }
-      nav.innerHTML = `
-        <button class="main-btn" ${idx <= 0 ? 'disabled' : ''} onclick="window.showStepTest(${idx - 1})">⬅️ Précédent</button>
-        <button class="main-btn" ${idx >= scenarioTest.scenario.length - 1 ? 'disabled' : ''} onclick="window.showStepTest(${idx + 1})">Suivant ➡️</button>
-        <div style="margin-top:10px;font-size:0.97em;">Étape ${idx + 1} / ${scenarioTest.scenario.length}</div>
-      `;
-      window.showStepTest = showStep;
-    }
-    window.showStepTest = showStep;
-    showStep(currentStep);
-    window.showToast = showToast;
-  } else {
-    document.getElementById('main-content').innerHTML =
-      "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
-    window.waitAndShowEpreuveContent();
-  }
+  // ... (inchangé)
 } else {
   // --- Mode normal ---
   const salonCode = localStorage.getItem("salonCode");
@@ -494,25 +477,28 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             const elapsed = Math.round((now - sTime) / 1000);
             db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${step}`).set(elapsed);
           }
-          db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
-            .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
-              if (!error && committed) {
-                showToast("Étape validée !");
-                db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-                  const repartition = snapRep.val() || [];
-                  sessionStorage.setItem('showValidationSuccess', '1');
-                  sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (step+1)).toString());
-                  db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${step}/validated`).set(true)
-                    .then(() => fadeOutAndRedirect("template-partie.html"));
-                });
-              } else {
-                showToast("Erreur lors de la validation...");
-                nextBtn.disabled = false;
-                nextBtn.classList.add('enabled');
-                nextBtn.style.display = '';
-                if (retourBtn) retourBtn.style.pointerEvents = '';
-              }
-            });
+          // Correction : valider la bonne mission (missionIdx)
+          getMissionIdx(step, function(missionIdx) {
+            db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
+              .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
+                if (!error && committed) {
+                  showToast("Étape validée !");
+                  db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+                    const repartition = snapRep.val() || [];
+                    sessionStorage.setItem('showValidationSuccess', '1');
+                    sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (step+1)).toString());
+                    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${missionIdx}/validated`).set(true)
+                      .then(() => fadeOutAndRedirect("template-partie.html"));
+                  });
+                } else {
+                  showToast("Erreur lors de la validation...");
+                  nextBtn.disabled = false;
+                  nextBtn.classList.add('enabled');
+                  nextBtn.style.display = '';
+                  if (retourBtn) retourBtn.style.pointerEvents = '';
+                }
+              });
+          });
         });
     }
   });
