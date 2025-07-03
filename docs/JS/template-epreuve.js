@@ -325,12 +325,13 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
             let retourBtn = document.getElementById('retourJeuBtn');
             if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
-            // Préparer la validation pour template-partie
+            // Marquer comme validée puis rediriger
             db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
               const repartition = snapRep.val() || [];
               sessionStorage.setItem('showValidationSuccess', '1');
               sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
-              fadeOutAndRedirect("template-partie.html");
+              db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/validated`).set(true)
+                .then(() => fadeOutAndRedirect("template-partie.html"));
             });
 
             if (typeof onUploaded === "function") onUploaded();
@@ -501,7 +502,8 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
                   const repartition = snapRep.val() || [];
                   sessionStorage.setItem('showValidationSuccess', '1');
                   sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (step+1)).toString());
-                  fadeOutAndRedirect("template-partie.html");
+                  db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${step}/validated`).set(true)
+                    .then(() => fadeOutAndRedirect("template-partie.html"));
                 });
               } else {
                 showToast("Erreur lors de la validation...");
