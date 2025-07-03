@@ -360,23 +360,32 @@
     const db = firebase.database();
 
     // Ajout SVG crâne & os croisés
-    function getSkullSVG() {
-      return `
-<svg class="svg-skull" width="32" height="32" viewBox="0 0 32 32" fill="none">
+function getSkullSVG() {
+  return `
+<svg class="svg-skull" width="38" height="38" viewBox="0 0 32 32" fill="none">
   <g>
-    <g>
-      <line x1="7" y1="25" x2="25" y2="7" stroke="#fff" stroke-width="2"/>
-      <line x1="25" y1="25" x2="7" y2="7" stroke="#fff" stroke-width="2"/>
+    <!-- Os croisés, plus épais et arrondis -->
+    <g stroke="#fff" stroke-width="3" stroke-linecap="round">
+      <line x1="7" y1="27" x2="25" y2="9"/>
+      <line x1="25" y1="27" x2="7" y2="9"/>
     </g>
-    <ellipse cx="16" cy="16" rx="8" ry="7" fill="#fafaff" stroke="#aaa" stroke-width="1.5" />
-    <ellipse cx="16" cy="23" rx="4.5" ry="2.5" fill="#e6e6e6"/>
-    <ellipse cx="13" cy="15.2" rx="1.4" ry="1.7" fill="#333"/>
-    <ellipse cx="19" cy="15.2" rx="1.4" ry="1.7" fill="#333"/>
-    <ellipse cx="16" cy="18.8" rx="1.1" ry="0.7" fill="#bbb"/>
+    <!-- Crâne principal, plus gros -->
+    <ellipse cx="16" cy="15" rx="9" ry="8" fill="#fdfdfd" stroke="#aaa" stroke-width="1.7"/>
+    <!-- Mâchoire (menton) -->
+    <ellipse cx="16" cy="24" rx="5" ry="3.2" fill="#ececec"/>
+    <!-- Yeux, ronds et expressifs -->
+    <ellipse cx="13" cy="15" rx="1.7" ry="2.2" fill="#222"/>
+    <ellipse cx="19" cy="15" rx="1.7" ry="2.2" fill="#222"/>
+    <!-- Nez, arrondi -->
+    <ellipse cx="16" cy="18.2" rx="1.1" ry="1.6" fill="#444"/>
+    <!-- Dents (traits fins) -->
+    <rect x="14.3" y="25.2" width="1.1" height="1.2" rx="0.3" fill="#ccc"/>
+    <rect x="16.6" y="25.2" width="1.1" height="1.2" rx="0.3" fill="#ccc"/>
   </g>
 </svg>
-      `;
-    }
+  `;
+}
+
 
     // Ajout gold param pour SVG épreuve
     function getMissionSVG(type, gold = false) {
