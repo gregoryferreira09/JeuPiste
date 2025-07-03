@@ -24,6 +24,10 @@ const MISSION_UPLOAD_LABELS = {
   fichier: (vars) => (vars.nb > 1 ? "Fichiers à envoyer" : "Fichier à envoyer"),
 };
 
+// --- Ajout clé : récupère l'indice mission dans l'URL (support carte libre) ---
+const params = new URLSearchParams(window.location.search);
+const missionIdx = params.has("idx") ? parseInt(params.get("idx"), 10) : null;
+
 function resetAffichageEtape() {
   ['titre-quete', 'metaphore-quete', 'mission-label', 'mission-text', 'upload-row', 'upload-feedback'].forEach(id => {
     let el = document.getElementById(id);
@@ -37,8 +41,6 @@ function resetAffichageEtape() {
   if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
 
-
-// Corrige les articles/contractions françaises
 function harmoniseArticles(phrase) {
   phrase = phrase.replace(/\bde un ([aeiouyhAEIOUYH])/g, "d'un $1");
   phrase = phrase.replace(/\bde une ([aeiouyhAEIOUYH])/g, "d'une $1");
@@ -54,7 +56,6 @@ function harmoniseArticles(phrase) {
   return phrase;
 }
 
-// Corrige les pluriels dynamiques type "personne[s]" --> "personne"/"personnes"
 function accordePluriel(phrase, nb) {
   return phrase.replace(/([a-zA-ZéèêëàâîïôöùûüçÉÈÊËÀÂÎÏÔÖÙÛÜÇ]+)\[s\]/g, function(_, mot) {
     return nb > 1 ? mot + "s" : mot;
@@ -111,15 +112,15 @@ function getUploadIcon(type) {
   switch(type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5 10.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5...`;
     case "video":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
     case "audio":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" rx="1"/></svg>`;
     case "collecte_objet":
-      return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.25" fill="#e0c185"/></svg>`;
+      return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx...`;
     case "fichier":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" height="2" rx="1" fill="#e0c185"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" ...`;
     default:
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><rect x="4" y="7" width="16" height="11" rx="2"/></svg>`;
   }
@@ -177,8 +178,6 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('titre-quete').textContent = titre || "";
   document.getElementById('metaphore-quete').innerHTML = metaphore ? `<em>${metaphore}</em>` : '';
 
-  // 2. (SUPPRIMÉ : Bloc GPS harmonisé si présent)
-
   // 3. Consigne et sous-consignes harmonisées
   document.getElementById('bloc-mission').style.display = '';
   document.getElementById('mission-label').textContent = "Consigne";
@@ -221,7 +220,9 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
     const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
-    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input type="text" id="answer-field" autocomplete="off" style="margin-bottom:8px;" class="main-input"/><div id="answer-feedback" style="margin-top:6px;font-size:0.97em;color:#e0c185;"></div></div>`;
+    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label>
+      <input id="answer-field" type="text" autocomplete="off" spellcheck="false" />
+    </div>`;
     const input = document.getElementById("answer-field");
     const nextBtn = document.getElementById("next-quest");
     nextBtn.style.display = '';
@@ -322,14 +323,13 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
             let retourBtn = document.getElementById('retourJeuBtn');
             if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
-            // --- Correction ici : valider sur le bon index mission ---
-db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-  const repartition = snapRep.val() || [];
-  sessionStorage.setItem('showValidationSuccess', '1');
-  sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
-  db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/validated`).set(true)
-    .then(() => fadeOutAndRedirect("template-partie.html"));
-});
+            db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+              const repartition = snapRep.val() || [];
+              sessionStorage.setItem('showValidationSuccess', '1');
+              sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
+              db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/validated`).set(true)
+                .then(() => fadeOutAndRedirect("template-partie.html"));
+            });
 
             if (typeof onUploaded === "function") onUploaded();
           }
@@ -389,48 +389,26 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
     });
 
     function chargerEtapeDynamique() {
-      db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
-        const step = snapStep.val() || 0;
-
-        if (scenarioCode === "parc_saint_nicolas") {
-          db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
-            resetAffichageEtape();
-            const etape = snapEpreuve.val();
-            if (!etape) {
+      db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+        const repartition = snapRep.val() || [];
+        
+        // --- Correction ici : support du mode carte libre (missionIdx dans URL) ---
+        if (missionIdx !== null && !isNaN(missionIdx) && repartition[missionIdx]) {
+          const etape = repartition[missionIdx];
+          resetAffichageEtape();
+          afficherEtapeHarmonisee(etape.epreuve || etape, missionIdx, window.currentScenarioMode, false);
+          document.getElementById('next-quest').onclick = () => validerEtape(missionIdx, repartition.length);
+        } else {
+          // fallback pour le mode linéaire classique
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`).once('value').then(snapStep => {
+            const step = snapStep.val() || 0;
+            if (step >= repartition.length) {
               document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
               window.waitAndShowEpreuveContent();
               return;
             }
-            document.getElementById('next-quest').style.display = 'none';
-            afficherEtapeHarmonisee(etape, step, window.currentScenarioMode, false);
-            document.getElementById('next-quest').onclick = () => validerEtape(step);
-          });
-        } else {
-          db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-            const repartition = snapRep.val() || [];
-            repartitionLength = repartition.length;
-
-            if (step >= repartition.length) {
-              db.ref(`parties/${salonCode}/scenarioJeu/arrivalPoint`).once('value').then(snapArrival => {
-                const arrival = snapArrival.val();
-                document.getElementById('main-content').innerHTML =
-                  `<div style="color:#2a4;font-weight:bold;">Bravo, vous avez terminé toutes les épreuves !</div>` +
-                  (arrival
-                    ? `<div style="margin-top:16px;font-size:1.15em;"><b>Point d'arrivée :</b><br>${arrival.gps ? `GPS : ${arrival.gps}` : ''}</div>`
-                    : '');
-                window.waitAndShowEpreuveContent();
-              });
-              return;
-            }
-
             const etape = repartition[step];
             resetAffichageEtape();
-            if (!etape) {
-              document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
-              window.waitAndShowEpreuveContent();
-              return;
-            }
-            document.getElementById('next-quest').style.display = 'none';
             afficherEtapeHarmonisee(etape.epreuve || etape, step, window.currentScenarioMode, false);
             document.getElementById('next-quest').onclick = () => validerEtape(step, repartition.length);
           });
@@ -438,7 +416,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
       });
     }
 
-    function validerEtape(step, repartLength) {
+    function validerEtape(idx, repartLength) {
       const nextBtn = document.getElementById('next-quest');
       nextBtn.disabled = true;
       nextBtn.classList.remove('enabled');
@@ -447,33 +425,25 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
       if (retourBtn) retourBtn.style.pointerEvents = 'none';
       showToast("Validation en cours...");
       const now = Date.now();
-      db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${step}/startTime`)
+      db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${idx}/startTime`)
         .once('value', function (snap) {
           const sTime = snap.val();
           if (sTime) {
             const elapsed = Math.round((now - sTime) / 1000);
-            db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${step}`).set(elapsed);
+            db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${idx}`).set(elapsed);
           }
-          // --- Correction ici : valider sur le bon index mission ---
-db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
-  .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
-    if (!error && committed) {
-      showToast("Étape validée !");
-      db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-        const repartition = snapRep.val() || [];
-        sessionStorage.setItem('showValidationSuccess', '1');
-        sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (step+1)).toString());
-        db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${step}/validated`).set(true)
-          .then(() => fadeOutAndRedirect("template-partie.html"));
-      });
-    } else {
-      showToast("Erreur lors de la validation...");
-      nextBtn.disabled = false;
-      nextBtn.classList.add('enabled');
-      nextBtn.style.display = '';
-      if (retourBtn) retourBtn.style.pointerEvents = '';
-    }
-  });
+          // --- Correction ici : valider bien l'index mission (idx), pas step ---
+          sessionStorage.setItem('showValidationSuccess', '1');
+          sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartLength - (idx+1)).toString());
+          db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${idx}/validated`).set(true)
+            .then(() => fadeOutAndRedirect("template-partie.html"))
+            .catch(() => {
+              showToast("Erreur lors de la validation...");
+              nextBtn.disabled = false;
+              nextBtn.classList.add('enabled');
+              nextBtn.style.display = '';
+              if (retourBtn) retourBtn.style.pointerEvents = '';
+            });
         });
     }
   });
