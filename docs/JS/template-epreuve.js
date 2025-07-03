@@ -244,6 +244,15 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   window.waitAndShowEpreuveContent();
 }
 
+// Effet fondu simple puis redirection
+function fadeOutAndRedirect(nextUrl) {
+  var main = document.getElementById('main-content');
+  main.classList.add('fadeout');
+  setTimeout(function() {
+    window.location.href = nextUrl;
+  }, 850); // doit être cohérent avec la durée du CSS (800ms)
+}
+
 function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
   const bloc = document.getElementById('bloc-upload');
   const row = document.getElementById('upload-row');
@@ -316,13 +325,13 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
             let retourBtn = document.getElementById('retourJeuBtn');
             if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
-            // Préparer l'animation de validation pour template-partie
-db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-  const repartition = snapRep.val() || [];
-  sessionStorage.setItem('showValidationSuccess', '1');
-  sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
-  startBurnTransitionAndRedirect("template-partie.html");
-});
+            // Préparer la validation pour template-partie
+            db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+              const repartition = snapRep.val() || [];
+              sessionStorage.setItem('showValidationSuccess', '1');
+              sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
+              fadeOutAndRedirect("template-partie.html");
+            });
 
             if (typeof onUploaded === "function") onUploaded();
           }
@@ -492,7 +501,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
                   const repartition = snapRep.val() || [];
                   sessionStorage.setItem('showValidationSuccess', '1');
                   sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (step+1)).toString());
-                  setTimeout(() => { window.location.href = "template-partie.html"; }, 1200);
+                  fadeOutAndRedirect("template-partie.html");
                 });
               } else {
                 showToast("Erreur lors de la validation...");
