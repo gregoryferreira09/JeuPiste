@@ -49,7 +49,7 @@ function renderMapsList() {
           <span
             class="gps-map-name${isSelected ? ' gps-map-name--selected' : ''}"
             data-mapname="${encodeURIComponent(name)}"
-            style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;${isSelected ? 'background:#ffeecb;color:#232832;border-radius:6px;padding:4px 12px;font-weight:bold;box-shadow:0 0 0 2px #e0c185,0 0 8px #ffeecb88;':''}"
+            style="cursor:pointer;color:#e0c185;font-family:'Cormorant Garamond',serif;${isSelected ? 'background:#ffeecb;color:#232832;border-radius:6px;padding:4px 12px;font-weight:bold;box-shadow:0 0 0 2px #e0c185,0 0 8px #ffeecb88;' : ''}"
           >
             ${name} <span style="color:#aaa;font-size:0.95em;">(${points.length} point${points.length>1?'s':''})</span>
           </span>
@@ -147,6 +147,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Première mise à jour
   afficherScenario();
+
+  // Bouton "Test scénario"
+  const btnTest = document.getElementById('testScenarioBtn');
+  if (btnTest) {
+    btnTest.onclick = function() {
+      if (scenario.length < 1) {
+        alert("Ajoute au moins une épreuve pour tester !");
+        return;
+      }
+      localStorage.setItem('scenarioTest', JSON.stringify({
+        mode: currentGameMode,
+        scenario: scenario,
+        gpsPoints: gpsPoints
+      }));
+      window.open('template-epreuve.html?test=1', '_blank');
+    };
+  }
 });
 
 // Accord dynamique de la règle du jeu
@@ -361,7 +378,6 @@ function initGpsBandeau() {
   const gpsClearBtn = document.getElementById('gpsClearBtn');
   const gpsMapName = document.getElementById('gpsMapName');
   const gpsSaveBtn = document.getElementById('gpsSaveBtn');
-  const gpsLocateBtn = document.getElementById('gpsLocateBtn');
   let uniqueId = 'gpsGlobalMap';
 
   // --- Initialisation Leaflet ---
@@ -470,37 +486,6 @@ function initGpsBandeau() {
     selectedMapName = name;
     renderMapsList();
   };
-
-  // Gestion du bouton "Me localiser"
-  if (gpsLocateBtn) {
-    gpsLocateBtn.onclick = function() {
-      if (!navigator.geolocation) {
-        alert("La géolocalisation n'est pas supportée par ce navigateur !");
-        return;
-      }
-      gpsLocateBtn.disabled = true;
-      gpsLocateBtn.textContent = "⏳";
-      navigator.geolocation.getCurrentPosition(function(pos) {
-        gpsLocateBtn.disabled = false;
-        gpsLocateBtn.textContent = "📍";
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        if (gpsMap && typeof gpsMap.setView === "function") {
-          gpsMap.setView([lat, lng], 16); // Zoom 16 sur ta position
-          // Marqueur temporaire
-          if (window._userPositionMarker) {
-            gpsMap.removeLayer(window._userPositionMarker);
-          }
-          window._userPositionMarker = L.marker([lat, lng], {title: "Vous êtes ici"}).addTo(gpsMap);
-          window._userPositionMarker.bindPopup("Vous êtes ici").openPopup();
-        }
-      }, function(err) {
-        gpsLocateBtn.disabled = false;
-        gpsLocateBtn.textContent = "📍";
-        alert("Impossible de vous localiser (" + (err.message || "erreur inconnue") + ")");
-      });
-    };
-  }
 
   // Affiche la liste des maps sauvegardées au chargement
   renderMapsList();
