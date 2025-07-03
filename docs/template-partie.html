@@ -321,10 +321,9 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // SVG d'icônes pour les missions (adapter selon tes besoins)
     function getMissionSVG(type) {
       if (type === "photo" || type === "photo_inconnus" || type === "collecte_objet") {
-        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5 10.[...]`;
+        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5 10.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>`;
       }
       if (type === "audio") {
         return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M12 3v10.55A4 4 0 1 0 14 17h1a5 5 0 0 1-5-5V3a1 1 0 1 1 2 0z"/></svg>`;
@@ -514,6 +513,9 @@
             btn.innerHTML = getMissionSVG(missionType);
             btn.disabled = true;
             btn.style.cursor = "default";
+            btn.onclick = null;
+            btn.ondblclick = null;
+            btn.tabIndex = -1;
           }
         }
 
