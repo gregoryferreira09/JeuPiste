@@ -455,27 +455,25 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${step}`).set(elapsed);
           }
           // --- Correction ici : valider sur le bon index mission ---
-          getMissionIdxForStepIndex(step, function(missionIdx) {
-            db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
-              .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
-                if (!error && committed) {
-                  showToast("Étape validée !");
-                  db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-                    const repartition = snapRep.val() || [];
-                    sessionStorage.setItem('showValidationSuccess', '1');
-                    sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (step+1)).toString());
-                    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${missionIdx}/validated`).set(true)
-                      .then(() => fadeOutAndRedirect("template-partie.html"));
-                  });
-                } else {
-                  showToast("Erreur lors de la validation...");
-                  nextBtn.disabled = false;
-                  nextBtn.classList.add('enabled');
-                  nextBtn.style.display = '';
-                  if (retourBtn) retourBtn.style.pointerEvents = '';
-                }
-              });
-          });
+db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
+  .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
+    if (!error && committed) {
+      showToast("Étape validée !");
+      db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+        const repartition = snapRep.val() || [];
+        sessionStorage.setItem('showValidationSuccess', '1');
+        sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (step+1)).toString());
+        db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${step}/validated`).set(true)
+          .then(() => fadeOutAndRedirect("template-partie.html"));
+      });
+    } else {
+      showToast("Erreur lors de la validation...");
+      nextBtn.disabled = false;
+      nextBtn.classList.add('enabled');
+      nextBtn.style.display = '';
+      if (retourBtn) retourBtn.style.pointerEvents = '';
+    }
+  });
         });
     }
   });
