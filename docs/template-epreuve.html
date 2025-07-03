@@ -186,7 +186,7 @@
       // Le script principal devra appeler showContentAfterLoader() quand tout est prêt
       // Mais on force le loader à durer au moins 3 secondes
       window.epreuveLoaderDisplayed = false;
-      setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 3000);
+      setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 1000);
     });
     // Utilisation dans template-epreuve.js (voir plus bas)
     window.showContentAfterLoader = showContentAfterLoader;
