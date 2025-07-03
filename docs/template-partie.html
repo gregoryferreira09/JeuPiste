@@ -87,12 +87,26 @@
       animation: pulseMission 1.2s infinite alternate;
     }
     .jeton.validated {
-      background: #38b948 !important;
-      border-color: #1b6f25 !important;
+      background: #668702 !important;        /* Vert validé */
+      border-color: #3e5000 !important;
       color: #fff !important;
       pointer-events: none !important;
       cursor: default !important;
       animation: none !important;
+    }
+    .jeton .svg-epreuve.gold {
+      fill: #d4af37 !important;
+    }
+    .jeton.no-mission {
+      background: #b0b0b0 !important;        /* Gris */
+      border-color: #888 !important;
+      color: #fff !important;
+      pointer-events: none !important;
+      cursor: default !important;
+    }
+    .svg-skull {
+      display: block;
+      margin: 0 auto;
     }
     .jeton .svg-epreuve {
       width: 30px;
@@ -104,7 +118,7 @@
       0% { box-shadow: 0 0 0 0 #d4af3740; }
       100% { box-shadow: 0 0 12px 6px #d4af3755; }
     }
-    .jeton:hover:not(.validated), .jeton:focus:not(.validated) {
+    .jeton:hover:not(.validated):not(.no-mission), .jeton:focus:not(.validated):not(.no-mission) {
       background: #fcedbe;
       border-color: #d4af37;
       color: #473714;
@@ -345,9 +359,32 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function getMissionSVG(type) {
-      // ... inchangé ...
-      return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="10" /></svg>`;
+    // Ajout SVG crâne & os croisés
+    function getSkullSVG() {
+      return `
+        <svg class="svg-skull" width="30" height="30" viewBox="0 0 32 32" fill="none">
+          <g>
+            <circle cx="16" cy="16" r="13" fill="#fff" opacity="0.12"/>
+            <g>
+              <ellipse cx="16" cy="15" rx="8" ry="7" fill="#fff"/>
+              <ellipse cx="13" cy="14" rx="1.3" ry="2" fill="#231d1d"/>
+              <ellipse cx="19" cy="14" rx="1.3" ry="2" fill="#231d1d"/>
+              <ellipse cx="16" cy="18.2" rx="2" ry="1.2" fill="#231d1d"/>
+            </g>
+            <g>
+              <rect x="6" y="24" width="20" height="2.4" rx="1.2" fill="#fff" transform="rotate(30 16 25.2)"/>
+              <rect x="6" y="24" width="20" height="2.4" rx="1.2" fill="#fff" transform="rotate(-30 16 25.2)"/>
+            </g>
+          </g>
+        </svg>
+      `;
+    }
+
+    // Ajout gold param pour SVG épreuve
+    function getMissionSVG(type, gold = false) {
+      let fillColor = gold ? '#d4af37' : '#fff';
+      let extraClass = gold ? ' gold' : '';
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" fill="${fillColor}"><circle cx="12" cy="12" r="10" /></svg>`;
     }
 
     function getMissionTypeByIndex(missionIdx, missionsList) {
@@ -389,7 +426,7 @@
     }
 
     function getOrCreateMissionPlacement(salonCode, nbGPS, nbMissions) {
-      // inchangé : la génération du mapping se fait déjà à la création de partie
+      // inchangé
       return db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => snap.val());
     }
 
@@ -485,6 +522,7 @@
       lastDistance = null;
     }
 
+    // --- JETONS de la carte ---
     function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, validatedMissions, finalGpsIndex, toutesMissionsValidees) {
       const gauche = document.getElementById('jetons-gauche');
       const droite = document.getElementById('jetons-droite');
@@ -494,10 +532,7 @@
       let jetonDiameter = (N > 10) ? 34 : 48;
 
       for(let i=0; i<N; i++) {
-        // NE PAS afficher le point final si ce n'est pas la fin du jeu
         if (i === finalGpsIndex && !toutesMissionsValidees) continue;
-
-        // NE PAS afficher le point final dans les colonnes lors de la fin (il sera sous la flèche)
         if (i === finalGpsIndex && toutesMissionsValidees) continue;
 
         const btn = document.createElement('button');
@@ -516,16 +551,26 @@
           isValidated = validatedMissions && validatedMissions[missionIdx] && validatedMissions[missionIdx].validated;
           if(isValidated) {
             btn.classList.add('validated');
-            btn.innerHTML = getMissionSVG(missionType);
+            btn.innerHTML = getMissionSVG(missionType, true); // SVG épreuve doré
             btn.disabled = true;
             btn.style.cursor = "default";
             btn.onclick = null;
             btn.ondblclick = null;
             btn.tabIndex = -1;
+          } else {
+            btn.innerHTML = getMissionSVG(missionType, false);
           }
+        } else {
+          btn.classList.add('no-mission');
+          btn.innerHTML = getSkullSVG();
+          btn.disabled = true;
+          btn.style.cursor = "default";
+          btn.onclick = null;
+          btn.ondblclick = null;
+          btn.tabIndex = -1;
         }
 
-        if(!btn.classList.contains('validated')) {
+        if(!btn.classList.contains('validated') && !btn.classList.contains('no-mission')) {
           btn.onclick = (e) => {
             e.preventDefault();
             hideCompass();
@@ -590,7 +635,6 @@
       let missions = [];
       let validatedMissions = {};
 
-      // Récupère tous les éléments nécessaires
       Promise.all([
         db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value'),
         db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value'),
@@ -606,7 +650,6 @@
 
         afficherCarteCentraleTousPoints(gpsPoints);
 
-        // Vérifie si toutes les missions sont validées (hors point final)
         let totalMissions = missions.length;
         let nbValidees = 0;
         for (let i = 0; i < totalMissions; i++) {
@@ -616,7 +659,6 @@
 
         genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missions, validatedMissions, finalGpsIndex, toutesMissionsValidees);
 
-        // Affichage du jeton final
         if (toutesMissionsValidees && finalGpsIndex !== null) {
           afficherJetonFinal(gpsPoints, finalGpsIndex);
         } else {
@@ -625,7 +667,7 @@
       });
 
       window.addEventListener('resize', () => {
-        lancerAccueil(); // Pour forcer le redraw responsive
+        lancerAccueil();
       });
     }
   </script>
