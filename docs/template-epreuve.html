@@ -71,6 +71,24 @@
       opacity: 1;
       transition: opacity 1.1s;
     }
+    /* Burn transition overlay */
+    #burn-transition {
+      display: none;
+      position: fixed;
+      z-index: 199999;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      background: transparent;
+    }
+    #burn-transition.active {
+      display: block !important;
+      animation: burnFade 1.2s forwards;
+    }
+    @keyframes burnFade {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      100% { opacity: 1; }
+    }
     @media (max-width: 650px) {
       .boutons-actions { margin-top: 18px; gap: 12px;}
     }
@@ -83,6 +101,10 @@
       Chargement de l'épreuve…
       <div class="loader-icon">⏳</div>
     </div>
+  </div>
+  <!-- Burn effect overlay (hidden by default) -->
+  <div id="burn-transition">
+    <canvas id="burn-canvas" width="1920" height="1080" style="width:100vw;height:100vh;display:block;"></canvas>
   </div>
   <header>
     <h1 class="site-title">Jeu de piste</h1>
@@ -162,9 +184,8 @@
   <script src="JS/template-epreuve.js"></script>
   <!-- Animation de loader et fadein -->
   <script>
-    // Cette variable doit être globale pour le JS principal
+    // Loader d'épreuve classique
     window.epreuveLoaderDisplayed = false;
-
     function showContentAfterLoader() {
       var main = document.getElementById('main-content');
       var loader = document.getElementById('epreuve-loader');
@@ -173,38 +194,69 @@
         setTimeout(function() {
           loader.style.display = 'none';
           main.classList.add('visible');
-        }, 620); // correspond à la transition CSS du loader
+        }, 620);
       } else {
         main.classList.add('visible');
       }
     }
-
-    // Bloque l'affichage du contenu tant que le loader n'a pas disparu
     document.addEventListener("DOMContentLoaded", function() {
       var main = document.getElementById('main-content');
       main.classList.remove('visible');
-      // Le script principal devra appeler showContentAfterLoader() quand tout est prêt
-      // Mais on force le loader à durer au moins 3 secondes
       window.epreuveLoaderDisplayed = false;
-      setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 1000);
+      setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 2000);
     });
-    // Utilisation dans template-epreuve.js (voir plus bas)
     window.showContentAfterLoader = showContentAfterLoader;
-  </script>
-  <script>
-    // Patch à ajouter dans JS/template-epreuve.js à la fin de afficherEtapeHarmonisee ET AVANT CHAQUE return.
-    // Exemple :
-    //   if (window.epreuveLoaderDisplayed) window.showContentAfterLoader();
-    //   else setTimeout(window.showContentAfterLoader, 3000);
-
-    // Pour rendre la logique robuste, on attend toujours 3s MINIMUM avant de faire le fade-in.
     window.waitAndShowEpreuveContent = function() {
       if (window.epreuveLoaderDisplayed) {
         window.showContentAfterLoader();
       } else {
-        setTimeout(window.showContentAfterLoader, 1000);
+        setTimeout(window.showContentAfterLoader, 2000);
       }
     };
+  </script>
+  <!-- Animation page qui brûle -->
+  <script>
+    function startBurnTransitionAndRedirect(nextUrl) {
+      const overlay = document.getElementById('burn-transition');
+      const canvas = document.getElementById('burn-canvas');
+      overlay.style.display = 'block';
+      overlay.classList.add('active');
+      overlay.style.pointerEvents = 'all';
+      // Responsive sizing
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let w = canvas.width, h = canvas.height;
+      const ctx = canvas.getContext('2d');
+      let radius = 80, maxR = Math.sqrt(w*w + h*h), step = 0;
+      function draw() {
+        ctx.clearRect(0,0,w,h);
+        // Fond noir
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0,0,w,h);
+        // Cercle de brûlure
+        let grad = ctx.createRadialGradient(w/2, h/2, radius*0.6, w/2, h/2, radius);
+        grad.addColorStop(0, "rgba(255,180,0,0.7)");
+        grad.addColorStop(0.2, "rgba(255,128,0,0.8)");
+        grad.addColorStop(0.4, "rgba(128,32,0,0.6)");
+        grad.addColorStop(0.85, "rgba(0,0,0,0.92)");
+        grad.addColorStop(1, "#000");
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(w/2, h/2, radius, 0, 2*Math.PI);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.globalCompositeOperation = "source-over";
+        radius += 55 + (radius/10); // vitesse
+        step++;
+        if (radius < maxR*1.3) {
+          requestAnimationFrame(draw);
+        } else {
+          window.location.href = nextUrl;
+        }
+      }
+      draw();
+    }
   </script>
 </body>
 </html>
