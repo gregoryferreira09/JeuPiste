@@ -117,10 +117,10 @@
   <header>
     <h1 class="site-title">Ludus itineris</h1>
   </header>
- 
-  <div id="nomScenarioSalon"></div>
+
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
+      <div id="nomScenarioSalon"></div>
       <h1>Salon de la partie</h1>
       <div class="bienvenue-message">
         Bonjour <span id="pseudoAffiche"></span>
@@ -152,6 +152,7 @@
       </div>
     </main>
   </div>
+
   <!-- BANDEAU BAS -->
   <footer class="footer">
     <p>© 2025 Ludus itineris. Tous droits réservés.</p>
@@ -208,16 +209,16 @@
       pseudoAffiche.textContent = monPseudo;
 
       // Met à jour mon pseudo dans la liste des joueurs si besoin
-// Correction universelle : met à jour tous les "Anonyme" ou "invité" trouvés par mon pseudo local
-if (salonCode && monPseudo && monPseudo !== "Anonyme" && monPseudo !== "invité") {
-  db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
-    snap.forEach(child => {
-      if (child.val().pseudo === "Anonyme" || child.val().pseudo === "invité") {
-        db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(monPseudo);
+      // Correction universelle : met à jour tous les "Anonyme" ou "invité" trouvés par mon pseudo local
+      if (salonCode && monPseudo && monPseudo !== "Anonyme" && monPseudo !== "invité") {
+        db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
+          snap.forEach(child => {
+            if (child.val().pseudo === "Anonyme" || child.val().pseudo === "invité") {
+              db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(monPseudo);
+            }
+          });
+        });
       }
-    });
-  });
-}
       let jeSuisCreateur = false;
       let countdownInterval = null;
       let lancementAutomatiqueDemarre = false;
