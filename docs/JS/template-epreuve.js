@@ -37,21 +37,6 @@ function resetAffichageEtape() {
   if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
 
-// --- UTILITAIRE : trouver l'index mission à valider pour une étape donnée ---
-function getMissionIdxForStepIndex(stepIndex, callback) {
-  const salonCode = localStorage.getItem("salonCode");
-  db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => {
-    const mapping = snap.val() || [];
-    // mapping[jetonIndex] === stepIndex
-    // On cherche l'index du mapping dont la valeur == stepIndex
-    let missionIdx = mapping.findIndex(idx => idx === stepIndex);
-    if (missionIdx === -1) {
-      // fallback: stepIndex (si jamais la mission n'est pas affectée à un jeton)
-      missionIdx = stepIndex;
-    }
-    callback(missionIdx);
-  });
-}
 
 // Corrige les articles/contractions françaises
 function harmoniseArticles(phrase) {
@@ -338,15 +323,13 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
             if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
             // --- Correction ici : valider sur le bon index mission ---
-            getMissionIdxForStepIndex(stepIndex, function(missionIdx) {
-              db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-                const repartition = snapRep.val() || [];
-                sessionStorage.setItem('showValidationSuccess', '1');
-                sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
-                db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${missionIdx}/validated`).set(true)
-                  .then(() => fadeOutAndRedirect("template-partie.html"));
-              });
-            });
+db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+  const repartition = snapRep.val() || [];
+  sessionStorage.setItem('showValidationSuccess', '1');
+  sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
+  db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/validated`).set(true)
+    .then(() => fadeOutAndRedirect("template-partie.html"));
+});
 
             if (typeof onUploaded === "function") onUploaded();
           }
