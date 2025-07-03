@@ -37,6 +37,18 @@ function resetAffichageEtape() {
   if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
 
+// Correction principale : mapping entre étape (stepIndex) et index de mission attendu sur la carte
+function getMissionIdxFromStepIndex(stepIndex, callback) {
+  const salonCode = localStorage.getItem("salonCode");
+  db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => {
+    const mapping = snap.val() || [];
+    // On cherche l'index dans mapping dont la valeur est stepIndex
+    let missionIdx = mapping.indexOf(stepIndex);
+    if (missionIdx === -1) missionIdx = stepIndex; // fallback
+    callback(missionIdx);
+  });
+}
+
 // Corrige les articles/contractions françaises
 function harmoniseArticles(phrase) {
   phrase = phrase.replace(/\bde un ([aeiouyhAEIOUYH])/g, "d'un $1");
@@ -208,7 +220,6 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   if (typesUpload.includes(etape.type)) {
     let labelUpload = MISSION_UPLOAD_LABELS[etape.type](vars);
     afficherBlocUpload(etape.type, stepIndex, vars.nb || 1, () => {
-      // Masque le bouton quête suivante dès le succès
       document.getElementById('next-quest').style.display = 'none';
       let retourBtn = document.getElementById('retourJeuBtn');
       if (retourBtn) retourBtn.style.pointerEvents = 'none';
@@ -244,31 +255,12 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   window.waitAndShowEpreuveContent();
 }
 
-// Effet fondu simple puis redirection
 function fadeOutAndRedirect(nextUrl) {
   var main = document.getElementById('main-content');
   main.classList.add('fadeout');
   setTimeout(function() {
     window.location.href = nextUrl;
-  }, 850); // doit être cohérent avec la durée du CSS (800ms)
-}
-
-// --- Correction principale : utilise le bon index missionIdx pour la validation ---
-function getMissionIdx(stepIndex, callback) {
-  const salonCode = localStorage.getItem("salonCode");
-  db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => {
-    // Ce mapping est un tableau où chaque valeur est l'index de mission pour un point GPS
-    // Pour une étape donnée (stepIndex), on cherche l'index dans ce mapping qui vaut stepIndex
-    const mapping = snap.val() || [];
-    // Inverse mapping : stepIndex correspond à quelle mission ?
-    let missionIdx = -1;
-    if (mapping.includes(stepIndex)) {
-      missionIdx = mapping.indexOf(stepIndex);
-    } else {
-      missionIdx = stepIndex; // fallback
-    }
-    callback(missionIdx);
-  });
+  }, 850);
 }
 
 function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
@@ -289,7 +281,6 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
     label.style.marginBottom = "12px";
     label.innerHTML = getUploadIcon(type);
 
-    // Label court sous le logo
     let court = "";
     if (type === "photo") court = `Photo ${i+1}`;
     else if (type === "audio") court = `Audio ${i+1}`;
@@ -311,7 +302,6 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
     input.id = `upload-file-${type}-${i}`;
     label.appendChild(input);
 
-    // Affichage du nom du fichier sélectionné
     let filenameDiv = document.createElement("div");
     filenameDiv.id = `filename-upload-${type}-${i}`;
     filenameDiv.style = "font-size:0.97em;color:#e0c185;text-align:center;min-height:1.2em;max-width:180px;overflow-x:auto;margin-top:2px;";
@@ -343,8 +333,7 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
             let retourBtn = document.getElementById('retourJeuBtn');
             if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
-            // Correction : écrire validated sur le bon index mission
-            getMissionIdx(stepIndex, function(missionIdx) {
+            getMissionIdxFromStepIndex(stepIndex, function(missionIdx) {
               db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
                 const repartition = snapRep.val() || [];
                 sessionStorage.setItem('showValidationSuccess', '1');
@@ -383,7 +372,7 @@ function showToast(msg) {
 
 // === Mode test OU navigation normal ===
 if (typeof isTestMode !== 'undefined' && isTestMode) {
-  // ... (inchangé)
+  // ... inchangé ...
 } else {
   // --- Mode normal ---
   const salonCode = localStorage.getItem("salonCode");
@@ -477,8 +466,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             const elapsed = Math.round((now - sTime) / 1000);
             db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${step}`).set(elapsed);
           }
-          // Correction : valider la bonne mission (missionIdx)
-          getMissionIdx(step, function(missionIdx) {
+          getMissionIdxFromStepIndex(step, function(missionIdx) {
             db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
               .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
                 if (!error && committed) {
