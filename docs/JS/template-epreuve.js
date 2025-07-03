@@ -110,15 +110,15 @@ function getUploadIcon(type) {
   switch(type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm7-10h-3.17l-1.41-1.41A2 2 0 0 0 13.42 4h-2.83a2 2 0 0 0-1.41.59L8.17 7H5a2 2[...]
     case "video":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
     case "audio":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="9" y="4" width="6" height="10" rx="3" fill="#e0c185"/><rect x="11" y="14" width="2" height="4" rx="1" fill="#e0c185"/><path d="M8 19a4 4 0 0 0 8 0" stroke="#e0c185" stroke-width="2" fill="none"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="9" y="4" width="6" height="10" rx="3" fill="#e0c185"/><rect x="11" y="14" width="2" height="4" rx="1" fill="#e0c185"/[...]
     case "collecte_objet":
-      return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.2" fill="#e0c185" transform="rotate(45 23.5 23.5)"/><path d="M13 15 Q15 13 17 13" stroke="#e0c185" stroke-width="1.2" fill="none"/></svg>`;
+      return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx[...]
     case "fichier":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" height="3" rx="1" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="9" y="11" width="6" height="1" fill="#e0c185"/><rect x="9" y="13" width="6" height="1" fill="#e0c185"/></svg>`;
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" [...]
     default:
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="4" y="7" width="16" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/></svg>`;
   }
@@ -177,7 +177,6 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('metaphore-quete').innerHTML = metaphore ? `<em>${metaphore}</em>` : '';
 
   // 2. (SUPPRIMÉ : Bloc GPS harmonisé si présent)
-  // => AUCUN lien Google Maps, AUCUN bouton/boussole/“Voir le lieu”
 
   // 3. Consigne et sous-consignes harmonisées
   document.getElementById('bloc-mission').style.display = '';
@@ -209,11 +208,10 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   if (typesUpload.includes(etape.type)) {
     let labelUpload = MISSION_UPLOAD_LABELS[etape.type](vars);
     afficherBlocUpload(etape.type, stepIndex, vars.nb || 1, () => {
-      document.getElementById('next-quest').style.display = '';
-      document.getElementById('next-quest').disabled = false;
-      if (testMode) {
-        document.getElementById('next-quest').onclick = () => showToast("En mode test, ce bouton ne valide rien 😉");
-      }
+      // Masque le bouton quête suivante dès le succès
+      document.getElementById('next-quest').style.display = 'none';
+      let retourBtn = document.getElementById('retourJeuBtn');
+      if (retourBtn) retourBtn.style.pointerEvents = 'none';
     }, testMode, labelUpload, etape.params?.consignes);
     return;
   }
@@ -222,7 +220,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
     const blocAnswer = document.getElementById("bloc-answer");
     blocAnswer.style.display = '';
-    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input id="answer-field" type="text" autocomplete="off" /></div>`;
+    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label><input type="text" id="answer-field" autocomplete="off" style="margin-bottom:8px;" class="main-input"/><div id="answer-feedback" style="margin-top:6px;font-size:0.97em;color:#e0c185;"></div></div>`;
     const input = document.getElementById("answer-field");
     const nextBtn = document.getElementById("next-quest");
     nextBtn.style.display = '';
@@ -308,16 +306,25 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
           await ref.set(url);
           filenameDiv.textContent = file.name;
           uploadStates[i] = true;
-if (uploadStates.every(Boolean)) {
-  document.getElementById('next-quest').disabled = false;
-  document.getElementById('next-quest').classList.add('enabled');
-  if (typeof onUploaded === "function") onUploaded();
+          if (uploadStates.every(Boolean)) {
+            document.getElementById('next-quest').disabled = true;
+            document.getElementById('next-quest').classList.remove('enabled');
+            document.getElementById('next-quest').style.display = 'none';
+            let retourBtn = document.getElementById('retourJeuBtn');
+            if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
-  // Redirection automatique après 2 secondes
-  setTimeout(() => {
-    window.location.href = "template-partie.html";
-  }, 2000);
-}
+            // Préparer l'animation de validation pour template-partie
+            db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+              const repartition = snapRep.val() || [];
+              sessionStorage.setItem('showValidationSuccess', '1');
+              sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
+              setTimeout(() => {
+                window.location.href = "template-partie.html";
+              }, 2000);
+            });
+
+            if (typeof onUploaded === "function") onUploaded();
+          }
         } catch (e) {
           filenameDiv.textContent = "Erreur upload !";
         }
@@ -392,7 +399,6 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
   let scenarioCode = null;
   let repartitionLength = null;
 
-  // On attend l'authentification AVANT toute écriture
   firebase.auth().onAuthStateChanged(function (user) {
     if (!user) {
       firebase.auth().signInAnonymously();
@@ -402,7 +408,6 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
     db.ref(`parties/${salonCode}/parametres/scenarioCode`).once('value').then(snapCode => {
       scenarioCode = snapCode.val();
 
-      // Récupère aussi le mode (pour le texte/affichage)
       db.ref(`parties/${salonCode}/scenario/mode`).once('value').then(snapMode => {
         window.currentScenarioMode = snapMode.val() || "arthurien";
       });
@@ -415,7 +420,6 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
         const step = snapStep.val() || 0;
 
         if (scenarioCode === "parc_saint_nicolas") {
-          // Ancienne logique : étapes fixes dans scenario/scenario
           db.ref(`parties/${salonCode}/scenario/scenario/${step}`).once('value').then(snapEpreuve => {
             resetAffichageEtape();
             const etape = snapEpreuve.val();
@@ -428,12 +432,10 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             document.getElementById('next-quest').onclick = () => validerEtape(step);
           });
         } else {
-          // Nouvelle logique : étapes dynamiques dans scenarioJeu/repartition
           db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
             const repartition = snapRep.val() || [];
             repartitionLength = repartition.length;
 
-            // Si on a dépassé toutes les étapes, on affiche le point d'arrivée
             if (step >= repartition.length) {
               db.ref(`parties/${salonCode}/scenarioJeu/arrivalPoint`).once('value').then(snapArrival => {
                 const arrival = snapArrival.val();
@@ -446,7 +448,6 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
               return;
             }
 
-            // Sinon, on affiche l'étape courante
             const etape = repartition[step];
             resetAffichageEtape();
             if (!etape) {
@@ -455,19 +456,21 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             }
             document.getElementById('next-quest').style.display = 'none';
             afficherEtapeHarmonisee(etape.epreuve || etape, step, window.currentScenarioMode, false);
-            document.getElementById('next-quest').onclick = () => validerEtape(step);
+            document.getElementById('next-quest').onclick = () => validerEtape(step, repartition.length);
           });
         }
       });
     }
 
-    function validerEtape(step) {
+    function validerEtape(step, repartLength) {
       const nextBtn = document.getElementById('next-quest');
       nextBtn.disabled = true;
       nextBtn.classList.remove('enabled');
+      nextBtn.style.display = 'none';
+      let retourBtn = document.getElementById('retourJeuBtn');
+      if (retourBtn) retourBtn.style.pointerEvents = 'none';
       showToast("Validation en cours...");
       const now = Date.now();
-      // On utilise bien le numéro d'étape (step), pas "current"
       db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${step}/startTime`)
         .once('value', function (snap) {
           const sTime = snap.val();
@@ -479,11 +482,18 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
               if (!error && committed) {
                 showToast("Étape validée !");
-                setTimeout(() => { window.location.reload(); }, 800);
+                db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+                  const repartition = snapRep.val() || [];
+                  sessionStorage.setItem('showValidationSuccess', '1');
+                  sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (step+1)).toString());
+                  setTimeout(() => { window.location.href = "template-partie.html"; }, 1200);
+                });
               } else {
                 showToast("Erreur lors de la validation...");
                 nextBtn.disabled = false;
                 nextBtn.classList.add('enabled');
+                nextBtn.style.display = '';
+                if (retourBtn) retourBtn.style.pointerEvents = '';
               }
             });
         });
