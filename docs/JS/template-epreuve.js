@@ -37,14 +37,18 @@ function resetAffichageEtape() {
   if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
 }
 
-// Correction principale : mapping entre étape (stepIndex) et index de mission attendu sur la carte
-function getMissionIdxFromStepIndex(stepIndex, callback) {
+// --- UTILITAIRE : trouver l'index mission à valider pour une étape donnée ---
+function getMissionIdxForStepIndex(stepIndex, callback) {
   const salonCode = localStorage.getItem("salonCode");
   db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => {
     const mapping = snap.val() || [];
-    // On cherche l'index dans mapping dont la valeur est stepIndex
-    let missionIdx = mapping.indexOf(stepIndex);
-    if (missionIdx === -1) missionIdx = stepIndex; // fallback
+    // mapping[jetonIndex] === stepIndex
+    // On cherche l'index du mapping dont la valeur == stepIndex
+    let missionIdx = mapping.findIndex(idx => idx === stepIndex);
+    if (missionIdx === -1) {
+      // fallback: stepIndex (si jamais la mission n'est pas affectée à un jeton)
+      missionIdx = stepIndex;
+    }
     callback(missionIdx);
   });
 }
@@ -333,7 +337,8 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
             let retourBtn = document.getElementById('retourJeuBtn');
             if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
-            getMissionIdxFromStepIndex(stepIndex, function(missionIdx) {
+            // --- Correction ici : valider sur le bon index mission ---
+            getMissionIdxForStepIndex(stepIndex, function(missionIdx) {
               db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
                 const repartition = snapRep.val() || [];
                 sessionStorage.setItem('showValidationSuccess', '1');
@@ -466,7 +471,8 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             const elapsed = Math.round((now - sTime) / 1000);
             db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${step}`).set(elapsed);
           }
-          getMissionIdxFromStepIndex(step, function(missionIdx) {
+          // --- Correction ici : valider sur le bon index mission ---
+          getMissionIdxForStepIndex(step, function(missionIdx) {
             db.ref(`parties/${salonCode}/equipes/${equipeNum}/currentStep`)
               .transaction(curStep => (curStep || 0) + 1, function (error, committed, snapshot) {
                 if (!error && committed) {
