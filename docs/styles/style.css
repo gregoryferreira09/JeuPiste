@@ -1118,3 +1118,24 @@ body {
   display: block;
   margin: 0 auto;
 }
+
+#gpsLocateBtn {
+  background: #232832;
+  color: #e0c185;
+  border: 2px solid #e0c185;
+  border-radius: 50%;
+  padding: 8px 15px;
+  min-width: 36px;
+  min-height: 36px;
+  font-weight: bold;
+  box-shadow: 0 1px 4px #0002;
+  cursor: pointer;
+  margin-left: 6px;
+  margin-right: 6px;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+#gpsLocateBtn:hover {
+  background: #3d2b1f;
+  color: #ffeecb;
+  border-color: #ffeecb;
+}
