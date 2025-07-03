@@ -61,6 +61,19 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
       chargerEtapeDynamique();
     });
 
+    function resetAffichageEtape() {
+  ['titre-quete', 'metaphore-quete', 'mission-label', 'mission-text', 'upload-row', 'upload-feedback'].forEach(id => {
+    let el = document.getElementById(id);
+    if (el) el.innerHTML = "";
+  });
+  ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
+    let el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  let oldGpsBtn = document.getElementById('gps-upload-btn');
+  if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
+}
+    
     function chargerEtapeDynamique() {
       // On récupère tout ce qu'il faut pour gérer le point final
       Promise.all([
