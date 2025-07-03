@@ -125,7 +125,7 @@ window.creerPartie = async function(formData) {
   };
 
   // Génère un code salon unique pour la partie (toujours nouveau)
-const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+  const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
 
   // *** SUPPRESSION DE L'ANCIEN SALON SI EXISTANT ***
   await db.ref('parties/' + salonCode).remove();
@@ -162,6 +162,11 @@ const salonCode = Math.random().toString(36).substr(2, 6).toUpperCase();
 
   // Stocke le scénario dans la partie
   await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
+
+  // === Correction clé : crée une vraie répartition des missions ===
+  // Chaque mission/épreuve doit être une COPIE différente
+  const repartition = scenarioToUse.scenario.map(epreuve => ({ ...epreuve }));
+  await db.ref('parties/' + salonCode + '/scenarioJeu/repartition').set(repartition);
 
   // GÉNÉRATION DES PERSONNAGES (exemple simple)
   let persosObj = {};
