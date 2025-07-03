@@ -17,6 +17,337 @@ const storage = firebase.storage();
 const params = new URLSearchParams(window.location.search);
 const missionIdx = params.has("idx") ? parseInt(params.get("idx"), 10) : null;
 
+// ---------------------- Fonctions utilitaires d'affichage ----------------------
+
+function resetAffichageEtape() {
+  ['titre-quete', 'metaphore-quete', 'mission-label', 'mission-text', 'upload-row', 'upload-feedback'].forEach(id => {
+    let el = document.getElementById(id);
+    if (el) el.innerHTML = "";
+  });
+  ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
+    let el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  let oldGpsBtn = document.getElementById('gps-upload-btn');
+  if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
+}
+
+function fadeOutAndRedirect(nextUrl) {
+  var main = document.getElementById('main-content');
+  if (main) main.classList.add('fadeout');
+  setTimeout(function() {
+    window.location.href = nextUrl;
+  }, 850);
+}
+
+function harmoniseArticles(phrase) {
+  phrase = phrase.replace(/\bde un ([aeiouyhAEIOUYH])/g, "d'un $1");
+  phrase = phrase.replace(/\bde une ([aeiouyhAEIOUYH])/g, "d'une $1");
+  phrase = phrase.replace(/\bde un /g, "d'un ");
+  phrase = phrase.replace(/\bde une /g, "d'une ");
+  phrase = phrase.replace(/\bde des /g, "des ");
+  phrase = phrase.replace(/\bde le /g, "du ");
+  phrase = phrase.replace(/\bde les /g, "des ");
+  phrase = phrase.replace(/\bà le /g, "au ");
+  phrase = phrase.replace(/\bà les /g, "aux ");
+  phrase = phrase.replace(/  +/g, " ");
+  phrase = phrase.replace(/d'([A-Z])/, function (m, p1) { return "d'" + p1.toLowerCase(); });
+  return phrase;
+}
+
+function accordePluriel(phrase, nb) {
+  return phrase.replace(/([a-zA-ZéèêëàâîïôöùûüçÉÈÊËÀÂÎÏÔÖÙÛÜÇ]+)\[s\]/g, function(_, mot) {
+    return nb > 1 ? mot + "s" : mot;
+  });
+}
+
+function buildVars(etape) {
+  let vars = {...etape.params};
+  let nb = 1;
+  switch (etape.type) {
+    case "photo_inconnus":
+      nb = Number(etape.params?.nbPersonnes) || (Array.isArray(etape.params?.consignes) ? etape.params.consignes.length : 1) || 1;
+      vars.nb = nb;
+      vars.nbPersonnes = nb;
+      vars.critere = etape.params?.critere || "";
+      vars.objet = nb > 1 ? "inconnu(e)s" : "inconnu(e)";
+      vars.photo = nb > 1 ? "photos" : "photo";
+      break;
+    case "photo":
+      nb = Number(etape.params?.nbPhotos) || (Array.isArray(etape.params?.consignes) ? etape.params.consignes.length : 1) || 1;
+      vars.nb = nb;
+      vars.photo = nb > 1 ? "photos" : "photo";
+      vars.objet = (etape.params?.objet || etape.params?.consigne || "").toLowerCase();
+      vars.objets = nb > 1 ? (vars.objet + "s") : vars.objet;
+      break;
+    case "collecte_objet":
+      nb = Number(etape.params?.nbObjets) || (Array.isArray(etape.params?.consignes) ? etape.params.consignes.length : 1) || 1;
+      vars.nb = nb;
+      vars.objet = (etape.params?.objet || "").toLowerCase();
+      vars.objets = nb > 1 ? (vars.objet + "s") : vars.objet;
+      break;
+    case "audio":
+      nb = Number(etape.params?.nbAudio) || (Array.isArray(etape.params?.consignes) ? etape.params.consignes.length : 1) || 1;
+      vars.nb = nb;
+      vars.audio = nb > 1 ? "audios" : "audio";
+      break;
+    case "video":
+      nb = Number(etape.params?.nbVideo) || (Array.isArray(etape.params?.consignes) ? etape.params.consignes.length : 1) || 1;
+      vars.nb = nb;
+      vars.video = nb > 1 ? "vidéos" : "vidéo";
+      break;
+    case "fichier":
+      nb = Number(etape.params?.nbFichiers) || (Array.isArray(etape.params?.consignes) ? etape.params.consignes.length : 1) || 1;
+      vars.nb = nb;
+      vars.fichier = nb > 1 ? "fichiers" : "fichier";
+      break;
+    default:
+      break;
+  }
+  return vars;
+}
+
+// Génération des consignes harmonisées pour une mission
+function genererPhraseMission(type, mode, vars = {}) {
+  // Si tu as un catalogue, adapte !
+  if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
+  let textes = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
+  if (!Array.isArray(textes)) {
+    if (typeof textes === "object" && textes !== null) {
+      textes = Object.values(textes).flat();
+    } else if (typeof textes === "string") {
+      textes = [textes];
+    } else {
+      textes = [];
+    }
+  }
+  let nb = vars.nb || 1;
+  let key = nb > 1 ? '[objets]' : '[objet]';
+  let textesFiltres = textes.filter(t => t.includes(key));
+  if (!textesFiltres.length) textesFiltres = textes;
+  let phrase = textesFiltres[Math.floor(Math.random() * textesFiltres.length)];
+  phrase = phrase.replace(/\[([a-zA-Z0-9_]+)\]/g, (match, k) => (vars[k] !== undefined ? vars[k] : match));
+  phrase = harmoniseArticles(phrase);
+  phrase = accordePluriel(phrase, nb);
+  if (nb <= 1) {
+    phrase = phrase.replace(/\bces images\b/gi, "cette image");
+    phrase = phrase.replace(/\bCes images\b/gi, "Cette image");
+    phrase = phrase.replace(/\bces preuves\b/gi, "cette preuve");
+    phrase = phrase.replace(/\bCes preuves\b/gi, "Cette preuve");
+  } else {
+    phrase = phrase.replace(/\bcette image\b/gi, "ces images");
+    phrase = phrase.replace(/\bCette image\b/gi, "Ces images");
+    phrase = phrase.replace(/\bcette preuve\b/gi, "ces preuves");
+    phrase = phrase.replace(/\bCette preuve\b/gi, "Ces preuves");
+  }
+  return phrase;
+}
+
+function getUploadIcon(type) {
+  switch(type) {
+    case "photo":
+    case "photo_inconnus":
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5..."/></svg>`;
+    case "video":
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
+    case "audio":
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" rx="1"/></svg>`;
+    case "collecte_objet":
+      return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx..."/></svg>`;
+    case "fichier":
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" ..."/></svg>`;
+    default:
+      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><rect x="4" y="7" width="16" height="11" rx="2"/></svg>`;
+  }
+}
+
+const MISSION_UPLOAD_LABELS = {
+  photo: (vars) => (vars.nb > 1 ? "Photos à envoyer" : "Photo à envoyer"),
+  photo_inconnus: (vars) => (vars.nb > 1 ? "Photos à envoyer" : "Photo à envoyer"),
+  audio: (vars) => (vars.nb > 1 ? "Audios à envoyer" : "Audio à envoyer"),
+  video: (vars) => (vars.nb > 1 ? "Vidéos à envoyer" : "Vidéo à envoyer"),
+  collecte_objet: (vars) => (vars.nb > 1 ? "Photos des objets à envoyer" : "Photo de l’objet à envoyer"),
+  fichier: (vars) => (vars.nb > 1 ? "Fichiers à envoyer" : "Fichier à envoyer"),
+};
+
+// Affichage harmonisé d'une étape
+function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
+  resetAffichageEtape();
+
+  // 1. Titre et métaphore
+  let titre = etape.titre || etape.nom || "";
+  let metaphore = etape.metaphore || "";
+  if ((!titre || titre === etape.type) || !metaphore) {
+    if (typeof getRandomAtmosphere === "function") {
+      const random = getRandomAtmosphere(etape.type, mode || "arthurien");
+      if (!titre || titre === etape.type) titre = random.titre;
+      if (!metaphore) metaphore = random.phrase;
+    }
+    if (!titre) titre = "Défi à relever";
+    if (!metaphore) metaphore = "Prépare-toi à l'aventure !";
+  }
+  document.getElementById('titre-quete').textContent = titre || "";
+  document.getElementById('metaphore-quete').innerHTML = metaphore ? `<em>${metaphore}</em>` : '';
+
+  // 3. Consigne et sous-consignes harmonisées
+  document.getElementById('bloc-mission').style.display = '';
+  document.getElementById('mission-label').textContent = "Consigne";
+  let vars = buildVars(etape);
+
+  let phraseMission = genererPhraseMission(etape.type, mode || "arthurien", vars)
+    || etape.params?.consigne
+    || etape.params?.objectif
+    || etape.params?.enigme
+    || etape.params?.question
+    || etape.description
+    || "[Aucune consigne définie]";
+  phraseMission = harmoniseArticles(phraseMission);
+  phraseMission = accordePluriel(phraseMission, vars.nb || 1);
+
+  // Sous-consignes : si consignes est un tableau non vide, on les affiche en liste
+  let sousConsignesHtml = "";
+  if (Array.isArray(etape.params?.consignes) && etape.params.consignes.length > 0) {
+    sousConsignesHtml = `<ul style="margin: 8px 0 0 0; padding-left: 24px;">` +
+      etape.params.consignes.map(c => c ? `<li>${accordePluriel(harmoniseArticles(c), vars.nb || 1)}</li>` : '').join('') +
+      `</ul>`;
+  }
+
+  document.getElementById('mission-text').innerHTML = phraseMission + sousConsignesHtml;
+
+  // 4. Bloc upload harmonisé multi-upload pour tous les types
+  const typesUpload = Object.keys(MISSION_UPLOAD_LABELS);
+  if (typesUpload.includes(etape.type)) {
+    let labelUpload = MISSION_UPLOAD_LABELS[etape.type](vars);
+    afficherBlocUpload(etape.type, stepIndex, vars.nb || 1, () => {
+      document.getElementById('next-quest').style.display = 'none';
+      let retourBtn = document.getElementById('retourJeuBtn');
+      if (retourBtn) retourBtn.style.pointerEvents = 'none';
+    }, testMode, labelUpload, etape.params?.consignes);
+    window.waitAndShowEpreuveContent && window.waitAndShowEpreuveContent();
+    return;
+  }
+
+  // 5. Bloc réponse/énigme si besoin
+  if (["mot_de_passe", "anagramme", "observation", "chasse_tresor", "signature_inconnu"].includes(etape.type)) {
+    const blocAnswer = document.getElementById("bloc-answer");
+    blocAnswer.style.display = '';
+    blocAnswer.innerHTML = `<div class="input-answer-wrapper"><label for="answer-field" class="input-answer-label">${etape.type === "mot_de_passe" ? "Entrez le mot de passe :" : "Votre réponse :"}</label>
+      <input id="answer-field" type="text" autocomplete="off" spellcheck="false" />
+    </div>`;
+    const input = document.getElementById("answer-field");
+    const nextBtn = document.getElementById("next-quest");
+    nextBtn.style.display = '';
+    nextBtn.disabled = true;
+    input.oninput = function () {
+      if (this.value.trim().length > 2) {
+        nextBtn.disabled = false;
+        nextBtn.classList.add('enabled');
+      } else {
+        nextBtn.disabled = true;
+        nextBtn.classList.remove('enabled');
+      }
+    };
+    window.waitAndShowEpreuveContent && window.waitAndShowEpreuveContent();
+    return;
+  }
+
+  document.getElementById('next-quest').style.display = '';
+  document.getElementById('next-quest').disabled = false;
+  window.waitAndShowEpreuveContent && window.waitAndShowEpreuveContent();
+}
+
+function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
+  const bloc = document.getElementById('bloc-upload');
+  const row = document.getElementById('upload-row');
+  row.innerHTML = '';
+  bloc.style.display = '';
+
+  let uploadStates = Array.from({length: nb}, () => false);
+
+  for (let i = 0; i < nb; i++) {
+    let label = document.createElement('label');
+    label.style.display = "inline-flex";
+    label.style.flexDirection = "column";
+    label.style.alignItems = "center";
+    label.style.justifyContent = "flex-start";
+    label.style.marginRight = "18px";
+    label.style.marginBottom = "12px";
+    label.innerHTML = getUploadIcon(type);
+
+    let court = "";
+    if (type === "photo") court = `Photo ${i+1}`;
+    else if (type === "audio") court = `Audio ${i+1}`;
+    else if (type === "video") court = `Vidéo ${i+1}`;
+    else if (type === "collecte_objet") court = `Objet ${i+1}`;
+    else if (type === "fichier") court = `Fichier ${i+1}`;
+    else court = labelUpload;
+
+    label.innerHTML += `<div style="display:block;text-align:center;font-size:0.98em;margin-top:4px;">${court}</div>`;
+
+    let input = document.createElement('input');
+    input.type = "file";
+    input.className = "visually-hidden";
+    input.accept =
+      type === "audio" ? "audio/*" :
+      type === "photo" || type === "photo_inconnus" || type === "collecte_objet" ? "image/*" :
+      type === "video" ? "video/*" :
+      "*/*";
+    input.id = `upload-file-${type}-${i}`;
+    label.appendChild(input);
+
+    let filenameDiv = document.createElement("div");
+    filenameDiv.id = `filename-upload-${type}-${i}`;
+    filenameDiv.style = "font-size:0.97em;color:#e0c185;text-align:center;min-height:1.2em;max-width:180px;overflow-x:auto;margin-top:2px;";
+    label.appendChild(filenameDiv);
+
+    row.appendChild(label);
+
+    if (testMode) {
+      input.disabled = true;
+      filenameDiv.textContent = "Upload désactivé en mode test.";
+    } else {
+      input.onchange = async function () {
+        if (!this.files || !this.files[0]) return;
+        const salonCode = localStorage.getItem("salonCode");
+        const equipeNum = localStorage.getItem("equipeNum");
+        const file = this.files[0];
+        const storagePath = `parties/${salonCode}/equipes/${equipeNum}/etape${stepIndex}/${type}${i}_${Date.now()}_${file.name.replace(/\s+/g, '')}`;
+        try {
+          let snapshot = await storage.ref(storagePath).put(file);
+          let url = await snapshot.ref.getDownloadURL();
+          let ref = db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/${type}${i}`);
+          await ref.set(url);
+          filenameDiv.textContent = file.name;
+          uploadStates[i] = true;
+          if (uploadStates.every(Boolean)) {
+            document.getElementById('next-quest').disabled = true;
+            document.getElementById('next-quest').classList.remove('enabled');
+            document.getElementById('next-quest').style.display = 'none';
+            let retourBtn = document.getElementById('retourJeuBtn');
+            if (retourBtn) retourBtn.style.pointerEvents = 'none';
+
+            db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+              const repartition = snapRep.val() || [];
+              sessionStorage.setItem('showValidationSuccess', '1');
+              sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
+              db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${stepIndex}/validated`).set(true)
+                .then(() => fadeOutAndRedirect("template-partie.html"));
+            });
+
+            if (typeof onUploaded === "function") onUploaded();
+          }
+        } catch (e) {
+          filenameDiv.textContent = "Erreur upload !";
+        }
+      };
+    }
+  }
+  document.getElementById('next-quest').disabled = true;
+  document.getElementById('next-quest').classList.remove('enabled');
+  if (testMode && typeof onUploaded === "function") onUploaded();
+}
+
+// ---------------------- Toast ----------------------
 function showToast(msg) {
   let toast = document.getElementById('toast-message');
   if (!toast) {
@@ -31,9 +362,10 @@ function showToast(msg) {
   setTimeout(() => { toast.classList.remove('visible'); }, 2200);
 }
 
-// === Mode test OU navigation normal ===
+// ---------------------- Logique principale ----------------------
+
 if (typeof isTestMode !== 'undefined' && isTestMode) {
-  // ... inchangé ...
+  // ... inchangé pour le mode test ...
 } else {
   // --- Mode normal ---
   const salonCode = localStorage.getItem("salonCode");
@@ -43,7 +375,6 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
   }
 
   let scenarioCode = null;
-  let repartitionLength = null;
 
   firebase.auth().onAuthStateChanged(function (user) {
     if (!user) {
@@ -61,29 +392,6 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
       chargerEtapeDynamique();
     });
 
-    function resetAffichageEtape() {
-  ['titre-quete', 'metaphore-quete', 'mission-label', 'mission-text', 'upload-row', 'upload-feedback'].forEach(id => {
-    let el = document.getElementById(id);
-    if (el) el.innerHTML = "";
-  });
-  ['bloc-gps','bloc-mission','bloc-upload','bloc-answer','bloc-indice','bloc-chrono','bloc-pendu'].forEach(id => {
-    let el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-  let oldGpsBtn = document.getElementById('gps-upload-btn');
-  if (oldGpsBtn && oldGpsBtn.parentNode) oldGpsBtn.parentNode.removeChild(oldGpsBtn);
-}
-
-    function fadeOutAndRedirect(nextUrl) {
-  var main = document.getElementById('main-content');
-  if (main) main.classList.add('fadeout');
-  setTimeout(function() {
-    window.location.href = nextUrl;
-  }, 850);
-}
-
-// ... (mets ici toutes tes autres fonctions utilitaires, comme afficherEtapeHarmonisee, etc.) ...
-    
     function chargerEtapeDynamique() {
       // On récupère tout ce qu'il faut pour gérer le point final
       Promise.all([
@@ -184,7 +492,3 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
     }
   });
 }
-
-// === Le reste du code (fonctions utilitaires d'affichage, génération des blocs, etc.) reste inchangé ===
-// (Tu peux remettre les fonctions resetAffichageEtape, afficherEtapeHarmonisee, fadeOutAndRedirect, etc.)
-// ... (tout ce qui est déjà dans ton fichier original en dehors de la logique de navigation/étape principale) ...
