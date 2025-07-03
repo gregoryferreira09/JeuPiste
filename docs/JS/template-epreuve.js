@@ -239,6 +239,10 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
 
   document.getElementById('next-quest').style.display = '';
   document.getElementById('next-quest').disabled = false;
+  // Affiche le contenu principal et masque le loader
+  document.getElementById('main-content').style.display = 'flex';
+  var loader = document.getElementById('epreuve-loader');
+  if (loader) loader.style.display = 'none';
 }
 
 function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
