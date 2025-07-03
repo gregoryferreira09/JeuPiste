@@ -317,14 +317,12 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
             if (retourBtn) retourBtn.style.pointerEvents = 'none';
 
             // Préparer l'animation de validation pour template-partie
-            db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
-              const repartition = snapRep.val() || [];
-              sessionStorage.setItem('showValidationSuccess', '1');
-              sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
-              setTimeout(() => {
-                window.location.href = "template-partie.html";
-              }, 2000);
-            });
+db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value').then(snapRep => {
+  const repartition = snapRep.val() || [];
+  sessionStorage.setItem('showValidationSuccess', '1');
+  sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartition.length - (stepIndex+1)).toString());
+  startBurnTransitionAndRedirect("template-partie.html");
+});
 
             if (typeof onUploaded === "function") onUploaded();
           }
