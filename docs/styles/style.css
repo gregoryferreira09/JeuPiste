@@ -1106,11 +1106,8 @@ body {
   #btn-retour { font-size:1.3em; left:2px; top:2px; padding:3px 6px 3px 3px;}
 }
 
-#burn-transition {
-  animation: burnFade 1.2s forwards;
-}
-@keyframes burnFade {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  100% { opacity: 1; }
+.fadeout {
+  transition: opacity 0.8s ease;
+  opacity: 0 !important;
+  pointer-events: none;
 }
