@@ -362,21 +362,27 @@
     // Ajout SVG crâne & os croisés
     function getSkullSVG() {
       return `
-        <svg class="svg-skull" width="30" height="30" viewBox="0 0 32 32" fill="none">
-          <g>
-            <circle cx="16" cy="16" r="13" fill="#fff" opacity="0.12"/>
-            <g>
-              <ellipse cx="16" cy="15" rx="8" ry="7" fill="#fff"/>
-              <ellipse cx="13" cy="14" rx="1.3" ry="2" fill="#231d1d"/>
-              <ellipse cx="19" cy="14" rx="1.3" ry="2" fill="#231d1d"/>
-              <ellipse cx="16" cy="18.2" rx="2" ry="1.2" fill="#231d1d"/>
-            </g>
-            <g>
-              <rect x="6" y="24" width="20" height="2.4" rx="1.2" fill="#fff" transform="rotate(30 16 25.2)"/>
-              <rect x="6" y="24" width="20" height="2.4" rx="1.2" fill="#fff" transform="rotate(-30 16 25.2)"/>
-            </g>
-          </g>
-        </svg>
+<svg class="svg-skull" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <g>
+    <!-- Os croisés -->
+    <g stroke="#dfdfdf" stroke-width="2.8" stroke-linecap="round">
+      <line x1="7" y1="25" x2="25" y2="7"/>
+      <line x1="25" y1="25" x2="7" y2="7"/>
+    </g>
+    <!-- Crâne -->
+    <ellipse cx="16" cy="16" rx="9" ry="8.5" fill="#f9f9f9" stroke="#111" stroke-width="2"/>
+    <!-- Menton -->
+    <ellipse cx="16" cy="23" rx="5" ry="3.5" fill="#f9f9f9" stroke="#111" stroke-width="2"/>
+    <!-- Nez -->
+    <ellipse cx="16" cy="18" rx="1.2" ry="1.5" fill="#222"/>
+    <!-- Yeux (asymétriques) -->
+    <ellipse cx="13" cy="15" rx="1.7" ry="2.4" fill="#111"/>
+    <ellipse cx="19.5" cy="15" rx="1.1" ry="1.8" fill="#111"/>
+    <!-- Dents (traits) -->
+    <rect x="14.8" y="23.5" width="0.8" height="1.4" rx="0.3" fill="#ccc"/>
+    <rect x="16.4" y="23.5" width="0.8" height="1.4" rx="0.3" fill="#ccc"/>
+  </g>
+</svg>
       `;
     }
 
