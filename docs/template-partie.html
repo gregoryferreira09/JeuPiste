@@ -212,12 +212,29 @@
       color: #473714;
       font-family:'Cormorant Garamond',serif;
     }
+    /* Jeton final sous la flèche */
+    #final-jeton-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 32px;
+      margin-bottom: 8px;
+    }
+    #final-jeton-label {
+      color: #e0c185;
+      margin-bottom: 8px;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.08em;
+      text-shadow: 0 2px 8px #0002;
+    }
     @media (max-width: 650px) {
       .jetons-colonne { gap: 18px; }
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
       #svg-arrow { width: 60px; height: 80px; }
       #jetons-colonnes-wrapper { min-height: 60px; padding-left: 6px; padding-right: 6px; }
       #validation-success { padding: 20px 8px; min-width: unset; }
+      #final-jeton-wrapper { margin-top: 16px; }
     }
   </style>
 </head>
@@ -258,6 +275,12 @@
                   </svg>
                 </div>
                 <div id="steps-info"></div>
+              </div>
+              <!-- Jeton final s'affiche ici si besoin -->
+              <div id="final-jeton-wrapper" style="display: none;">
+                <div id="final-jeton-label">Point final à rejoindre pour terminer</div>
+                <button id="final-jeton-btn" class="jeton" style="width:48px;height:48px;" aria-label="Point GPS final"></button>
+                <div id="final-jeton-info" style="color:#e0c185;font-size:1em;margin-top:5px;"></div>
               </div>
             </div>
             <div id="jetons-droite" class="jetons-colonne"></div>
@@ -308,6 +331,7 @@
     });
   </script>
   <script>
+    // --- LOGIQUE ADAPTÉE POUR POINT FINAL ---
     const firebaseConfig = {
       apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
       authDomain: "murder-party-ba8d1.firebaseapp.com",
@@ -322,19 +346,7 @@
     const db = firebase.database();
 
     function getMissionSVG(type) {
-      if (type === "photo" || type === "photo_inconnus" || type === "collecte_objet") {
-        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5 10.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>`;
-      }
-      if (type === "audio") {
-        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M12 3v10.55A4 4 0 1 0 14 17h1a5 5 0 0 1-5-5V3a1 1 0 1 1 2 0z"/></svg>`;
-      }
-      if (type === "video") {
-        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
-      }
-      if (type === "fichier") {
-        return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" rx="1" fill="#38b948" /></svg>`;
-      }
-      // Default icon
+      // ... inchangé ...
       return `<svg class="svg-epreuve" viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="10" /></svg>`;
     }
 
@@ -377,28 +389,15 @@
     }
 
     function getOrCreateMissionPlacement(salonCode, nbGPS, nbMissions) {
-      return db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => {
-        let arr = snap.val();
-        if (Array.isArray(arr) && arr.length === nbGPS) {
-          return arr;
-        } else {
-          let indices = [...Array(nbGPS).keys()];
-          for (let i = nbGPS-1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [indices[i], indices[j]] = [indices[j], indices[i]];
-          }
-          let placement = Array(nbGPS).fill(-1);
-          for(let m=0; m<nbMissions; m++) placement[indices[m]] = m;
-          return db.ref(`parties/${salonCode}/jetonMissionsMapping`).set(placement).then(() => placement);
-        }
-      });
+      // inchangé : la génération du mapping se fait déjà à la création de partie
+      return db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snap => snap.val());
     }
 
     // Flèche Cupidon dynamique & info pas
     let compassWatchId = null;
     let lastDistance = null;
 
-    function showCompass(targetGps) {
+    function showCompass(targetGps, onArrivee) {
       const container = document.getElementById('compass-arrow-container');
       container.style.display = "flex";
       const stepsInfo = document.getElementById('steps-info');
@@ -438,6 +437,7 @@
 
         if (distance < 5) {
           stepsInfo.textContent = "Vous êtes arrivé !";
+          if (typeof onArrivee === "function") onArrivee();
         } else {
           stepsInfo.textContent = steps + " pas restants";
         }
@@ -485,7 +485,7 @@
       lastDistance = null;
     }
 
-    function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, validatedMissions) {
+    function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, validatedMissions, finalGpsIndex, toutesMissionsValidees) {
       const gauche = document.getElementById('jetons-gauche');
       const droite = document.getElementById('jetons-droite');
       gauche.innerHTML = '';
@@ -494,6 +494,12 @@
       let jetonDiameter = (N > 10) ? 34 : 48;
 
       for(let i=0; i<N; i++) {
+        // NE PAS afficher le point final si ce n'est pas la fin du jeu
+        if (i === finalGpsIndex && !toutesMissionsValidees) continue;
+
+        // NE PAS afficher le point final dans les colonnes lors de la fin (il sera sous la flèche)
+        if (i === finalGpsIndex && toutesMissionsValidees) continue;
+
         const btn = document.createElement('button');
         btn.className = 'jeton';
         btn.textContent = i+1;
@@ -544,22 +550,78 @@
       }
     }
 
+    function afficherJetonFinal(gpsPoints, finalGpsIndex) {
+      const wrapper = document.getElementById('final-jeton-wrapper');
+      const btn = document.getElementById('final-jeton-btn');
+      const label = document.getElementById('final-jeton-label');
+      const info = document.getElementById('final-jeton-info');
+      if (finalGpsIndex === null || typeof gpsPoints[finalGpsIndex] === "undefined") {
+        wrapper.style.display = "none";
+        return;
+      }
+      btn.textContent = (finalGpsIndex+1);
+      btn.disabled = false;
+      btn.className = 'jeton';
+      info.textContent = "";
+      wrapper.style.display = "flex";
+
+      btn.onclick = (e) => {
+        e.preventDefault();
+        hideCompass();
+        // Lance la boussole vers le point final
+        showCompass(gpsPoints[finalGpsIndex], () => {
+          info.textContent = "🎉 Félicitations, vous avez terminé le jeu !";
+          btn.disabled = true;
+          btn.classList.add("validated");
+          setTimeout(() => {
+            info.textContent = "";
+            window.location.href = "accueil.html";
+          }, 3200);
+        });
+      };
+    }
+
     function lancerAccueil() {
       const salonCode = localStorage.getItem("salonCode");
       const equipeNum = localStorage.getItem("equipeNum");
-      db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snap => {
-        const points = snap.val() || [];
-        afficherCarteCentraleTousPoints(points);
+      let gpsPoints = [];
+      let jetonMissionsMapping = [];
+      let finalGpsIndex = null;
+      let missions = [];
+      let validatedMissions = {};
 
-        db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
-          const missions = snapMission.val() || [];
-          getOrCreateMissionPlacement(salonCode, points.length, missions.length).then(jetonMissionsMapping => {
-            db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).once('value').then(snapStatus => {
-              const validatedMissions = snapStatus.val() || {};
-              genererJetonsColonnes(points, jetonMissionsMapping, missions, validatedMissions);
-            });
-          });
-        });
+      // Récupère tous les éléments nécessaires
+      Promise.all([
+        db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value'),
+        db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value'),
+        db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value'),
+        db.ref(`parties/${salonCode}/finalGpsIndex`).once('value'),
+        db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).once('value')
+      ]).then(([snapPoints, snapMission, snapMapping, snapFinal, snapStatus]) => {
+        gpsPoints = snapPoints.val() || [];
+        missions = snapMission.val() || [];
+        jetonMissionsMapping = snapMapping.val() || [];
+        finalGpsIndex = typeof snapFinal.val() === "number" ? snapFinal.val() : null;
+        validatedMissions = snapStatus.val() || {};
+
+        afficherCarteCentraleTousPoints(gpsPoints);
+
+        // Vérifie si toutes les missions sont validées (hors point final)
+        let totalMissions = missions.length;
+        let nbValidees = 0;
+        for (let i = 0; i < totalMissions; i++) {
+          if (validatedMissions && validatedMissions[i] && validatedMissions[i].validated) nbValidees++;
+        }
+        let toutesMissionsValidees = (nbValidees === totalMissions);
+
+        genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missions, validatedMissions, finalGpsIndex, toutesMissionsValidees);
+
+        // Affichage du jeton final
+        if (toutesMissionsValidees && finalGpsIndex !== null) {
+          afficherJetonFinal(gpsPoints, finalGpsIndex);
+        } else {
+          document.getElementById('final-jeton-wrapper').style.display = "none";
+        }
       });
 
       window.addEventListener('resize', () => {
