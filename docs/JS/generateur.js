@@ -382,9 +382,28 @@ function initGpsBandeau() {
   }
   loadLeafletAndInit();
 
-  function initMap() {
-    if (gpsMap) { gpsMap.remove(); gpsMap = null; }
+function initMap() {
+  if (gpsMap) { gpsMap.remove(); gpsMap = null; }
+
+  // On tente la géolocalisation
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      gpsMap = L.map(uniqueId).setView([lat, lng], 16);
+      finishMapInit();
+    }, function() {
+      // Fallback Angers si refusé ou erreur
+      gpsMap = L.map(uniqueId).setView([47.478419, -0.563166], 13);
+      finishMapInit();
+    }, { enableHighAccuracy: true });
+  } else {
+    // Fallback si pas de géoloc du tout
     gpsMap = L.map(uniqueId).setView([47.478419, -0.563166], 13);
+    finishMapInit();
+  }
+
+  function finishMapInit() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(gpsMap);
     gpsMarkersLayer = L.layerGroup().addTo(gpsMap);
     gpsPoints.forEach((pt, idx) => addMarker(pt, idx));
@@ -396,6 +415,8 @@ function initGpsBandeau() {
     });
     refreshGpsList();
   }
+}
+  
   function addMarker(pt, idx) {
     let marker = L.marker([pt.lat, pt.lng], { draggable: false, title: `Point ${idx + 1}` });
     marker.addTo(gpsMarkersLayer);
