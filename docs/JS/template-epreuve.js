@@ -213,6 +213,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
       let retourBtn = document.getElementById('retourJeuBtn');
       if (retourBtn) retourBtn.style.pointerEvents = 'none';
     }, testMode, labelUpload, etape.params?.consignes);
+    window.waitAndShowEpreuveContent();
     return;
   }
 
@@ -234,15 +235,13 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
         nextBtn.classList.remove('enabled');
       }
     };
+    window.waitAndShowEpreuveContent();
     return;
   }
 
   document.getElementById('next-quest').style.display = '';
   document.getElementById('next-quest').disabled = false;
-  // Affiche le contenu principal et masque le loader
-  document.getElementById('main-content').style.display = 'flex';
-  var loader = document.getElementById('epreuve-loader');
-  if (loader) loader.style.display = 'none';
+  window.waitAndShowEpreuveContent();
 }
 
 function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
@@ -366,6 +365,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
       if (!etape) {
         document.getElementById('main-content').innerHTML =
           "<div style='color:#2a4;font-weight:bold;'>Fin du test du scénario !</div>";
+        window.waitAndShowEpreuveContent();
         return;
       }
       document.getElementById('next-quest').style.display = 'none';
@@ -391,6 +391,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
   } else {
     document.getElementById('main-content').innerHTML =
       "<div style='color:#c00;font-weight:bold;'>Aucun scénario à tester.<br>Retourne dans le générateur et clique sur 'Tester le scénario'.</div>";
+    window.waitAndShowEpreuveContent();
   }
 } else {
   // --- Mode normal ---
@@ -429,6 +430,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             const etape = snapEpreuve.val();
             if (!etape) {
               document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
+              window.waitAndShowEpreuveContent();
               return;
             }
             document.getElementById('next-quest').style.display = 'none';
@@ -448,6 +450,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
                   (arrival
                     ? `<div style="margin-top:16px;font-size:1.15em;"><b>Point d'arrivée :</b><br>${arrival.gps ? `GPS : ${arrival.gps}` : ''}</div>`
                     : '');
+                window.waitAndShowEpreuveContent();
               });
               return;
             }
@@ -456,6 +459,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             resetAffichageEtape();
             if (!etape) {
               document.getElementById('main-content').innerHTML = "Bravo, partie terminée !";
+              window.waitAndShowEpreuveContent();
               return;
             }
             document.getElementById('next-quest').style.display = 'none';
