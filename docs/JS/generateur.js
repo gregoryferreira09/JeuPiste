@@ -423,23 +423,24 @@ function initMap() {
   }
 }
   
-  function addMarker(pt, idx) {
-const redIcon = L.icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-  iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-    
-let marker = L.marker([pt.lat, pt.lng], { icon: redIcon, draggable: false, title: `Point ${idx + 1}` });
-    marker.addTo(gpsMarkersLayer);
-    marker.bindPopup(`<b>Point ${idx + 1}</b><br>${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
-      <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>`);
-    gpsMarkers[idx] = marker;
-  }
+function addMarker(pt, idx) {
+  const redIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+    iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+  let marker = L.marker([pt.lat, pt.lng], { icon: redIcon, draggable: false, title: `Point ${idx + 1}` });
+  marker.addTo(gpsMarkersLayer);
+  marker.bindPopup(`<b>Point ${idx + 1}</b><br>${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
+    <br><button type="button" onclick="window._deleteGpsPoint_${uniqueId}(${idx});">Supprimer</button>`);
+  gpsMarkers[idx] = marker;
+}
+window.addMarker = addMarker;
+  
   function removeLastMarker() {
     if (gpsMarkers.length > 0) {
       gpsMarkersLayer.removeLayer(gpsMarkers.pop());
