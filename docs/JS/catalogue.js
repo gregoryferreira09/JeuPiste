@@ -42,16 +42,17 @@ const QUESTS_CATALOGUE = [
   },
 
   // === AUDIO ===
-  {
-    id: "audio",
-    nom: "Enregistrement audio",
-    description: "Capturer un son, un message, une chanson, un cri de guerre, une imitation, etc.",
-    parametres: [
-      { key: "consigne", type: "text", label: "Consigne audio", placeholder: "ex : imite le cri du hibou" }
-    ],
-    combinable: ["chrono"],
-    preview: "audio"
-  },
+{
+  id: "audio",
+  nom: "Enregistrement audio",
+  description: "Capturer un ou plusieurs sons, messages, chansons, cris de guerre, imitations, etc.",
+  parametres: [
+    { key: "nbAudio", type: "number", label: "Nombre d'audios", default: 1, min: 1, max: 10 }
+    // plus de champ "consigne" ici, c'est géré dynamiquement comme photo/duel
+  ],
+  combinable: ["chrono"],
+  preview: "audio"
+},
 
   // === GPS (1 ou plusieurs points) ===
   {
