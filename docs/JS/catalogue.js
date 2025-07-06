@@ -105,7 +105,7 @@ const QUESTS_CATALOGUE = [
   ],
   combinable: [],
   preview: "duel"
-}
+},
   
   {
     id: "pendu",
