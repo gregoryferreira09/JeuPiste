@@ -160,14 +160,21 @@
     });
 
     // Fonction pour afficher le pseudo
-    function afficherPseudoAccueil() {
-      var pseudo = localStorage.getItem("pseudo");
-      if (pseudo && pseudo.trim().length > 0 && pseudo !== "Anonyme" && pseudo !== "invité") {
-        document.getElementById("pseudoAffiche").textContent = pseudo;
-      } else {
-        document.getElementById("pseudoAffiche").textContent = "invité";
-      }
-    }
+function afficherPseudoAccueil() {
+  var pseudo = localStorage.getItem("pseudo");
+  var el = document.getElementById("pseudoAffiche");
+  // Liste de pseudos considérés comme anonymes
+  if (
+    !pseudo || 
+    pseudo.trim().length < 1 ||
+    pseudo.trim().toLowerCase() === "anonyme" ||
+    pseudo.trim().toLowerCase() === "invité"
+  ) {
+    el.textContent = ""; // rien du tout
+  } else {
+    el.textContent = pseudo;
+  }
+}
 
     // Affichage initial du pseudo
     document.addEventListener("DOMContentLoaded", afficherPseudoAccueil);
