@@ -649,15 +649,15 @@ updateRandomUI();
     row.style.gap = '8px';
     row.style.marginBottom = '6px';
 
-    let label = document.createElement('span');
-    if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
-    else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
-    else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
-    else label.textContent = `Consigne ${i+1}:`;
-    label.style.minWidth = "130px"; // ou plus selon la longueur max attendue
-    label.style.display = "inline-block";
-    label.style.marginRight = "10px"; // espace confortable entre label et select
-    row.appendChild(label);
+let label = document.createElement('span');
+if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
+else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
+else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
+else label.textContent = `Consigne ${i+1}:`;
+label.style.minWidth = "130px";
+label.style.display = "inline-block";
+label.style.marginRight = "10px";
+row.appendChild(label);
 
     let select = document.createElement('select');
     let optEmpty = document.createElement('option');
