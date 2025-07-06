@@ -920,3 +920,19 @@ function resetMapContainer() {
     }
   }
 }
+
+const gpsClearBtn = document.getElementById('gpsClearBtn');
+if (gpsClearBtn) {
+  gpsClearBtn.onclick = function() {
+    if (typeof gpsPoints !== "undefined" && gpsPoints.length === 0) return;
+    showModalConfirm("Supprimer tous les points GPS ?", function(ok) {
+      if (ok) {
+        gpsPoints.length = 0;
+        if (typeof removeAllMarkers === "function") removeAllMarkers();
+        if (typeof refreshGpsList === "function") refreshGpsList();
+        if (typeof renderMapsList === "function") renderMapsList();
+        if (typeof selectedMapName !== "undefined") selectedMapName = null;
+      }
+    });
+  };
+}
