@@ -433,6 +433,7 @@ const redIcon = L.icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+    
 let marker = L.marker([pt.lat, pt.lng], { icon: redIcon, draggable: false, title: `Point ${idx + 1}` });
     marker.addTo(gpsMarkersLayer);
     marker.bindPopup(`<b>Point ${idx + 1}</b><br>${pt.lat.toFixed(6)}, ${pt.lng.toFixed(6)}
