@@ -1192,7 +1192,7 @@ body {
 /* Agrandit la carte tout en laissant 7mm de chaque côté et 1cm en haut/bas */
 #gpsGlobalMap {
   width: 100%;
-  height: 85vh;      /* Ajuste à 70vh ou 80vh si tu veux encore plus grand */
+  height: 95vh;      /* Ajuste à 70vh ou 80vh si tu veux encore plus grand */
   min-height: 340px; /* Pour ne pas être trop petit sur mobile */
   max-width: 100%;
   margin: 0 auto;
