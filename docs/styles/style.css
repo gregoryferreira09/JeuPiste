@@ -1191,15 +1191,15 @@ body {
 
 /* Agrandit la carte tout en laissant 7mm de chaque côté et 1cm en haut/bas */
 #gpsGlobalMap {
-  width: calc(100vw - 14mm);
-  height: calc(100vh - 2cm - 32px); /* 32px = marges/paddings éventuels du bandeau doré, ajuste si nécessaire */
-  margin: 1cm 7mm;
-  max-width: 100vw;
-  max-height: calc(100vh - 2cm);
-  min-height: 300px;
-  border-radius: 15px;
+  width: 100%;
+  height: 65vh;      /* Ajuste à 70vh ou 80vh si tu veux encore plus grand */
+  min-height: 340px; /* Pour ne pas être trop petit sur mobile */
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 14px;
   box-shadow: 0 2px 12px #0002;
   display: block;
+  background: #ccc;  /* Optionnel : couleur de fond si la carte met du temps à charger */
 }
 
 /* Sur mobile : garde la même logique, ajuste la min-height si tu veux */
