@@ -947,35 +947,26 @@ body {
   background: none; /* ou background: transparent; */
 }
 
-#gpsClearBtn,
-#gpsLocateBtn,
-#gpsSaveBtn {
-  width: 48px;
-  height: 48px;
-  min-width: 36px;
-  min-height: 36px;
-  max-width: 48px;
-  max-height: 48px;
-  border-radius: 50% !important;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  font-size: 1.5em;
-  margin: 0 4px;
-}
-
-/* Responsive pour mobile */
 @media (max-width: 600px) {
   #gpsClearBtn,
   #gpsLocateBtn,
   #gpsSaveBtn {
-    width: 44px;
-    height: 44px;
-    font-size: 1.2em;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    font-size: 1.4em !important;
+    margin: 0 4px !important;
   }
-  
+
 #gpsSaveArea {
   display: flex;
   align-items: center;
