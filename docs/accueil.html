@@ -117,7 +117,7 @@
       <h1>Ludus itineris</h1>
       <h2>Course à la montre en équipe bancale</h2>
       <div class="bienvenue-message">
-      Bonjour<span id="pseudoAffiche"></span>
+        Bonjour<span id="pseudoAffiche"></span>
       </div>
       <div class="menu-buttons" role="group" aria-label="Actions principales">
         <button class="main-btn" type="button" onclick="window.location.href='creer-partie.html'">🎮 Créer une partie</button>
@@ -151,7 +151,6 @@
       }
     });
   </script>
-
   <script>
     // Effet d'ouverture fadeIn
     document.addEventListener("DOMContentLoaded", function() {
@@ -159,33 +158,22 @@
       if (main) main.classList.add('visible');
     });
 
-    // Fonction pour afficher le pseudo
-function afficherPseudoAccueil() {
-  var pseudo = localStorage.getItem("pseudo");
-  var el = document.getElementById("pseudoAffiche");
-  // Liste de pseudos considérés comme anonymes
-  if (
-    !pseudo || 
-    pseudo.trim().length < 1 ||
-    pseudo.trim().toLowerCase() === "anonyme" ||
-    pseudo.trim().toLowerCase() === "invité"
-  ) {
-    el.textContent = ""; // rien du tout
-  } else {
-    el.textContent = pseudo;
-  }
-}
+    // Fonction pour afficher le pseudo correctement sur la page d'accueil
+    function afficherPseudoAccueil() {
+      var pseudo = localStorage.getItem("pseudo");
+      var el = document.getElementById("pseudoAffiche");
+      if (
+        !pseudo ||
+        pseudo.trim().length < 1 ||
+        pseudo.trim().toLowerCase() === "anonyme" ||
+        pseudo.trim().toLowerCase() === "invité"
+      ) {
+        el.textContent = ""; // Pas d'espace ni pseudo = juste "Bonjour"
+      } else {
+        el.textContent = " " + pseudo; // Affiche : Bonjour Grégory
+      }
+    }
 
-    if (
-  !pseudo || 
-  pseudo.trim().length < 1 ||
-  pseudo.trim().toLowerCase() === "anonyme" ||
-  pseudo.trim().toLowerCase() === "invité"
-) {
-  el.textContent = ""; // pas d'espace ni pseudo
-} else {
-  el.textContent = " " + pseudo; // espace avant le nom
-}
     // Affichage initial du pseudo
     document.addEventListener("DOMContentLoaded", afficherPseudoAccueil);
 
