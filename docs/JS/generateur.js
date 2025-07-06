@@ -568,103 +568,137 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       const qtyParam = quest.parametres.find(p => p.type === "number");
       let consigneList = Array.isArray(values.consignes) ? [...values.consignes] : [''];
 
-      // Champ quantité
-      let fieldWrapper = document.createElement('div');
-      fieldWrapper.className = 'form-field';
-      fieldWrapper.style.display = 'flex';
-      fieldWrapper.style.alignItems = 'center';
-      fieldWrapper.style.gap = '12px';
-      fieldWrapper.style.marginBottom = '10px';
+ 
+      
+let fieldWrapper = document.createElement('div');
+fieldWrapper.className = 'form-field';
+fieldWrapper.style.display = 'flex';
+fieldWrapper.style.alignItems = 'center';
+fieldWrapper.style.gap = '12px';
+fieldWrapper.style.marginBottom = '10px';
 
-      let labelQty = document.createElement('label');
-      labelQty.textContent = qtyParam.label;
-      labelQty.setAttribute('for', qtyParam.key);
-      labelQty.style.marginRight = "8px";
-      fieldWrapper.appendChild(labelQty);
+// Label quantité
+let labelQty = document.createElement('label');
+labelQty.textContent = qtyParam.label;
+labelQty.setAttribute('for', qtyParam.key);
+labelQty.style.marginRight = "8px";
+fieldWrapper.appendChild(labelQty);
 
-      let inputQty = document.createElement('input');
-      inputQty.type = 'number';
-      inputQty.id = qtyParam.key;
-      inputQty.name = qtyParam.key;
-      inputQty.min = qtyParam.min || 1;
-      inputQty.max = qtyParam.max || 10;
-      inputQty.value = consigneList.length;
-      inputQty.style.width = "2cm";
-      inputQty.style.fontSize = "1em";
-      inputQty.style.padding = "4px 6px";
-      inputQty.style.textAlign = "center";
-      fieldWrapper.appendChild(inputQty);
+// Champ quantité
+let inputQty = document.createElement('input');
+inputQty.type = 'number';
+inputQty.id = qtyParam.key;
+inputQty.name = qtyParam.key;
+inputQty.min = qtyParam.min || 1;
+inputQty.max = qtyParam.max || 10;
+inputQty.value = consigneList.length;
+inputQty.style.width = "2cm";
+inputQty.style.fontSize = "1em";
+inputQty.style.padding = "4px 6px";
+inputQty.style.textAlign = "center";
+fieldWrapper.appendChild(inputQty);
 
-      form.appendChild(fieldWrapper);
+// Bouton/texte aléatoire
+let randomBtn = document.createElement('span');
+randomBtn.textContent = 'Aléatoire';
+randomBtn.className = 'random-toggle';
+randomBtn.style.cursor = 'pointer';
+randomBtn.style.marginLeft = '10px';
+randomBtn.style.padding = '3px 12px';
+randomBtn.style.borderRadius = '7px';
+randomBtn.style.border = '1.5px solid #e0c185';
+randomBtn.style.transition = 'background 0.2s, color 0.2s, border 0.2s';
+fieldWrapper.appendChild(randomBtn);
+form.appendChild(fieldWrapper);
 
-      // Zone consignes dynamique
-      let consignesZone = document.createElement('div');
-      consignesZone.id = 'consignesZone';
-      consignesZone.style.marginTop = "14px";
-      form.appendChild(consignesZone);
+// Zone consignes dynamique
+let consignesZone = document.createElement('div');
+consignesZone.id = 'consignesZone';
+consignesZone.style.marginTop = "14px";
+form.appendChild(consignesZone);
+
+let isRandom = false;
+function updateRandomUI() {
+  if (isRandom) {
+    // Doré et gras
+    randomBtn.style.background = '#e0c185';
+    randomBtn.style.color = '#231d1d';
+    randomBtn.style.fontWeight = 'bold';
+  } else {
+    // Normal
+    randomBtn.style.background = 'none';
+    randomBtn.style.color = '';
+    randomBtn.style.fontWeight = '';
+  }
+}
+
+randomBtn.onclick = function() {
+  isRandom = !isRandom;
+  updateRandomUI();
+  renderConsignesSelects();
+};
+
+updateRandomUI();
 
       function renderConsignesSelects() {
-        consignesZone.innerHTML = '';
-        let used = new Set(consigneList.filter(x => x && x !== '__random__'));
-        for (let i = 0; i < consigneList.length; i++) {
-          let row = document.createElement('div');
-          row.style.display = 'flex';
-          row.style.alignItems = 'center';
-          row.style.gap = '8px';
-          row.style.marginBottom = '6px';
+  consignesZone.innerHTML = '';
+  for (let i = 0; i < consigneList.length; i++) {
+    let row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.gap = '8px';
+    row.style.marginBottom = '6px';
 
-          let label = document.createElement('span');
-          if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
-          else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
-          else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
-          else label.textContent = `Consigne ${i+1}:`;
-          label.style.minWidth = "80px";
-          row.appendChild(label);
+    let label = document.createElement('span');
+    if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
+    else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
+    else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
+    else label.textContent = `Consigne ${i+1}:`;
+    label.style.minWidth = "80px";
+    row.appendChild(label);
 
-          let select = document.createElement('select');
-          let optEmpty = document.createElement('option');
-          optEmpty.value = '';
-          optEmpty.textContent = '-- choisir une mission --';
-          select.appendChild(optEmpty);
+    let select = document.createElement('select');
+    let optEmpty = document.createElement('option');
+    optEmpty.value = '';
+    optEmpty.textContent = '-- choisir une mission --';
+    select.appendChild(optEmpty);
 
-          // Option Aléatoire
-          let optRandom = document.createElement('option');
-          optRandom.value = '__random__';
-          optRandom.textContent = 'Aléatoire (mission surprise)';
-          select.appendChild(optRandom);
+    (SUGGESTIONS[quest.id] || []).forEach((sugg, idx) => {
+      let opt = document.createElement('option');
+      opt.value = sugg;
+      opt.textContent = sugg;
+      select.appendChild(opt);
+    });
+    select.value = consigneList[i];
+    // Désactive si mode aléatoire
+    select.disabled = isRandom;
+    select.style.opacity = isRandom ? 0.5 : 1;
 
-          (SUGGESTIONS[quest.id] || []).forEach((sugg, idx) => {
-            let opt = document.createElement('option');
-            opt.value = sugg;
-            opt.textContent = sugg;
-            if (used.has(sugg) && consigneList[i] !== sugg) opt.disabled = true;
-            select.appendChild(opt);
-          });
-          select.value = consigneList[i];
+    select.onchange = function() {
+      consigneList[i] = this.value;
+      renderConsignesSelects();
+    };
+    row.appendChild(select);
 
-          select.onchange = function() {
-            consigneList[i] = this.value;
-            renderConsignesSelects();
-          };
-          row.appendChild(select);
+    // Bouton suppression (si plus d'une ligne)
+    if (consigneList.length > 1) {
+      let delBtn = document.createElement('button');
+      delBtn.type = "button";
+      delBtn.textContent = "❌";
+      delBtn.style.marginLeft = "6px";
+      delBtn.onclick = function() {
+        consigneList.splice(i, 1);
+        inputQty.value = consigneList.length;
+        renderConsignesSelects();
+      };
+      delBtn.disabled = isRandom;
+      delBtn.style.opacity = isRandom ? 0.5 : 1;
+      row.appendChild(delBtn);
+    }
 
-          // Bouton suppression (si plus d'une ligne)
-          if (consigneList.length > 1) {
-            let delBtn = document.createElement('button');
-            delBtn.type = "button";
-            delBtn.textContent = "❌";
-            delBtn.style.marginLeft = "6px";
-            delBtn.onclick = function() {
-              consigneList.splice(i, 1);
-              inputQty.value = consigneList.length;
-              renderConsignesSelects();
-            };
-            row.appendChild(delBtn);
-          }
-
-          consignesZone.appendChild(row);
-        }
-      }
+    consignesZone.appendChild(row);
+  }
+}
 
       inputQty.oninput = function() {
         let n = parseInt(inputQty.value, 10) || 1;
@@ -686,44 +720,34 @@ function generateQuestForm(questTypeId, containerId, values = {}) {
       form.appendChild(submit);
 
       // AU SUBMIT
-      form.onsubmit = function(e) {
-        e.preventDefault();
-        const data = {};
-        let result = [];
-        let pool = (SUGGESTIONS[quest.id] || []).filter(Boolean);
-        // Retire les suggestions déjà explicitement choisies
-        consigneList.forEach(val => {
-          if (val && val !== '__random__') {
-            const idx = pool.indexOf(val);
-            if (idx !== -1) pool.splice(idx, 1);
-          }
-        });
-        let poolCopy = pool.slice();
-        consigneList.forEach(val => {
-          if (val === '__random__') {
-            if (pool.length > 0) {
-              let idx = Math.floor(Math.random() * pool.length);
-              result.push(pool[idx]);
-              pool.splice(idx, 1);
-            } else if (poolCopy.length > 0) {
-              let idx = Math.floor(Math.random() * poolCopy.length);
-              result.push(poolCopy[idx]);
-            } else {
-              result.push('');
-            }
-          } else {
-            result.push(val);
-          }
-        });
+     form.onsubmit = function(e) {
+  e.preventDefault();
+  const data = {};
+  let result = [];
+  if (isRandom) {
+    let pool = (SUGGESTIONS[quest.id] || []).filter(Boolean);
+    for (let i = 0; i < consigneList.length; i++) {
+      // Choix aléatoire sans doublon
+      if (pool.length > 0) {
+        let idx = Math.floor(Math.random() * pool.length);
+        result.push(pool[idx]);
+        pool.splice(idx, 1);
+      } else {
+        result.push('');
+      }
+    }
+  } else {
+    result = consigneList.slice();
+  }
+  // Nettoie les vides
+  data[qtyParam.key] = result.filter(x => x).length;
+  data.consignes = result.filter(x => x);
 
-        // Nettoie les vides
-        data[qtyParam.key] = result.filter(x => x).length;
-        data.consignes = result.filter(x => x);
-
-        ajouterEtapeAuScenario({ type: questTypeId, params: data });
-        form.reset();
-        container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
-      };
+  ajouterEtapeAuScenario({ type: questTypeId, params: data });
+  form.reset();
+  container.innerHTML = `<div class="succes">Étape ajoutée !<br/>Sélectionne un nouveau type d'épreuve ci-dessus.</div>`;
+};
+      
       container.appendChild(form);
       return; // Ne pas générer les champs standards pour ces types
     } else {
