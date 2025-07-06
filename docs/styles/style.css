@@ -1255,3 +1255,10 @@ input[type="number"] {
   max-width: 350px;
   align-self: center;
 }
+
+.bienvenue-message {
+  font-size: 2em;         /* Modifie la taille à ton goût (exemple : 2em ou 2.5em) */
+  font-weight: bold;      /* Optionnel : pour un effet plus marqué */
+  margin: 24px 0 16px 0;  /* Optionnel : espace autour */
+  letter-spacing: 0.5px;  /* Optionnel : aère un peu le texte */
+}
