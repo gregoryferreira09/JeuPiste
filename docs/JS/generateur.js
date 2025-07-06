@@ -640,8 +640,19 @@ randomBtn.onclick = function() {
 
 updateRandomUI();
 
-      function renderConsignesSelects() {
+function renderConsignesSelects() {
   consignesZone.innerHTML = '';
+  if (isRandom) {
+    // Mode aléatoire : ne rien afficher, juste un message d'attente
+    let msg = document.createElement('div');
+    msg.style.fontStyle = "italic";
+    msg.style.padding = "12px 0";
+    msg.style.color = "#e0c185";
+    msg.style.fontWeight = "bold";
+    msg.textContent = "Les missions seront révélées pendant le jeu !";
+    consignesZone.appendChild(msg);
+    return;
+  }
   for (let i = 0; i < consigneList.length; i++) {
     let row = document.createElement('div');
     row.style.display = 'flex';
@@ -649,12 +660,14 @@ updateRandomUI();
     row.style.gap = '8px';
     row.style.marginBottom = '6px';
 
-let label = document.createElement('span');
-if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
-else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
-else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
-else label.textContent = `Consigne ${i+1}:`;
-row.appendChild(label);
+    let label = document.createElement('span');
+    if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
+    else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
+    else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
+    else if (quest.id === "audio") label.textContent = `Audio ${i+1}:`;
+    else if (quest.id === "duel") label.textContent = `Duel ${i+1}:`;
+    else label.textContent = `Consigne ${i+1}:`;
+    row.appendChild(label);
 
     let select = document.createElement('select');
     let optEmpty = document.createElement('option');
@@ -669,9 +682,8 @@ row.appendChild(label);
       select.appendChild(opt);
     });
     select.value = consigneList[i];
-    // Désactive si mode aléatoire
-    select.disabled = isRandom;
-    select.style.opacity = isRandom ? 0.5 : 1;
+    select.disabled = false;
+    select.style.opacity = 1;
 
     select.onchange = function() {
       consigneList[i] = this.value;
@@ -690,8 +702,8 @@ row.appendChild(label);
         inputQty.value = consigneList.length;
         renderConsignesSelects();
       };
-      delBtn.disabled = isRandom;
-      delBtn.style.opacity = isRandom ? 0.5 : 1;
+      delBtn.disabled = false;
+      delBtn.style.opacity = 1;
       row.appendChild(delBtn);
     }
 
