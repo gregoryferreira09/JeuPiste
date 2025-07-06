@@ -939,25 +939,52 @@ body {
 
 .gps-map-actions {
   display: flex;
-  flex-direction: row;    /* Ligne horizontale */
-  align-items: center;    /* Centre verticalement */
+  flex-direction: row;
+  align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 12px 10px 0 10px;
+  padding: 12px 8px 0 8px;
   background: none;
+  flex-wrap: wrap; /* permet le passage à la ligne si vraiment trop serré */
 }
 
 #gpsClearBtn,
 #gpsLocateBtn {
-  /* styles ronds, voir plus haut */
+  background: #232832;
+  color: #e0c185;
+  border: 2px solid #e0c185;
+  border-radius: 50%;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  min-width: 36px;
+  min-height: 36px;
+  font-weight: bold;
+  font-size: 1.2em;
+  box-shadow: 0 1px 4px #0002;
+  cursor: pointer;
+  margin: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+#gpsClearBtn:hover,
+#gpsLocateBtn:hover {
+  background: #3d2b1f;
+  color: #ffeecb;
+  border-color: #ffeecb;
 }
 
+/* Le champ + bouton de sauvegarde forment un seul bloc */
 #gpsSaveArea {
   display: flex;
-  flex-direction: row;    /* Champ + bouton sur la même ligne */
+  flex-direction: row;
   align-items: stretch;
   gap: 0;
+  min-width: 0;
+  flex: 2 1 180px;
 }
 
 #gpsMapName {
@@ -966,15 +993,16 @@ body {
   background: #232832;
   color: #ffeecb;
   border: 2px solid #e0c185;
-  padding: 0 9px 0 12px;
-  min-width: 120px;
+  padding: 0 8px 0 12px;
+  min-width: 70px;
+  max-width: 160px;
   outline: none;
   display: block;
-  height: 38px;
+  height: 40px;
   font-size: 1.1em;
-  flex: 1 1 auto;
+  flex: 1 1 80px;
+  box-sizing: border-box;
 }
-
 #gpsSaveBtn {
   background: #232832;
   color: #e0c185;
@@ -988,7 +1016,7 @@ body {
   box-shadow: 0 1px 4px #0002;
   transition: background 0.15s, color 0.15s, border 0.15s;
   display: block;
-  height: 38px;
+  height: 40px;
   min-width: 42px;
 }
 #gpsSaveBtn:hover {
@@ -997,30 +1025,38 @@ body {
   border-color: #ffeecb;
 }
 
-/* Responsive : sur mobile, garde la même ligne ou adapte si trop serré */
-@media (max-width: 600px) {
+/* === Responsive Mobile : tout reste sur une ligne tant que possible === */
+@media (max-width: 700px) {
   .gps-map-actions {
-    flex-direction: row;
-    flex-wrap: wrap; /* autorise passage à la ligne si pas assez large */
-    gap: 8px;
-    align-items: center;
+    gap: 6px;
+    padding: 8px 2vw 0 2vw;
+    flex-wrap: wrap;
   }
   #gpsSaveArea {
-    flex: 1 1 200px;
-    min-width: 160px;
+    min-width: 0;
+    flex: 2 1 110px;
   }
   #gpsMapName {
-    font-size: 1em;
-    height: 36px;
+    max-width: 110px;
+    font-size: 0.97em;
+    height: 34px;
   }
   #gpsSaveBtn {
-    height: 36px;
-    padding: 0 10px;
+    height: 34px;
     font-size: 1em;
+    padding: 0 7px;
+  }
+  #gpsClearBtn,
+  #gpsLocateBtn {
+    width: 34px;
+    height: 34px;
+    font-size: 1em;
+    min-width: 30px;
+    min-height: 30px;
   }
 }
 
-/* Centrage parfait de la liste des points GPS et du recap */
+/* === Centrage parfait de la liste des points GPS et du recap === */
 #gpsListDiv {
   display: flex;
   flex-wrap: wrap;
@@ -1029,80 +1065,37 @@ body {
   gap: 8px 14px;
   text-align: center;
   margin: 0 auto 12px auto;
+  width: 100%;
 }
-
 #gpsListDiv > div {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-#gpsRecapDiv {
-  text-align: center;
-  width: 100%;
-  margin: 0 auto 12px auto;
-}
-
-#gpsInfosBloc > div > b {
-  width: 100%;
-  display: block;
-  text-align: center;
-}
-
-/* Responsive ajustement pour les actions sous la carte */
-@media (max-width: 650px) {
-  .gps-map-actions {
-    flex-direction: column;
-    gap: 8px;
-    align-items: stretch;
-  }
-  #gpsSaveArea {
-    width: 100%;
-  }
-  #gpsMapName {
-    flex: 1 1 auto;
-  }
-}
-
-
-#gpsInfosBloc > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-#gpsListDiv {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8px 14px;
-  text-align: center;
-  margin: 0 auto 12px auto;
-  width: 100%;
-}
-
 #gpsListDiv em {
   margin: 0 auto;
   text-align: center;
   width: 100%;
   display: block;
 }
-
 #gpsRecapDiv {
   text-align: center;
   width: 100%;
   margin: 0 auto 12px auto;
 }
-
+#gpsInfosBloc > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
 #gpsInfosBloc > div > b {
   width: 100%;
   display: block;
   text-align: center;
 }
 
-
+/* === Carte centrale === */
 #central-map-block {
   margin: 25px 0 15px 0;
   display: flex;
@@ -1117,6 +1110,7 @@ body {
   background: #222;
 }
 
+/* === Retour bouton === */
 #btn-retour {
   font-family: 'Cinzel Decorative', serif;
   padding: 4px 18px 4px 8px;
@@ -1143,25 +1137,4 @@ body {
   height: 38px;
   display: block;
   margin: 0 auto;
-}
-
-#gpsLocateBtn {
-  background: #232832;
-  color: #e0c185;
-  border: 2px solid #e0c185;
-  border-radius: 50%;
-  padding: 8px 15px;
-  min-width: 36px;
-  min-height: 36px;
-  font-weight: bold;
-  box-shadow: 0 1px 4px #0002;
-  cursor: pointer;
-  margin-left: 6px;
-  margin-right: 6px;
-  transition: background 0.15s, color 0.15s, border 0.15s;
-}
-#gpsLocateBtn:hover {
-  background: #3d2b1f;
-  color: #ffeecb;
-  border-color: #ffeecb;
 }
