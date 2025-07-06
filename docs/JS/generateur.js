@@ -654,9 +654,6 @@ if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
 else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
 else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
 else label.textContent = `Consigne ${i+1}:`;
-label.style.minWidth = "130px";
-label.style.display = "inline-block";
-label.style.marginRight = "10px";
 row.appendChild(label);
 
     let select = document.createElement('select');
