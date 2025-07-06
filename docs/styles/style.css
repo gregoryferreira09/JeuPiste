@@ -1240,3 +1240,18 @@ input[type="number"] {
   margin-bottom: 0;         /* Plus d'espace inutile sous le select */
   font-size: 1em;
 }
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;         /* espace vertical entre les boutons, adapte à ton goût */
+  margin: 36px 0 0 0;
+  align-items: stretch;
+}
+.menu-buttons .main-btn {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 350px;
+  align-self: center;
+}
