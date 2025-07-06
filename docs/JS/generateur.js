@@ -256,6 +256,22 @@ function afficherScenario() {
   });
 }
 
+function showModalConfirm(callback) {
+  const modal = document.getElementById('modalConfirm');
+  modal.style.display = 'flex';
+  const yesBtn = document.getElementById('modalYesBtn');
+  const noBtn = document.getElementById('modalNoBtn');
+  function cleanup() {
+    modal.style.display = 'none';
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+    modal.querySelector('.modal-overlay').onclick = null;
+  }
+  yesBtn.onclick = function() { cleanup(); callback(true); };
+  noBtn.onclick = function() { cleanup(); callback(false); };
+  modal.querySelector('.modal-overlay').onclick = function() { cleanup(); callback(false); };
+}
+
 // Supprimer une étape
 function supprimerEtape(idx) {
   scenario.splice(idx, 1);
