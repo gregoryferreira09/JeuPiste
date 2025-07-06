@@ -145,11 +145,11 @@ document.addEventListener("DOMContentLoaded", function() {
   // === GPS GLOBAL BANDEAU INITIALISATION ===
   initGpsBandeau();
 
-  window._deleteGpsPoint_gpsGlobalMap = function(idx) {
-  gpsPoints.splice(idx, 1);
+window._deleteGpsPoint_gpsGlobalMap = function(idx) {
+  gpsPoints.splice(idx, 1); // Supprime le point du tableau
   if (typeof removeAllMarkers === "function") removeAllMarkers();
   gpsPoints.forEach((pt, i) => addMarker(pt, i));
-  if (typeof refreshGpsList === "function") refreshGpsList();
+  if (typeof refreshGpsList === "function") refreshGpsList(); // Met à jour la liste affichée
 };
   // Première mise à jour
   afficherScenario();
