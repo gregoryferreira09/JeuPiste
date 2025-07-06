@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Accueil – Ludus itineris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Feuille de style Leaflet pour préchargement OSM -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="styles/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
@@ -105,6 +107,8 @@
       }
       .info { margin: 12px 0 0 0; }
     }
+    /* Préchargement OSM invisible */
+    #preloadMap { width:1px; height:1px; position:absolute; left:-9999px; top:-9999px; overflow:hidden; }
   </style>
 </head>
 <body class="accueil" style="background:#1b1b1b;">
@@ -131,6 +135,22 @@
     <p>© 2025 Ludus itineris. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+
+  <!-- Préchargement tuiles OSM pour effet instantané sur la carte -->
+  <div id="preloadMap"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      if (window.L && document.getElementById('preloadMap')) {
+        // Crée une mini-carte Leaflet hors écran pour précharger les tuiles
+        var preloadMap = L.map('preloadMap', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false });
+        preloadMap.setView([47.478419, -0.563166], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(preloadMap);
+        // Détruit la map après 5s pour libérer la mémoire (optionnel)
+        setTimeout(function(){ preloadMap.remove(); }, 5000);
+      }
+    });
+  </script>
 
   <script>
     // Effet d'ouverture fadeIn
