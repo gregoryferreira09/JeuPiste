@@ -470,15 +470,18 @@ let marker = L.marker([pt.lat, pt.lng], { icon: redIcon, draggable: false, title
   window.refreshGpsList = refreshGpsList;
 
   // Gestion du bouton poubelle (vider tous les points)
-  gpsClearBtn.onclick = function() {
-    if (gpsPoints.length > 0 && confirm("Supprimer tous les points GPS ?")) {
+gpsClearBtn.onclick = function() {
+  if (gpsPoints.length === 0) return;
+  showModalConfirm(function(ok) {
+    if (ok) {
       gpsPoints.length = 0;
       removeAllMarkers();
       refreshGpsList();
-      selectedMapName = null; // aussi on désélectionne la map active visuellement
+      selectedMapName = null;
       renderMapsList();
     }
-  };
+  });
+};
 
   // Gestion du bouton sauvegarde (disquette)
   gpsSaveBtn.onclick = function() {
