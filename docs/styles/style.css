@@ -1203,3 +1203,16 @@ body {
   font-weight: bold;
   border-color: #d4af37;
 }
+
+
+/* Forcer l'affichage des flèches (spin buttons) sur les champs number, y compris sur mobile Android */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: auto !important;
+  appearance: auto !important;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: number-input !important;
+  appearance: number-input !important;
+}
