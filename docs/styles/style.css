@@ -1188,3 +1188,18 @@ body {
 @media (max-width: 570px) {
   #confirmationModal .main-accueil {max-width:90vw;}
 }
+
+.random-toggle {
+  cursor: pointer;
+  border: 1.5px solid #e0c185;
+  border-radius: 7px;
+  padding: 3px 12px;
+  margin-left: 10px;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.random-toggle.active {
+  background: #e0c185;
+  color: #231d1d;
+  font-weight: bold;
+  border-color: #d4af37;
+}
