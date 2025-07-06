@@ -90,7 +90,7 @@ const QUESTS_CATALOGUE = [
     nom: "Chronométré",
     description: "Réaliser une action ou une série de quêtes en un temps imparti.",
     parametres: [
-      { key: "duree", type: "number", label: "Temps imparti (secondes)", default: 60, min: 10, max: 3600 }
+      { key: "duree", type: "number", label: "Temps imparti (secondes)", default: 60, min: 1, max: 3600 }
     ],
     combinable: []
   },
