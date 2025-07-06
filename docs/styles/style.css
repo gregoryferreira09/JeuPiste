@@ -944,7 +944,8 @@ body {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  padding: 12px 8px 0 8px;
+  margin-top: 18px;  /* Ou 20px, ou 5mm pour ~18px */
+  padding-top: 0; 
   background: none;
   flex-wrap: wrap; /* permet le passage à la ligne si vraiment trop serré */
 }
