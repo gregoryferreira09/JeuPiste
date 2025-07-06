@@ -1244,7 +1244,7 @@ input[type="number"] {
 .menu-buttons {
   display: flex;
   flex-direction: column;
-  gap: 32px;         /* espace vertical entre les boutons, adapte à ton goût */
+  gap: 20px;         /* espace vertical entre les boutons, adapte à ton goût */
   margin: 36px 0 0 0;
   align-items: stretch;
 }
