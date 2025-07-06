@@ -936,3 +936,45 @@ if (gpsClearBtn) {
     });
   };
 }
+
+function showModalConfirm(questionText, callback) {
+  const modal = document.getElementById('confirmationModal');
+  const question = document.getElementById('modalQuestion');
+  const yesBtn = document.getElementById('confirmModalBtn');
+  const noBtn = document.getElementById('cancelModalBtn');
+  question.textContent = questionText;
+  modal.classList.add('active');
+  function cleanup() {
+    modal.classList.remove('active');
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+    document.onkeydown = null;
+  }
+  yesBtn.onclick = function() { cleanup(); callback(true); };
+  noBtn.onclick = function() { cleanup(); callback(false); };
+  document.onkeydown = function(e) {
+    if (e.key === "Escape") { cleanup(); callback(false); }
+  };
+}
+
+// ---------------------------------------------------------------------------
+// EXEMPLE D'UTILISATION pour le bouton poubelle GPS
+// Place ce code dans initGpsBandeau ou dans le DOMContentLoaded
+// ---------------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", function() {
+  const gpsClearBtn = document.getElementById('gpsClearBtn');
+  if (gpsClearBtn) {
+    gpsClearBtn.onclick = function() {
+      if (typeof gpsPoints !== "undefined" && gpsPoints.length === 0) return;
+      showModalConfirm("Supprimer tous les points GPS ?", function(ok) {
+        if (ok) {
+          gpsPoints.length = 0;
+          if (typeof removeAllMarkers === "function") removeAllMarkers();
+          if (typeof refreshGpsList === "function") refreshGpsList();
+          if (typeof renderMapsList === "function") renderMapsList();
+          if (typeof selectedMapName !== "undefined") selectedMapName = null;
+        }
+      });
+    };
+  }
+});
