@@ -513,6 +513,9 @@ function initMap() {
             gpsMap.removeLayer(window._userPositionMarker);
           }
 // Définition d’une icône différente (exemple : verte)
+if (window._userPositionMarker) {
+  gpsMap.removeLayer(window._userPositionMarker);
+}
 const userIcon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x-green.png',
   iconSize: [25, 41],
@@ -521,7 +524,10 @@ const userIcon = L.icon({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   shadowSize: [41, 41]
 });
-window._userPositionMarker = L.marker([lat, lng], { icon: userIcon, title: "Vous êtes ici" }).addTo(gpsMap);
+window._userPositionMarker = L.marker([lat, lng], {
+  icon: userIcon,
+  title: "Vous êtes ici"
+}).addTo(gpsMap);
 window._userPositionMarker.bindPopup("Vous êtes ici").openPopup();
         }
       }, function(err) {
