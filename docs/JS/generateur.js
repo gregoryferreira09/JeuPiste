@@ -380,24 +380,8 @@ function initGpsBandeau() {
   const gpsLocateBtn = document.getElementById('gpsLocateBtn');
   let uniqueId = 'gpsGlobalMap';
 
-  // --- Initialisation Leaflet ---
-  function loadLeafletAndInit() {
-    if (!window.leafletLoaded) {
-      let link = document.createElement('link');
-      link.rel = "stylesheet";
-      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-      document.head.appendChild(link);
-      let script = document.createElement('script');
-      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-      script.onload = initMap;
-      document.body.appendChild(script);
-      window.leafletLoaded = true;
-    } else {
-      initMap();
-    }
-  }
-  loadLeafletAndInit();
-
+initMap();
+  
 function initMap() {
   if (gpsMap) { gpsMap.remove(); gpsMap = null; }
 
