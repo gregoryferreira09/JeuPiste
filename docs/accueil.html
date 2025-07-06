@@ -176,6 +176,16 @@ function afficherPseudoAccueil() {
   }
 }
 
+    if (
+  !pseudo || 
+  pseudo.trim().length < 1 ||
+  pseudo.trim().toLowerCase() === "anonyme" ||
+  pseudo.trim().toLowerCase() === "invité"
+) {
+  el.textContent = ""; // pas d'espace ni pseudo
+} else {
+  el.textContent = " " + pseudo; // espace avant le nom
+}
     // Affichage initial du pseudo
     document.addEventListener("DOMContentLoaded", afficherPseudoAccueil);
 
