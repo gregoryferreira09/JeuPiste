@@ -947,6 +947,35 @@ body {
   background: none; /* ou background: transparent; */
 }
 
+#gpsClearBtn,
+#gpsLocateBtn,
+#gpsSaveBtn {
+  width: 48px;
+  height: 48px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 48px;
+  max-height: 48px;
+  border-radius: 50% !important;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font-size: 1.5em;
+  margin: 0 4px;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 600px) {
+  #gpsClearBtn,
+  #gpsLocateBtn,
+  #gpsSaveBtn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.2em;
+  }
+  
 #gpsSaveArea {
   display: flex;
   align-items: center;
@@ -1037,34 +1066,6 @@ body {
     flex: 1 1 auto;
   }
   
-  #gpsClearBtn,
-#gpsSaveBtn,
-#gpsLocateBtn {
-  width: 48px;             /* Largeur fixe pour le cercle */
-  height: 48px;            /* Hauteur fixe pour le cercle */
-  min-width: 36px;
-  min-height: 36px;
-  max-width: 48px;
-  max-height: 48px;
-  border-radius: 50% !important; /* Toujours un cercle */
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  font-size: 1.6em;        /* Ajuste selon la taille voulue */
-  margin: 0 4px;
-}
-
-@media (max-width: 600px) {
-  #gpsClearBtn,
-  #gpsSaveBtn,
-  #gpsLocateBtn {
-    width: 44px;
-    height: 44px;
-    font-size: 1.3em;
-  }
-}
 }
 
 
