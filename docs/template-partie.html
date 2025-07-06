@@ -1,680 +1,663 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Carte & Missions – Ludus itineris</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    .jetons-arc-container {
-      background: none !important;
-      border-radius: 0 !important;
-      min-height: 0 !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: visible;
-      margin: 0;
-      width: 100%;
-      flex-direction: column;
-    }
-    #jetons-colonnes-wrapper {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-      justify-content: space-between;
-      align-items: stretch;
-      min-height: 220px;
-      margin-bottom: 10px;
-      padding-left: 32px;
-      padding-right: 32px;
-      box-sizing: border-box;
-    }
-    .jetons-colonne {
-      display: flex;
-      flex-direction: column;
-      gap: 38px;
-      align-items: flex-start;
-      justify-content: flex-start;
-      min-width: 54px;
-      flex: 0 0 auto;
-    }
-    #jetons-gauche {
-      align-items: flex-start;
-    }
-    #jetons-droite {
-      align-items: flex-end;
-    }
-    #colonne-fleche {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-width: 110px;
-      flex: 0 0 110px;
-    }
-    .jeton {
-      border-radius: 50%;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.19em;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      box-shadow: 0 2px 8px #0002;
-      outline: none;
-      pointer-events: auto;
-      transition: background 0.18s, border .18s, color .18s, transform .13s;
-      cursor: pointer;
-      border: 2.5px solid #e0c185;
-      background: #fff;
-      color: #231d1d;
-      min-width: 34px;
-      min-height: 34px;
-      width: 48px;
-      height: 48px;
-      position: relative;
-    }
-    .jeton.no-mission {
-      background: #b0b0b0 !important;
-      border-color: #888 !important;
-      color: #fff !important;
-      pointer-events: none !important;
-      cursor: default !important;
-      animation: none !important;
-    }
-    .jeton.validated {
-      background: #668702 !important;
-      border-color: #3e5000 !important;
-      color: #fff !important;
-      pointer-events: none !important;
-      cursor: default !important;
-      animation: none !important;
-    }
-    .jeton.final-jeton {
-      background: #ffe285 !important;
-      border-color: #d4af37 !important;
-      color: #473714 !important;
-      pointer-events: none !important;
-      cursor: default !important;
-      animation: none !important;
-      box-shadow: 0 0 10px #d4af37cc, 0 2px 8px #0002;
-    }
-    .svg-skull {
-      display: block;
-      margin: 0 auto;
-      width: 38px;
-      height: 38px;
-    }
-    .jeton .svg-epreuve {
-      width: 30px;
-      height: 30px;
-      display: block;
-      margin: 0 auto;
-    }
-    .jeton .svg-epreuve.gold {
-      fill: #d4af37 !important;
-    }
-    #steps-info {
-      color: #e0c185;
-      text-align: center;
-      font-family: "Cinzel Decorative", serif;
-      font-size: 1.15em;
-      margin-top: 10px;
-      font-weight: bold;
-      text-shadow: 0 2px 8px #0002;
-      letter-spacing: 0.5px;
-      transition: color 0.25s;
-    }
-    #steps-info.error {
-      color: #d62727 !important;
-      transition: color 0.1s;
-    }
-    @keyframes pulseMission {
-      0% { box-shadow: 0 0 0 0 #d4af3740; }
-      100% { box-shadow: 0 0 12px 6px #d4af3755; }
-    }
-    #compass-arrow-container {
-      display: none;
-      width: 100%;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    #compass-arrow {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    #svg-arrow {
-      transition: transform 1.3s cubic-bezier(0.33,1,0.68,1);
-      will-change: transform;
-      width: 90px;
-      height: 110px;
-      filter: drop-shadow(0 2px 10px #d4af3760);
-      display: block;
-    }
-    #modal-perdu {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0; top: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.45);
-      justify-content: center;
-      align-items: center;
-    }
-    #modal-perdu.active {
-      display: flex;
-    }
-    #modal-perdu-content {
-      background: #fff;
-      color: #473714;
-      border-radius: 16px;
-      padding: 38px 34px 20px 34px;
-      box-shadow: 0 4px 24px #0003;
-      font-size: 1.25em;
-      font-family: 'Cinzel Decorative', serif;
-      text-align: center;
-      position: relative;
-    }
-    #modal-perdu-content button {
-      margin-top: 22px;
-      font-size: 1em;
-      background: #e0c185;
-      border: none;
-      padding: 10px 28px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Cinzel Decorative', serif;
-      color: #473714;
-      font-weight: bold;
-      box-shadow: 0 2px 8px #e0c18544;
-      transition: background 0.18s;
-    }
-    #modal-perdu-content button:hover {
-      background: #d4af37;
-      color: #fff;
-    }
-    /* --- Animation validation --- */
-    #validation-success {
-      display: none;
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 99999;
-      background: rgba(255,255,255,0.97);
-      border-radius: 18px;
-      padding: 48px 38px;
-      text-align: center;
-      box-shadow: 0 8px 40px #231d1d55;
-      min-width: 240px;
-      min-height: 100px;
-      animation: fadeinValSuccess 0.3s;
-    }
-    @keyframes fadeinValSuccess {
-      from { opacity: 0; transform: translate(-50%,-46%);}
-      to   { opacity: 1; transform: translate(-50%,-50%);}
-    }
-    #validation-success .validation-check {
-      font-size: 2.2em;
-      color: #38b948;
-      font-family:'Cinzel Decorative',serif;
-      margin-bottom: 17px;
-    }
-    #validation-success #validation-epreuves-restantes {
-      font-size: 1.15em;
-      color: #473714;
-      font-family:'Cormorant Garamond',serif;
-    }
-    #final-jeton-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin-top: 32px;
-      margin-bottom: 8px;
-    }
-    #final-jeton-label {
-      color: #e0c185;
-      margin-bottom: 8px;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.08em;
-      text-shadow: 0 2px 8px #0002;
-    }
-    @media (max-width: 650px) {
-      .jetons-colonne { gap: 18px; }
-      .jeton { width: 34px; height: 34px; font-size: 0.98em; }
-      #svg-arrow { width: 60px; height: 80px; }
-      #jetons-colonnes-wrapper { min-height: 60px; padding-left: 6px; padding-right: 6px; }
-      #validation-success { padding: 20px 8px; min-width: unset; }
-      #final-jeton-wrapper { margin-top: 16px; }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1 class="site-title">Ludus itineris</h1>
-  </header>
-  <div class="center-wrapper">
-    <main class="main-accueil fadeIn" role="main">
-      <h2 class="titre-course">Carte & Missions</h2>
-      <div id="central-map-block">
-        <div id="centralMap"></div>
-      </div>
-      <section>
-        <div style="margin-bottom: 14px; color: #ffeecb; font-size: 1.12em;">
-          Sélectionnez un jeton sur la carte pour tenter de découvrir une épreuve.
-        </div>
-        <div class="jetons-arc-container">
-          <div id="jetons-colonnes-wrapper">
-            <div id="jetons-gauche" class="jetons-colonne"></div>
-            <div id="colonne-fleche">
-              <div id="compass-arrow-container">
-                <div id="compass-arrow">
-                  <svg id="svg-arrow" width="90" height="110" viewBox="0 0 90 110">
-                    <defs>
-                      <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#fff7c4"/>
-                        <stop offset="55%" stop-color="#e0c185"/>
-                        <stop offset="100%" stop-color="#d4af37"/>
-                      </linearGradient>
-                      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
-                      </filter>
-                    </defs>
-                    <rect x="39" y="20" width="12" height="60" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
-                    <polygon points="45,8 65,47 45,35 25,47" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
-                    <polyline points="45,80 25,105 45,95 65,105 45,80" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
-                  </svg>
-                </div>
-                <div id="steps-info"></div>
-              </div>
-              <!-- Jeton final s'affiche ici si besoin -->
-              <div id="final-jeton-wrapper" style="display: none;">
-                <div id="final-jeton-label">Point final à rejoindre pour terminer</div>
-                <button id="final-jeton-btn" class="jeton final-jeton" style="width:48px;height:48px;" aria-label="Point GPS final"></button>
-                <div id="final-jeton-info" style="color:#e0c185;font-size:1em;margin-top:5px;"></div>
-              </div>
-            </div>
-            <div id="jetons-droite" class="jetons-colonne"></div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-  <!-- Animation de validation épreuve réussie -->
-  <div id="validation-success">
-    <div class="validation-check">✔️ Quête validée !</div>
-    <div id="validation-epreuves-restantes"></div>
-  </div>
-  <!-- Modal perdu -->
-  <div id="modal-perdu">
-    <div id="modal-perdu-content">
-      <div>Perdu !<br>Ce jeton ne cache pas d'épreuve.</div>
-      <button onclick="document.getElementById('modal-perdu').classList.remove('active')">Fermer</button>
-    </div>
-  </div>
-  <footer class="footer">
-    <p>© 2025 Ludus itineris. Tous droits réservés.</p>
-    <a href="mentions-legales.html">Mentions légales</a>
-  </footer>
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script>
-    // --- Animation de validation après une quête réussie ---
-    window.addEventListener('DOMContentLoaded', function() {
-      if (sessionStorage.getItem('showValidationSuccess') === '1') {
-        var block = document.getElementById('validation-success');
-        block.style.display = 'block';
-        const nbRest = sessionStorage.getItem('nbEpreuvesRestantes') || '';
-        if (nbRest && Number(nbRest) > 0) {
-          document.getElementById('validation-epreuves-restantes').textContent =
-            `Plus que ${nbRest} épreuve${(Number(nbRest)>1 ? 's' : '')} !`;
-        } else {
-          document.getElementById('validation-epreuves-restantes').textContent = "C'était la dernière épreuve !";
-        }
-        setTimeout(function() {
-          block.style.display = 'none';
-          sessionStorage.removeItem('showValidationSuccess');
-          sessionStorage.removeItem('nbEpreuvesRestantes');
-        }, 1900);
-      }
-    });
-  </script>
-  <script>
-    // --- LOGIQUE ADAPTÉE POUR POINT FINAL ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-      authDomain: "murder-party-ba8d1.firebaseapp.com",
-      databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "murder-party-ba8d1",
-      storageBucket: "murder-party-ba8d1.firebasestorage.app",
-      messagingSenderId: "20295055805",
-      appId: "1:20295055805:web:0963719c3f23ab7752fad4",
-      measurementId: "G-KSBMBB7KMJ"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-function getSkullSVG() {
-  return `
-<svg class="svg-skull" width="38" height="38" viewBox="0 0 32 32" fill="none">
-  <g>
-    <g stroke="#fff" stroke-width="3" stroke-linecap="round">
-      <line x1="7" y1="27" x2="25" y2="9"/>
-      <line x1="25" y1="27" x2="7" y2="9"/>
-    </g>
-    <ellipse cx="16" cy="15" rx="9" ry="8" fill="#fdfdfd" stroke="#aaa" stroke-width="1.7"/>
-    <ellipse cx="16" cy="24" rx="5" ry="3.2" fill="#ececec"/>
-    <ellipse cx="13" cy="15" rx="1.7" ry="2.2" fill="#222"/>
-    <ellipse cx="19" cy="15" rx="1.7" ry="2.2" fill="#222"/>
-    <ellipse cx="16" cy="18.2" rx="1.1" ry="1.6" fill="#444"/>
-    <rect x="14.3" y="25.2" width="1.1" height="1.2" rx="0.3" fill="#ccc"/>
-    <rect x="16.6" y="25.2" width="1.1" height="1.2" rx="0.3" fill="#ccc"/>
-  </g>
-</svg>
-  `;
+/* === FOND GÉNÉRAL ET STRUCTURE ===
+Utilisé dans : toutes les pages
+*/
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Cormorant Garamond', serif;
+  background-color: #1b1b1b;
+  color: #f4e4c1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  scroll-behavior: smooth;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-function getMissionSVG(type, gold = false, isFinal = false) {
-  let fillColor = isFinal ? '#ffe285' : gold ? '#d4af37' : '#fff';
-  let extraClass = gold ? ' gold' : '';
-  switch (type) {
-    case "photo":
-      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="7" width="18" height="12" rx="2" fill="${fillColor}" stroke="#231d1d" stroke-width="1.5"/>
-        <circle cx="12" cy="13" r="3" fill="#231d1d"/>
-        <rect x="8" y="4" width="8" height="3" rx="1" fill="#231d1d"/>
-      </svg>`;
-    // ... (autres types comme dans ta version)
-    default:
-      return `<svg class="svg-epreuve${extraClass}" width="38" height="38" viewBox="0 0 24 24" fill="${fillColor}"><circle cx="12" cy="12" r="10"/></svg>`;
+/* === HEADER & FOOTER harmonisés ===
+Utilisé dans : toutes les pages
+*/
+header, .footer, footer {
+  width: 100%;
+  min-width: 100vw;
+  background: #000;
+  color: #e0c185;
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  padding-top: 22px;
+  padding-bottom: 22px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  position: relative;
+  left: 0; right: 0; bottom: 0; margin-top: 0;
+}
+header h1, .site-title {
+  margin: 0;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 2.2em;
+  color: #e0c185;
+  letter-spacing: 1.5px;
+}
+.footer a, footer a { color: #e0c185; text-decoration: underline; }
+.footer a:hover, footer a:hover { color: #f4e4c1; text-decoration: none; }
+
+/* === STRUCTURE PRINCIPALE ===
+Utilisé dans : accueil, main pages, générateur, etc.
+*/
+.center-wrapper {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+@media (max-width: 650px) {
+  .center-wrapper { padding-top: 16px; padding-bottom: 16px; }
+}
+
+/* === BLOC PRINCIPAL .main-accueil et variantes ===
+Utilisé dans : accueil, créer-partie, générateur, etc.
+*/
+.main-accueil,
+.main-join {
+  margin: 0 auto;
+  background: #2c1b1b;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px #0001;
+  padding: 32px 28px;
+  border: 2px solid #e0c185;
+  color: #f4e4c1;
+  font-family: 'Cormorant Garamond', serif;
+  width: 100%;
+  max-width: 520px;
+  box-sizing: border-box;
+}
+@media (max-width: 650px) {
+  .main-accueil, .main-join {
+    max-width: 99vw;
+    min-width: 0;
+    padding: 12px 2vw;
+    border-radius: 12px;
+    margin: 10px auto;
   }
 }
 
-function getMissionTypeByIndex(missionIdx, missionsList) {
-  const mission = missionsList && missionsList[missionIdx];
-  return mission ? (mission.type || mission.epreuve?.type) : null;
+/* === TITRES, LIENS, PARAGRAPHES ===
+Utilisé dans : toutes les pages
+*/
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cinzel Decorative', serif;
+  color: #e0c185;
+  margin-bottom: 0.6em;
+}
+a {
+  color: #d1c5a3;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover { text-decoration: underline; color: #f4e4c1; }
+
+/* === ACCESSIBILITÉ ===
+Utilisé dans : toutes les pages
+*/
+button:focus, a:focus, input:focus {
+  outline: 2px solid #e0c185;
+  outline-offset: 3px;
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  var main = document.querySelector('.fadeIn');
-  if (main) setTimeout(() => main.classList.add('visible'), 50);
-});
-
-firebase.auth().onAuthStateChanged(function(user) {
-  if (!user) firebase.auth().signInAnonymously();
-  else lancerAccueil();
-});
-
-let userPosition = null;
-function getDistanceMeters(lat1, lng1, lat2, lng2) {
-  const R = 6371000;
-  const toRad = deg => deg * Math.PI / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLng/2) * Math.sin(dLng/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
+/* === FORMULAIRES : .form-container ===
+Utilisé dans : générateur, créer-partie, rejoindre-partie, etc.
+*/
+.form-container,
+.boutons-actions {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
-
-function afficherCarteCentraleTousPoints(points) {
-  let mapDiv = document.getElementById('centralMap');
-  if (!mapDiv) return;
-  if (window._centralLeafletMap) {
-    window._centralLeafletMap.remove();
-    window._centralLeafletMap = null;
-  }
-  let center = points && points.length ? [points[0].lat, points[0].lng] : [47.4784, -0.5631];
-  let map = L.map('centralMap').setView(center, 15);
-  window._centralLeafletMap = map;
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-  if (points && points.length) {
-    points.forEach((pt, idx) => {
-      if(pt.lat && pt.lng)
-        L.marker([pt.lat, pt.lng], { title: `Point ${idx + 1}` })
-          .addTo(map)
-          .bindPopup(`Point ${idx + 1}<br>${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}`);
-    });
-    let group = new L.featureGroup(points.filter(pt=>pt.lat&&pt.lng).map(pt=>L.marker([pt.lat, pt.lng])));
-    map.fitBounds(group.getBounds().pad(0.2));
-  }
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+  align-items: stretch;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
-
-// --- JETONS de la carte ---
-let jetonsState = []; // "white" | "no-mission" | "validated"
-
-function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, validatedMissions, finalGpsIndex, toutesMissionsValidees) {
-  const gauche = document.getElementById('jetons-gauche');
-  const droite = document.getElementById('jetons-droite');
-  gauche.innerHTML = '';
-  droite.innerHTML = '';
-  const N = gpsPoints.length;
-  let jetonDiameter = (N > 10) ? 34 : 48;
-  jetonsState = jetonsState.length === N ? jetonsState : Array(N).fill("white");
-
-  for(let i=0; i<N; i++) {
-    if (i === finalGpsIndex && !toutesMissionsValidees) continue;
-    if (i === finalGpsIndex && toutesMissionsValidees) continue;
-
-    const btn = document.createElement('button');
-    btn.className = 'jeton';
-    btn.textContent = i+1;
-    btn.setAttribute('aria-label', `Point GPS ${i+1}`);
-    btn.style.width = btn.style.height = jetonDiameter + "px";
-    btn.dataset.idx = i;
-    let hasMission = jetonMissionsMapping[i] !== -1;
-    let missionType = hasMission ? getMissionTypeByIndex(jetonMissionsMapping[i], missionsList) : null;
-    let isValidated = hasMission && validatedMissions && validatedMissions[jetonMissionsMapping[i]] && validatedMissions[jetonMissionsMapping[i]].validated;
-
-    // Etat dynamique :
-    if (isValidated) {
-      btn.classList.add('validated');
-      btn.innerHTML = getMissionSVG(missionType, true);
-      btn.disabled = true;
-      btn.style.cursor = "default";
-      btn.onclick = null;
-      btn.ondblclick = null;
-      btn.tabIndex = -1;
-      jetonsState[i] = "validated";
-    } else if (jetonsState[i] === "no-mission") {
-      btn.classList.add('no-mission');
-      btn.innerHTML = getSkullSVG();
-      btn.disabled = true;
-      btn.style.cursor = "default";
-      btn.onclick = null;
-      btn.ondblclick = null;
-      btn.tabIndex = -1;
-    } else {
-      // Affichage blanc (état initial)
-      btn.innerHTML = i+1;
-      btn.tabIndex = 0;
-      btn.onclick = (e) => {
-        e.preventDefault();
-        hideCompass();
-        showCompass(gpsPoints[i]);
-      };
-      btn.ondblclick = (e) => {
-        e.preventDefault();
-        hideCompass();
-        // Vérifie la position
-        if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 12) {
-          const stepsInfo = document.getElementById('steps-info');
-          stepsInfo.classList.add('error');
-          setTimeout(() => stepsInfo.classList.remove('error'), 1700);
-          return;
-        }
-        if (hasMission) {
-          window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-        } else {
-          // Jeton sans mission, grise/désactive/crâne
-          btn.className = 'jeton no-mission';
-          btn.innerHTML = getSkullSVG();
-          btn.disabled = true;
-          btn.style.cursor = "default";
-          btn.onclick = null;
-          btn.ondblclick = null;
-          btn.tabIndex = -1;
-          jetonsState[i] = "no-mission";
-          document.getElementById('modal-perdu').classList.add('active');
-        }
-      };
-    }
-
-    if (i % 2 === 0) {
-      gauche.appendChild(btn);
-    } else {
-      droite.appendChild(btn);
-    }
+.form-container label {
+  text-align: left;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #e0c185;
+}
+.form-container select,
+.form-container input[type="text"] {
+  padding: 10px 8px;
+  border-radius: 7px;
+  border: 2px solid #e0c185;
+  background-color: #fff;
+  color: #2c1b1b;
+  font-size: 1.1em;
+  margin-bottom: 10px;
+  font-family: inherit;
+  outline: none;
+  transition: border .18s, background .18s, color .18s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.form-container select:focus,
+.form-container input[type="text"]:focus {
+  border: 2px solid #d4af37;
+  background: #fff;
+  color: #2c1b1b;
+}
+.form-container input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: #e9c78c;
+}
+.form-container select,
+.form-container option {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15em;
+  color: #2c1b1b;
+  background: #fff;
+}
+.form-container select {
+  border: 2px solid #e0c185;
+  border-radius: 7px;
+  padding: 10px 8px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='goldenrod' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 98%;
+  background-position-y: 50%;
+  background-size: 22px;
+  font-weight: 500;
+}
+.form-container select:focus { border: 2px solid #d4af37; }
+.form-container select option {
+  background: #fff;
+  color: #2c1b1b;
+  font-size: 1.15em;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+}
+@media (max-width: 650px) {
+  .form-container, .boutons-actions { max-width: 99vw; padding: 0; }
+  .main-btn, .form-container .main-btn, .boutons-actions .main-btn {
+    font-size: 1em;
+    padding: 14px 10px;
   }
 }
 
-function afficherJetonFinal(gpsPoints, finalGpsIndex) {
-  const wrapper = document.getElementById('final-jeton-wrapper');
-  const btn = document.getElementById('final-jeton-btn');
-  const info = document.getElementById('final-jeton-info');
-  if (finalGpsIndex === null || typeof gpsPoints[finalGpsIndex] === "undefined") {
-    wrapper.style.display = "none";
-    return;
+/* === BOUTONS PRINCIPAUX harmonisés ===
+Utilisé dans : toutes les pages, pour tous les boutons d'action
+*/
+.main-btn,
+.form-container .main-btn,
+.boutons-actions .main-btn {
+  background: #1b1b1b;
+  color: #fdf3df;
+  border: 2px solid #e0c185;
+  border-radius: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15em;
+  padding: 14px 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin: 0 0 8px 0;
+  display: block;
+  box-sizing: border-box;
+}
+.main-btn:last-child { margin-bottom: 0; }
+.main-btn:hover,
+.main-btn:focus {
+  background-color: #3d2b1f;
+  color: #e0c185;
+  box-shadow: 0 0 8px #e0c18588;
+  outline: 2px solid #e0c185;
+  outline-offset: 4px;
+}
+.gold-btn,
+.form-container .gold-btn {
+  background: #e0c185;
+  color: #231d1d;
+  border: 2px solid #e0c185;
+  border-radius: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15em;
+  padding: 14px 30px;
+  cursor: pointer;
+  font-weight: bold;
+  box-sizing: border-box;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.gold-btn:hover,
+.form-container .gold-btn:hover,
+.gold-btn:focus,
+.form-container .gold-btn:focus {
+  background: #ffeecb;
+  color: #473714;
+  box-shadow: 0 0 8px #e0c18588;
+  outline: 2px solid #e0c185;
+  outline-offset: 4px;
+}
+@media (max-width: 650px) {
+  .main-btn, .form-container .main-btn, .boutons-actions .main-btn,
+  .gold-btn, .form-container .gold-btn {
+    width: 100%;
+    min-width: 0;
+    padding: 14px 10px;
+    font-size: 1em;
   }
-  btn.innerHTML = getMissionSVG('final', false, true);
-  btn.disabled = true;
-  btn.className = 'jeton final-jeton';
-  info.textContent = "";
-  wrapper.style.display = "flex";
 }
 
-let compassWatchId = null;
-let lastDistance = null;
+/* === GROUPES DE BOUTONS / ACTIONS ===
+Utilisé dans : générateur, accueil, etc.
+*/
+.boutons-actions, .group-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+.group-btns .main-btn { margin-bottom: 0 !important; }
 
-function showCompass(targetGps, onArrivee) {
-  const container = document.getElementById('compass-arrow-container');
-  container.style.display = "flex";
-  const stepsInfo = document.getElementById('steps-info');
-  stepsInfo.textContent = "Recherche de la position...";
-  if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
-  lastDistance = null;
+/* === FADE-IN ANIMATION ===
+Utilisé dans : toutes les pages ayant .fadeIn
+*/
+.fadeIn { opacity: 0; transition: opacity 0.5s; }
+.fadeIn.visible { opacity: 1; }
 
-  function updateArrow(position) {
-    userPosition = { lat: position.coords.latitude, lng: position.coords.longitude };
-    const userLat = position.coords.latitude;
-    const userLng = position.coords.longitude;
-    const targetLat = targetGps.lat;
-    const targetLng = targetGps.lng;
+/* === MESSAGES & FEEDBACK ===
+Utilisé dans : formulaires, feedback utilisateur
+*/
+.message, .error-message, .feedback-message, .form-feedback {
+  min-height: 22px;
+  margin-top: 4px;
+  font-weight: bold;
+  font-size: 1em;
+  color: #c00;
+  animation: fadeInMessage 0.5s ease forwards;
+}
+.message.succes, .feedback-message.succes { color: #2ecc40; }
+@keyframes fadeInMessage { from { opacity: 0; } to { opacity: 1; } }
 
-    const toRad = deg => deg * Math.PI / 180;
-    const dLon = toRad(targetLng - userLng);
-    const y = Math.sin(dLon) * Math.cos(toRad(targetLat));
-    const x = Math.cos(toRad(userLat)) * Math.sin(toRad(targetLat)) -
-              Math.sin(toRad(userLat)) * Math.cos(toRad(targetLat)) * Math.cos(dLon);
-    let brng = Math.atan2(y, x);
-    brng = (brng * 180 / Math.PI + 360) % 360;
-
-    const distance = getDistanceMeters(userLat, userLng, targetLat, targetLng);
-
-    if (lastDistance !== null && Math.abs(distance - lastDistance) < 2) {
-      return;
-    }
-    lastDistance = distance;
-
-    const steps = Math.round(distance / 0.75);
-
-    if (distance < 5) {
-      stepsInfo.textContent = "Vous êtes arrivé !";
-      if (typeof onArrivee === "function") onArrivee();
-    } else {
-      stepsInfo.textContent = steps + " pas restants";
-    }
-
-    let deviceHeading = 0;
-    if (window.lastDeviceOrientation !== undefined) {
-      deviceHeading = window.lastDeviceOrientation;
-    }
-    const heading = brng - deviceHeading;
-
-    document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
-  }
-
-  if (navigator.geolocation) {
-    compassWatchId = navigator.geolocation.watchPosition(
-      updateArrow,
-      (err) => { stepsInfo.textContent = "Impossible d'accéder à la position."; },
-      { enableHighAccuracy: true }
-    );
-  } else {
-    stepsInfo.textContent = "Géolocalisation non supportée.";
-  }
-
-  window.addEventListener('deviceorientationabsolute', function(e) {
-    if (e.absolute && e.alpha !== null) {
-      window.lastDeviceOrientation = e.alpha;
-    }
-  }, true);
-  window.addEventListener('deviceorientation', function(e) {
-    if (e.webkitCompassHeading !== undefined) {
-      window.lastDeviceOrientation = e.webkitCompassHeading;
-    }
-  }, true);
+/* === PRESENTATION ET OBJECTIFS ===
+Utilisé dans : accueil, pages jeu, etc.
+*/
+.presentation-jeu {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.8em;
+  margin: 38px 0 24px 0;
+}
+.titre-course {
+  font-family: 'Cinzel Decorative', serif;
+  color: #e0c185;
+  font-size: 1.5em;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.texte-course {
+  font-size: 1.14em;
+  margin-bottom: 0.4em;
+  color: #ffeecb;
+}
+.objectif-course {
+  margin: 1.2em 0 0.7em 0;
+  font-size: 1.18em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.objectif-label {
+  background: #e0c185;
+  color: #181212;
+  font-weight: bold;
+  border-radius: 7px;
+  padding: 0.12em 0.8em;
+  margin-bottom: 0.3em;
+  display: inline-block;
+}
+.objectif-text { color: #ffeecb; }
+.regles-course {
+  margin-top: 0.8em;
+  color: #f5e2bf;
+  font-size: 1.09em;
+  line-height: 1.6;
 }
 
-function hideCompass() {
-  const container = document.getElementById('compass-arrow-container');
-  container.style.display = "none";
-  const stepsInfo = document.getElementById('steps-info');
-  stepsInfo.textContent = "";
-  if (compassWatchId) {
-    navigator.geolocation.clearWatch(compassWatchId);
-    compassWatchId = null;
+/* === MODALES GÉNÉRIQUES ===
+Utilisé dans : confirmation retour, toast, etc.
+*/
+.modal-toast, .modal, #confirmationRetourAccueil, #confirmationModal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 50%; top: 10%;
+  transform: translateX(-50%);
+  background: #231d1d;
+  color: #ffeecb;
+  border: 2px solid #e0c185;
+  border-radius: 8px;
+  padding: 16px 28px;
+  font-size: 1.14em;
+  box-shadow: 0 4px 22px #0006;
+  text-align:center;
+  max-width: 90vw;
+}
+.modal-toast.visible, .modal.show, #confirmationRetourAccueil.active, #confirmationModal.active { display: block !important; animation: fadein 0.3s; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+/* === ICONES ET ACTIONS HORIZONTALES ===
+Utilisé dans : épreuves, révélations, etc.
+*/
+.actions-row-horizontal {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  margin-top: 38px;
+  margin-bottom: 10px;
+}
+.icon-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+  max-width: 90px;
+}
+.icon-action a, .icon-action label {
+  cursor: pointer;
+  color: #e0c185;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.icon-action a:hover, .icon-action label:hover { color: #ffeecb; }
+.icon-action svg, .icon-action img {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 6px;
+  fill: #e0c185;
+  transition: fill 0.2s, filter 0.2s;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.icon-action a:hover svg, .icon-action label:hover svg {
+  fill: #ffeecb;
+  filter: drop-shadow(0 0 4px #e0c18577);
+}
+.icon-action .grayed svg { filter: grayscale(1) brightness(0.7); fill: #b5a073; }
+.icon-action span {
+  font-size: 0.98em;
+  color: #e0c185;
+  margin-top: 2px;
+  text-align: center;
+}
+@media (max-width: 650px) {
+  .actions-row-horizontal { gap: 14px; flex-direction: column; align-items: stretch; }
+  .icon-action { width: 100%; flex-direction: row; justify-content: flex-start; gap: 10px; margin-bottom: 12px; }
+  .icon-action span { text-align: left; }
+}
+
+/* === GPS & MAPS - BANDEAU GLOBAL ===
+Utilisé dans : générateur.html, template-partie.html (pour la map)
+*/
+#gpsGlobalMap {
+  width: 100%;
+  min-width: 220px;
+  min-height: 240px;
+  height: 300px;
+  max-width: 450px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px #0002;
+  border: 1.5px solid #343947;
+  background: none !important;
+  position: relative;
+}
+.gps-map-actions {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 10px 0 10px;
+  background: none;
+}
+#gpsClearBtn, #gpsSaveBtn {
+  background: #232832;
+  color: #e0c185;
+  border: 2px solid #e0c185;
+  border-radius: 50%;
+  padding: 8px 16px;
+  min-width: 36px;
+  min-height: 36px;
+  font-weight: bold;
+  box-shadow: 0 1px 4px #0002;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+#gpsClearBtn:hover, #gpsSaveBtn:hover {
+  background: #3d2b1f;
+  color: #ffeecb;
+  border-color: #ffeecb;
+}
+#gpsMapName, #gpsSaveBtn {
+  height: 38px;
+  box-sizing: border-box;
+  font-size: 1.1em;
+}
+#gpsMapName {
+  background: #232832;
+  color: #ffeecb;
+  border: 2px solid #e0c185;
+  border-radius: 7px 0 0 7px;
+  border-right: 0;
+  padding: 0 9px 0 12px;
+  min-width: 120px;
+  outline: none;
+  display: block;
+}
+#gpsSaveBtn {
+  border-radius: 0 7px 7px 0;
+  border-left: 0;
+  background: #232832;
+  color: #e0c185;
+  border: 2px solid #e0c185;
+  width: 48px;
+  padding: 0;
+  font-size: 1.25em;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 1px 4px #0002;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+  display: block;
+}
+#gpsSaveBtn:hover {
+  background: #3d2b1f;
+  color: #ffeecb;
+  border-color: #ffeecb;
+}
+#gpsSaveArea {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+.gps-map-name--selected {
+  background: #ffeecb !important;
+  color: #232832 !important;
+  font-weight: bold;
+  box-shadow: 0 0 0 2px #e0c185, 0 0 8px #ffeecb88;
+  border-radius: 6px;
+  padding: 4px 12px;
+}
+@media (max-width: 950px) {
+  .bandeau-gps-global { flex-direction: column; gap: 20px; }
+  #gpsMapBloc, #gpsInfosBloc { max-width: none; min-width: 0; }
+  #gpsGlobalMap { max-width: 100%; }
+}
+@media (max-width: 600px) {
+  .bandeau-gps-global { padding: 7px 4vw; }
+  #gpsGlobalMap { min-height: 180px; height: 190px; }
+  .gps-map-actions { padding: 0 2px 6px 2px; }
+  #gpsSavedMaps { min-width: 0; font-size: 1em; }
+}
+
+/* === DRAG & DROP DES ÉPREUVES ===
+Utilisé dans : générateur.html (scénario)
+*/
+.epreuve-ligne {
+  display: flex;
+  align-items: center;
+  background: #291e17;
+  border-radius: 7px;
+  margin-bottom: 7px;
+  padding: 7px 10px;
+  position: relative;
+  box-shadow: 0 1px 4px #0002;
+  cursor: grab;
+  transition: background 0.2s;
+  user-select: none;
+}
+.epreuve-ligne.dragover,
+.epreuve-ligne.dragging,
+.epreuve-ligne.dragging-touch {
+  background: #4c3b2a;
+  opacity: 0.8;
+}
+.epreuve-delete {
+  cursor: pointer;
+  margin-right: 14px;
+  color: #c00;
+  font-size: 1.3em;
+  user-select: none;
+  transition: color 0.2s;
+}
+.epreuve-delete:hover { color: #ff3838; }
+.epreuve-edit {
+  cursor: pointer;
+  margin-left: auto;
+  font-size: 1.1em;
+  color: #e0c185;
+  user-select: none;
+  transition: color 0.2s;
+}
+.epreuve-edit:hover { color: #ffeecb; }
+.epreuve-label { margin-left: 7px; flex: 1; }
+.epreuve-num { font-weight: bold; min-width: 30px; text-align: right; }
+
+/* === CARTES PERSONNAGE ET GALERIES ===
+Utilisé dans : profils, galerie personnages, équipe
+*/
+.galerie-personnages, .galerie-equipes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+.carte-personnage, .carte-equipe {
+  background-color: #2c1b1b;
+  border: 2px solid #e9c78c;
+  border-radius: 12px;
+  width: 200px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  min-width: 0;
+  max-width: 480px;
+  color: #f4e4c1;
+  font-family: 'Cormorant Garamond', serif;
+}
+.carte-personnage:hover, .carte-equipe:hover { transform: scale(1.05); }
+.carte-personnage.indisponible, .carte-equipe.indisponible {
+  filter: grayscale(0.8) blur(1px);
+  pointer-events: none;
+  opacity: 0.7;
+}
+.carte-personnage-avatarzone, .carte-personnage-avatar {
+  flex: 0 0 auto;
+  margin-right: 18px;
+  display: flex;
+  align-items: center;
+}
+.carte-personnage-infos {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.carte-personnage-role {
+  color: #e0c185;
+  font-style: italic;
+  font-size: 1em;
+}
+.carte-personnage-desc {
+  color: #f4e4c1;
+  font-size: 0.98em;
+  margin-top: 2px;
+}
+.pris-label {
+  color: #b71c1c;
+  font-size: 0.95em;
+  font-weight: bold;
+  margin-left: 8px;
+  background: #fff3;
+  padding: 2px 7px;
+  border-radius: 5px;
+  display: inline-block;
+}
+@media (max-width: 650px) {
+  .carte-personnage, .carte-equipe {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 8px;
+    min-width: 0;
+    width: 100%;
+    max-width: 98vw;
   }
-  lastDistance = null;
+  .carte-personnage-avatarzone { margin-right: 0; margin-bottom: 8px; }
+  .carte-personnage-avatar { width: 56px; height: 56px; }
 }
 
-function lancerAccueil() {
-  const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = localStorage.getItem("equipeNum");
-  Promise.all([
-    db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value'),
-    db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value'),
-    db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value'),
-    db.ref(`parties/${salonCode}/finalGpsIndex`).once('value'),
-    db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).once('value')
-  ]).then(([snapPoints, snapMission, snapMapping, snapFinal, snapStatus]) => {
-    const gpsPoints = snapPoints.val() || [];
-    const missions = snapMission.val() || [];
-    const jetonMissionsMapping = snapMapping.val() || [];
-    const finalGpsIndex = typeof snapFinal.val() === "number" ? snapFinal.val() : null;
-    const validatedMissions = snapStatus.val() || {};
-
-    afficherCarteCentraleTousPoints(gpsPoints);
-
-    let totalMissions = missions.length;
-    let nbValidees = 0;
-    for (let i = 0; i < totalMissions; i++) {
-      if (validatedMissions && validatedMissions[i] && validatedMissions[i].validated) nbValidees++;
-    }
-    let toutesMissionsValidees = (nbValidees === totalMissions);
-
-    genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missions, validatedMissions, finalGpsIndex, toutesMissionsValidees);
-
-    if (toutesMissionsValidees && finalGpsIndex !== null) {
-      afficherJetonFinal(gpsPoints, finalGpsIndex);
-    } else {
-      document.getElementById('final-jeton-wrapper').style.display = "none";
-    }
-  });
-
-  window.addEventListener('resize', () => {
-    lancerAccueil();
-  });
+/* === VISUALLY-HIDDEN POUR ACCESSIBILITÉ ===
+Utilisé dans : toutes les pages accessibilité
+*/
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px,1px,1px,1px);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
 }
-  </script>
-</body>
-</html>
+
+/* === GRAYED/DÉSACTIVE ===
+Utilisé dans : icônes désactivées, boutons désactivés
+*/
+.grayed {
+  filter: grayscale(1) brightness(0.8);
+  opacity: 0.6;
+}
+
+/* === AUTRES BLOCS SPÉCIFIQUES : à compléter si besoin === */
+/* ... Ajoute ici les styles spécifiques à des pages ou fonctionnalités particulières ... */
