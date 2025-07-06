@@ -96,17 +96,16 @@ const QUESTS_CATALOGUE = [
   },
 
   // === DEFI EN DUEL ===
-  {
-    id: "duel",
-    nom: "Défi en duel",
-    description: "Deux équipes s’affrontent sur un mini-jeu (score, rapidité, etc.). L'équipe perdante perd une minute à devoir attendre sur lace",
-    parametres: [
-      { key: "type_duel", type: "text", label: "Type de duel", placeholder: "Course, quizz, etc." },
-      { key: "critere_victoire", type: "text", label: "Critère de victoire", placeholder: "Premier à finir, meilleur score, etc." }
-    ],
-    combinable: [],
-    preview: "duel"
-  },
+{
+  id: "duel",
+  nom: "Défi en duel",
+  description: "Deux équipes s’affrontent sur un mini-jeu (score, rapidité, etc.). L'équipe perdante perd une minute à devoir attendre sur place.",
+  parametres: [
+    { key: "nombre", type: "number", label: "Nombre de duels", min: 1, max: 10 }
+  ],
+  combinable: [],
+  preview: "duel"
+}
   
   {
     id: "pendu",
