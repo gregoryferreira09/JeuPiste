@@ -1216,3 +1216,27 @@ input[type="number"] {
   -moz-appearance: number-input !important;
   appearance: number-input !important;
 }
+
+/* Harmonisation consignes : label large + select extensible */
+#consignesZone > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+#consignesZone span {
+  min-width: 110px;         /* Suffisant pour "Personne/Photo 3:" etc. */
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+#consignesZone select {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: auto;
+  max-width: 100%;
+  margin-bottom: 0;         /* Plus d'espace inutile sous le select */
+  font-size: 1em;
+}
