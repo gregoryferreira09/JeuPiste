@@ -1189,24 +1189,24 @@ body {
   #confirmationModal .main-accueil {max-width:90vw;}
 }
 
-/* --- Agrandir la carte GPS sur mobile et desktop --- */
+/* Agrandit la carte tout en laissant 7mm de chaque côté et 1cm en haut/bas */
 #gpsGlobalMap {
-  width: 100vw !important;
-  max-width: 100vw !important;
-  height: 60vh !important;    /* ou 70vh pour encore plus grand */
-  max-height: 80vh;
-  min-height: 320px;
-  margin: 0 auto;
-  border-radius: 10px;
+  width: calc(100vw - 14mm);
+  height: calc(100vh - 2cm - 32px); /* 32px = marges/paddings éventuels du bandeau doré, ajuste si nécessaire */
+  margin: 1cm 7mm;
+  max-width: 100vw;
+  max-height: calc(100vh - 2cm);
+  min-height: 300px;
+  border-radius: 15px;
   box-shadow: 0 2px 12px #0002;
   display: block;
 }
 
-/* Occupe encore plus de place sur mobile */
+/* Sur mobile : garde la même logique, ajuste la min-height si tu veux */
 @media (max-width: 700px) {
   #gpsGlobalMap {
-    height: 80vh !important;
-    min-height: 340px;
-    border-radius: 0;
+    height: calc(100vh - 2cm - 16px);
+    min-height: 220px;
+    border-radius: 7px;
   }
 }
