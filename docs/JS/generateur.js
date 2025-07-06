@@ -523,7 +523,8 @@ const userIcon = L.icon({
 });
 window._userPositionMarker = L.marker([lat, lng], { icon: userIcon, title: "Vous êtes ici" }).addTo(gpsMap);
 window._userPositionMarker.bindPopup("Vous êtes ici").openPopup();
-      }, function(err) {
+      }, 
+        function(err) {
         gpsLocateBtn.disabled = false;
         gpsLocateBtn.textContent = "📍";
         alert("Impossible de vous localiser (" + (err.message || "erreur inconnue") + ")");
