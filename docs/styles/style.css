@@ -202,8 +202,8 @@ button:focus, a:focus, input:focus {
 
 /* === Bandeau principal (main-accueil) toujours présent === */
 .main-accueil {
-  width: 100px;         /* largeur fixe sur desktop */
-  max-width: 520vw;
+  width: 100%;
+  max-width: 520px;
   min-width: 0;
   margin: 40px auto;
   background: #2c1b1b;
