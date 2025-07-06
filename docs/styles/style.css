@@ -938,48 +938,26 @@ body {
 
 
 .gps-map-actions {
-  /* Supprime position:absolute, left, right, bottom, z-index, pointer-events */
-  width: 100%;
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;    /* Ligne horizontale */
+  align-items: center;    /* Centre verticalement */
+  justify-content: center;
   gap: 12px;
-  padding: 12px 10px 0 10px; /* Padding top pour espacer de la carte */
-  background: none; /* ou background: transparent; */
+  width: 100%;
+  padding: 12px 10px 0 10px;
+  background: none;
 }
 
-/* Boutons ronds uniquement pour la corbeille et le pointeur GPS */
 #gpsClearBtn,
 #gpsLocateBtn {
-  background: #232832;
-  color: #e0c185;
-  border: 2px solid #e0c185;
-  border-radius: 50%;
-  padding: 8px 16px;
-  min-width: 36px;
-  min-height: 36px;
-  font-weight: bold;
-  box-shadow: 0 1px 4px #0002;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border 0.15s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4em;
-  margin: 0 4px;
-}
-#gpsClearBtn:hover,
-#gpsLocateBtn:hover {
-  background: #3d2b1f;
-  color: #ffeecb;
-  border-color: #ffeecb;
+  /* styles ronds, voir plus haut */
 }
 
-/* Le champ + bouton de sauvegarde forment un seul bloc */
 #gpsSaveArea {
   display: flex;
+  flex-direction: row;    /* Champ + bouton sur la même ligne */
   align-items: stretch;
   gap: 0;
-  width: auto;
 }
 
 #gpsMapName {
@@ -1019,31 +997,26 @@ body {
   border-color: #ffeecb;
 }
 
-/* Responsive styles pour mobile */
+/* Responsive : sur mobile, garde la même ligne ou adapte si trop serré */
 @media (max-width: 600px) {
-  #gpsClearBtn,
-  #gpsLocateBtn {
-    width: 48px !important;
-    height: 48px !important;
-    min-width: 36px !important;
-    min-height: 36px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
-    border-radius: 50% !important;
-    padding: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-    font-size: 1.4em !important;
-    margin: 0 4px !important;
+  .gps-map-actions {
+    flex-direction: row;
+    flex-wrap: wrap; /* autorise passage à la ligne si pas assez large */
+    gap: 8px;
+    align-items: center;
   }
-
   #gpsSaveArea {
-    width: 100%;
+    flex: 1 1 200px;
+    min-width: 160px;
   }
   #gpsMapName {
-    flex: 1 1 auto;
+    font-size: 1em;
+    height: 36px;
+  }
+  #gpsSaveBtn {
+    height: 36px;
+    padding: 0 10px;
+    font-size: 1em;
   }
 }
 
