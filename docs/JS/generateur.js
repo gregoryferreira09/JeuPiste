@@ -653,6 +653,7 @@ let label = document.createElement('span');
 if (quest.id === "photo") label.textContent = `Photo ${i+1}:`;
 else if (quest.id === "photo_inconnus") label.textContent = `Personne/Photo ${i+1}:`;
 else if (quest.id === "collecte_objet") label.textContent = `Objet ${i+1}:`;
+else if (quest.id === "duel") label.textContent = `Duel ${i+1}:`;
 else label.textContent = `Consigne ${i+1}:`;
 label.style.minWidth = "130px";
 label.style.display = "inline-block";
