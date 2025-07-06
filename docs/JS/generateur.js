@@ -521,7 +521,7 @@ const userIcon = L.icon({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   shadowSize: [41, 41]
 });
-window._userPositionMarker = L.marker([lat, lng], { icon: userIcon, title: "Vous êtes ici"}).addTo(gpsMap);
+window._userPositionMarker = L.marker([lat, lng], { icon: userIcon, title: "Vous êtes ici" }).addTo(gpsMap);
 window._userPositionMarker.bindPopup("Vous êtes ici").openPopup();
         }
       }, function(err) {
