@@ -19,7 +19,7 @@
       overflow: hidden;
       box-shadow: 0 1px 6px #0002;
       border: 1.5px solid #343947;
-      background: none !important; /* PAS de fond */
+      background: none !important;
       position: relative;
     }
     .gps-map-actions,
@@ -57,48 +57,47 @@
       color: #ffeecb;
       border-color: #ffeecb;
     }
-   #gpsMapName, #gpsSaveBtn {
-  height: 38px; /* même hauteur pour le champ et le bouton */
-  box-sizing: border-box;
-  font-size: 1.1em;
-}
-#gpsMapName {
-  background: #232832;
-  color: #ffeecb;
-  border: 2px solid #e0c185;
-  border-radius: 7px 0 0 7px;
-  border-right: 0;
-  padding: 0 9px 0 12px; /* on enlève du padding vertical */
-  min-width: 120px;
-  outline: none;
-  display: block;
-}
-#gpsSaveBtn {
-  border-radius: 0 7px 7px 0;
-  border-left: 0;
-  background: #232832;
-  color: #e0c185;
-  border: 2px solid #e0c185;
-  width: 48px;
-  padding: 0;
-  font-size: 1.25em;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 1px 4px #0002;
-  transition: background 0.15s, color 0.15s, border 0.15s;
-  display: block;
-}
-#gpsSaveBtn:hover {
-  background: #3d2b1f;
-  color: #ffeecb;
-  border-color: #ffeecb;
-}
-#gpsSaveArea {
-  display: flex;
-  align-items: stretch; /* bien aligner sur la hauteur */
-  gap: 0;
-}
-    /* Harmonisation du select et du bouton charger */
+    #gpsMapName, #gpsSaveBtn {
+      height: 38px;
+      box-sizing: border-box;
+      font-size: 1.1em;
+    }
+    #gpsMapName {
+      background: #232832;
+      color: #ffeecb;
+      border: 2px solid #e0c185;
+      border-radius: 7px 0 0 7px;
+      border-right: 0;
+      padding: 0 9px 0 12px;
+      min-width: 120px;
+      outline: none;
+      display: block;
+    }
+    #gpsSaveBtn {
+      border-radius: 0 7px 7px 0;
+      border-left: 0;
+      background: #232832;
+      color: #e0c185;
+      border: 2px solid #e0c185;
+      width: 48px;
+      padding: 0;
+      font-size: 1.25em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 1px 4px #0002;
+      transition: background 0.15s, color 0.15s, border 0.15s;
+      display: block;
+    }
+    #gpsSaveBtn:hover {
+      background: #3d2b1f;
+      color: #ffeecb;
+      border-color: #ffeecb;
+    }
+    #gpsSaveArea {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
     #gpsSavedMaps {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.1em;
@@ -139,16 +138,55 @@
       outline: 2px solid #e0c185;
       outline-offset: 2px;
     }
-
     .gps-map-name--selected {
-  background: #ffeecb !important;
-  color: #232832 !important;
-  font-weight: bold;
-  box-shadow: 0 0 0 2px #e0c185, 0 0 8px #ffeecb88;
-  border-radius: 6px;
-  padding: 4px 12px;
-}
-    
+      background: #ffeecb !important;
+      color: #232832 !important;
+      font-weight: bold;
+      box-shadow: 0 0 0 2px #e0c185, 0 0 8px #ffeecb88;
+      border-radius: 6px;
+      padding: 4px 12px;
+    }
+    /* ----------- MODALE UNIVERSELLE harmonisée salon ----------- */
+    #confirmationModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(44,27,27,0.75);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    #confirmationModal.active {
+      display: flex;
+    }
+    #confirmationModal .main-accueil {
+      max-width: 340px;
+      margin: auto;
+      text-align: center;
+      border: 2px solid #e0c185;
+      background: #2c1b1b;
+      border-radius: 18px;
+      box-shadow: 0 4px 20px #0008;
+      padding: 32px 28px;
+    }
+    #confirmationModal .modal-question {
+      font-weight: bold;
+      margin-bottom: 22px;
+      color: #e0c185;
+      font-family: 'Cinzel Decorative',serif;
+      font-size: 1.1em;
+    }
+    #confirmationModal .boutons-actions {
+      display: flex;
+      flex-direction: row;
+      gap: 24px;
+      justify-content: center;
+      margin: 0;
+    }
+    #confirmationModal .main-btn {
+      width: 130px;
+      margin-bottom: 0;
+    }
     @media (max-width: 950px) {
       .bandeau-gps-global { flex-direction: column; gap: 20px; }
       #gpsMapBloc, #gpsInfosBloc { max-width: none; min-width: 0; }
@@ -159,6 +197,7 @@
       #gpsGlobalMap { min-height: 180px; height: 190px; }
       .gps-map-actions { padding: 0 2px 6px 2px; }
       #gpsSavedMaps { min-width: 0; font-size: 1em; }
+      #confirmationModal .main-accueil {max-width:90vw;}
     }
   </style>
 </head>
@@ -178,14 +217,14 @@
         <div id="gpsMapBloc">
           <div id="gpsGlobalMap"></div>
           <!-- Actions SOUS la map, dans #gpsMapBloc -->
-<div class="gps-map-actions">
-  <button id="gpsClearBtn" type="button" title="Vider tous les points">🗑️</button>
-  <button id="gpsLocateBtn" type="button" title="Me localiser">📍</button>
-  <div id="gpsSaveArea">
-    <input type="text" id="gpsMapName" placeholder="Nom de la carte">
-    <button type="button" id="gpsSaveBtn" title="Sauvegarder la map">💾</button>
-  </div>
-</div>
+          <div class="gps-map-actions">
+            <button id="gpsClearBtn" type="button" title="Vider tous les points">🗑️</button>
+            <button id="gpsLocateBtn" type="button" title="Me localiser">📍</button>
+            <div id="gpsSaveArea">
+              <input type="text" id="gpsMapName" placeholder="Nom de la carte">
+              <button type="button" id="gpsSaveBtn" title="Sauvegarder la map">💾</button>
+            </div>
+          </div>
         </div>
         <div id="gpsInfosBloc">
           <div>
@@ -199,16 +238,16 @@
       </div>
       <!-- FIN BANDEAU GPS GLOBAL -->
 
-      <div id="modalConfirm" style="display:none;">
-  <div class="modal-overlay"></div>
-  <div class="modal-content">
-    <div class="modal-message">Supprimer tous les points GPS&nbsp;?</div>
-    <div class="modal-actions">
-      <button id="modalYesBtn" class="main-btn">Oui</button>
-      <button id="modalNoBtn" class="main-btn">Non</button>
-    </div>
-  </div>
-</div>
+      <!-- MODALE DE CONFIRMATION HARMONISÉE -->
+      <div id="confirmationModal">
+        <div class="main-accueil">
+          <div class="modal-question" id="modalQuestion"></div>
+          <div class="boutons-actions">
+            <button id="confirmModalBtn" class="main-btn">Oui</button>
+            <button id="cancelModalBtn" class="main-btn">Non</button>
+          </div>
+        </div>
+      </div>
       
       <form class="form-container" id="epreuveForm" autocomplete="off">
         <div class="form-field">
@@ -253,8 +292,47 @@
   <script src="JS/catalogue-phrases.js"></script>
   <script src="JS/generateur.js"></script>
   <script>
-    // Harmonisation bouton "Charger"
+    // Fonction modale harmonisée
+    function showModalConfirm(questionText, callback) {
+      const modal = document.getElementById('confirmationModal');
+      const question = document.getElementById('modalQuestion');
+      const yesBtn = document.getElementById('confirmModalBtn');
+      const noBtn = document.getElementById('cancelModalBtn');
+      question.textContent = questionText;
+      modal.classList.add('active');
+      function cleanup() {
+        modal.classList.remove('active');
+        yesBtn.onclick = null;
+        noBtn.onclick = null;
+      }
+      yesBtn.onclick = function() { cleanup(); callback(true); };
+      noBtn.onclick = function() { cleanup(); callback(false); };
+      // Fermer aussi sur touche Échap
+      document.onkeydown = function(e) {
+        if (e.key === "Escape") { cleanup(); callback(false); }
+      };
+    }
+
+    // Harmonisation bouton "Vider tous les points"
     document.addEventListener("DOMContentLoaded", function() {
+      const gpsClearBtn = document.getElementById('gpsClearBtn');
+      if (gpsClearBtn) {
+        // On attend que la carte soit prête
+        gpsClearBtn.onclick = function() {
+          if (typeof gpsPoints !== "undefined" && gpsPoints.length === 0) return;
+          showModalConfirm("Supprimer tous les points GPS ?", function(ok) {
+            if (ok) {
+              // Les fonctions suivantes sont définies dans generateur.js
+              gpsPoints.length = 0;
+              if (typeof removeAllMarkers === "function") removeAllMarkers();
+              if (typeof refreshGpsList === "function") refreshGpsList();
+              if (typeof renderMapsList === "function") renderMapsList();
+              if (typeof selectedMapName !== "undefined") selectedMapName = null;
+            }
+          });
+        };
+      }
+      // Harmonisation bouton "Charger"
       const selectMap = document.getElementById('gpsSavedMaps');
       const btnLoad = document.getElementById('btnLoadMap');
       if (btnLoad && selectMap) {
