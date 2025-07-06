@@ -266,7 +266,7 @@ const SUGGESTIONS = {
 
 
 
-  defi_amis: [
+  duel: [
     "Pierre-Feuille-Ciseaux (classique, un tour ou en 2 manches gagnantes)",
     "Duel de regard (le premier qui cligne des yeux a perdu)",
     "Barbichette (le premier qui rit ou sourit perd)",
