@@ -17,8 +17,8 @@
         Bonjour<span id="pseudoAffiche"></span>
       </div>
       <div class="menu-buttons" role="group" aria-label="Actions principales">
-        <button class="main-btn" type="button" onclick="window.location.href='creer-partie.html'">🎮 Créer une partie</button>
-        <button class="main-btn" type="button" onclick="window.location.href='rejoindre-partie.html'">👥 Rejoindre une partie</button>
+        <button class="main-btn" type="button" onclick="verifPseudoEtRediriger('creer-partie.html')">🎮 Créer une partie</button>
+        <button class="main-btn" type="button" onclick="verifPseudoEtRediriger('rejoindre-partie.html')">👥 Rejoindre une partie</button>
         <button class="main-btn" type="button" onclick="window.location.href='profil-joueur.html'">👤 Profil</button>
         <button class="main-btn" type="button" onclick="window.location.href='gamemaster.html'">🧩 Gamemaster </button>
         <button class="main-btn" type="button" onclick="window.location.href='générateur.html'">🛠️ Générateur</button>
@@ -71,22 +71,19 @@
       }
     }
 
-    // Dans le onclick des boutons créer/rejoindre une partie
-function verifPseudoEtRediriger(url) {
-  var pseudo = localStorage.getItem("pseudo");
-  if (!pseudo || pseudo.trim().length < 1 ||
-    pseudo.trim().toLowerCase() === "anonyme" ||
-    pseudo.trim().toLowerCase() === "invité") {
-    alert("Merci de choisir un pseudo avant de jouer !");
-    window.location.href = "profil-joueur.html";
-  } else {
-    window.location.href = url;
-  }
-}
-// Et dans le HTML :
-<button class="main-btn" type="button" onclick="verifPseudoEtRediriger('creer-partie.html')">🎮 Créer une partie</button>
-<button class="main-btn" type="button" onclick="verifPseudoEtRediriger('rejoindre-partie.html')">👥 Rejoindre une partie</button>
-    
+    // Vérifie le pseudo avant de créer/rejoindre une partie
+    function verifPseudoEtRediriger(url) {
+      var pseudo = localStorage.getItem("pseudo");
+      if (!pseudo || pseudo.trim().length < 1 ||
+        pseudo.trim().toLowerCase() === "anonyme" ||
+        pseudo.trim().toLowerCase() === "invité") {
+        alert("Merci de choisir un pseudo avant de jouer !");
+        window.location.href = "profil-joueur.html";
+      } else {
+        window.location.href = url;
+      }
+    }
+
     // Affichage initial du pseudo
     document.addEventListener("DOMContentLoaded", afficherPseudoAccueil);
 
@@ -95,7 +92,7 @@ function verifPseudoEtRediriger(url) {
       if (event.key === "pseudo") {
         afficherPseudoAccueil();
       }
-    }
+    });
 
     // Nettoyage code salon si existant
     localStorage.removeItem("salonCode");
