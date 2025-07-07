@@ -500,11 +500,10 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
       // Affichage blanc (état initial)
       btn.innerHTML = i+1;
       btn.tabIndex = 0;
-      btn.onclick = (e) => {
-        e.preventDefault();
-        hideCompass();
-        showCompass(gpsPoints[i]);
-      };
+btn.onclick = (e) => {
+  e.preventDefault();
+  showCompass(gpsPoints[i]);
+};
       btn.ondblclick = (e) => {
         e.preventDefault();
         hideCompass();
@@ -515,6 +514,17 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
           setTimeout(() => stepsInfo.classList.remove('error'), 1700);
           return;
         }
+        if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
+  const stepsInfo = document.getElementById('steps-info');
+  stepsInfo.classList.add('error');
+  const arrow = document.getElementById('svg-arrow');
+  arrow.classList.add('arrow-error');
+  setTimeout(() => {
+    stepsInfo.classList.remove('error');
+    arrow.classList.remove('arrow-error');
+  }, 1700);
+  return;
+}
         if (hasMission) {
           window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
         } else {
