@@ -118,6 +118,13 @@ window.creerPartie = async function(formData) {
   let pseudo = localStorage.getItem("pseudo") || "Anonyme";
   pseudo = pseudo.replace(/[<>\/\\'"`]/g, "").trim().substring(0, 30);
 
+  // Vérification du pseudo AVANT de créer la partie
+  if (!pseudo || pseudo.toLowerCase() === "anonyme" || pseudo.toLowerCase() === "invité") {
+    alert("Merci de choisir un pseudo valide avant de créer une partie !");
+    window.location.href = "profil-joueur.html";
+    return;
+  }
+
   const parametresPartie = {
     nombreJoueurs,
     createur: uuid,
@@ -169,11 +176,8 @@ window.creerPartie = async function(formData) {
   await db.ref('parties/' + salonCode + '/scenarioJeu/repartition').set(repartition);
 
   // GESTION GPS : Génération du mapping mission/points GPS
-  // ------------------------------------------------------
-  // On suppose que les points GPS sont stockés dans scenarioToUse.gpsPoints ou dans scenario.gpsPoints
   let gpsPoints = scenarioToUse.gpsPoints || (scenarioToUse.scenario && scenarioToUse.scenario.gpsPoints) || [];
   if (!Array.isArray(gpsPoints) || gpsPoints.length === 0) {
-    // Essai de fallback pour compatibilité
     if (scenarioToUse && scenarioToUse.scenario && Array.isArray(scenarioToUse.scenario)) {
       gpsPoints = [];
       scenarioToUse.scenario.forEach(etape => {
@@ -184,26 +188,15 @@ window.creerPartie = async function(formData) {
       });
     }
   }
-
-  // Nombre de missions et de points GPS
   const nbMissions = repartition.length;
   const nbGPS = gpsPoints.length;
-
-  // Si il y a plus de points GPS que de missions, on attribue UN point final (non utilisé), qui sera révélé à la fin.
   let finalGpsIndex = null;
   let jetonMissionsMapping = [];
 
   if (nbGPS > nbMissions) {
-    // Choix du point final : le dernier, ou aléatoire
     finalGpsIndex = nbGPS - 1;
-    // Si tu veux aléatoire, dé-commente la ligne suivante :
-    // finalGpsIndex = Math.floor(Math.random() * nbGPS);
-
-    // On prépare la mapping : -1 pour le point final, 0...N-2 pour les autres
     jetonMissionsMapping = Array(nbGPS).fill(-1);
     let indices = [...Array(nbGPS).keys()].filter(i => i !== finalGpsIndex);
-
-    // Mélange
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
@@ -212,15 +205,10 @@ window.creerPartie = async function(formData) {
       jetonMissionsMapping[indices[m]] = m;
     }
   } else {
-    // Cas classique : autant de missions que de points GPS (ou moins => tous les points servent)
     jetonMissionsMapping = [...Array(nbGPS).keys()].map(i => i < nbMissions ? i : -1);
     finalGpsIndex = -1;
   }
-
-  // Stockage du mapping dans la partie
   await db.ref('parties/' + salonCode + '/jetonMissionsMapping').set(jetonMissionsMapping);
-
-  // Stockage de l'index du point final (pour l'affichage spécial à la fin)
   await db.ref('parties/' + salonCode + '/finalGpsIndex').set(finalGpsIndex);
 
   // GÉNÉRATION DES PERSONNAGES (exemple simple)
@@ -230,6 +218,7 @@ window.creerPartie = async function(formData) {
   }
   await db.ref('parties/' + salonCode + '/personnages').set(persosObj);
 
+  // AJOUT DU JOUEUR AVEC PSEUDO ET UUID BIEN REMPLIS
   await db.ref('parties/' + salonCode + '/joueurs').push({
     uuid,
     pseudo
