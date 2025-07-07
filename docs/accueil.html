@@ -55,7 +55,7 @@
       if (main) main.classList.add('visible');
     });
 
-    // Fonction pour afficher le pseudo correctement sur la page d'accueil
+    // Affiche correctement le pseudo sur la page d'accueil
     function afficherPseudoAccueil() {
       var pseudo = localStorage.getItem("pseudo");
       var el = document.getElementById("pseudoAffiche");
@@ -71,7 +71,7 @@
       }
     }
 
-    // Vérifie le pseudo avant de créer/rejoindre une partie
+    // Vérifie le pseudo uniquement lors d'une tentative de création/rejoindre partie
     function verifPseudoEtRediriger(url) {
       var pseudo = localStorage.getItem("pseudo");
       if (!pseudo || pseudo.trim().length < 1 ||
