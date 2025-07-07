@@ -158,6 +158,9 @@
       filter: drop-shadow(0 2px 10px #d4af3760);
       display: block;
     }
+    #svg-arrow.arrow-error {
+      filter: drop-shadow(0 0 12px #e02424) drop-shadow(0 0 4px #e02424);
+    }
     #modal-perdu {
       display: none;
       position: fixed;
@@ -364,6 +367,7 @@
 
     let searchingArrowInterval = null;
     let isSearchingArrow = false;
+    let currentJetonIndex = null; // <-- pour mémoriser l'index du jeton courant
     
 function getSkullSVG() {
   return `
@@ -500,41 +504,42 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
       // Affichage blanc (état initial)
       btn.innerHTML = i+1;
       btn.tabIndex = 0;
-btn.onclick = (e) => {
-  e.preventDefault();
-  showCompass(gpsPoints[i]);
-};
+      btn.onclick = (e) => {
+        e.preventDefault();
+        currentJetonIndex = i; // mémorisation de l'index
+        showCompass(gpsPoints[i]);
+      };
 
       btn.ondblclick = (e) => {
-  e.preventDefault();
-  // Vérifie la distance, sans cacher la boussole
-  if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
-    const stepsInfo = document.getElementById('steps-info');
-    stepsInfo.classList.add('error');
-    const arrow = document.getElementById('svg-arrow');
-    arrow.classList.add('arrow-error');
-    setTimeout(() => {
-      stepsInfo.classList.remove('error');
-      arrow.classList.remove('arrow-error');
-    }, 1700);
-    return;
-  }
-  if (hasMission) {
-    window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-  } else {
-    // Jeton sans mission, grise/désactive/crâne
-    btn.className = 'jeton no-mission';
-    btn.innerHTML = getSkullSVG();
-    btn.disabled = true;
-    btn.style.cursor = "default";
-    btn.onclick = null;
-    btn.ondblclick = null;
-    btn.tabIndex = -1;
-    jetonsState[i] = "no-mission";
-    document.getElementById('modal-perdu').classList.add('active');
-  }
-};
-
+        e.preventDefault();
+        // Vérifie la distance, sans cacher la boussole
+        if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
+          const stepsInfo = document.getElementById('steps-info');
+          stepsInfo.classList.add('error');
+          const arrow = document.getElementById('svg-arrow');
+          arrow.classList.add('arrow-error');
+          setTimeout(() => {
+            stepsInfo.classList.remove('error');
+            arrow.classList.remove('arrow-error');
+          }, 1700);
+          return;
+        }
+        if (hasMission) {
+          window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
+        } else {
+          // Jeton sans mission, grise/désactive/crâne
+          btn.className = 'jeton no-mission';
+          btn.innerHTML = getSkullSVG();
+          btn.disabled = true;
+          btn.style.cursor = "default";
+          btn.onclick = null;
+          btn.ondblclick = null;
+          btn.tabIndex = -1;
+          jetonsState[i] = "no-mission";
+          document.getElementById('modal-perdu').classList.add('active');
+        }
+      };
+    }
 
     if (i % 2 === 0) {
       gauche.appendChild(btn);
@@ -567,7 +572,7 @@ function showCompass(targetGps, onArrivee) {
   container.style.display = "flex";
   const stepsInfo = document.getElementById('steps-info');
   stepsInfo.textContent = "Recherche de la position...";
-startSearchingArrow();
+  startSearchingArrow();
   if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
   lastDistance = null;
 
@@ -611,10 +616,28 @@ startSearchingArrow();
     stopSearchingArrow();
     document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
   }
-document.getElementById('svg-arrow').onclick = function() {
-  // Copie ici la logique du double-clic !
-};
-  
+
+  document.getElementById('svg-arrow').onclick = function() {
+    if (currentJetonIndex === null) return;
+    // il faut que gpsPoints, jetonMissionsMapping, etc. soient accessibles ici (mettre en global si besoin)
+    if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[currentJetonIndex].lat, gpsPoints[currentJetonIndex].lng) > 30) {
+      const stepsInfo = document.getElementById('steps-info');
+      stepsInfo.classList.add('error');
+      const arrow = document.getElementById('svg-arrow');
+      arrow.classList.add('arrow-error');
+      setTimeout(() => {
+        stepsInfo.classList.remove('error');
+        arrow.classList.remove('arrow-error');
+      }, 1700);
+      return;
+    }
+    if (jetonMissionsMapping[currentJetonIndex] !== -1) {
+      window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[currentJetonIndex]}`;
+    } else {
+      // Tu peux afficher le modal perdu ici si besoin
+    }
+  };
+
   if (navigator.geolocation) {
     compassWatchId = navigator.geolocation.watchPosition(
       updateArrow,
@@ -642,10 +665,9 @@ function startSearchingArrow() {
   isSearchingArrow = true;
   const arrow = document.getElementById('svg-arrow');
   searchingArrowInterval = setInterval(() => {
-    // Fait tourner la flèche à des angles aléatoires (ou incrémental)
     const randomDeg = Math.random() * 360;
     arrow.style.transform = `rotate(${randomDeg}deg)`;
-  }, 260); // toutes les 260ms, change la rotation (ajuste la vitesse si besoin)
+  }, 260);
 }
 
 function stopSearchingArrow() {
@@ -668,6 +690,8 @@ function hideCompass() {
   stopSearchingArrow();
 }
 
+let gpsPoints = [], jetonMissionsMapping = [], missions = [], validatedMissions = [];
+
 function lancerAccueil() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = localStorage.getItem("equipeNum");
@@ -678,11 +702,11 @@ function lancerAccueil() {
     db.ref(`parties/${salonCode}/finalGpsIndex`).once('value'),
     db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).once('value')
   ]).then(([snapPoints, snapMission, snapMapping, snapFinal, snapStatus]) => {
-    const gpsPoints = snapPoints.val() || [];
-    const missions = snapMission.val() || [];
-    const jetonMissionsMapping = snapMapping.val() || [];
+    gpsPoints = snapPoints.val() || [];
+    missions = snapMission.val() || [];
+    jetonMissionsMapping = snapMapping.val() || [];
     const finalGpsIndex = typeof snapFinal.val() === "number" ? snapFinal.val() : null;
-    const validatedMissions = snapStatus.val() || {};
+    validatedMissions = snapStatus.val() || {};
 
     afficherCarteCentraleTousPoints(gpsPoints);
 
