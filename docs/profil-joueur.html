@@ -286,55 +286,60 @@
         }
       });
 
-      pseudoDisplay.addEventListener("blur", function() {
-        let newPseudo = pseudoDisplay.textContent.trim();
-        if (!newPseudo) {
-          newPseudo = defaultPseudo;
-          pseudoFeedback.textContent = "Le pseudo ne peut pas être vide.";
-        } else {
-          pseudoFeedback.textContent = "Pseudo enregistré.";
-        }
-        localStorage.setItem("pseudo", newPseudo);
-        pseudoDisplay.textContent = newPseudo;
-        setTimeout(()=>{pseudoFeedback.textContent="";}, 1800);
+     pseudoDisplay.addEventListener("blur", function() {
+  let newPseudo = pseudoDisplay.textContent.trim();
+  if (!newPseudo) {
+    newPseudo = defaultPseudo;
+    pseudoFeedback.textContent = "Le pseudo ne peut pas être vide.";
+  } else {
+    pseudoFeedback.textContent = "Pseudo enregistré.";
+  }
+  localStorage.setItem("pseudo", newPseudo);
+  pseudoDisplay.textContent = newPseudo;
+  setTimeout(()=>{pseudoFeedback.textContent="";}, 1800);
 
-        // Synchronisation du pseudo sur Firebase si on est dans un salon
-        const salonCode = localStorage.getItem("salonCode");
-        if (
-          salonCode &&
-          newPseudo &&
-          newPseudo.toLowerCase() !== 'anonyme' &&
-          newPseudo.toLowerCase() !== 'invité'
-        ) {
-          function sendPseudoToFirebase() {
-            if (!window.firebase.apps || !window.firebase.apps.length) {
-              firebase.initializeApp({
-                apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-                authDomain: "murder-party-ba8d1.firebaseapp.com",
-                databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-                projectId: "murder-party-ba8d1"
-              });
-            }
-            var db = firebase.database();
-            db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
-              snap.forEach(child => {
-                db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(newPseudo);
-              });
-            });
+  // Synchronisation du pseudo sur Firebase si on est dans un salon
+  const salonCode = localStorage.getItem("salonCode");
+  const myUuid = localStorage.getItem("uuid");
+  if (
+    salonCode &&
+    myUuid &&
+    newPseudo &&
+    newPseudo.toLowerCase() !== 'anonyme' &&
+    newPseudo.toLowerCase() !== 'invité'
+  ) {
+    function sendPseudoToFirebase() {
+      if (!window.firebase.apps || !window.firebase.apps.length) {
+        firebase.initializeApp({
+          apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+          authDomain: "murder-party-ba8d1.firebaseapp.com",
+          databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "murder-party-ba8d1"
+        });
+      }
+      var db = firebase.database();
+      db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
+        snap.forEach(child => {
+          // Met à jour UNIQUEMENT ton uuid
+          if (child.val().uuid === myUuid) {
+            db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(newPseudo);
           }
-          if (typeof firebase === "undefined") {
-            var script1 = document.createElement('script');
-            script1.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
-            document.head.appendChild(script1);
-            var script2 = document.createElement('script');
-            script2.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js";
-            document.head.appendChild(script2);
-            script2.onload = sendPseudoToFirebase;
-          } else {
-            sendPseudoToFirebase();
-          }
-        }
+        });
       });
+    }
+    if (typeof firebase === "undefined") {
+      var script1 = document.createElement('script');
+      script1.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+      document.head.appendChild(script1);
+      var script2 = document.createElement('script');
+      script2.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js";
+      document.head.appendChild(script2);
+      script2.onload = sendPseudoToFirebase;
+    } else {
+      sendPseudoToFirebase();
+    }
+  }
+});
 
       pseudoDisplay.addEventListener("focus", function() {
         pseudoFeedback.textContent = "Appuie sur Entrée pour valider.";
