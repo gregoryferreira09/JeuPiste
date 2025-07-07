@@ -1262,3 +1262,8 @@ input[type="number"] {
   margin: 24px 0 16px 0;  /* Optionnel : espace autour */
   letter-spacing: 0.5px;  /* Optionnel : aère un peu le texte */
 }
+
+#svg-arrow.arrow-error {
+  filter: drop-shadow(0 0 12px #e02424) drop-shadow(0 0 4px #e02424);
+  stroke: #e02424 !important;
+}
