@@ -208,17 +208,18 @@
       let monPseudo = localStorage.getItem("pseudo") || "invité";
       pseudoAffiche.textContent = monPseudo;
 
-      // Met à jour mon pseudo dans la liste des joueurs si besoin
-      // Correction universelle : met à jour tous les "Anonyme" ou "invité" trouvés par mon pseudo local
-      if (salonCode && monPseudo && monPseudo !== "Anonyme" && monPseudo !== "invité") {
-        db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
-          snap.forEach(child => {
-            if (child.val().pseudo === "Anonyme" || child.val().pseudo === "invité") {
-              db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(monPseudo);
-            }
-          });
-        });
+// Met à jour mon pseudo dans la base si besoin, pour mon propre joueur
+if (salonCode && monPseudo && monPseudo.trim().toLowerCase() !== "anonyme" && monPseudo.trim().toLowerCase() !== "invité") {
+  db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
+    snap.forEach(child => {
+      // On vérifie le pseudo ET l'utilisateur actuel (par exemple via un identifiant localStorage si tu en utilises un, sinon, on recolle le pseudo à tous les "anonyme/invité")
+      if (child.val().pseudo === "Anonyme" || child.val().pseudo === "invité" || child.val().pseudo !== monPseudo) {
+        // Si c'est mon enregistrement (on compare aussi d'autres infos si dispo)
+        db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(monPseudo);
       }
+    });
+  });
+}
       let jeSuisCreateur = false;
       let countdownInterval = null;
       let lancementAutomatiqueDemarre = false;
