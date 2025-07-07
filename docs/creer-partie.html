@@ -15,26 +15,26 @@
   </script>
   <!-- ========= SCENARIO PAR DÉFAUT ========== -->
   <script>
-
     // Nettoyage du contexte si retour à la création d'une partie
-localStorage.removeItem('pseudo');
-localStorage.removeItem('pseudoOrigine');
-localStorage.removeItem('salonCode');
-localStorage.removeItem('enCours');
-localStorage.removeItem('parametresPartie');
+    // *** NE PAS supprimer le pseudo ici ***
+    // localStorage.removeItem('pseudo');
+    localStorage.removeItem('pseudoOrigine');
+    localStorage.removeItem('salonCode');
+    localStorage.removeItem('enCours');
+    localStorage.removeItem('parametresPartie');
     
-  // ⚠️ Modifie ici les étapes selon ton vrai scénario Parc Saint Nicolas !
-  window.SCENARIO_PAR_DEFAUT = {
-    scenario: [
-      { type: "gps", params: { consigne: "Va à l'entrée du parc", gps: "47.4712,-0.5523" } },
-      { type: "photo", params: { consigne: "Prends une photo de la statue" } },
-      { type: "enigme", params: { consigne: "Résous cette énigme : Je suis grand quand je suis jeune et petit quand je suis vieux. Qui suis-je ?", solution: "une bougie" } },
-      { type: "observation", params: { consigne: "Note le nombre de bancs autour du grand arbre", solution: "4" } },
-      { type: "mot_de_passe", params: { consigne: "Trouve le mot de passe caché sur le panneau", solution: "parc" } },
-      { type: "gps", params: { consigne: "Rends-toi au kiosque", gps: "47.4713,-0.5530" } },
-      { type: "revelation", params: { consigne: "Bravo, tu as terminé le parcours !" } }
-    ]
-  };
+    // ⚠️ Modifie ici les étapes selon ton vrai scénario Parc Saint Nicolas !
+    window.SCENARIO_PAR_DEFAUT = {
+      scenario: [
+        { type: "gps", params: { consigne: "Va à l'entrée du parc", gps: "47.4712,-0.5523" } },
+        { type: "photo", params: { consigne: "Prends une photo de la statue" } },
+        { type: "enigme", params: { consigne: "Résous cette énigme : Je suis grand quand je suis jeune et petit quand je suis vieux. Qui suis-je ?", solution: "une bougie" } },
+        { type: "observation", params: { consigne: "Note le nombre de bancs autour du grand arbre", solution: "4" } },
+        { type: "mot_de_passe", params: { consigne: "Trouve le mot de passe caché sur le panneau", solution: "parc" } },
+        { type: "gps", params: { consigne: "Rends-toi au kiosque", gps: "47.4713,-0.5530" } },
+        { type: "revelation", params: { consigne: "Bravo, tu as terminé le parcours !" } }
+      ]
+    };
   </script>
   <!-- ======================================== -->
 </head>
@@ -128,7 +128,7 @@ localStorage.removeItem('parametresPartie');
 <script src="JS/ux-enhance.js"></script><!-- Chemin corrigé -->
 <script src="JS/scalability.js"></script><!-- Chemin corrigé -->
 
-  <script>
+<script>
   // Désactive tout loader bloquant pour test
   var loader = document.getElementById('global-loader');
   if(loader) loader.remove();
