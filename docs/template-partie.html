@@ -611,7 +611,10 @@ startSearchingArrow();
     stopSearchingArrow();
     document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
   }
-
+document.getElementById('svg-arrow').onclick = function() {
+  // Copie ici la logique du double-clic !
+};
+  
   if (navigator.geolocation) {
     compassWatchId = navigator.geolocation.watchPosition(
       updateArrow,
