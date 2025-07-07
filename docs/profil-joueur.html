@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/style.css">
   <style>
-    /* PAS de style sur .main-accueil ! */
     .avatar-section {
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 24px; margin-top: 24px;
@@ -221,49 +220,6 @@
         });
       }
 
-      // Synchronisation du pseudo sur Firebase si on est dans un salon
-const salonCode = localStorage.getItem("salonCode");
-if (salonCode && newPseudo && newPseudo.toLowerCase() !== 'anonyme' && newPseudo.toLowerCase() !== 'invité') {
-  // On update TOUS les "pseudo" du joueur courant dans cette partie (on ne peut pas faire mieux sans ID unique)
-  // Charge Firebase si besoin :
-  if (typeof firebase === "undefined") {
-    // Charger Firebase JS si pas déjà fait (optionnel si déjà présent dans la page)
-    var script1 = document.createElement('script');
-    script1.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
-    document.head.appendChild(script1);
-    var script2 = document.createElement('script');
-    script2.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js";
-    document.head.appendChild(script2);
-    script2.onload = sendPseudoToFirebase;
-  } else {
-    sendPseudoToFirebase();
-  }
-
-  function sendPseudoToFirebase() {
-    if (!window.firebase.apps || !window.firebase.apps.length) {
-      firebase.initializeApp({
-        apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
-        authDomain: "murder-party-ba8d1.firebaseapp.com",
-        databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "murder-party-ba8d1"
-      });
-    }
-    var db = firebase.database();
-    db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
-      snap.forEach(child => {
-        // Met à jour tous les pseudos qui correspondent à "Anonyme", "invité" ou ton ancien pseudo
-        if (
-          child.val().pseudo === "Anonyme" ||
-          child.val().pseudo === "invité" ||
-          child.val().pseudo !== newPseudo
-        ) {
-          db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(newPseudo);
-        }
-      });
-    });
-  }
-}
-      
       // Ouvre la modale d'avatar
       function ouvrirModal() {
         afficherListeAvatars(selectedAvatar);
@@ -316,12 +272,12 @@ if (salonCode && newPseudo && newPseudo.toLowerCase() !== 'anonyme' && newPseudo
       pseudoDisplay.textContent = pseudo;
 
       pseudoDisplay.addEventListener("input", function() {
-  if (this.textContent.trim().length < 1) {
-    pseudoFeedback.textContent = "Le pseudo ne peut pas être vide.";
-  } else {
-    pseudoFeedback.textContent = "";
-  }
-});
+        if (this.textContent.trim().length < 1) {
+          pseudoFeedback.textContent = "Le pseudo ne peut pas être vide.";
+        } else {
+          pseudoFeedback.textContent = "";
+        }
+      });
 
       pseudoDisplay.addEventListener("keydown", function(e) {
         if (e.key === "Enter") {
@@ -341,6 +297,43 @@ if (salonCode && newPseudo && newPseudo.toLowerCase() !== 'anonyme' && newPseudo
         localStorage.setItem("pseudo", newPseudo);
         pseudoDisplay.textContent = newPseudo;
         setTimeout(()=>{pseudoFeedback.textContent="";}, 1800);
+
+        // Synchronisation du pseudo sur Firebase si on est dans un salon
+        const salonCode = localStorage.getItem("salonCode");
+        if (
+          salonCode &&
+          newPseudo &&
+          newPseudo.toLowerCase() !== 'anonyme' &&
+          newPseudo.toLowerCase() !== 'invité'
+        ) {
+          function sendPseudoToFirebase() {
+            if (!window.firebase.apps || !window.firebase.apps.length) {
+              firebase.initializeApp({
+                apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+                authDomain: "murder-party-ba8d1.firebaseapp.com",
+                databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+                projectId: "murder-party-ba8d1"
+              });
+            }
+            var db = firebase.database();
+            db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
+              snap.forEach(child => {
+                db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(newPseudo);
+              });
+            });
+          }
+          if (typeof firebase === "undefined") {
+            var script1 = document.createElement('script');
+            script1.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+            document.head.appendChild(script1);
+            var script2 = document.createElement('script');
+            script2.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js";
+            document.head.appendChild(script2);
+            script2.onload = sendPseudoToFirebase;
+          } else {
+            sendPseudoToFirebase();
+          }
+        }
       });
 
       pseudoDisplay.addEventListener("focus", function() {
@@ -364,8 +357,8 @@ if (salonCode && newPseudo && newPseudo.toLowerCase() !== 'anonyme' && newPseudo
   </noscript>
 
   <script src="JS/security-enhance.js"></script>
-<script src="JS/ux-enhance.js"></script>
-<script src="JS/scalability.js"></script>
+  <script src="JS/ux-enhance.js"></script>
+  <script src="JS/scalability.js"></script>
   
 </body>
 </html>
