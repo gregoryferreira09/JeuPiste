@@ -362,6 +362,9 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    let searchingArrowInterval = null;
+    let isSearchingArrow = false;
+    
 function getSkullSVG() {
   return `
 <svg class="svg-skull" width="38" height="38" viewBox="0 0 32 32" fill="none">
@@ -560,6 +563,7 @@ function showCompass(targetGps, onArrivee) {
   container.style.display = "flex";
   const stepsInfo = document.getElementById('steps-info');
   stepsInfo.textContent = "Recherche de la position...";
+startSearchingArrow();
   if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
   lastDistance = null;
 
@@ -600,6 +604,7 @@ function showCompass(targetGps, onArrivee) {
     }
     const heading = brng - deviceHeading;
 
+    stopSearchingArrow();
     document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
   }
 
@@ -624,7 +629,24 @@ function showCompass(targetGps, onArrivee) {
     }
   }, true);
 }
+    
+function startSearchingArrow() {
+  if (isSearchingArrow) return;
+  isSearchingArrow = true;
+  const arrow = document.getElementById('svg-arrow');
+  searchingArrowInterval = setInterval(() => {
+    // Fait tourner la flèche à des angles aléatoires (ou incrémental)
+    const randomDeg = Math.random() * 360;
+    arrow.style.transform = `rotate(${randomDeg}deg)`;
+  }, 260); // toutes les 260ms, change la rotation (ajuste la vitesse si besoin)
+}
 
+function stopSearchingArrow() {
+  if (!isSearchingArrow) return;
+  isSearchingArrow = false;
+  clearInterval(searchingArrowInterval);
+  searchingArrowInterval = null;
+}
 function hideCompass() {
   const container = document.getElementById('compass-arrow-container');
   container.style.display = "none";
@@ -635,6 +657,8 @@ function hideCompass() {
     compassWatchId = null;
   }
   lastDistance = null;
+
+  stopSearchingArrow();
 }
 
 function lancerAccueil() {
