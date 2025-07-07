@@ -349,6 +349,28 @@
         }, 1900);
       }
     });
+
+    // --- Gestion des jetons malus (sans mission) sauvegardés par équipe/partie ---
+    function getMalusKey() {
+      let salonCode = localStorage.getItem("salonCode") || "";
+      let equipeNum = localStorage.getItem("equipeNum") || "";
+      return `malusJetons_${salonCode}_${equipeNum}`;
+    }
+    function saveMalusJeton(idx) {
+      let key = getMalusKey();
+      let arr = JSON.parse(localStorage.getItem(key) || "[]");
+      if (!arr.includes(idx)) {
+        arr.push(idx);
+        localStorage.setItem(key, JSON.stringify(arr));
+      }
+    }
+    function getMalusJetons() {
+      let key = getMalusKey();
+      return JSON.parse(localStorage.getItem(key) || "[]");
+    }
+    function clearMalusJetons() {
+      localStorage.removeItem(getMalusKey());
+    }
   </script>
   <script>
     // --- LOGIQUE ADAPTÉE POUR POINT FINAL ---
@@ -367,8 +389,8 @@
 
     let searchingArrowInterval = null;
     let isSearchingArrow = false;
-    let currentJetonIndex = null; // <-- pour mémoriser l'index du jeton courant
-    
+    let currentJetonIndex = null;
+
 function getSkullSVG() {
   return `
 <svg class="svg-skull" width="38" height="38" viewBox="0 0 32 32" fill="none">
@@ -458,15 +480,17 @@ function afficherCarteCentraleTousPoints(points) {
 
 // --- JETONS de la carte ---
 let jetonsState = []; // "white" | "no-mission" | "validated"
+let gpsPoints = [], jetonMissionsMapping = [], missions = [], validatedMissions = [];
 
-function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, validatedMissions, finalGpsIndex, toutesMissionsValidees) {
+function genererJetonsColonnes(gpsPts, jetonMap, missionsList, validatedMissions, finalGpsIndex, toutesMissionsValidees) {
   const gauche = document.getElementById('jetons-gauche');
   const droite = document.getElementById('jetons-droite');
   gauche.innerHTML = '';
   droite.innerHTML = '';
-  const N = gpsPoints.length;
+  const N = gpsPts.length;
   let jetonDiameter = (N > 10) ? 34 : 48;
   jetonsState = jetonsState.length === N ? jetonsState : Array(N).fill("white");
+  let malusJetons = getMalusJetons();
 
   for(let i=0; i<N; i++) {
     if (i === finalGpsIndex && !toutesMissionsValidees) continue;
@@ -478,9 +502,9 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
     btn.setAttribute('aria-label', `Point GPS ${i+1}`);
     btn.style.width = btn.style.height = jetonDiameter + "px";
     btn.dataset.idx = i;
-    let hasMission = jetonMissionsMapping[i] !== -1;
-    let missionType = hasMission ? getMissionTypeByIndex(jetonMissionsMapping[i], missionsList) : null;
-    let isValidated = hasMission && validatedMissions && validatedMissions[jetonMissionsMapping[i]] && validatedMissions[jetonMissionsMapping[i]].validated;
+    let hasMission = jetonMap[i] !== -1;
+    let missionType = hasMission ? getMissionTypeByIndex(jetonMap[i], missionsList) : null;
+    let isValidated = hasMission && validatedMissions && validatedMissions[jetonMap[i]] && validatedMissions[jetonMap[i]].validated;
 
     // Etat dynamique :
     if (isValidated) {
@@ -492,7 +516,7 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
       btn.ondblclick = null;
       btn.tabIndex = -1;
       jetonsState[i] = "validated";
-    } else if (jetonsState[i] === "no-mission") {
+    } else if (jetonsState[i] === "no-mission" || malusJetons.includes(i)) {
       btn.classList.add('no-mission');
       btn.innerHTML = getSkullSVG();
       btn.disabled = true;
@@ -500,20 +524,21 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
       btn.onclick = null;
       btn.ondblclick = null;
       btn.tabIndex = -1;
+      jetonsState[i] = "no-mission";
     } else {
       // Affichage blanc (état initial)
       btn.innerHTML = i+1;
       btn.tabIndex = 0;
       btn.onclick = (e) => {
         e.preventDefault();
-        currentJetonIndex = i; // mémorisation de l'index
-        showCompass(gpsPoints[i]);
+        currentJetonIndex = i;
+        showCompass(gpsPts[i]);
       };
 
       btn.ondblclick = (e) => {
         e.preventDefault();
         // Vérifie la distance, sans cacher la boussole
-        if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
+        if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPts[i].lat, gpsPts[i].lng) > 30) {
           const stepsInfo = document.getElementById('steps-info');
           stepsInfo.classList.add('error');
           const arrow = document.getElementById('svg-arrow');
@@ -525,9 +550,9 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
           return;
         }
         if (hasMission) {
-          window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
+          window.location.href = `template-epreuve.html?idx=${jetonMap[i]}`;
         } else {
-          // Jeton sans mission, grise/désactive/crâne
+          // Jeton sans mission, grise/désactive/crâne + sauvegarde localStorage
           btn.className = 'jeton no-mission';
           btn.innerHTML = getSkullSVG();
           btn.disabled = true;
@@ -537,6 +562,7 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
           btn.tabIndex = -1;
           jetonsState[i] = "no-mission";
           document.getElementById('modal-perdu').classList.add('active');
+          saveMalusJeton(i); // <-- Sauvegarde malus
         }
       };
     }
@@ -549,11 +575,11 @@ function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, va
   }
 }
 
-function afficherJetonFinal(gpsPoints, finalGpsIndex) {
+function afficherJetonFinal(gpsPts, finalGpsIndex) {
   const wrapper = document.getElementById('final-jeton-wrapper');
   const btn = document.getElementById('final-jeton-btn');
   const info = document.getElementById('final-jeton-info');
-  if (finalGpsIndex === null || typeof gpsPoints[finalGpsIndex] === "undefined") {
+  if (finalGpsIndex === null || typeof gpsPts[finalGpsIndex] === "undefined") {
     wrapper.style.display = "none";
     return;
   }
@@ -619,7 +645,6 @@ function showCompass(targetGps, onArrivee) {
 
   document.getElementById('svg-arrow').onclick = function() {
     if (currentJetonIndex === null) return;
-    // il faut que gpsPoints, jetonMissionsMapping, etc. soient accessibles ici (mettre en global si besoin)
     if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[currentJetonIndex].lat, gpsPoints[currentJetonIndex].lng) > 30) {
       const stepsInfo = document.getElementById('steps-info');
       stepsInfo.classList.add('error');
@@ -634,7 +659,7 @@ function showCompass(targetGps, onArrivee) {
     if (jetonMissionsMapping[currentJetonIndex] !== -1) {
       window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[currentJetonIndex]}`;
     } else {
-      // Tu peux afficher le modal perdu ici si besoin
+      // Optionnel: affichage modal perdu ou rien
     }
   };
 
@@ -690,8 +715,6 @@ function hideCompass() {
   stopSearchingArrow();
 }
 
-let gpsPoints = [], jetonMissionsMapping = [], missions = [], validatedMissions = [];
-
 function lancerAccueil() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = localStorage.getItem("equipeNum");
@@ -721,6 +744,7 @@ function lancerAccueil() {
 
     if (toutesMissionsValidees && finalGpsIndex !== null) {
       afficherJetonFinal(gpsPoints, finalGpsIndex);
+      // Optionnel : clearMalusJetons(); // Si tu veux effacer les malus à la toute fin de la partie
     } else {
       document.getElementById('final-jeton-wrapper').style.display = "none";
     }
