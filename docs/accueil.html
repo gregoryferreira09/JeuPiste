@@ -71,6 +71,22 @@
       }
     }
 
+    // Dans le onclick des boutons créer/rejoindre une partie
+function verifPseudoEtRediriger(url) {
+  var pseudo = localStorage.getItem("pseudo");
+  if (!pseudo || pseudo.trim().length < 1 ||
+    pseudo.trim().toLowerCase() === "anonyme" ||
+    pseudo.trim().toLowerCase() === "invité") {
+    alert("Merci de choisir un pseudo avant de jouer !");
+    window.location.href = "profil-joueur.html";
+  } else {
+    window.location.href = url;
+  }
+}
+// Et dans le HTML :
+<button class="main-btn" type="button" onclick="verifPseudoEtRediriger('creer-partie.html')">🎮 Créer une partie</button>
+<button class="main-btn" type="button" onclick="verifPseudoEtRediriger('rejoindre-partie.html')">👥 Rejoindre une partie</button>
+    
     // Affichage initial du pseudo
     document.addEventListener("DOMContentLoaded", afficherPseudoAccueil);
 
