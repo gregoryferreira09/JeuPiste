@@ -221,6 +221,49 @@
         });
       }
 
+      // Synchronisation du pseudo sur Firebase si on est dans un salon
+const salonCode = localStorage.getItem("salonCode");
+if (salonCode && newPseudo && newPseudo.toLowerCase() !== 'anonyme' && newPseudo.toLowerCase() !== 'invité') {
+  // On update TOUS les "pseudo" du joueur courant dans cette partie (on ne peut pas faire mieux sans ID unique)
+  // Charge Firebase si besoin :
+  if (typeof firebase === "undefined") {
+    // Charger Firebase JS si pas déjà fait (optionnel si déjà présent dans la page)
+    var script1 = document.createElement('script');
+    script1.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+    document.head.appendChild(script1);
+    var script2 = document.createElement('script');
+    script2.src = "https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js";
+    document.head.appendChild(script2);
+    script2.onload = sendPseudoToFirebase;
+  } else {
+    sendPseudoToFirebase();
+  }
+
+  function sendPseudoToFirebase() {
+    if (!window.firebase.apps || !window.firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyD-BxBu-4ElCqbHrZPM-4-6yf1-yWnL1bI",
+        authDomain: "murder-party-ba8d1.firebaseapp.com",
+        databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "murder-party-ba8d1"
+      });
+    }
+    var db = firebase.database();
+    db.ref('parties/' + salonCode + '/joueurs').once('value', snap => {
+      snap.forEach(child => {
+        // Met à jour tous les pseudos qui correspondent à "Anonyme", "invité" ou ton ancien pseudo
+        if (
+          child.val().pseudo === "Anonyme" ||
+          child.val().pseudo === "invité" ||
+          child.val().pseudo !== newPseudo
+        ) {
+          db.ref('parties/' + salonCode + '/joueurs/' + child.key + '/pseudo').set(newPseudo);
+        }
+      });
+    });
+  }
+}
+      
       // Ouvre la modale d'avatar
       function ouvrirModal() {
         afficherListeAvatars(selectedAvatar);
