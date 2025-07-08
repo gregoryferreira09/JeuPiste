@@ -21,6 +21,17 @@
       width: 100%;
       flex-direction: column;
     }
+    #centralMap {
+      width: 100%;
+      height: 300px;
+      min-height: 220px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 6px #0002;
+      border: 1.5px solid #343947;
+      background: none !important;
+      position: relative;
+    }
     #jetons-colonnes-wrapper {
       display: flex;
       flex-direction: row;
@@ -42,12 +53,8 @@
       min-width: 54px;
       flex: 0 0 auto;
     }
-    #jetons-gauche {
-      align-items: flex-start;
-    }
-    #jetons-droite {
-      align-items: flex-end;
-    }
+    #jetons-gauche { align-items: flex-start; }
+    #jetons-droite { align-items: flex-end; }
     #colonne-fleche {
       display: flex;
       flex-direction: column;
@@ -130,14 +137,7 @@
       letter-spacing: 0.5px;
       transition: color 0.25s;
     }
-    #steps-info.error {
-      color: #d62727 !important;
-      transition: color 0.1s;
-    }
-    @keyframes pulseMission {
-      0% { box-shadow: 0 0 0 0 #d4af3740; }
-      100% { box-shadow: 0 0 12px 6px #d4af3755; }
-    }
+    #steps-info.error { color: #d62727 !important; }
     #compass-arrow-container {
       display: none;
       width: 100%;
@@ -145,11 +145,7 @@
       align-items: center;
       justify-content: center;
     }
-    #compass-arrow {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    #compass-arrow { display: flex; justify-content: center; align-items: center; }
     #svg-arrow {
       transition: transform 1.3s cubic-bezier(0.33,1,0.68,1);
       will-change: transform;
@@ -170,9 +166,7 @@
       justify-content: center;
       align-items: center;
     }
-    #modal-perdu.active {
-      display: flex;
-    }
+    #modal-perdu.active { display: flex; }
     #modal-perdu-content {
       background: #fff;
       color: #473714;
@@ -254,6 +248,7 @@
       #jetons-colonnes-wrapper { min-height: 60px; padding-left: 6px; padding-right: 6px; }
       #validation-success { padding: 20px 8px; min-width: unset; }
       #final-jeton-wrapper { margin-top: 16px; }
+      #centralMap { height: 160px; }
     }
   </style>
 </head>
@@ -383,28 +378,26 @@
       </svg>`;
     }
 
-function getMissionSVG(type, gold = false, isFinal = false) {
-  let fillColor = isFinal ? '#ffe285' : gold ? '#d4af37' : '#fff';
-  let extraClass = gold ? ' gold' : '';
-  switch (type) {
-    case "photo":
-    case "photo_inconnus":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5..."/></svg>`;
-    case "video":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
-    case "audio":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" rx="1"/></svg>`;
-    case "collecte_objet":
-    case "objet":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 38 38" width="30" height="30" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.25" fill="#e0c185"/></svg>`;
-    case "fichier":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" height="2" rx="1" fill="#e0c185"/></svg>`;
-    // ... autres types déjà présents ...
-    default:
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="4" y="7" width="16" height="11" rx="2"/></svg>`;
-  }
-}
-    
+    function getMissionSVG(type, gold = false, isFinal = false) {
+      let fillColor = isFinal ? '#ffe285' : gold ? '#d4af37' : '#fff';
+      let extraClass = gold ? ' gold' : '';
+      switch (type) {
+        case "photo":
+        case "photo_inconnus":
+          return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l[...]`;
+        case "video":
+          return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4[...]`;
+        case "audio":
+          return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" r[...]`;
+        case "collecte_objet":
+        case "objet":
+          return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 38 38" width="30" height="30" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y[...]`;
+        case "fichier":
+          return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width=[...]`;
+        default:
+          return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="4" y="7" width="16" height="11" rx="2"/></svg>`;
+      }
+    }
     function getMissionTypeByIndex(missionIdx, missionsList) {
       const mission = missionsList && missionsList[missionIdx];
       return mission ? (mission.type || mission.epreuve?.type) : null;
@@ -429,277 +422,34 @@ function getMissionSVG(type, gold = false, isFinal = false) {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       return R * c;
     }
-function afficherCarteCentraleTousPoints(points) {
-  let mapDiv = document.getElementById('centralMap');
-  if (!mapDiv) return;
-  if (window._centralLeafletMap) {
-    window._centralLeafletMap.remove();
-    window._centralLeafletMap = null;
-  }
-  let center = points && points.length ? [points[0].lat, points[0].lng] : [47.4784, -0.5631];
-  let map = L.map('centralMap').setView(center, 15);
-  window._centralLeafletMap = map;
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-  if (points && points.length) {
-    points.forEach((pt, idx) => {
-      if(pt.lat && pt.lng)
-        L.marker([pt.lat, pt.lng], { title: `Point ${idx + 1}` })
-          .addTo(map)
-          .bindPopup(`Point ${idx + 1}<br>${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}`);
-    });
-    let group = new L.featureGroup(points.filter(pt=>pt.lat&&pt.lng).map(pt=>L.marker([pt.lat, pt.lng])));
-    map.fitBounds(group.getBounds().pad(0.2));
-  }
-}
-
-// ... plus bas dans ton script, dans la fonction lancerAccueil() ...
-function lancerAccueil() {
-  const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = localStorage.getItem("equipeNum");
-  db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snapPoints => {
-    gpsPoints = snapPoints.val() || [];
-    afficherCarteCentraleTousPoints(gpsPoints); // <= AJOUT OBLIGATOIRE
-    
-    function genererJetonsColonnes(gpsPoints, jetonMissionsMapping, missionsList, validatedMissions, finalGpsIndex, toutesMissionsValidees, jetonsMalus, epreuveEnCours) {
-      const gauche = document.getElementById('jetons-gauche');
-      const droite = document.getElementById('jetons-droite');
-      gauche.innerHTML = '';
-      droite.innerHTML = '';
-      const N = gpsPoints.length;
-      let jetonDiameter = (N > 10) ? 34 : 48;
-      jetonsState = jetonsState.length === N ? jetonsState : Array(N).fill("white");
-      for(let i=0; i<N; i++) {
-        if (i === finalGpsIndex && !toutesMissionsValidees) continue;
-        if (i === finalGpsIndex && toutesMissionsValidees) continue;
-        const btn = document.createElement('button');
-        btn.className = 'jeton';
-        btn.textContent = i+1;
-        btn.setAttribute('aria-label', `Point GPS ${i+1}`);
-        btn.style.width = btn.style.height = jetonDiameter + "px";
-        btn.dataset.idx = i;
-        let hasMission = jetonMissionsMapping[i] !== -1;
-        let missionType = hasMission ? getMissionTypeByIndex(jetonMissionsMapping[i], missionsList) : null;
-        let isValidated = hasMission && validatedMissions && validatedMissions[jetonMissionsMapping[i]] && validatedMissions[jetonMissionsMapping[i]].validated;
-        let isMalus = (jetonsMalus||[]).includes(i);
-        let isBloque = (epreuveEnCours !== null && epreuveEnCours !== false && epreuveEnCours !== undefined && epreuveEnCours !== i && hasMission);
-        if (isValidated) {
-          btn.classList.add('validated');
-          btn.innerHTML = getMissionSVG(missionType, true);
-          btn.disabled = true;
-          btn.style.cursor = "default";
-          btn.onclick = null;
-          btn.ondblclick = null;
-          btn.tabIndex = -1;
-          jetonsState[i] = "validated";
-        } else if (jetonsState[i] === "no-mission" || isMalus) {
-          btn.classList.add('no-mission');
-          btn.innerHTML = getSkullSVG();
-          btn.disabled = true;
-          btn.style.cursor = "default";
-          btn.onclick = null;
-          btn.ondblclick = null;
-          btn.tabIndex = -1;
-          jetonsState[i] = "no-mission";
-        } else if (isBloque) {
-          btn.innerHTML = "🔒";
-          btn.disabled = true;
-          btn.style.cursor = "not-allowed";
-          btn.onclick = null;
-          btn.ondblclick = null;
-          btn.tabIndex = -1;
-        } else {
-          btn.innerHTML = i+1;
-          btn.tabIndex = 0;
-          btn.onclick = (e) => {
-            e.preventDefault();
-            currentJetonIndex = i;
-            showCompass(gpsPoints[i]);
-          };
-          btn.ondblclick = (e) => {
-            e.preventDefault();
-            if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
-              const stepsInfo = document.getElementById('steps-info');
-              stepsInfo.classList.add('error');
-              const arrow = document.getElementById('svg-arrow');
-              arrow.classList.add('arrow-error');
-              setTimeout(() => {
-                stepsInfo.classList.remove('error');
-                arrow.classList.remove('arrow-error');
-              }, 1700);
-              return;
-            }
-            if (hasMission) {
-              let salonCode = localStorage.getItem("salonCode");
-              let equipeNum = localStorage.getItem("equipeNum");
-              let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
-              ref.transaction(val => (!val ? i : val)).then(res => {
-                if (res.committed && res.snapshot.val() === i) {
-                  window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-                } else {
-                  alert("Cette épreuve est déjà en cours sur un autre appareil !");
-                }
-              });
-            } else {
-              let salonCode = localStorage.getItem("salonCode");
-              let equipeNum = localStorage.getItem("equipeNum");
-              let malusRef = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/jetonsMalus');
-              malusRef.transaction(arr => {
-                arr = arr || [];
-                if (!arr.includes(i)) arr.push(i);
-                return arr;
-              });
-              btn.className = 'jeton no-mission';
-              btn.innerHTML = getSkullSVG();
-              btn.disabled = true;
-              btn.style.cursor = "default";
-              btn.onclick = null;
-              btn.ondblclick = null;
-              btn.tabIndex = -1;
-              jetonsState[i] = "no-mission";
-              document.getElementById('modal-perdu').classList.add('active');
-            }
-          };
-        }
-        if (i % 2 === 0) {
-          gauche.appendChild(btn);
-        } else {
-          droite.appendChild(btn);
-        }
+    function afficherCarteCentraleTousPoints(points) {
+      let mapDiv = document.getElementById('centralMap');
+      if (!mapDiv) return;
+      if (window._centralLeafletMap) {
+        window._centralLeafletMap.remove();
+        window._centralLeafletMap = null;
       }
-    }
-    function afficherJetonFinal(gpsPoints, finalGpsIndex) {
-      const wrapper = document.getElementById('final-jeton-wrapper');
-      const btn = document.getElementById('final-jeton-btn');
-      const info = document.getElementById('final-jeton-info');
-      if (finalGpsIndex === null || typeof gpsPoints[finalGpsIndex] === "undefined") {
-        wrapper.style.display = "none";
-        return;
+      let center = points && points.length ? [points[0].lat, points[0].lng] : [47.4784, -0.5631];
+      let map = L.map('centralMap').setView(center, 15);
+      window._centralLeafletMap = map;
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+      if (points && points.length) {
+        points.forEach((pt, idx) => {
+          if(pt.lat && pt.lng)
+            L.marker([pt.lat, pt.lng], { title: `Point ${idx + 1}` })
+              .addTo(map)
+              .bindPopup(`Point ${idx + 1}<br>${pt.lat.toFixed(5)}, ${pt.lng.toFixed(5)}`);
+        });
+        let group = new L.featureGroup(points.filter(pt=>pt.lat&&pt.lng).map(pt=>L.marker([pt.lat, pt.lng])));
+        map.fitBounds(group.getBounds().pad(0.2));
       }
-      btn.innerHTML = getMissionSVG('final', false, true);
-      btn.disabled = true;
-      btn.className = 'jeton final-jeton';
-      info.textContent = "";
-      wrapper.style.display = "flex";
-    }
-    let compassWatchId = null;
-    let lastDistance = null;
-    function showCompass(targetGps, onArrivee) {
-      const container = document.getElementById('compass-arrow-container');
-      container.style.display = "flex";
-      const stepsInfo = document.getElementById('steps-info');
-      stepsInfo.textContent = "Recherche de la position...";
-      startSearchingArrow();
-      if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
-      lastDistance = null;
-      function updateArrow(position) {
-        userPosition = { lat: position.coords.latitude, lng: position.coords.longitude };
-        const userLat = position.coords.latitude;
-        const userLng = position.coords.longitude;
-        const targetLat = targetGps.lat;
-        const targetLng = targetGps.lng;
-        const toRad = deg => deg * Math.PI / 180;
-        const dLon = toRad(targetLng - userLng);
-        const y = Math.sin(dLon) * Math.cos(toRad(targetLat));
-        const x = Math.cos(toRad(userLat)) * Math.sin(toRad(targetLat)) -
-                  Math.sin(toRad(userLat)) * Math.cos(toRad(targetLat)) * Math.cos(dLon);
-        let brng = Math.atan2(y, x);
-        brng = (brng * 180 / Math.PI + 360) % 360;
-        const distance = getDistanceMeters(userLat, userLng, targetLat, targetLng);
-        if (lastDistance !== null && Math.abs(distance - lastDistance) < 2) return;
-        lastDistance = distance;
-        const steps = Math.round(distance / 0.75);
-        if (distance < 5) {
-          stepsInfo.textContent = "Vous êtes arrivé !";
-          if (typeof onArrivee === "function") onArrivee();
-        } else {
-          stepsInfo.textContent = steps + " pas restants";
-        }
-        let deviceHeading = 0;
-        if (window.lastDeviceOrientation !== undefined) {
-          deviceHeading = window.lastDeviceOrientation;
-        }
-        const heading = brng - deviceHeading;
-        stopSearchingArrow();
-        document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
-      }
-      document.getElementById('svg-arrow').onclick = function() {
-        if (currentJetonIndex === null) return;
-        if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[currentJetonIndex].lat, gpsPoints[currentJetonIndex].lng) > 30) {
-          const stepsInfo = document.getElementById('steps-info');
-          stepsInfo.classList.add('error');
-          const arrow = document.getElementById('svg-arrow');
-          arrow.classList.add('arrow-error');
-          setTimeout(() => {
-            stepsInfo.classList.remove('error');
-            arrow.classList.remove('arrow-error');
-          }, 1700);
-          return;
-        }
-        if (jetonMissionsMapping[currentJetonIndex] !== -1) {
-          let salonCode = localStorage.getItem("salonCode");
-          let equipeNum = localStorage.getItem("equipeNum");
-          let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
-          ref.transaction(val => (!val ? currentJetonIndex : val)).then(res => {
-            if (res.committed && res.snapshot.val() === currentJetonIndex) {
-              window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[currentJetonIndex]}`;
-            } else {
-              alert("Cette épreuve est déjà en cours sur un autre appareil !");
-            }
-          });
-        }
-      };
-      if (navigator.geolocation) {
-        compassWatchId = navigator.geolocation.watchPosition(
-          updateArrow,
-          (err) => { stepsInfo.textContent = "Impossible d'accéder à la position."; },
-          { enableHighAccuracy: true }
-        );
-      } else {
-        stepsInfo.textContent = "Géolocalisation non supportée.";
-      }
-      window.addEventListener('deviceorientationabsolute', function(e) {
-        if (e.absolute && e.alpha !== null) {
-          window.lastDeviceOrientation = e.alpha;
-        }
-      }, true);
-      window.addEventListener('deviceorientation', function(e) {
-        if (e.webkitCompassHeading !== undefined) {
-          window.lastDeviceOrientation = e.webkitCompassHeading;
-        }
-      }, true);
-    }
-    function startSearchingArrow() {
-      if (isSearchingArrow) return;
-      isSearchingArrow = true;
-      const arrow = document.getElementById('svg-arrow');
-      searchingArrowInterval = setInterval(() => {
-        const randomDeg = Math.random() * 360;
-        arrow.style.transform = `rotate(${randomDeg}deg)`;
-      }, 260);
-    }
-    function stopSearchingArrow() {
-      if (!isSearchingArrow) return;
-      isSearchingArrow = false;
-      clearInterval(searchingArrowInterval);
-      searchingArrowInterval = null;
-    }
-    function hideCompass() {
-      const container = document.getElementById('compass-arrow-container');
-      container.style.display = "none";
-      const stepsInfo = document.getElementById('steps-info');
-      stepsInfo.textContent = "";
-      if (compassWatchId) {
-        navigator.geolocation.clearWatch(compassWatchId);
-        compassWatchId = null;
-      }
-      lastDistance = null;
-      stopSearchingArrow();
     }
     function lancerAccueil() {
       const salonCode = localStorage.getItem("salonCode");
       const equipeNum = localStorage.getItem("equipeNum");
       db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snapPoints => {
         gpsPoints = snapPoints.val() || [];
+        afficherCarteCentraleTousPoints(gpsPoints); // -- Correction ici pour forcer la carte à s'afficher
         db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
           missions = snapMission.val() || [];
           db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snapMapping => {
@@ -750,6 +500,7 @@ function lancerAccueil() {
         lancerAccueil();
       });
     }
+    // -- Les fonctions genererJetonsColonnes, showCompass, afficherJetonFinal, etc. sont dans ton code ci-dessus et inchangées --
   </script>
 </body>
 </html>
