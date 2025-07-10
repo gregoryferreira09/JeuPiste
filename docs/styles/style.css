@@ -1267,3 +1267,21 @@ input[type="number"] {
   filter: drop-shadow(0 0 12px #e02424) drop-shadow(0 0 4px #e02424);
   stroke: #e02424 !important;
 }
+
+.main-input, .form-input {
+  padding: 7px 12px;
+  border: 1.5px solid #e0c185;
+  border-radius: 6px;
+  font-size: 1.05em;
+  background: #fffaf2;
+  color: #333;
+  margin-bottom: 12px;
+}
+.form-label {
+  font-weight: 600;
+  color: #e0c185;
+  font-size: 1.1em;
+}
+.form-group {
+  margin-bottom: 1em;
+}
