@@ -4,45 +4,18 @@
   <meta charset="UTF-8">
   <title>Créer une Partie - Ludus itineris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Polices Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/style.css"><!-- Chemin corrigé -->
+  <link rel="stylesheet" href="styles/style.css">
   <script>
-   // Ne reset le code salon que si on arrive sur cette page sans transition depuis salon.html
-   if (!document.referrer.includes("salon.html")) {
-     localStorage.removeItem("salonCode");
-   }
+    if (!document.referrer.includes("salon.html")) {
+      localStorage.removeItem("salonCode");
+    }
   </script>
-  <!-- ========= SCENARIO PAR DÉFAUT ========== -->
-  <script>
-    // Nettoyage du contexte si retour à la création d'une partie
-    // *** NE PAS supprimer le pseudo ici ***
-    // localStorage.removeItem('pseudo');
-    localStorage.removeItem('pseudoOrigine');
-    localStorage.removeItem('salonCode');
-    localStorage.removeItem('enCours');
-    localStorage.removeItem('parametresPartie');
-    
-    // ⚠️ Modifie ici les étapes selon ton vrai scénario Parc Saint Nicolas !
-    window.SCENARIO_PAR_DEFAUT = {
-      scenario: [
-        { type: "gps", params: { consigne: "Va à l'entrée du parc", gps: "47.4712,-0.5523" } },
-        { type: "photo", params: { consigne: "Prends une photo de la statue" } },
-        { type: "enigme", params: { consigne: "Résous cette énigme : Je suis grand quand je suis jeune et petit quand je suis vieux. Qui suis-je ?", solution: "une bougie" } },
-        { type: "observation", params: { consigne: "Note le nombre de bancs autour du grand arbre", solution: "4" } },
-        { type: "mot_de_passe", params: { consigne: "Trouve le mot de passe caché sur le panneau", solution: "parc" } },
-        { type: "gps", params: { consigne: "Rends-toi au kiosque", gps: "47.4713,-0.5530" } },
-        { type: "revelation", params: { consigne: "Bravo, tu as terminé le parcours !" } }
-      ]
-    };
-  </script>
-  <!-- ======================================== -->
 </head>
 <body>
 <header>
   <h1 class="site-title">Ludus itineris</h1>
 </header>
- 
 <div class="center-wrapper">
   <main class="main-accueil fadeIn" role="main">
     <h2 id="creer-partie-heading" style="text-align:center; margin-bottom: 1.3em;">Créer une Partie</h2>
@@ -50,13 +23,18 @@
 
       <label for="scenarioSelect">Choisissez le scénario :</label>
       <select id="scenarioSelect" name="scenarioSelect" required>
-  <option value="">-- Choisissez un scénario --</option>
-  <option value="parc_saint_nicolas">Parc Saint Nicolas</option>
-</select>
+        <option value="">-- Choisissez un scénario --</option>
+        <option value="parc_saint_nicolas">Parc Saint Nicolas</option>
+      </select>
 
       <label for="game-duration"><b>Durée de jeu (minutes) :</b></label>
       <input type="number" id="game-duration" name="game-duration" min="1" required>
-      
+
+      <label>
+        <input type="checkbox" id="show-map" name="show-map" checked>
+        Afficher la carte (mode débutant)
+      </label>
+
       <label for="nombreJoueurs">Nombre de joueurs :</label>
       <select id="nombreJoueurs" name="nombreJoueurs" required>
         <option value="1">1 joueur</option>
@@ -75,25 +53,21 @@
 
       <div class="boutons-actions">
         <button class="main-btn" type="submit" id="genererBtn">Créer la partie</button>
-        <a class="main-btn" href="accueil.html" id="retourAccueilBtn">Retour</a><!-- Chemin corrigé -->
+        <a class="main-btn" href="accueil.html" id="retourAccueilBtn">Retour</a>
       </div>
       <div class="message" id="message" role="alert" aria-live="polite"></div>
     </form>
   </main>
 </div>
- 
 <footer class="footer">
   <p>© 2025 Murder Party. Tous droits réservés.</p>
   <a href="mentions-legales.html">Mentions légales</a>
 </footer>
- 
-<!-- Charger Firebase AVANT tout JS qui l'utilise -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="JS/creer-partie.js"></script>
 <script>
-  // Gestion du submit sécurisé
   const form = document.getElementById('creerPartieForm');
   const message = document.getElementById('message');
   form.addEventListener('submit', function(e) {
@@ -113,8 +87,6 @@
       message.textContent = "Fonction de création absente.";
     }
   });
-
-  // Empêche le retour arrière du navigateur de revenir dans le salon sans reset
   window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
       localStorage.removeItem("salonCode");
@@ -126,16 +98,12 @@
     ⚠️ JavaScript est désactivé. Vous ne pourrez pas créer de partie.
   </div>
 </noscript>
- 
-<script src="JS/security-enhance.js"></script><!-- Chemin corrigé -->
-<script src="JS/ux-enhance.js"></script><!-- Chemin corrigé -->
-<script src="JS/scalability.js"></script><!-- Chemin corrigé -->
- 
+<script src="JS/security-enhance.js"></script>
+<script src="JS/ux-enhance.js"></script>
+<script src="JS/scalability.js"></script>
 <script>
-  // Désactive tout loader bloquant pour test
   var loader = document.getElementById('global-loader');
   if(loader) loader.remove();
 </script>
-  
 </body>
 </html>
