@@ -99,14 +99,12 @@ window.creerPartie = async function(formData) {
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
   const scenarioCode = formData.get("scenarioSelect");
   const dureeMinutes = parseInt(formData.get("game-duration"), 10);
-  // Gestion de la case à cocher "Afficher la carte"
   const showMap = formData.get("show-map") === "on";
 
   if (!scenarioCode) {
     alert("Veuillez choisir un scénario.");
     return;
   }
-
   if (isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12 
    || isNaN(dureeMinutes) || dureeMinutes < 1) {
     alert("Veuillez remplir tous les champs correctement.");
@@ -132,8 +130,8 @@ window.creerPartie = async function(formData) {
     nombreJoueurs,
     createur: uuid,
     scenarioCode: scenarioCode || "",
-    dureeMinutes,         // Enregistre la durée
-    showMap               // Enregistre le choix d'affichage carte
+    dureeMinutes,         
+    showMap              
   };
 
   // Génère un code salon unique pour la partie (toujours nouveau)
@@ -196,14 +194,18 @@ window.creerPartie = async function(formData) {
   let jetonMissionsMapping = [];
 
   if (nbGPS > nbMissions) {
-    finalGpsIndex = nbGPS - 1;
+    // Choisir un point FINAL aléatoire parmi tous les points GPS
+    finalGpsIndex = Math.floor(Math.random() * nbGPS);
     jetonMissionsMapping = Array(nbGPS).fill(-1);
+    // On exclut le point final du mapping missions
     let indices = [...Array(nbGPS).keys()].filter(i => i !== finalGpsIndex);
+    // Mélange les indices restants
     for (let i = indices.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
-    for(let m=0; m<nbMissions; m++) {
+    // Assigne les missions aux indices (hors final)
+    for (let m = 0; m < nbMissions; m++) {
       jetonMissionsMapping[indices[m]] = m;
     }
   } else {
