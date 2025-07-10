@@ -4,7 +4,7 @@ const firebaseConfig = {
   authDomain: "murder-party-ba8d1.firebaseapp.com",
   databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.firebasestorage.app",
+  storageBucket: "murder-party-ba8d1.appspot.com",
   messagingSenderId: "20295055805",
   appId: "1:20295055805:web:0963719c3f23ab7752fad4",
   measurementId: "G-KSBMBB7KMJ"
@@ -98,13 +98,17 @@ window.creerPartie = async function(formData) {
 
   const nombreJoueurs = parseInt(formData.get("nombreJoueurs"), 10);
   const scenarioCode = formData.get("scenarioSelect");
+  const dureeMinutes = parseInt(formData.get("game-duration"), 10);
+  // Gestion de la case à cocher "Afficher la carte"
+  const showMap = formData.get("show-map") === "on";
 
   if (!scenarioCode) {
     alert("Veuillez choisir un scénario.");
     return;
   }
 
-  if (isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12) {
+  if (isNaN(nombreJoueurs) || nombreJoueurs < 1 || nombreJoueurs > 12 
+   || isNaN(dureeMinutes) || dureeMinutes < 1) {
     alert("Veuillez remplir tous les champs correctement.");
     return;
   }
@@ -118,7 +122,6 @@ window.creerPartie = async function(formData) {
   let pseudo = localStorage.getItem("pseudo") || "Anonyme";
   pseudo = pseudo.replace(/[<>\/\\'"`]/g, "").trim().substring(0, 30);
 
-  // Vérification du pseudo AVANT de créer la partie
   if (!pseudo || pseudo.toLowerCase() === "anonyme" || pseudo.toLowerCase() === "invité") {
     alert("Merci de choisir un pseudo valide avant de créer une partie !");
     window.location.href = "profil-joueur.html";
@@ -128,7 +131,9 @@ window.creerPartie = async function(formData) {
   const parametresPartie = {
     nombreJoueurs,
     createur: uuid,
-    scenarioCode: scenarioCode || ""
+    scenarioCode: scenarioCode || "",
+    dureeMinutes,         // Enregistre la durée
+    showMap               // Enregistre le choix d'affichage carte
   };
 
   // Génère un code salon unique pour la partie (toujours nouveau)
@@ -144,14 +149,12 @@ window.creerPartie = async function(formData) {
   let scenarioToUse = null;
 
   if (scenarioCode === "parc_saint_nicolas") {
-    // On utilise le scénario local (dans le JS)
     if (typeof SCENARIO_PAR_DEFAUT === "undefined") {
       alert("Scénario Parc Saint Nicolas manquant dans le code.");
       return;
     }
     scenarioToUse = SCENARIO_PAR_DEFAUT;
   } else {
-    // On charge depuis Firebase
     const snap = await db.ref('scenarios/' + scenarioCode).once('value');
     if (!snap.exists()) {
       alert("Scénario sélectionné introuvable.");
@@ -170,12 +173,11 @@ window.creerPartie = async function(formData) {
   // Stocke le scénario dans la partie
   await db.ref('parties/' + salonCode + '/scenario').set(scenarioToUse);
 
-  // === Correction clé : crée une vraie répartition des missions ===
-  // Chaque mission/épreuve doit être une COPIE différente
+  // Répartition des missions (copie)
   const repartition = scenarioToUse.scenario.map(epreuve => ({ ...epreuve }));
   await db.ref('parties/' + salonCode + '/scenarioJeu/repartition').set(repartition);
 
-  // GESTION GPS : Génération du mapping mission/points GPS
+  // GESTION GPS : mapping mission/points GPS
   let gpsPoints = scenarioToUse.gpsPoints || (scenarioToUse.scenario && scenarioToUse.scenario.gpsPoints) || [];
   if (!Array.isArray(gpsPoints) || gpsPoints.length === 0) {
     if (scenarioToUse && scenarioToUse.scenario && Array.isArray(scenarioToUse.scenario)) {
@@ -224,9 +226,12 @@ window.creerPartie = async function(formData) {
     pseudo
   });
 
+  // Enregistre aussi en localStorage pour le client
   localStorage.setItem("parametresPartie", JSON.stringify(parametresPartie));
   localStorage.setItem("salonCode", salonCode);
   localStorage.setItem("nombreJoueurs", nombreJoueurs);
+  localStorage.setItem("dureeMinutes", dureeMinutes);
+  localStorage.setItem("showMap", showMap ? "1" : "0");
 
   window.location.href = "salon.html";
 };
