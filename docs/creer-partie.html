@@ -27,8 +27,19 @@
         <option value="parc_saint_nicolas">Parc Saint Nicolas</option>
       </select>
 
-      <label for="game-duration"><b>Durée de jeu (minutes) :</b></label>
-      <input type="number" id="game-duration" name="game-duration" min="1" required>
+      <div class="form-group">
+  <label for="game-duration" class="form-label">Durée de jeu (minutes)&nbsp;:</label>
+  <input 
+    type="number" 
+    id="game-duration" 
+    name="game-duration" 
+    min="1" 
+    required 
+    placeholder="Ex: 60"
+    class="main-input" 
+    style="max-width: 120px; display: inline-block; margin-left: 8px;"
+  >
+</div>
 
       <label>
         <input type="checkbox" id="show-map" name="show-map" checked>
