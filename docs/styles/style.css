@@ -1355,3 +1355,10 @@ input[type="number"] {
   color: #d62727 !important;
   transition: color 0.1s;
 }
+
+#validation-success {
+  display: none;
+}
+#modal-perdu {
+  display: none;
+}
