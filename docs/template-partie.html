@@ -247,18 +247,6 @@
       font-size: 1.08em;
       text-shadow: 0 2px 8px #0002;
     }
-    /* AJOUT : style pour que la carte soit visible et responsive */
-    #centralMap {
-      width: 100%;
-      min-width: 220px;
-      min-height: 260px;
-      height: 300px;
-      max-width: 600px;
-      border-radius: 10px;
-      margin: 20px auto 24px auto;
-      box-shadow: 0 1px 8px #0002;
-      background: #e0c18511;
-    }
     @media (max-width: 650px) {
       .jetons-colonne { gap: 18px; }
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
@@ -266,7 +254,6 @@
       #jetons-colonnes-wrapper { min-height: 60px; padding-left: 6px; padding-right: 6px; }
       #validation-success { padding: 20px 8px; min-width: unset; }
       #final-jeton-wrapper { margin-top: 16px; }
-      #centralMap { height: 180px; min-height: 120px; }
     }
   </style>
 </head>
@@ -338,10 +325,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <!-- ... (le JS reste inchangé, inclus dans ta question, à partir de window.addEventListener('DOMContentLoaded', function() {... }) ... -->
-  <!-- (garde bien tout le JS déjà présent) -->
   <script>
-    
     window.addEventListener('DOMContentLoaded', function() {
       if (sessionStorage.getItem('showValidationSuccess') === '1') {
         var block = document.getElementById('validation-success');
