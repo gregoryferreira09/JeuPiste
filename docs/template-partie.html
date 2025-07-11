@@ -23,6 +23,7 @@
     @media (max-width: 650px) {
       #centralMap { height: 160px; }
     }
+    /* Ajoute ici tous tes autres styles personnalisés jetons/colonne/flèche si besoin */
   </style>
 </head>
 <body>
@@ -46,7 +47,19 @@
               <div id="compass-arrow-container">
                 <div id="compass-arrow">
                   <svg id="svg-arrow" width="90" height="110" viewBox="0 0 90 110">
-                    <!-- ... SVG ... -->
+                    <defs>
+                      <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#fff7c4"/>
+                        <stop offset="55%" stop-color="#e0c185"/>
+                        <stop offset="100%" stop-color="#d4af37"/>
+                      </linearGradient>
+                      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
+                      </filter>
+                    </defs>
+                    <rect x="39" y="20" width="12" height="60" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
+                    <polygon points="45,8 65,47 45,35 25,47" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
+                    <polyline points="45,80 25,105 45,95 65,105 45,80" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
                   </svg>
                 </div>
                 <div id="steps-info"></div>
@@ -81,7 +94,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <!-- Ton script principal -->
+  <!-- Script principal -->
   <script src="JS/template-partie.js"></script>
 </body>
 </html>
