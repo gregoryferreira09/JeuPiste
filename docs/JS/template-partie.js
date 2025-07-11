@@ -4,7 +4,7 @@ const firebaseConfig = {
   authDomain: "murder-party-ba8d1.firebaseapp.com",
   databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.firebasestorage.app",
+  storageBucket: "murder-party-ba8d1",
   messagingSenderId: "20295055805",
   appId: "1:20295055805:web:0963719c3f23ab7752fad4",
   measurementId: "G-KSBMBB7KMJ"
@@ -155,7 +155,6 @@ function afficherCarteCentraleTousPoints(points) {
 
 // ========== LOGIQUE DES JETONS ==========
 
-// Utilitaire pour valider ou maluser un jeton si recliqué dessus (ou sur la flèche)
 function tenterAccesJetonCourant() {
   if (currentJetonIndex === null) return;
   let i = currentJetonIndex;
@@ -270,6 +269,7 @@ function genererJetonsColonnes(
     let isValidated = hasMission && validatedMissions && validatedMissions[jetonMissionsMapping[i]] && validatedMissions[jetonMissionsMapping[i]].validated;
     let isMalus = (jetonsMalus||[]).includes(i);
     let isBloque = (epreuveEnCours !== null && epreuveEnCours !== false && epreuveEnCours !== undefined && epreuveEnCours !== i && hasMission);
+
     if (isValidated) {
       btn.classList.add('validated');
       btn.innerHTML = getMissionSVG(missionType, true);
@@ -309,7 +309,7 @@ function genererJetonsColonnes(
           showCompass(gpsPoints[i]);
         }
       };
-      btn.ondblclick = null; // On ne gère plus le double-clic
+      btn.ondblclick = null;
     }
     if (i % 2 === 0) {
       gauche.appendChild(btn);
@@ -464,3 +464,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('modal-perdu').classList.remove('active');
   };
 });
+
+// ========== BONUS : Débloquer l'équipe quand on quitte l'épreuve proprement ==========
+// Place ce code dans le JS de la page template-epreuve.html, sur le bouton "Retour à la carte":
+/*
+document.getElementById('btn-retour-carte').onclick = function() {
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = localStorage.getItem("equipeNum");
+  if (salonCode && equipeNum) {
+    firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuveEnCours').set(null);
+  }
+  window.location.href = "template-partie.html";
+};
+*/
