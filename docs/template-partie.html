@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    /* ====== Carte ====== */
     #centralMap {
       width: 100%;
       height: 300px;
@@ -24,17 +23,10 @@
     @media (max-width: 650px) {
       #centralMap { height: 160px; }
     }
-
-    /* ====== Jetons et colonnes ====== */
     .jetons-arc-container {
-      background: none !important;
-      border-radius: 0 !important;
-      min-height: 0 !important;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: visible;
-      margin: 0;
       width: 100%;
       flex-direction: column;
     }
@@ -137,8 +129,7 @@
       .jeton { width: 34px; height: 34px; font-size: 0.98em; }
       #jetons-colonnes-wrapper { min-height: 60px; padding-left: 6px; padding-right: 6px; }
     }
-
-    /* ====== Flèche & texte harmonisé ====== */
+    /* Flèche & texte harmonisé */
     #compass-arrow-container {
       display: flex;
       flex-direction: column;
@@ -189,7 +180,6 @@
       color: #d62727 !important;
       transition: color 0.1s;
     }
-
     /* Masquer modales par défaut */
     #validation-success, #modal-perdu {
       display: none;
@@ -264,7 +254,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <!-- Script principal séparé -->
   <script src="JS/template-partie.js"></script>
 </body>
 </html>
