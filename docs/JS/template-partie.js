@@ -37,7 +37,27 @@ let gpsPoints = [], jetonMissionsMapping = [], missions = [], validatedMissions 
 let finalGpsIndex = null;
 let resizeTimeout = null;
 
-// ========== INIT PRINCIPALE ==========
+// ========== DOM + AUTH READY ==========
+function onDomAndAuthReady(callback) {
+  let domReady = false, authReady = false;
+  function tryRun() { if (domReady && authReady) callback(); }
+  document.addEventListener('DOMContentLoaded', () => {
+    domReady = true;
+    tryRun();
+    var main = document.querySelector('.fadeIn');
+    if (main) setTimeout(() => main.classList.add('visible'), 50);
+    if (sessionStorage.getItem('showValidationSuccess') === '1') showValidationSuccess();
+  });
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) firebase.auth().signInAnonymously();
+    else {
+      authReady = true;
+      tryRun();
+    }
+  });
+}
+
+// ========== LOGIQUE SYNCHRO JEU ==========
 function checkLocalStorageOrRedirect() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = localStorage.getItem("equipeNum");
@@ -139,47 +159,20 @@ function hideModalPerdu() {
   document.getElementById('modal-perdu').classList.remove('active');
 }
 
-// ========== DOM READY & AUTH ==========
-function onDomAndAuthReady(callback) {
-  let domReady = false, authReady = false;
-  function tryRun() { if (domReady && authReady) callback(); }
-  document.addEventListener('DOMContentLoaded', () => {
-    domReady = true;
-    tryRun();
-    // Animation d'apparition
-    var main = document.querySelector('.fadeIn');
-    if (main) setTimeout(() => main.classList.add('visible'), 50);
-    // "Validation réussie"
-    if (sessionStorage.getItem('showValidationSuccess') === '1') showValidationSuccess();
-  });
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (!user) firebase.auth().signInAnonymously();
-    else {
-      authReady = true;
-      tryRun();
-    }
-  });
-}
+// ========== LOGIQUE DE JEU (jetons, flèches, etc.) ==========
+// ... ici tu gardes tes fonctions getSkullSVG, getMissionSVG, getMissionTypeByIndex,
+// genererJetonsColonnes, afficherJetonFinal, showCompass, etc. comme dans ton template original ...
 
 // ========== RESIZE (DÉBOUNCED) ==========
-function setupResizeHandler() {
-  window.addEventListener('resize', function() {
-    if (resizeTimeout) clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      lancerAccueil();
-    }, 350);
-  });
-}
+window.addEventListener('resize', function() {
+  if (window._centralLeafletMap) {
+    setTimeout(() => window._centralLeafletMap.invalidateSize(), 300);
+  }
+});
 
-// ========== JETONS (A ADAPTER SELON TON JEU) ==========
-// Tu dois garder tes fonctions genererJetonsColonnes, afficherJetonFinal, etc., à l’identique.
-// Mais dans genererJetonsColonnes, NE JAMAIS afficher "Perdu !" au chargement : seulement lors du clic sur un jeton sans épreuve.
-
-
-// ========== LANCEMENT ==========
+// ========== LANCEMENT SYNCHRO ==========
 onDomAndAuthReady(() => {
   lancerAccueil();
-  setupResizeHandler();
 });
 
 // ========= Pour la modale "Perdu !" =========
