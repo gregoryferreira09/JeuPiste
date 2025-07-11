@@ -1298,3 +1298,9 @@ input[type="number"] {
   box-shadow: 0 1px 8px #0002;
   background: #e0c18511;
 }
+@media (max-width: 650px) {
+  #centralMap {
+    height: 180px;
+    min-height: 120px;
+  }
+}
