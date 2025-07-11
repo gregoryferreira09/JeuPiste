@@ -268,7 +268,6 @@ function genererJetonsColonnes(
     let missionType = hasMission ? getMissionTypeByIndex(jetonMissionsMapping[i], missionsList) : null;
     let isValidated = hasMission && validatedMissions && validatedMissions[jetonMissionsMapping[i]] && validatedMissions[jetonMissionsMapping[i]].validated;
     let isMalus = (jetonsMalus||[]).includes(i);
-    let isBloque = (epreuveEnCours !== null && epreuveEnCours !== false && epreuveEnCours !== undefined && epreuveEnCours !== i && hasMission);
 
     if (isValidated) {
       btn.classList.add('validated');
@@ -288,13 +287,6 @@ function genererJetonsColonnes(
       btn.ondblclick = null;
       btn.tabIndex = -1;
       jetonsState[i] = "no-mission";
-    } else if (isBloque) {
-      btn.innerHTML = "🔒";
-      btn.disabled = true;
-      btn.style.cursor = "not-allowed";
-      btn.onclick = null;
-      btn.ondblclick = null;
-      btn.tabIndex = -1;
     } else {
       btn.innerHTML = i+1;
       btn.tabIndex = 0;
@@ -464,16 +456,3 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('modal-perdu').classList.remove('active');
   };
 });
-
-// ========== BONUS : Débloquer l'équipe quand on quitte l'épreuve proprement ==========
-// Place ce code dans le JS de la page template-epreuve.html, sur le bouton "Retour à la carte":
-/*
-document.getElementById('btn-retour-carte').onclick = function() {
-  const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = localStorage.getItem("equipeNum");
-  if (salonCode && equipeNum) {
-    firebase.database().ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuveEnCours').set(null);
-  }
-  window.location.href = "template-partie.html";
-};
-*/
