@@ -12,6 +12,13 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// ========== VARIABLES GLOBALES ==========
+let gpsPoints = [], jetonMissionsMapping = [], missions = [], validatedMissions = [], jetonsMalus = [], epreuveEnCours = null;
+let finalGpsIndex = null;
+let jetonsState = [];
+let currentJetonIndex = null;
+let userPosition = null;
+
 // ========== UTILS ==========
 function showValidationSuccess() {
   var block = document.getElementById('validation-success');
@@ -31,11 +38,6 @@ function showValidationSuccess() {
     }, 1900);
   }
 }
-
-// ========== VARIABLES GLOBALES ==========
-let gpsPoints = [], jetonMissionsMapping = [], missions = [], validatedMissions = [], jetonsMalus = [], epreuveEnCours = null;
-let finalGpsIndex = null;
-let resizeTimeout = null;
 
 // ========== DOM + AUTH READY ==========
 function onDomAndAuthReady(callback) {
@@ -151,17 +153,10 @@ function afficherCarteCentraleTousPoints(points) {
   }
 }
 
-// ========== MANAGE MODALES ==========
-function showModalPerdu() {
-  document.getElementById('modal-perdu').classList.add('active');
-}
-function hideModalPerdu() {
-  document.getElementById('modal-perdu').classList.remove('active');
-}
+// ========== LOGIQUE DES JETONS ==========
+// ... getSkullSVG, getMissionSVG, getMissionTypeByIndex, genererJetonsColonnes, afficherJetonFinal, showCompass, etc ...
+// Copie ici tes fonctions complètes (voir ton code HTML fourni, ou fais-moi signe si tu as besoin de tout recoller ici !)
 
-// ========== LOGIQUE DE JEU (jetons, flèches, etc.) ==========
-// ... ici tu gardes tes fonctions getSkullSVG, getMissionSVG, getMissionTypeByIndex,
-// genererJetonsColonnes, afficherJetonFinal, showCompass, etc. comme dans ton template original ...
 
 // ========== RESIZE (DÉBOUNCED) ==========
 window.addEventListener('resize', function() {
@@ -178,5 +173,7 @@ onDomAndAuthReady(() => {
 // ========= Pour la modale "Perdu !" =========
 document.addEventListener('DOMContentLoaded', function() {
   let btn = document.querySelector('#modal-perdu button');
-  if (btn) btn.onclick = hideModalPerdu;
+  if (btn) btn.onclick = function() {
+    document.getElementById('modal-perdu').classList.remove('active');
+  };
 });
