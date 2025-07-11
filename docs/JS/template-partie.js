@@ -343,6 +343,7 @@ function getDistanceMeters(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
+// ========== FLÈCHE, COMPASS, ETC ==========
 let compassWatchId = null;
 let lastDistance = null;
 let isSearchingArrow = false;
