@@ -154,6 +154,46 @@ function afficherCarteCentraleTousPoints(points) {
 }
 
 // ========== LOGIQUE DES JETONS ==========
+
+// Utilitaire pour valider ou maluser un jeton si recliqué dessus (ou sur la flèche)
+function tenterAccesJetonCourant() {
+  if (currentJetonIndex === null) return;
+  let i = currentJetonIndex;
+  if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
+    const stepsInfo = document.getElementById('steps-info');
+    stepsInfo.classList.add('error');
+    const arrow = document.getElementById('svg-arrow');
+    arrow.classList.add('arrow-error');
+    setTimeout(() => {
+      stepsInfo.classList.remove('error');
+      arrow.classList.remove('arrow-error');
+    }, 1700);
+    // Mettre le jeton en rouge/crâne si ce n'est pas déjà fait
+    let salonCode = localStorage.getItem("salonCode");
+    let equipeNum = localStorage.getItem("equipeNum");
+    let malusRef = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/jetonsMalus');
+    malusRef.transaction(arr => {
+      arr = arr || [];
+      if (!arr.includes(i)) arr.push(i);
+      return arr;
+    });
+    document.getElementById('modal-perdu').classList.add('active');
+    return;
+  }
+  if (jetonMissionsMapping[i] !== -1) {
+    let salonCode = localStorage.getItem("salonCode");
+    let equipeNum = localStorage.getItem("equipeNum");
+    let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
+    ref.transaction(val => (!val ? i : val)).then(res => {
+      if (res.committed && res.snapshot.val() === i) {
+        window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
+      } else {
+        alert("Cette épreuve est déjà en cours sur un autre appareil !");
+      }
+    });
+  }
+}
+
 function getSkullSVG() {
   return `<svg class="svg-skull" width="38" height="38" viewBox="0 0 32 32" fill="none">
       <g>
@@ -260,53 +300,16 @@ function genererJetonsColonnes(
       btn.tabIndex = 0;
       btn.onclick = (e) => {
         e.preventDefault();
-        currentJetonIndex = i;
-        showCompass(gpsPoints[i]);
-      };
-      btn.ondblclick = (e) => {
-        e.preventDefault();
-        if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
-          const stepsInfo = document.getElementById('steps-info');
-          stepsInfo.classList.add('error');
-          const arrow = document.getElementById('svg-arrow');
-          arrow.classList.add('arrow-error');
-          setTimeout(() => {
-            stepsInfo.classList.remove('error');
-            arrow.classList.remove('arrow-error');
-          }, 1700);
-          return;
-        }
-        if (hasMission) {
-          let salonCode = localStorage.getItem("salonCode");
-          let equipeNum = localStorage.getItem("equipeNum");
-          let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
-          ref.transaction(val => (!val ? i : val)).then(res => {
-            if (res.committed && res.snapshot.val() === i) {
-              window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-            } else {
-              alert("Cette épreuve est déjà en cours sur un autre appareil !");
-            }
-          });
+        if (currentJetonIndex === i) {
+          // On tente l’accès/validation/malus à chaque clic sur le même jeton, même longtemps après
+          tenterAccesJetonCourant();
         } else {
-          let salonCode = localStorage.getItem("salonCode");
-          let equipeNum = localStorage.getItem("equipeNum");
-          let malusRef = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/jetonsMalus');
-          malusRef.transaction(arr => {
-            arr = arr || [];
-            if (!arr.includes(i)) arr.push(i);
-            return arr;
-          });
-          btn.className = 'jeton no-mission';
-          btn.innerHTML = getSkullSVG();
-          btn.disabled = true;
-          btn.style.cursor = "default";
-          btn.onclick = null;
-          btn.ondblclick = null;
-          btn.tabIndex = -1;
-          jetonsState[i] = "no-mission";
-          document.getElementById('modal-perdu').classList.add('active');
+          // Premier clic : focus le jeton et affiche la flèche
+          currentJetonIndex = i;
+          showCompass(gpsPoints[i]);
         }
       };
+      btn.ondblclick = null; // On ne gère plus le double-clic
     }
     if (i % 2 === 0) {
       gauche.appendChild(btn);
@@ -389,30 +392,7 @@ function showCompass(targetGps, onArrivee) {
     document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
   }
   document.getElementById('svg-arrow').onclick = function() {
-    if (currentJetonIndex === null) return;
-    if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[currentJetonIndex].lat, gpsPoints[currentJetonIndex].lng) > 30) {
-      const stepsInfo = document.getElementById('steps-info');
-      stepsInfo.classList.add('error');
-      const arrow = document.getElementById('svg-arrow');
-      arrow.classList.add('arrow-error');
-      setTimeout(() => {
-        stepsInfo.classList.remove('error');
-        arrow.classList.remove('arrow-error');
-      }, 1700);
-      return;
-    }
-    if (jetonMissionsMapping[currentJetonIndex] !== -1) {
-      let salonCode = localStorage.getItem("salonCode");
-      let equipeNum = localStorage.getItem("equipeNum");
-      let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
-      ref.transaction(val => (!val ? currentJetonIndex : val)).then(res => {
-        if (res.committed && res.snapshot.val() === currentJetonIndex) {
-          window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[currentJetonIndex]}`;
-        } else {
-          alert("Cette épreuve est déjà en cours sur un autre appareil !");
-        }
-      });
-    }
+    tenterAccesJetonCourant();
   };
   if (navigator.geolocation) {
     compassWatchId = navigator.geolocation.watchPosition(
