@@ -4,7 +4,7 @@ const firebaseConfig = {
   authDomain: "murder-party-ba8d1.firebaseapp.com",
   databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1",
+  storageBucket: "murder-party-ba8d1.firebasestorage.app",
   messagingSenderId: "20295055805",
   appId: "1:20295055805:web:0963719c3f23ab7752fad4",
   measurementId: "G-KSBMBB7KMJ"
@@ -109,7 +109,7 @@ function lancerAccueil() {
               if (finalWrapper) finalWrapper.style.display = "none";
             }
           }
- 
+
           db.ref(`parties/${salonCode}/equipes/${equipeNum}/jetonsMalus`).on('value', snapMalus => {
             jetonsMalus = snapMalus.val() || [];
             redraw();
@@ -155,6 +155,7 @@ function afficherCarteCentraleTousPoints(points) {
 
 // ========== LOGIQUE DES JETONS ==========
 
+// Utilitaire pour valider ou maluser un jeton si recliqué dessus (ou sur la flèche)
 function tenterAccesJetonCourant() {
   if (currentJetonIndex === null) return;
   let i = currentJetonIndex;
@@ -268,7 +269,7 @@ function genererJetonsColonnes(
     let missionType = hasMission ? getMissionTypeByIndex(jetonMissionsMapping[i], missionsList) : null;
     let isValidated = hasMission && validatedMissions && validatedMissions[jetonMissionsMapping[i]] && validatedMissions[jetonMissionsMapping[i]].validated;
     let isMalus = (jetonsMalus||[]).includes(i);
-
+    let isBloque = (epreuveEnCours !== null && epreuveEnCours !== false && epreuveEnCours !== undefined && epreuveEnCours !== i && hasMission);
     if (isValidated) {
       btn.classList.add('validated');
       btn.innerHTML = getMissionSVG(missionType, true);
@@ -287,6 +288,13 @@ function genererJetonsColonnes(
       btn.ondblclick = null;
       btn.tabIndex = -1;
       jetonsState[i] = "no-mission";
+    } else if (isBloque) {
+      btn.innerHTML = "🔒";
+      btn.disabled = true;
+      btn.style.cursor = "not-allowed";
+      btn.onclick = null;
+      btn.ondblclick = null;
+      btn.tabIndex = -1;
     } else {
       btn.innerHTML = i+1;
       btn.tabIndex = 0;
@@ -301,7 +309,7 @@ function genererJetonsColonnes(
           showCompass(gpsPoints[i]);
         }
       };
-      btn.ondblclick = null;
+      btn.ondblclick = null; // On ne gère plus le double-clic
     }
     if (i % 2 === 0) {
       gauche.appendChild(btn);
