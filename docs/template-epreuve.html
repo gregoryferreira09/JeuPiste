@@ -212,6 +212,9 @@
       } else {
         setTimeout(window.showContentAfterLoader, 300);
       }
+      window.location.href = "template-partie.html";
+// Ajoute aussi AVANT :
+window.sessionStorage.removeItem("currentJetonIndex"); // Si tu l'utilises en sessionStorage
     };
   </script>
   <!-- Animation page qui brûle -->
