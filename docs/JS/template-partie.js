@@ -82,6 +82,7 @@ function lancerAccueil() {
       missions = snapMission.val() || [];
       db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snapMapping => {
         jetonMissionsMapping = snapMapping.val() || [];
+        console.log("jetonMissionsMapping", jetonMissionsMapping); // DEBUG
         db.ref(`parties/${salonCode}/finalGpsIndex`).once('value').then(snapFinal => {
           finalGpsIndex = typeof snapFinal.val() === "number" ? snapFinal.val() : null;
 
@@ -92,6 +93,7 @@ function lancerAccueil() {
               if (validatedMissions && validatedMissions[i] && validatedMissions[i].validated) nbValidees++;
             }
             let toutesMissionsValidees = (nbValidees === totalMissions);
+            console.log("jetonsMalus", jetonsMalus); // DEBUG
             genererJetonsColonnes(
               gpsPoints,
               jetonMissionsMapping,
@@ -155,11 +157,16 @@ function afficherCarteCentraleTousPoints(points) {
 
 // ========== LOGIQUE DES JETONS ==========
 
-// Utilitaire pour valider ou maluser un jeton si recliqué dessus (ou sur la flèche)
 function tenterAccesJetonCourant() {
   if (currentJetonIndex === null) return;
   let i = currentJetonIndex;
-  if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
+
+  // Correction : Ne pas ajouter de malus si la géoloc n'est pas dispo (ne pas griser tous les jetons !)
+  if (!userPosition) {
+    alert("La géolocalisation est requise pour jouer. Veuillez l’activer/autoriser dans votre navigateur.");
+    return;
+  }
+  if (getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
     const stepsInfo = document.getElementById('steps-info');
     stepsInfo.classList.add('error');
     const arrow = document.getElementById('svg-arrow');
@@ -218,16 +225,16 @@ function getMissionSVG(type, gold = false, isFinal = false) {
   switch (type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M21 19l-5.5-7-5 6-2.5-3L3 19"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5 17l2.5-3.5 2 2.5 3-4L19 17"/></svg>`;
     case "video":
       return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="15" height="14" rx="2"/><polygon points="18,8 23,12 18,16"/></svg>`;
     case "audio":
       return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" rx="1"/></svg>`;
     case "collecte_objet":
     case "objet":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 38 38" width="30" height="30" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.25" fill="#e0c185"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 38 38" width="30" height="30" fill="none"><circle cx="19" cy="19" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.2" fill="#e0c185"/></svg>`;
     case "fichier":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" height="2" rx="1" fill="#e0c185"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" height="2" rx="1" fill="#d4af37"/></svg>`;
     default:
       return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="4" y="7" width="16" height="11" rx="2"/></svg>`;
   }
@@ -257,19 +264,23 @@ function genererJetonsColonnes(
   let jetonDiameter = (N > 10) ? 34 : 48;
   jetonsState = jetonsState.length === N ? jetonsState : Array(N).fill("white");
   for(let i=0; i<N; i++) {
+    // On saute le point final selon le cas
     if (i === finalGpsIndex && !toutesMissionsValidees) continue;
     if (i === finalGpsIndex && toutesMissionsValidees) continue;
+
     const btn = document.createElement('button');
     btn.className = 'jeton';
     btn.textContent = i+1;
     btn.setAttribute('aria-label', `Point GPS ${i+1}`);
     btn.style.width = btn.style.height = jetonDiameter + "px";
     btn.dataset.idx = i;
+
     let hasMission = jetonMissionsMapping[i] !== -1;
     let missionType = hasMission ? getMissionTypeByIndex(jetonMissionsMapping[i], missionsList) : null;
     let isValidated = hasMission && validatedMissions && validatedMissions[jetonMissionsMapping[i]] && validatedMissions[jetonMissionsMapping[i]].validated;
     let isMalus = (jetonsMalus||[]).includes(i);
     let isBloque = (epreuveEnCours !== null && epreuveEnCours !== false && epreuveEnCours !== undefined && epreuveEnCours !== i && hasMission);
+
     if (isValidated) {
       btn.classList.add('validated');
       btn.innerHTML = getMissionSVG(missionType, true);
@@ -279,7 +290,16 @@ function genererJetonsColonnes(
       btn.ondblclick = null;
       btn.tabIndex = -1;
       jetonsState[i] = "validated";
-    } else if (jetonsState[i] === "no-mission" || isMalus) {
+    } else if (!hasMission) {
+      btn.classList.add('no-mission');
+      btn.innerHTML = getSkullSVG();
+      btn.disabled = true;
+      btn.style.cursor = "default";
+      btn.onclick = null;
+      btn.ondblclick = null;
+      btn.tabIndex = -1;
+      jetonsState[i] = "no-mission";
+    } else if (isMalus) {
       btn.classList.add('no-mission');
       btn.innerHTML = getSkullSVG();
       btn.disabled = true;
@@ -309,7 +329,7 @@ function genererJetonsColonnes(
           showCompass(gpsPoints[i]);
         }
       };
-      btn.ondblclick = null; // On ne gère plus le double-clic
+      btn.ondblclick = null;
     }
     if (i % 2 === 0) {
       gauche.appendChild(btn);
