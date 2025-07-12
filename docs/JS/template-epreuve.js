@@ -145,9 +145,13 @@ function genererPhraseMission(type, mode, vars = {}) {
 
 function getUploadIcon(type) {
   switch(type) {
-    case "photo":
-    case "photo_inconnus":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5..."/></svg>`;
+case "photo":
+case "photo_inconnus":
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185" xmlns="http://www.w3.org/2000/svg">
+  <rect x="3" y="5" width="18" height="14" rx="2"/>
+  <circle cx="8.5" cy="12" r="2"/>
+  <path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11zM7.5 17l2.5-3.5 2 2.5 3-4L19 17"/>
+  </svg>`;
     case "video":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
     case "audio":
