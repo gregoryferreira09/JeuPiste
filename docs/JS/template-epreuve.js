@@ -156,10 +156,17 @@ case "photo_inconnus":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><path d="M17 10.5V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 4v-11l-4 4z"/></svg>`;
     case "audio":
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" rx="1"/></svg>`;
-    case "collecte_objet":
-      return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx..."/></svg>`;
-    case "fichier":
-      return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" ..."/></svg>`;
+case "collecte_objet":
+  return `<svg viewBox="0 0 38 38" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="14" width="22" height="14" rx="3" fill="#e0c185" stroke="#bfa145" stroke-width="2"/>
+    <path d="M8 14l11-8 11 8" stroke="#bfa145" stroke-width="2" fill="none"/>
+    <circle cx="19" cy="21" r="3" fill="#bfa145"/>
+  </svg>`;
+case "fichier":
+  return `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="6" y="4" width="12" height="16" rx="2" fill="#e0c185" stroke="#bfa145" stroke-width="2"/>
+    <path d="M14 4v4h4" stroke="#bfa145" stroke-width="2" fill="none"/>
+  </svg>`;
     default:
       return `<svg viewBox="0 0 24 24" width="38" height="38" fill="#e0c185"><rect x="4" y="7" width="16" height="11" rx="2"/></svg>`;
   }
