@@ -2,258 +2,276 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Carte & Missions – Ludus itineris</title>
+  <title id="page-title">Quête - Ludus itineris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    #centralMap {
+    html, body { height: 100%; }
+    body { min-height: 100vh; background: #231d1d; }
+    .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px,1px,1px,1px); white-space: nowrap; border: 0; padding: 0; margin: -1px; }
+    .grayed { opacity: 0.5; pointer-events: none; }
+    .main-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+    .main-btn.enabled { background: #e0c185; color: #231d1d; font-weight: bold; }
+    .actions-row-horizontal { display: flex; align-items: center; gap: 24px; margin: 24px 0; }
+    .icon-action { display: flex; flex-direction: column; align-items: center; width: 90px; }
+    .icon-action label, .icon-action a { cursor: pointer; }
+    .modal-toast { display: none; position: fixed; left: 50%; top: 10%; transform: translateX(-50%); background: #231d1d; color: #ffeecb; border: 2px solid #e0c185; border-radius: 8px; padding: 16px 24px; z-index: 9999; }
+    .modal-toast.visible { display: block; animation: fadein 0.3s;}
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; }}
+    .boutons-actions {
       width: 100%;
-      height: 300px;
-      min-height: 220px;
-      border-radius: 10px;
-      margin-bottom: 18px;
-      box-shadow: 0 1px 6px #0002;
-      border: 1.5px solid #343947;
-      background: none !important;
-      position: relative;
-    }
-    @media (max-width: 650px) {
-      #centralMap { height: 160px; }
-    }
-    .jetons-arc-container {
       display: flex;
-      align-items: center;
       justify-content: center;
-      width: 100%;
-      flex-direction: column;
-    }
-    #jetons-colonnes-wrapper {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-      justify-content: space-between;
-      align-items: stretch;
-      min-height: 220px;
-      margin-bottom: 10px;
-      padding-left: 32px;
-      padding-right: 32px;
-      box-sizing: border-box;
-    }
-    .jetons-colonne {
-      display: flex;
-      flex-direction: column;
-      gap: 38px;
-      align-items: flex-start;
-      justify-content: flex-start;
-      min-width: 54px;
-      flex: 0 0 auto;
-    }
-    #jetons-gauche { align-items: flex-start; }
-    #jetons-droite { align-items: flex-end; }
-    #colonne-fleche {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-width: 110px;
-      flex: 0 0 110px;
-    }
-    .jeton {
-      border-radius: 50%;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.19em;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      box-shadow: 0 2px 8px #0002;
-      outline: none;
-      pointer-events: auto;
-      transition: background 0.18s, border .18s, color .18s, transform .13s;
-      cursor: pointer;
-      border: 2.5px solid #e0c185;
-      background: #fff;
-      color: #231d1d;
-      min-width: 34px;
-      min-height: 34px;
-      width: 48px;
-      height: 48px;
-      position: relative;
-    }
-    .jeton.no-mission {
-      background: #b0b0b0 !important;
-      border-color: #888 !important;
-      color: #fff !important;
-      pointer-events: none !important;
-      cursor: default !important;
-      animation: none !important;
-    }
-    .jeton.validated {
-      background: #668702 !important;
-      border-color: #3e5000 !important;
-      color: #fff !important;
-      pointer-events: none !important;
-      cursor: default !important;
-      animation: none !important;
-    }
-    .jeton.final-jeton {
-      background: #ffe285 !important;
-      border-color: #d4af37 !important;
-      color: #473714 !important;
-      pointer-events: none !important;
-      cursor: default !important;
-      animation: none !important;
-      box-shadow: 0 0 10px #d4af37cc, 0 2px 8px #0002;
-    }
-    .svg-skull {
-      display: block;
-      margin: 0 auto;
-      width: 38px;
-      height: 38px;
-    }
-    .jeton .svg-epreuve {
-      width: 30px;
-      height: 30px;
-      display: block;
-      margin: 0 auto;
-    }
-    .jeton .svg-epreuve.gold {
-      fill: #d4af37 !important;
-    }
-    @media (max-width: 650px) {
-      .jetons-colonne { gap: 18px; }
-      .jeton { width: 34px; height: 34px; font-size: 0.98em; }
-      #jetons-colonnes-wrapper { min-height: 60px; padding-left: 6px; padding-right: 6px; }
-    }
-    /* Flèche & texte harmonisé */
-    #compass-arrow-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      margin-top: 0;
+      margin-top: 36px;
       margin-bottom: 0;
+      gap: 24px;
     }
-    #compass-arrow {
+    /* Loader overlay */
+    #epreuve-loader {
+      position: fixed;
+      z-index: 99999;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #231d1d;
       display: flex;
-      justify-content: center;
       align-items: center;
-      width: 100%;
+      justify-content: center;
+      transition: opacity 0.6s;
+      opacity: 1;
+      pointer-events: all;
     }
-    #svg-arrow {
-      width: 130px;
-      height: 170px;
-      max-width: 180px;
-      max-height: 210px;
-      display: block;
-      margin: 0 auto;
-      filter: drop-shadow(0 2px 10px #d4af3760);
-      transition: transform 1.3s cubic-bezier(0.33,1,0.68,1);
-      will-change: transform;
+    #epreuve-loader.hide {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s;
     }
-    @media (max-width: 650px) {
-      #svg-arrow {
-        width: 86px;
-        height: 110px;
-        max-width: 100px;
-        max-height: 120px;
-      }
-    }
-    #steps-info {
+    #epreuve-loader .loader-content {
       color: #e0c185;
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.18em;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-      text-shadow: 0 2px 8px #0002;
-      margin-top: 14px;
-      margin-bottom: 0;
+      font-size: 2em;
       text-align: center;
-      transition: color 0.25s;
+      font-family: 'Cinzel Decorative', serif;
+      letter-spacing: 1px;
     }
-    #steps-info.error {
-      color: #d62727 !important;
-      transition: color 0.1s;
+    #epreuve-loader .loader-icon {
+      font-size: 2.3em;
+      margin-top: 10px;
+      animation: loader-spin 1.1s linear infinite;
+      display: block;
     }
-    /* Masquer modales par défaut */
-    #validation-success, #modal-perdu {
+    @keyframes loader-spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    /* Fade-in effect for main content */
+    #main-content {
+      opacity: 0;
+      transition: opacity 1.1s;
+    }
+    #main-content.visible {
+      opacity: 1;
+      transition: opacity 1.1s;
+    }
+    /* Burn transition overlay */
+    #burn-transition {
       display: none;
+      position: fixed;
+      z-index: 199999;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      background: transparent;
+    }
+    #burn-transition.active {
+      display: block !important;
+      animation: burnFade 1.2s forwards;
+    }
+    @keyframes burnFade {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      100% { opacity: 1; }
+    }
+    @media (max-width: 650px) {
+      .boutons-actions { margin-top: 18px; gap: 12px;}
     }
   </style>
 </head>
 <body>
+  <!-- Loader overlay -->
+  <div id="epreuve-loader">
+    <div class="loader-content">
+      Chargement de l'épreuve…
+      <div class="loader-icon">⏳</div>
+    </div>
+  </div>
+  <!-- Burn effect overlay (hidden by default) -->
+  <div id="burn-transition">
+    <canvas id="burn-canvas" width="1920" height="1080" style="width:100vw;height:100vh;display:block;"></canvas>
+  </div>
   <header>
     <h1 class="site-title">Ludus itineris</h1>
   </header>
   <div class="center-wrapper">
-    <main class="main-accueil fadeIn" role="main">
-      <h2 class="titre-course">Carte & Missions</h2>
-      <div id="central-map-block">
-        <div id="centralMap"></div>
+    <main class="main-accueil" id="main-content" role="main" style="display:flex;flex-direction:column;min-height:520px;">
+      <!-- TITRE ET METAPHORE UNIQUES -->
+      <h2 class="titre-course" id="titre-quete"></h2>
+      <div class="presentation-jeu" style="margin-top:24px;">
+        <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
       </div>
-      <section>
-        <div style="margin-bottom: 14px; color: #ffeecb; font-size: 1.12em;">
-          Sélectionnez un jeton sur la carte pour tenter de découvrir une épreuve.
+      <div class="objectif-course" id="objectif-block" style="display:none;">
+        <div class="objectif-label">Objectif</div>
+        <div class="objectif-text" id="objectif-text"></div>
+      </div>
+      <div class="objectif-course" id="defi-block" style="display:none;background: #251a1a;">
+        <div class="objectif-label" style="background:#cba55a; color:#231d1d;">Défi</div>
+        <div class="objectif-text" id="defi-text"></div>
+      </div>
+      <!-- Bloc Mission (consigne courante) -->
+      <div id="bloc-mission" style="display:none;">
+        <div class="objectif-course">
+          <div class="objectif-label" id="mission-label">Mission</div>
+          <div class="objectif-text" id="mission-text"></div>
         </div>
-        <div class="jetons-arc-container">
-          <div id="jetons-colonnes-wrapper">
-            <div id="jetons-gauche" class="jetons-colonne"></div>
-            <div id="colonne-fleche">
-              <div id="compass-arrow-container">
-                <div id="compass-arrow">
-                  <svg id="svg-arrow" width="130" height="170" viewBox="0 0 90 110">
-                    <defs>
-                      <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#fff7c4"/>
-                        <stop offset="55%" stop-color="#e0c185"/>
-                        <stop offset="100%" stop-color="#d4af37"/>
-                      </linearGradient>
-                      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#bba465" flood-opacity="0.5"/>
-                      </filter>
-                    </defs>
-                    <rect x="39" y="20" width="12" height="60" rx="6" fill="url(#gold-gradient)" filter="url(#shadow)"/>
-                    <polygon points="45,8 65,47 45,35 25,47" fill="url(#gold-gradient)" stroke="#d4af37" stroke-width="2"/>
-                    <polyline points="45,80 25,105 45,95 65,105 45,80" fill="url(#gold-gradient)" stroke="#fff5c2" stroke-width="2"/>
-                  </svg>
-                </div>
-                <div id="steps-info"></div>
-              </div>
-              <div id="final-jeton-wrapper" style="display: none;">
-                <div id="final-jeton-label">Point final à rejoindre pour terminer</div>
-                <button id="final-jeton-btn" class="jeton final-jeton" style="width:48px;height:48px;" aria-label="Point GPS final"></button>
-                <div id="final-jeton-info" style="color:#e0c185;font-size:1em;margin-top:5px;"></div>
-              </div>
-            </div>
-            <div id="jetons-droite" class="jetons-colonne"></div>
+      </div>
+      <!-- Bloc Upload (photo, audio, etc) -->
+      <div id="bloc-upload" style="display:none;">
+        <div class="actions-row-horizontal" id="upload-row"></div>
+        <div id="upload-feedback"></div>
+      </div>
+      <!-- Bloc Réponse (input pour anagramme, réponse libre, etc) -->
+      <div id="bloc-answer" style="display:none;"></div>
+      <!-- Bloc Indice (modale) -->
+      <div id="bloc-indice" style="display:none;">
+        <button id="show-indice" type="button">Voir l’indice</button>
+        <div id="indice-modal" style="display:none;">
+          <div class="modal-img-wrapper">
+            <button class="close-modal" id="close-indice" aria-label="Fermer l’indice">&times;</button>
+            <img id="indice-img" src="" alt="Indice visuel" style="display:none;">
+            <div id="indice-text" style="margin-top:12px;"></div>
           </div>
         </div>
-      </section>
+      </div>
+      <!-- Bloc Chrono (si besoin) -->
+      <div id="bloc-chrono" style="display:none;">
+        <span class="chrono-timer" id="timer"></span>
+        <span class="chrono-message" id="chrono-message"></span>
+      </div>
+      <!-- Bloc Pendu (mini-jeu) -->
+      <div id="bloc-pendu" style="display:none;"></div>
+      <!-- Bouton validation -->
+      <button id="next-quest" class="main-btn" style="display:none;" disabled>Quête suivante</button>
+      <!-- BOUTON RETOUR EN BAS DU CADRE -->
+      <div class="boutons-actions">
+        <button class="main-btn" id="retourJeuBtn" style="min-width:140px;text-align:center;">
+          &#8592; Retour au jeu
+        </button>
+      </div>
     </main>
-  </div>
-  <div id="validation-success">
-    <div class="validation-check">✔️ Quête validée !</div>
-    <div id="validation-epreuves-restantes"></div>
-  </div>
-  <div id="modal-perdu">
-    <div id="modal-perdu-content">
-      <div>Perdu !<br>Ce jeton ne cache pas d'épreuve.</div>
-      <button onclick="document.getElementById('modal-perdu').classList.remove('active')">Fermer</button>
-    </div>
   </div>
   <footer class="footer">
     <p>© 2025 Ludus itineris. Tous droits réservés.</p>
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
+  <div class="modal-toast" id="toast-message" role="alert" aria-live="assertive"></div>
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="JS/template-partie.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+  <!-- Catalogue des phrases -->
+  <script src="JS/catalogue-phrases.js"></script>
+  <!-- Catalogue des atmosphères -->
+  <script src="JS/catalogue-atmospheres.js"></script>
+  <!-- Script principal de gestion de l'épreuve -->
+  <script src="JS/template-epreuve.js"></script>
+  <!-- Animation de loader et fadein -->
+  <script>
+    // Loader d'épreuve classique
+    window.epreuveLoaderDisplayed = false;
+    function showContentAfterLoader() {
+      var main = document.getElementById('main-content');
+      var loader = document.getElementById('epreuve-loader');
+      if (loader) {
+        loader.classList.add('hide');
+        setTimeout(function() {
+          loader.style.display = 'none';
+          main.classList.add('visible');
+        }, 620);
+      } else {
+        main.classList.add('visible');
+      }
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+      var main = document.getElementById('main-content');
+      main.classList.remove('visible');
+      window.epreuveLoaderDisplayed = false;
+      setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 300);
+    });
+    window.showContentAfterLoader = showContentAfterLoader;
+    window.waitAndShowEpreuveContent = function() {
+      if (window.epreuveLoaderDisplayed) {
+        window.showContentAfterLoader();
+      } else {
+        setTimeout(window.showContentAfterLoader, 300);
+      }
+    };
+  </script>
+  <!-- Animation page qui brûle -->
+  <script>
+    function startBurnTransitionAndRedirect(nextUrl) {
+      const overlay = document.getElementById('burn-transition');
+      const canvas = document.getElementById('burn-canvas');
+      overlay.style.display = 'block';
+      overlay.classList.add('active');
+      overlay.style.pointerEvents = 'all';
+      // Responsive sizing
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let w = canvas.width, h = canvas.height;
+      const ctx = canvas.getContext('2d');
+      let radius = 80, maxR = Math.sqrt(w*w + h*h), step = 0;
+      function draw() {
+        ctx.clearRect(0,0,w,h);
+        // Fond noir
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0,0,w,h);
+        // Cercle de brûlure
+        let grad = ctx.createRadialGradient(w/2, h/2, radius*0.6, w/2, h/2, radius);
+        grad.addColorStop(0, "rgba(255,180,0,0.7)");
+        grad.addColorStop(0.2, "rgba(255,128,0,0.8)");
+        grad.addColorStop(0.4, "rgba(128,32,0,0.6)");
+        grad.addColorStop(0.85, "rgba(0,0,0,0.92)");
+        grad.addColorStop(1, "#000");
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(w/2, h/2, radius, 0, 2*Math.PI);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.globalCompositeOperation = "source-over";
+        radius += 55 + (radius/10); // vitesse
+        step++;
+        if (radius < maxR*1.3) {
+          requestAnimationFrame(draw);
+        } else {
+          window.location.href = nextUrl;
+        }
+      }
+      draw();
+    }
+
+    // Correction retour carte : bouton retour au jeu
+    document.addEventListener("DOMContentLoaded", function() {
+      var retourBtn = document.getElementById('retourJeuBtn');
+      if (retourBtn) {
+        retourBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          // Remet à zéro l’index du dernier jeton sélectionné (si défini via sessionStorage)
+          try {
+            window.sessionStorage.removeItem("currentJetonIndex");
+          } catch(e){}
+          window.location.href = "template-partie.html";
+        });
+      }
+    });
+  </script>
 </body>
 </html>
