@@ -13,7 +13,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // ========== VARIABLES GLOBALES ==========
-let gpsPoints = [], jetonMissionsMapping = [], missions = [], validatedMissions = [], jetonsMalus = [], epreuveEnCours = null;
+let gpsPoints = [], jetonMissionsMapping = [], missions = [], validatedMissions = [], jetonsMalus = [];
 let finalGpsIndex = null;
 let jetonsState = [];
 let currentJetonIndex = null;
@@ -82,7 +82,6 @@ function lancerAccueil() {
       missions = snapMission.val() || [];
       db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snapMapping => {
         jetonMissionsMapping = snapMapping.val() || [];
-        console.log("jetonMissionsMapping", jetonMissionsMapping); // DEBUG
         db.ref(`parties/${salonCode}/finalGpsIndex`).once('value').then(snapFinal => {
           finalGpsIndex = typeof snapFinal.val() === "number" ? snapFinal.val() : null;
 
@@ -93,7 +92,6 @@ function lancerAccueil() {
               if (validatedMissions && validatedMissions[i] && validatedMissions[i].validated) nbValidees++;
             }
             let toutesMissionsValidees = (nbValidees === totalMissions);
-            console.log("jetonsMalus", jetonsMalus); // DEBUG
             genererJetonsColonnes(
               gpsPoints,
               jetonMissionsMapping,
@@ -101,8 +99,7 @@ function lancerAccueil() {
               validatedMissions,
               finalGpsIndex,
               toutesMissionsValidees,
-              jetonsMalus,
-              epreuveEnCours
+              jetonsMalus
             );
             if (toutesMissionsValidees && finalGpsIndex !== null) {
               afficherJetonFinal(gpsPoints, finalGpsIndex);
@@ -118,10 +115,6 @@ function lancerAccueil() {
           });
           db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).on('value', snapStatus => {
             validatedMissions = snapStatus.val() || {};
-            redraw();
-          });
-          db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuveEnCours`).on('value', snapEpreuve => {
-            epreuveEnCours = snapEpreuve.val();
             redraw();
           });
           redraw();
@@ -188,16 +181,7 @@ function tenterAccesJetonCourant() {
     return;
   }
   if (jetonMissionsMapping[i] !== -1) {
-    let salonCode = localStorage.getItem("salonCode");
-    let equipeNum = localStorage.getItem("equipeNum");
-    let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
-    ref.transaction(val => (!val ? i : val)).then(res => {
-      if (res.committed && res.snapshot.val() === i) {
-        window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-      } else {
-        alert("Cette épreuve est déjà en cours sur un autre appareil !");
-      }
-    });
+    window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
   }
 }
 
@@ -252,8 +236,7 @@ function genererJetonsColonnes(
   validatedMissions,
   finalGpsIndex,
   toutesMissionsValidees,
-  jetonsMalus,
-  epreuveEnCours
+  jetonsMalus
 ) {
   const gauche = document.getElementById('jetons-gauche');
   const droite = document.getElementById('jetons-droite');
@@ -264,7 +247,6 @@ function genererJetonsColonnes(
   let jetonDiameter = (N > 10) ? 34 : 48;
   jetonsState = jetonsState.length === N ? jetonsState : Array(N).fill("white");
   for(let i=0; i<N; i++) {
-    // On saute le point final selon le cas
     if (i === finalGpsIndex && !toutesMissionsValidees) continue;
     if (i === finalGpsIndex && toutesMissionsValidees) continue;
 
