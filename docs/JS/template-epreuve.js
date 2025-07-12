@@ -347,14 +347,6 @@ function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, l
   if (testMode && typeof onUploaded === "function") onUploaded();
 }
 
-window.addEventListener('beforeunload', function() {
-  const salonCode = localStorage.getItem("salonCode");
-  const equipeNum = localStorage.getItem("equipeNum");
-  if (salonCode && equipeNum) {
-    firebase.database().ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours').set(null);
-  }
-});
-
 // ---------------------- Toast ----------------------
 function showToast(msg) {
   let toast = document.getElementById('toast-message');
