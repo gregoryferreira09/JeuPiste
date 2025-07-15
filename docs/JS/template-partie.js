@@ -147,12 +147,23 @@ function handleShowMap() {
   if (localStorage.getItem("showMap") !== null) {
     showMap = localStorage.getItem("showMap") === "1";
   }
-  document.addEventListener("DOMContentLoaded", function() {
+  // Applique la classe immédiatement
+  function doHide() {
     const mapBlock = document.getElementById("central-map-block");
     if (mapBlock) {
-      mapBlock.style.display = showMap ? "block" : "none";
+      if (!showMap) {
+        mapBlock.classList.add("hide-map");
+      } else {
+        mapBlock.classList.remove("hide-map");
+      }
     }
-  });
+  }
+  // Lance tout de suite si la div existe, sinon réessaye au DOMContentLoaded
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", doHide);
+  } else {
+    doHide();
+  }
 }
 
 // ========== LOGIQUE SYNCHRO ==========
