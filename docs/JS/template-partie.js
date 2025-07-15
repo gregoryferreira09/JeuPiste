@@ -73,16 +73,21 @@ function checkLocalStorageOrRedirect() {
 // ========== CHRONO GLOBAL ==========
 function initGlobalChrono() {
   const dureeMinutes = parseInt(localStorage.getItem("dureeMinutes"), 10);
-  // Crée ou récupère le chrono global
   let chronoDiv = document.getElementById("chrono-global");
   if (!chronoDiv) {
     chronoDiv = document.createElement("div");
     chronoDiv.id = "chrono-global";
-    chronoDiv.style.fontSize = "1.25em";
+    // --- STYLE GROS ET VISIBLE ---
+    chronoDiv.style.fontSize = "2.2em";
     chronoDiv.style.color = "#e0c185";
-    chronoDiv.style.marginBottom = "12px";
+    chronoDiv.style.marginBottom = "18px";
     chronoDiv.style.fontWeight = "bold";
     chronoDiv.style.textAlign = "center";
+    chronoDiv.style.background = "#2c1a1a";
+    chronoDiv.style.borderRadius = "12px";
+    chronoDiv.style.padding = "18px 0 12px 0";
+    chronoDiv.style.boxShadow = "0 2px 12px #0004";
+    chronoDiv.style.letterSpacing = "1px";
     // Place le chrono juste avant la carte
     const mapBlock = document.getElementById("central-map-block");
     if (mapBlock && mapBlock.parentNode) {
@@ -99,17 +104,38 @@ function initGlobalChrono() {
   chronoDiv.style.display = "block";
   let totalSeconds = dureeMinutes * 60;
   let endTimestamp = Date.now() + totalSeconds * 1000;
+  let wasRed = false;
 
   function updateChrono() {
     let now = Date.now();
     let remaining = Math.max(0, Math.round((endTimestamp - now) / 1000));
     let min = Math.floor(remaining / 60);
     let sec = remaining % 60;
+
+    // Format plus lisible (toujours deux chiffres sur les secondes)
     chronoDiv.textContent = `⏰ Temps restant : ${min}m${sec < 10 ? "0" : ""}${sec}s`;
+
+    // Effet ROUGE vif quand pile une minute (60s) restante
+    if (remaining === 60 && !wasRed) {
+      chronoDiv.style.color = "#ff3b3b";
+      chronoDiv.style.background = "#fff0f0";
+      chronoDiv.style.transition = "color 0.08s, background 0.08s";
+      wasRed = true;
+      setTimeout(() => {
+        chronoDiv.style.color = "#e0c185";
+        chronoDiv.style.background = "#2c1a1a";
+      }, 950);
+    }
+    if (remaining !== 60) {
+      wasRed = false;
+    }
+
     if (remaining > 0) {
       setTimeout(updateChrono, 1000);
     } else {
       chronoDiv.textContent = "⏰ Temps écoulé !";
+      chronoDiv.style.color = "#ff3b3b";
+      chronoDiv.style.background = "#fff0f0";
     }
   }
   updateChrono();
