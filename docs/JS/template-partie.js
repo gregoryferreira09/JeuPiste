@@ -70,6 +70,67 @@ function checkLocalStorageOrRedirect() {
   return true;
 }
 
+// ========== CHRONO GLOBAL ==========
+function initGlobalChrono() {
+  const dureeMinutes = parseInt(localStorage.getItem("dureeMinutes"), 10);
+  // Crée ou récupère le chrono global
+  let chronoDiv = document.getElementById("chrono-global");
+  if (!chronoDiv) {
+    chronoDiv = document.createElement("div");
+    chronoDiv.id = "chrono-global";
+    chronoDiv.style.fontSize = "1.25em";
+    chronoDiv.style.color = "#e0c185";
+    chronoDiv.style.marginBottom = "12px";
+    chronoDiv.style.fontWeight = "bold";
+    chronoDiv.style.textAlign = "center";
+    // Place le chrono juste avant la carte
+    const mapBlock = document.getElementById("central-map-block");
+    if (mapBlock && mapBlock.parentNode) {
+      mapBlock.parentNode.insertBefore(chronoDiv, mapBlock);
+    } else {
+      const main = document.querySelector('.main-accueil');
+      if (main) main.insertBefore(chronoDiv, main.firstChild);
+    }
+  }
+  if (isNaN(dureeMinutes) || dureeMinutes < 1) {
+    chronoDiv.style.display = "none";
+    return;
+  }
+  chronoDiv.style.display = "block";
+  let totalSeconds = dureeMinutes * 60;
+  let endTimestamp = Date.now() + totalSeconds * 1000;
+
+  function updateChrono() {
+    let now = Date.now();
+    let remaining = Math.max(0, Math.round((endTimestamp - now) / 1000));
+    let min = Math.floor(remaining / 60);
+    let sec = remaining % 60;
+    chronoDiv.textContent = `⏰ Temps restant : ${min}m${sec < 10 ? "0" : ""}${sec}s`;
+    if (remaining > 0) {
+      setTimeout(updateChrono, 1000);
+    } else {
+      chronoDiv.textContent = "⏰ Temps écoulé !";
+    }
+  }
+  updateChrono();
+}
+
+// ========== MASQUER OU AFFICHER LA CARTE SELON showMap ==========
+function handleShowMap() {
+  let showMap = true;
+  if (localStorage.getItem("showMap") !== null) {
+    showMap = localStorage.getItem("showMap") === "1";
+  }
+  document.addEventListener("DOMContentLoaded", function() {
+    const mapBlock = document.getElementById("central-map-block");
+    if (mapBlock) {
+      mapBlock.style.display = showMap ? "block" : "none";
+    }
+  });
+}
+
+// ========== LOGIQUE SYNCHRO ==========
+
 function lancerAccueil() {
   if (!checkLocalStorageOrRedirect()) return;
   const salonCode = localStorage.getItem("salonCode");
@@ -154,7 +215,6 @@ function afficherCarteCentraleTousPoints(points) {
 }
 
 // ========== LOGIQUE DES JETONS ==========
-
 function tenterAccesJetonCourant() {
   if (currentJetonIndex === null) return;
   let i = currentJetonIndex;
@@ -217,14 +277,14 @@ function getMissionSVG(type, gold = false, isFinal = false) {
   switch (type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M21 19l-5.5-7-5 6-2.5-3L3 19"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11z"/></svg>`;
     case "video":
       return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="15" height="14" rx="2"/><polygon points="18,8 23,12 18,16"/></svg>`;
     case "audio":
       return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" rx="1"/></svg>`;
     case "collecte_objet":
     case "objet":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 38 38" width="30" height="30" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.25" fill="#e0c185"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 38 38" width="30" height="30" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.2" fill="#e0c185"/></svg>`;
     case "fichier":
       return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" height="2" rx="1" fill="#e0c185"/></svg>`;
     default:
@@ -293,10 +353,8 @@ function genererJetonsColonnes(
       btn.onclick = (e) => {
         e.preventDefault();
         if (currentJetonIndex === i) {
-          // On tente l’accès/validation/malus à chaque clic sur le même jeton, même longtemps après
           tenterAccesJetonCourant();
         } else {
-          // Premier clic : focus le jeton et affiche la flèche
           currentJetonIndex = i;
           showCompass(gpsPoints[i]);
         }
@@ -446,7 +504,9 @@ window.addEventListener('resize', function() {
 
 // ========== LANCEMENT SYNCHRO ==========
 onDomAndAuthReady(() => {
-  lancerAccueil();
+  handleShowMap();      // Masque ou affiche la carte selon le paramètre
+  initGlobalChrono();   // Ajoute le chrono global si durée définie
+  lancerAccueil();      // Logique de jeu principale
 });
 
 // ========= Pour la modale "Perdu !" =========
