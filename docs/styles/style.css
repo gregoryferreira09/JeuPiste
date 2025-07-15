@@ -1362,3 +1362,8 @@ input[type="number"] {
 #modal-perdu {
   display: none;
 }
+
+#central-map-block.hide-map {
+  display: none !important;
+}
+
