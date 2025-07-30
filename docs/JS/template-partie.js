@@ -292,7 +292,7 @@ if (jetonMissionsMapping[i] !== -1) {
     }
   });
 }
-
+}
 function getSkullSVG() {
   return `<svg class="svg-skull" width="38" height="38" viewBox="0 0 32 32" fill="none">
       <g>
