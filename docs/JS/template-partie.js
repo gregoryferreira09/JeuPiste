@@ -39,6 +39,15 @@ function showValidationSuccess() {
   }
 }
 
+// ========== Remise à zéro de l'épreuve en cours ==========
+function resetEpreuveEnCours() {
+  const salonCode = localStorage.getItem("salonCode");
+  const equipeNum = localStorage.getItem("equipeNum");
+  if (salonCode && equipeNum) {
+    db.ref('parties/' + salonCode + '/equipes/' + equipeNum + '/epreuveEnCours').set(null);
+  }
+}
+
 // ========== DOM + AUTH READY ==========
 function onDomAndAuthReady(callback) {
   let domReady = false, authReady = false;
@@ -276,23 +285,24 @@ function tenterAccesJetonCourant() {
     document.getElementById('modal-perdu').classList.add('active');
     return;
   }
-if (jetonMissionsMapping[i] !== -1) {
-  let salonCode = localStorage.getItem("salonCode");
-  let equipeNum = localStorage.getItem("equipeNum");
-  let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
-  ref.once('value').then(snap => {
-    const epreuveEnCours = snap.val();
-    if (epreuveEnCours === null || epreuveEnCours === i) {
-      // Soit aucune épreuve en cours, soit c'est bien celle-là : on la (ré)active et on y va
-      ref.set(i).then(() => {
-        window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-      });
-    } else {
-      alert("Cette épreuve est déjà en cours sur un autre appareil !");
-    }
-  });
+  if (jetonMissionsMapping[i] !== -1) {
+    let salonCode = localStorage.getItem("salonCode");
+    let equipeNum = localStorage.getItem("equipeNum");
+    let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
+    ref.once('value').then(snap => {
+      const epreuveEnCours = snap.val();
+      if (epreuveEnCours === null || epreuveEnCours === i) {
+        // Soit aucune épreuve en cours, soit c'est bien celle-là : on la (ré)active et on y va
+        ref.set(i).then(() => {
+          window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
+        });
+      } else {
+        alert("Cette épreuve est déjà en cours sur un autre appareil !");
+      }
+    });
+  }
 }
-}
+
 function getSkullSVG() {
   return `<svg class="svg-skull" width="38" height="38" viewBox="0 0 32 32" fill="none">
       <g>
@@ -317,16 +327,16 @@ function getMissionSVG(type, gold = false, isFinal = false) {
   switch (type) {
     case "photo":
     case "photo_inconnus":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2.586A2 2 0 0 1 9.828 5.586l.586.586H19a2 2 0 0 1 2 2v11z"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="[...]
     case "video":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="15" height="14" rx="2"/><polygon points="18,8 23,12 18,16"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="3" y="5" width="15" height="14" rx="2"/><polygon points="18,8 23,12 18,16"/></svg[...]
     case "audio":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" rx="1"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="9" y="4" width="6" height="10" rx="3"/><rect x="11" y="14" width="2" height="4" r[...]
     case "collecte_objet":
     case "objet":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 38 38" width="30" height="30" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y="23.5" width="8" height="2.5" rx="1.2" fill="#e0c185"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 38 38" width="30" height="30" fill="none"><circle cx="17" cy="17" r="9" stroke="#e0c185" stroke-width="3" fill="none"/><rect x="23.5" y[...]
     case "fichier":
-      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width="2"/><rect x="6" y="5" width="4" height="2" rx="1" fill="#e0c185"/></svg>`;
+      return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="none"><rect x="6" y="7" width="12" height="11" rx="2" fill="#e0c185" stroke="#e0c185" stroke-width=[...]
     default:
       return `<svg class="svg-epreuve${extraClass}" viewBox="0 0 24 24" width="30" height="30" fill="#e0c185"><rect x="4" y="7" width="16" height="11" rx="2"/></svg>`;
   }
@@ -544,6 +554,7 @@ window.addEventListener('resize', function() {
 
 // ========== LANCEMENT SYNCHRO ==========
 onDomAndAuthReady(() => {
+  resetEpreuveEnCours(); // Remet à zéro l'épreuve en cours à chaque retour sur la carte
   handleShowMap();      // Masque ou affiche la carte selon le paramètre
   initGlobalChrono();   // Ajoute le chrono global si durée définie
   lancerAccueil();      // Logique de jeu principale
