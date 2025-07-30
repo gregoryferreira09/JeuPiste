@@ -276,18 +276,21 @@ function tenterAccesJetonCourant() {
     document.getElementById('modal-perdu').classList.add('active');
     return;
   }
-  if (jetonMissionsMapping[i] !== -1) {
-    let salonCode = localStorage.getItem("salonCode");
-    let equipeNum = localStorage.getItem("equipeNum");
-    let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
-    ref.transaction(val => (!val ? i : val)).then(res => {
-      if (res.committed && res.snapshot.val() === i) {
+if (jetonMissionsMapping[i] !== -1) {
+  let salonCode = localStorage.getItem("salonCode");
+  let equipeNum = localStorage.getItem("equipeNum");
+  let ref = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/epreuveEnCours');
+  ref.once('value').then(snap => {
+    const epreuveEnCours = snap.val();
+    if (epreuveEnCours === null || epreuveEnCours === i) {
+      // Soit aucune épreuve en cours, soit c'est bien celle-là : on la (ré)active et on y va
+      ref.set(i).then(() => {
         window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
-      } else {
-        alert("Cette épreuve est déjà en cours sur un autre appareil !");
-      }
-    });
-  }
+      });
+    } else {
+      alert("Cette épreuve est déjà en cours sur un autre appareil !");
+    }
+  });
 }
 
 function getSkullSVG() {
