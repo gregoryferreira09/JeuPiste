@@ -264,7 +264,7 @@ function afficherCarteCentraleTousPoints(points) {
 function tenterAccesJetonCourant() {
   if (currentJetonIndex === null) return;
   let i = currentJetonIndex;
-  if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
+if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
     const stepsInfo = document.getElementById('steps-info');
     stepsInfo.classList.add('error');
     const arrow = document.getElementById('svg-arrow');
@@ -273,18 +273,11 @@ function tenterAccesJetonCourant() {
       stepsInfo.classList.remove('error');
       arrow.classList.remove('arrow-error');
     }, 1700);
-    // Mettre le jeton en rouge/crâne si ce n'est pas déjà fait
-    let salonCode = localStorage.getItem("salonCode");
-    let equipeNum = localStorage.getItem("equipeNum");
-    let malusRef = db.ref('parties/'+salonCode+'/equipes/'+equipeNum+'/jetonsMalus');
-    malusRef.transaction(arr => {
-      arr = arr || [];
-      if (!arr.includes(i)) arr.push(i);
-      return arr;
-    });
+    // Ne PAS mettre le jeton en malus/crâne !
     document.getElementById('modal-perdu').classList.add('active');
     return;
-  }
+}
+  
   if (jetonMissionsMapping[i] !== -1) {
     let salonCode = localStorage.getItem("salonCode");
     let equipeNum = localStorage.getItem("equipeNum");
