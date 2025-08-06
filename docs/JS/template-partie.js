@@ -264,7 +264,7 @@ function afficherCarteCentraleTousPoints(points) {
 function tenterAccesJetonCourant() {
   if (currentJetonIndex === null) return;
   let i = currentJetonIndex;
-if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 30) {
+if (!userPosition || getDistanceMeters(userPosition.lat, userPosition.lng, gpsPoints[i].lat, gpsPoints[i].lng) > 100) {
     const stepsInfo = document.getElementById('steps-info');
     stepsInfo.classList.add('error');
     const arrow = document.getElementById('svg-arrow');
