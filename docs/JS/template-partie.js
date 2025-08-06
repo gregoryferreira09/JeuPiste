@@ -453,37 +453,50 @@ function showCompass(targetGps, onArrivee) {
   startSearchingArrow();
   if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
   lastDistance = null;
-  function updateArrow(position) {
-    userPosition = { lat: position.coords.latitude, lng: position.coords.longitude };
-    const userLat = position.coords.latitude;
-    const userLng = position.coords.longitude;
-    const targetLat = targetGps.lat;
-    const targetLng = targetGps.lng;
-    const toRad = deg => deg * Math.PI / 180;
-    const dLon = toRad(targetLng - userLng);
-    const y = Math.sin(dLon) * Math.cos(toRad(targetLat));
-    const x = Math.cos(toRad(userLat)) * Math.sin(toRad(targetLat)) -
-              Math.sin(toRad(userLat)) * Math.cos(toRad(targetLat)) * Math.cos(dLon);
-    let brng = Math.atan2(y, x);
-    brng = (brng * 180 / Math.PI + 360) % 360;
-    const distance = getDistanceMeters(userLat, userLng, targetLat, targetLng);
-    if (lastDistance !== null && Math.abs(distance - lastDistance) < 2) return;
-    lastDistance = distance;
-    const steps = Math.round(distance / 0.75);
-    if (distance < 5) {
-      stepsInfo.textContent = "Vous êtes arrivé !";
-      if (typeof onArrivee === "function") onArrivee();
-    } else {
-      stepsInfo.textContent = steps + " pas restants";
-    }
-    let deviceHeading = 0;
-    if (window.lastDeviceOrientation !== undefined) {
-      deviceHeading = window.lastDeviceOrientation;
-    }
-    const heading = brng - deviceHeading;
-    stopSearchingArrow();
-    document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
+
+  
+const PERIMETRE_AUTORISE = 75; // Mets ici la valeur que tu veux
+
+function updateArrow(position) {
+  userPosition = { lat: position.coords.latitude, lng: position.coords.longitude };
+  const userLat = position.coords.latitude;
+  const userLng = position.coords.longitude;
+  const targetLat = targetGps.lat;
+  const targetLng = targetGps.lng;
+  const toRad = deg => deg * Math.PI / 180;
+  const dLon = toRad(targetLng - userLng);
+  const y = Math.sin(dLon) * Math.cos(toRad(targetLat));
+  const x = Math.cos(toRad(userLat)) * Math.sin(toRad(targetLat)) -
+            Math.sin(toRad(userLat)) * Math.cos(toRad(targetLat)) * Math.cos(dLon);
+  let brng = Math.atan2(y, x);
+  brng = (brng * 180 / Math.PI + 360) % 360;
+  const distance = getDistanceMeters(userLat, userLng, targetLat, targetLng);
+  if (lastDistance !== null && Math.abs(distance - lastDistance) < 2) return;
+  lastDistance = distance;
+  const steps = Math.round(distance / 0.75);
+
+  // Vérifie la distance pour le style
+  if (distance < 5) {
+    stepsInfo.textContent = "Vous êtes arrivé !";
+    stepsInfo.style.color = ""; // couleur par défaut ou une couleur spéciale
+    if (typeof onArrivee === "function") onArrivee();
+  } else if (distance <= PERIMETRE_AUTORISE) {
+    stepsInfo.textContent = steps + " pas restants";
+    stepsInfo.style.color = "green"; // Affiche en vert
+  } else {
+    stepsInfo.textContent = steps + " pas restants";
+    stepsInfo.style.color = ""; // couleur par défaut
   }
+
+  let deviceHeading = 0;
+  if (window.lastDeviceOrientation !== undefined) {
+    deviceHeading = window.lastDeviceOrientation;
+  }
+  const heading = brng - deviceHeading;
+  stopSearchingArrow();
+  document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
+}
+  
   document.getElementById('svg-arrow').onclick = function() {
     tenterAccesJetonCourant();
   };
