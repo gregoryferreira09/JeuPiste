@@ -184,6 +184,75 @@
     #validation-success, #modal-perdu {
       display: none;
     }
+    
+    /* Style pour les modales */
+    #modal-perdu.active {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #modal-perdu-content {
+      background: #2c1a1a;
+      color: #e0c185;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid #e0c185;
+      max-width: 300px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2em;
+    }
+    
+    #modal-perdu-content button {
+      margin-top: 20px;
+      background: #e0c185;
+      color: #2c1a1a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1em;
+      font-weight: bold;
+    }
+    
+    #modal-perdu-content button:hover {
+      background: #d4af37;
+    }
+    
+    #validation-success {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #668702;
+      color: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      text-align: center;
+      z-index: 1000;
+      font-size: 1.1em;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    
+    .arrow-error {
+      animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      75% { transform: rotate(10deg); }
+    }
   </style>
 </head>
 <body>
