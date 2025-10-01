@@ -314,8 +314,13 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
 
   // ==== GESTION DU JEU DU PENDU ====
   if (etape.type === "pendu") {
+    // Correction : génération du mot si absent ou trop court
+    if (!etape.params) etape.params = {};
+    if (!etape.params.mot_pendu || etape.params.mot_pendu.length < 6) {
+      etape.params.mot_pendu = genererMotPenduAleatoire();
+    }
     document.getElementById('bloc-pendu').style.display = '';
-    afficherJeuPenduFirebaseEtape(etape.params && etape.params.mot_pendu ? etape.params.mot_pendu : "");
+    afficherJeuPenduFirebaseEtape(etape.params.mot_pendu);
     return;
   }
   // ==== FIN GESTION DU PENDU ====
