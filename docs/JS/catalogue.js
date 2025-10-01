@@ -110,41 +110,18 @@ const QUESTS_CATALOGUE = [
   
   {
     id: "pendu",
-    nom: "Le Jeu du Pendu", // mettre "nom" pour l'affichage, pas "titre"
-    description: "Rendez-vous à l’endroit précis indiqué pour activer le jeu du pendu. Une fois sur place, vous aurez un temps limité pour deviner un mot français de 6 ou 7 lettres.",
-    lieu: "À définir", // Remplace par l’identifiant ou la description du lieu précis
-    type: "mini-jeu",
-    tempsLimite: 120, // en secondes, à ajuster selon la difficulté souhaitée
-    genererMot: function() {
-      // Catalogue tout public : mots français de 6 et 7 lettres
-
-const MOTS_6_LETTRES = [
-  "ACAJOU","AGNEAU","ALARME","ANANAS","ANGORA","ANIMAL","ARCADE","AVIRON","AZIMUT","BABINE",
-  "BALADE","BONZAÏ","BASSON","BILLET","BOUCHE","BOUCLE","BRONZE","CABANE","CAÏMAN","CLOCHE",
-  "CHÈQUE","CIRAGE","COCCYX","CRAYON","GARAGE","GOSPEL","GOULOT","GRAMME","GRELOT","GUENON",
-  "HOCHET","HORMIS","HUMOUR","HURLER","JARGON","LIMITE","LIONNE","MENTHE","OISEAU","PODIUM",
-  "POULPE","POUMON","PUZZLE","QUARTZ","RAPIDE","SÉISME","TÉTINE","TOMATE","WALABI","WHISKY",
-  "ZIPPER"
-];
-
-const MOTS_7_LETTRES = [
-  "ABRITER","BALLAST","BARYTON","BASSINE","BATAVIA","BILLARD","BRETZEL","CITHARE","CHARIOT","CLAIRON",
-  "CORBEAU","CORTEGE","CRAPAUD","CYMBALE","DENTIER","DJEMBÉ","DRAPEAU","EXEMPLE","FOURMIS","GRANDIR",
-  "ICEBERG","JAVELOT","JOCKEY","JOURNAL","JOURNÉE","JOUXTER","LOSANGE","MACADAM","MONDIAL","NOTABLE",
-  "OXYGÈNE","PANIQUE","PÉTROLE","POTERIE","POUVOIR","RENÉGAT","SCOOTER","SENTEUR","SIFFLET","SPIRALE",
-  "SUCETTE","STROPHE","TONNEAU","TROUSSE","TUNIQUE","UKULÉLÉ","VAUTOUR","ZOZOTER"
-];
-      return mots[Math.floor(Math.random() * mots.length)];
-    },
-    boutonAleatoire: {
-      label: "Nouveau mot",
-      action: function() {}
-    },
-    visuel: function(container) {},
-    instructions: "Devinez le mot de 6 ou 7 lettres en proposant des lettres une par une. Attention au temps limité !",
-    preview: "pendu"
+    nom: "Le Jeu du Pendu",
+    description: "Devinez le mot mystère en proposant des lettres une par une. Attention au nombre d’erreurs !",
+    parametres: [
+      { key: "mot_pendu", type: "text", label: "Mot à deviner", optional: true },
+      { key: "mode", type: "select", label: "Mode de mot", options: ["Aléatoire (mot tiré du catalogue)", "Personnalisé"], default: "Aléatoire (mot tiré du catalogue)" }
+    ],
+    preview: "pendu",
+    genererMot: genererMotPenduAleatoire,
+    instructions: "Devinez le mot de 6 ou 7 lettres en proposant des lettres une par une. Attention au temps limité !"
   }
 ];
+
 
 
 // Suggestions pour les quêtes photos
@@ -283,7 +260,6 @@ const SUGGESTIONS = {
   ],
 
 
-
   duel: [
     "Pierre-Feuille-Ciseaux (classique, un tour ou en 2 manches gagnantes)",
     "Duel de regard (le premier qui cligne des yeux a perdu)",
@@ -294,6 +270,13 @@ const SUGGESTIONS = {
     "Course à cloche-pied (sur une courte distance)",
     "Cri le plus long (qui tient un cri ou une note la plus longue)",
     "Pierre-feuille-ciseaux en relais (enchaîner 3 duels en équipe)"
-  ]
-}
+  ],
+
+  
+    pendu: [
+    "Mot de 6 lettres à deviner (aléatoire)",
+    "Mot de 7 lettres à deviner (aléatoire)",
+    "Mot personnalisé (proposez votre propre mot mystère)"
+    ]
+  }
   
