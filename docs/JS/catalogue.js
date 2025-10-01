@@ -111,7 +111,7 @@ const QUESTS_CATALOGUE = [
   {
     id: "pendu",
     nom: "Le Jeu du Pendu", // mettre "nom" pour l'affichage, pas "titre"
-    description: "Rendez-vous à l’endroit précis indiqué pour activer le jeu du pendu. Une fois sur place, vous aurez un temps limité pour deviner un mot français de 8 lettres.",
+    description: "Rendez-vous à l’endroit précis indiqué pour activer le jeu du pendu. Une fois sur place, vous aurez un temps limité pour deviner un mot français de 6 ou 7 lettres.",
     lieu: "À définir", // Remplace par l’identifiant ou la description du lieu précis
     type: "mini-jeu",
     tempsLimite: 120, // en secondes, à ajuster selon la difficulté souhaitée
