@@ -1,5 +1,3 @@
-// quests-catalogue.js
-
 // ==== Mots pour le pendu ====
 const MOTS_6_LETTRES = [
   "ACAJOU","AGNEAU","ALARME","ANANAS","ANGORA","ANIMAL","ARCADE","AVIRON","AZIMUT","BABINE",
