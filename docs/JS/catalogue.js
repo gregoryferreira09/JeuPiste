@@ -116,7 +116,24 @@ const QUESTS_CATALOGUE = [
     type: "mini-jeu",
     tempsLimite: 120, // en secondes, à ajuster selon la difficulté souhaitée
     genererMot: function() {
-      const mots = ["fromages", "lunettes", "chiffres", "parcours", "bouchons", "dessiner"];
+      // Catalogue tout public : mots français de 6 et 7 lettres
+
+const MOTS_6_LETTRES = [
+  "ACAJOU","AGNEAU","ALARME","ANANAS","ANGORA","ANIMAL","ARCADE","AVIRON","AZIMUT","BABINE",
+  "BALADE","BONZAÏ","BASSON","BILLET","BOUCHE","BOUCLE","BRONZE","CABANE","CAÏMAN","CLOCHE",
+  "CHÈQUE","CIRAGE","COCCYX","CRAYON","GARAGE","GOSPEL","GOULOT","GRAMME","GRELOT","GUENON",
+  "HOCHET","HORMIS","HUMOUR","HURLER","JARGON","LIMITE","LIONNE","MENTHE","OISEAU","PODIUM",
+  "POULPE","POUMON","PUZZLE","QUARTZ","RAPIDE","SÉISME","TÉTINE","TOMATE","WALABI","WHISKY",
+  "ZIPPER"
+];
+
+const MOTS_7_LETTRES = [
+  "ABRITER","BALLAST","BARYTON","BASSINE","BATAVIA","BILLARD","BRETZEL","CITHARE","CHARIOT","CLAIRON",
+  "CORBEAU","CORTEGE","CRAPAUD","CYMBALE","DENTIER","DJEMBÉ","DRAPEAU","EXEMPLE","FOURMIS","GRANDIR",
+  "ICEBERG","JAVELOT","JOCKEY","JOURNAL","JOURNÉE","JOUXTER","LOSANGE","MACADAM","MONDIAL","NOTABLE",
+  "OXYGÈNE","PANIQUE","PÉTROLE","POTERIE","POUVOIR","RENÉGAT","SCOOTER","SENTEUR","SIFFLET","SPIRALE",
+  "SUCETTE","STROPHE","TONNEAU","TROUSSE","TUNIQUE","UKULÉLÉ","VAUTOUR","ZOZOTER"
+];
       return mots[Math.floor(Math.random() * mots.length)];
     },
     boutonAleatoire: {
@@ -124,7 +141,7 @@ const QUESTS_CATALOGUE = [
       action: function() {}
     },
     visuel: function(container) {},
-    instructions: "Devinez le mot de 8 lettres en proposant des lettres une par une. Attention au temps limité !",
+    instructions: "Devinez le mot de 6 ou 7 lettres en proposant des lettres une par une. Attention au temps limité !",
     preview: "pendu"
   }
 ];
