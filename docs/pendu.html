@@ -2,32 +2,38 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Jeu du Pendu</title>
+  <title>Jeu du Pendu – Ludus itineris</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
 </head>
-<body>
-  <!-- Header commun -->
-  <header>
-    <h1>Jeu du Pendu</h1>
-    <nav>
-      <a href="index.html">Accueil</a>
-      <a href="pendu.html" class="active">Pendu</a>
-      <!-- autres liens -->
-    </nav>
-  </header>
-  <main>
-    <section id="pendu-container">
-      <div id="word-container"></div>
-      <div id="alphabet-container"></div>
-      <div id="pendu-drawing"></div>
-      <div id="message"></div>
-    </section>
-  </main>
-  <!-- Footer commun -->
-  <footer>
-    <p>&copy; 2025 Jeu de murder party en ligne</p>
+<body class="pendu-bg" style="background:#1b1b1b;">
+  <div class="center-wrapper">
+    <main class="main-pendu fadeIn" role="main">
+      <h1 class="pendu-title">Jeu du Pendu</h1>
+      <h2 class="pendu-soustitre">Devinez le mot mystère</h2>
+      <div id="pendu-container" class="pendu-section">
+        <div id="word-container" class="pendu-word"></div>
+        <div id="pendu-drawing" class="pendu-drawing"></div>
+        <div id="alphabet-container" class="pendu-alphabet"></div>
+        <div id="message" class="pendu-message"></div>
+      </div>
+      <div class="pendu-actions">
+        <a href="index.html" class="main-btn">🏠 Retour à l'accueil</a>
+      </div>
+    </main>
+  </div>
+  <footer class="footer">
+    <p>© 2025 Ludus itineris. Tous droits réservés.</p>
+    <a href="mentions-legales.html">Mentions légales</a>
   </footer>
   <script src="JS/pendu.js"></script>
- <script src="JS/catalogue.js"></script>
+  <script src="JS/catalogue.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var main = document.querySelector('.fadeIn');
+      if (main) main.classList.add('visible');
+    });
+  </script>
 </body>
 </html>
