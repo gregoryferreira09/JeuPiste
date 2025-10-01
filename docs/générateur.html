@@ -203,7 +203,7 @@
       #gpsSavedMaps { min-width: 0; font-size: 1em; }
       #confirmationModal .main-accueil {max-width:90vw;}
     }
- </style>
+  </style>
 </head>
 <body>
   <header>
@@ -282,6 +282,7 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
+  <!-- Librairies et scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -289,6 +290,7 @@
   <script src="JS/catalogue-phrases.js"></script>
   <script src="JS/generateur.js"></script>
   <script>
+    // Fonction modale harmonisée
     function showModalConfirm(questionText, callback) {
       const modal = document.getElementById('confirmationModal');
       const question = document.getElementById('modalQuestion');
@@ -307,6 +309,8 @@
         if (e.key === "Escape") { cleanup(); callback(false); }
       };
     }
+
+    // Harmonisation bouton "Vider tous les points"
     document.addEventListener("DOMContentLoaded", function() {
       const gpsClearBtn = document.getElementById('gpsClearBtn');
       if (gpsClearBtn) {
@@ -337,21 +341,56 @@
       }
     });
 
+    // Fonction pour générer un mot de pendu aléatoire
     function genererMotPendu() {
-      const tousMots = MOTS_6_LETTRES.concat(MOTS_7_LETTRES);
+      // Tu dois définir ces listes (MOTS_6_LETTRES et MOTS_7_LETTRES) dans catalogue.js ou ici
+      const tousMots = (typeof MOTS_6_LETTRES !== "undefined" ? MOTS_6_LETTRES : []).concat(
+        (typeof MOTS_7_LETTRES !== "undefined" ? MOTS_7_LETTRES : [])
+      );
+      if (tousMots.length === 0) {
+        // Fallback si pas de mots disponibles
+        return "MYSTERE";
+      }
       return tousMots[Math.floor(Math.random() * tousMots.length)];
     }
 
+    // Version complète pour la génération et sauvegarde du scénario
     function exporterScenario() {
-      const typeEpreuve = document.getElementById('questTypeSelect').value;
-      let scenario = {
-        univers: document.getElementById('modeScenarioSelect').value,
-        type: typeEpreuve,
-      };
-      if(typeEpreuve === "pendu") {
-        scenario.mot_pendu = genererMotPendu();
+      if (typeof scenario === "undefined" || scenario.length < 1) {
+        alert("Il faut au moins 1 épreuve pour générer un scénario !");
+        return;
       }
-      alert("Scénario généré :\n" + JSON.stringify(scenario, null, 2));
+
+      // Ajout gestion pendu : si une étape de type "pendu" est présente, on lui ajoute un mot
+      scenario.forEach(etape => {
+        if (etape.type === "pendu" && !etape.params.mot_pendu) {
+          etape.params.mot_pendu = genererMotPendu();
+        }
+      });
+
+      const codeSalon = Math.random().toString(36).substr(2, 6).toUpperCase();
+      const nomScenario = prompt("Donne un nom à ce scénario :", "Scénario " + codeSalon) || ("Scénario " + codeSalon);
+
+      firebase.database().ref('scenariosList/' + codeSalon).set({
+        nom: nomScenario,
+        code: codeSalon,
+        date: Date.now()
+      })
+      .then(() => {
+        firebase.database().ref('scenarios/' + codeSalon).set({
+          mode: (typeof currentGameMode !== "undefined" ? currentGameMode : document.getElementById('modeScenarioSelect').value),
+          scenario,
+          gpsPoints
+        });
+      })
+      .then(() => {
+        localStorage.setItem("dernierScenarioCree", codeSalon);
+        window.location.href = "creer-partie.html?scenarioCode=" + codeSalon;
+      })
+      .catch((error) => {
+        alert("Erreur lors de la génération du scénario : " + error.message);
+        console.error(error);
+      });
     }
   </script>
 </body>
