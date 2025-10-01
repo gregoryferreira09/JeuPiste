@@ -220,7 +220,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     // Variables pour le pendu
     let motSecret = (etape.params && etape.params.mot_pendu) ? etape.params.mot_pendu.toUpperCase() : "";
     let lettresTrouvees = Array(motSecret.length).fill("");
-    let essaisRestants = 8;
+    let essaisRestants = 9;
     let lettresTestees = [];
 
     // HTML du jeu du pendu
@@ -268,7 +268,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     }
 
     function afficherDessin() {
-      document.getElementById("pendu-drawing").textContent = `Erreurs : ${8 - essaisRestants}/8`;
+      document.getElementById("pendu-drawing").textContent = `Erreurs : ${8 - essaisRestants}/9`;
     }
 
     function verifierFin() {
