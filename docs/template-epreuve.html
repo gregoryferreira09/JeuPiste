@@ -155,7 +155,12 @@
         <span class="chrono-message" id="chrono-message"></span>
       </div>
       <!-- Bloc Pendu (mini-jeu) -->
-      <div id="bloc-pendu" style="display:none;"></div>
+      <div id="bloc-pendu" style="display:none;">
+        <div id="word-container"></div>
+        <div id="alphabet-container"></div>
+        <div id="pendu-drawing"></div>
+        <div id="message"></div>
+      </div>
       <!-- Bouton validation -->
       <button id="next-quest" class="main-btn" style="display:none;" disabled>Quête suivante</button>
       <!-- BOUTON RETOUR EN BAS DU CADRE -->
@@ -182,6 +187,9 @@
   <script src="JS/catalogue-atmospheres.js"></script>
   <!-- Script principal de gestion de l'épreuve -->
   <script src="JS/template-epreuve.js"></script>
+  <!-- Scripts pour le pendu -->
+  <script src="JS/catalogue-pendu.js"></script>
+  <script src="JS/pendu.js"></script>
   <!-- Animation de loader et fadein -->
   <script>
     // Loader d'épreuve classique
@@ -204,6 +212,23 @@
       main.classList.remove('visible');
       window.epreuveLoaderDisplayed = false;
       setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 300);
+
+      // === AJOUT PENDU ===
+      // Récupérer l'épreuve courante (exemple via localStorage, à adapter si tu utilises autre chose)
+      let epreuve;
+      try {
+        epreuve = JSON.parse(localStorage.getItem("epreuveCourante"));
+      } catch(e) {
+        epreuve = null;
+      }
+      if (epreuve && epreuve.type === "pendu" && epreuve.mot_pendu) {
+        document.getElementById("bloc-pendu").style.display = "";
+        initJeuPendu(epreuve.mot_pendu, function(succes, mot) {
+          document.getElementById("next-quest").style.display = "";
+          document.getElementById("next-quest").disabled = false;
+        });
+      }
+      // === FIN AJOUT PENDU ===
     });
     window.showContentAfterLoader = showContentAfterLoader;
     window.waitAndShowEpreuveContent = function() {
