@@ -171,10 +171,6 @@ const MISSION_UPLOAD_LABELS = {
 
 // ======================== JEU DU PENDU HARMONISÉ ========================
 
-// Catalogues de mots exemples
-const MOTS_6_LETTRES = ["BANANE", "TOMATE", "ORANGE", "PIANO", "LAMPE", "CHEVAL"];
-const MOTS_7_LETTRES = ["ABRICOT", "CITRON", "POMMEAU", "CAMÉLIA", "GIRAFE", "CHAPEAU"];
-
 // Fonction d'affichage du pendu harmonisé
 function afficherJeuPenduFirebaseEtape(motSecretParam) {
   let motSecret = motSecretParam && motSecretParam.length >= 6
