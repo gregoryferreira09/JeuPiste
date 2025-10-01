@@ -1,4 +1,3 @@
-const MOTS_URL = "mots8lettres.json";
 const MOT_KEY = "pendu-mot";
 
 let motSecret = "";
@@ -13,13 +12,12 @@ function chargerMot() {
     motSecret = motLocal;
     demarrerJeu();
   } else {
-    fetch(MOTS_URL)
-      .then(res => res.json())
-      .then(mots => {
-        motSecret = mots[Math.floor(Math.random() * mots.length)].toUpperCase();
-        localStorage.setItem(MOT_KEY, motSecret);
-        demarrerJeu();
-      });
+    // Tirage aléatoire entre 6 et 7 lettres
+    const longueur = Math.random() < 0.5 ? 6 : 7;
+    const catalogue = longueur === 6 ? MOTS_6_LETTRES : MOTS_7_LETTRES;
+    motSecret = catalogue[Math.floor(Math.random() * catalogue.length)].toUpperCase();
+    localStorage.setItem(MOT_KEY, motSecret);
+    demarrerJeu();
   }
 }
 
@@ -52,6 +50,7 @@ function afficherAlphabet() {
 }
 
 function choisirLettre(lettre) {
+  if (lettresTestees.includes(lettre) || essaisRestants === 0) return;
   lettresTestees.push(lettre);
   if (motSecret.includes(lettre)) {
     motSecret.split("").forEach((l, i) => {
@@ -69,7 +68,7 @@ function choisirLettre(lettre) {
 }
 
 function afficherPendu() {
-  // Simple exemple textuel, à remplacer par un dessin SVG/CSS
+  // Exemple simple, à remplacer par un dessin si besoin
   const penduDiv = document.getElementById("pendu-drawing");
   penduDiv.textContent = `Erreurs : ${8 - essaisRestants}/8`;
 }
