@@ -1367,3 +1367,37 @@ input[type="number"] {
   display: none !important;
 }
 
+.pendu-key {
+  margin: 2px;
+  padding: 8px 12px;
+  font-size: 1.1em;
+  border-radius: 6px;
+  border: 1px solid #e0c185;
+  background: #2c1b1b;
+  color: #ffeecb;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.pendu-key:disabled {
+  background: #aaa;
+  color: #fff;
+  cursor: not-allowed;
+}
+.pendu-word {
+  font-size: 2em;
+  letter-spacing: 0.5em;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.pendu-drawing {
+  margin: 14px 0;
+  font-weight: bold;
+  font-size: 1.1em;
+  text-align: center;
+}
+.pendu-message {
+  margin-top: 18px;
+  font-size: 1.15em;
+  text-align: center;
+  font-weight: bold;
+}
