@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
+  <!-- Ajout des fonts pendu si besoin -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
     html, body { height: 100%; }
     body { min-height: 100vh; background: #231d1d; }
@@ -156,10 +158,21 @@
       </div>
       <!-- Bloc Pendu (mini-jeu) -->
       <div id="bloc-pendu" style="display:none;">
-        <div id="word-container"></div>
-        <div id="alphabet-container"></div>
-        <div id="pendu-drawing"></div>
-        <div id="message"></div>
+        <!-- 
+          Bloc du pendu stylisé, incorporé depuis le code pendu.html
+          On conserve le container pour intégration JS.
+        -->
+        <h2 class="pendu-title" style="text-align:center; margin-bottom:1.3em;">Jeu du Pendu</h2>
+        <h3 class="pendu-soustitre">Devinez le mot mystère</h3>
+        <div id="pendu-container" class="pendu-section">
+          <div id="word-container" class="pendu-word"></div>
+          <div id="pendu-drawing" class="pendu-drawing"></div>
+          <div id="alphabet-container" class="pendu-alphabet"></div>
+          <div id="message" class="pendu-message"></div>
+        </div>
+        <div class="boutons-actions" style="margin-top:2em;">
+          <a href="index.html" class="main-btn">🏠 Retour à l'accueil</a>
+        </div>
       </div>
       <!-- Bouton validation -->
       <button id="next-quest" class="main-btn" style="display:none;" disabled>Quête suivante</button>
@@ -214,7 +227,6 @@
       setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 300);
 
       // === AJOUT PENDU ===
-      // Récupérer l'épreuve courante (exemple via localStorage, à adapter si tu utilises autre chose)
       let epreuve;
       try {
         epreuve = JSON.parse(localStorage.getItem("epreuveCourante"));
@@ -229,6 +241,9 @@
         });
       }
       // === FIN AJOUT PENDU ===
+      // Animation fadeIn pour le pendu
+      var penduMain = document.querySelector('.main-accueil');
+      if (penduMain) penduMain.classList.add('visible');
     });
     window.showContentAfterLoader = showContentAfterLoader;
     window.waitAndShowEpreuveContent = function() {
