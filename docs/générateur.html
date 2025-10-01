@@ -203,7 +203,7 @@
       #gpsSavedMaps { min-width: 0; font-size: 1em; }
       #confirmationModal .main-accueil {max-width:90vw;}
     }
-  </style>
+ </style>
 </head>
 <body>
   <header>
@@ -212,15 +212,12 @@
 
   <div class="center-wrapper">
     <main class="main-accueil fadeIn" role="main">
-      <!-- Lancement et règle du jeu -->
       <div id="lancement-jeu" style="font-weight:bold; font-size:1.15em; margin-bottom:6px;"></div>
       <div id="regle-jeu" style="font-style:italic; margin-bottom:18px;"></div>
 
-      <!-- BANDEAU GPS GLOBAL -->
       <div id="bandeau-gps-global" class="bandeau-gps-global">
         <div id="gpsMapBloc">
           <div id="gpsGlobalMap"></div>
-          <!-- Actions SOUS la map, dans #gpsMapBloc -->
           <div class="gps-map-actions">
             <button id="gpsClearBtn" type="button" title="Vider tous les points">🗑️</button>
             <button id="gpsLocateBtn" type="button" title="Me localiser">📍</button>
@@ -236,13 +233,10 @@
             <div id="gpsListDiv" style="margin-top:8px;"><em>Aucun point ajouté.</em></div>
           </div>
           <div id="gpsRecapDiv">Zone de jeu : 0 point</div>
-          <!-- Harmonisation du select + bouton charger -->
           <div id="gpsMapsList" style="margin-top:12px;"></div>
         </div>
       </div>
-      <!-- FIN BANDEAU GPS GLOBAL -->
 
-      <!-- MODALE DE CONFIRMATION HARMONISÉE -->
       <div id="confirmationModal">
         <div class="main-accueil">
           <div class="modal-question" id="modalQuestion"></div>
@@ -288,15 +282,14 @@
     <a href="mentions-legales.html">Mentions légales</a>
   </footer>
 
-  <!-- Librairies et scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="JS/catalogue.js"></script>
   <script src="JS/catalogue-phrases.js"></script>
+  <script src="JS/catalogue-pendu.js"></script>
   <script src="JS/generateur.js"></script>
   <script>
-    // Fonction modale harmonisée
     function showModalConfirm(questionText, callback) {
       const modal = document.getElementById('confirmationModal');
       const question = document.getElementById('modalQuestion');
@@ -311,22 +304,17 @@
       }
       yesBtn.onclick = function() { cleanup(); callback(true); };
       noBtn.onclick = function() { cleanup(); callback(false); };
-      // Fermer aussi sur touche Échap
       document.onkeydown = function(e) {
         if (e.key === "Escape") { cleanup(); callback(false); }
       };
     }
-
-    // Harmonisation bouton "Vider tous les points"
     document.addEventListener("DOMContentLoaded", function() {
       const gpsClearBtn = document.getElementById('gpsClearBtn');
       if (gpsClearBtn) {
-        // On attend que la carte soit prête
         gpsClearBtn.onclick = function() {
           if (typeof gpsPoints !== "undefined" && gpsPoints.length === 0) return;
           showModalConfirm("Supprimer tous les points GPS ?", function(ok) {
             if (ok) {
-              // Les fonctions suivantes sont définies dans generateur.js
               gpsPoints.length = 0;
               if (typeof removeAllMarkers === "function") removeAllMarkers();
               if (typeof refreshGpsList === "function") refreshGpsList();
@@ -336,7 +324,6 @@
           });
         };
       }
-      // Harmonisation bouton "Charger"
       const selectMap = document.getElementById('gpsSavedMaps');
       const btnLoad = document.getElementById('btnLoadMap');
       if (btnLoad && selectMap) {
@@ -345,12 +332,28 @@
             alert('Choisissez une map à charger.');
             return;
           }
-          // Déclenche le onchange si défini (logique de chargement déjà présente dans generateur.js)
           const event = new Event('change');
           selectMap.dispatchEvent(event);
         }
       }
     });
+
+    function genererMotPendu() {
+      const tousMots = MOTS_6_LETTRES.concat(MOTS_7_LETTRES);
+      return tousMots[Math.floor(Math.random() * tousMots.length)];
+    }
+
+    function exporterScenario() {
+      const typeEpreuve = document.getElementById('questTypeSelect').value;
+      let scenario = {
+        univers: document.getElementById('modeScenarioSelect').value,
+        type: typeEpreuve,
+      };
+      if(typeEpreuve === "pendu") {
+        scenario.mot_pendu = genererMotPendu();
+      }
+      alert("Scénario généré :\n" + JSON.stringify(scenario, null, 2));
+    }
   </script>
 </body>
 </html>
