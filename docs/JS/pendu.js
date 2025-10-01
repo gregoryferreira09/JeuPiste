@@ -2,7 +2,7 @@ const MOT_KEY = "pendu-mot";
 
 let motSecret = "";
 let lettresTrouvees = [];
-let essaisRestants = 8;
+let essaisRestants = 9;
 let lettresTestees = [];
 
 function chargerMot() {
@@ -23,7 +23,7 @@ function chargerMot() {
 
 function demarrerJeu() {
   lettresTrouvees = Array(motSecret.length).fill("");
-  essaisRestants = 8;
+  essaisRestants = 9;
   lettresTestees = [];
   afficherMot();
   afficherAlphabet();
