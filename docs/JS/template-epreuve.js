@@ -4,7 +4,7 @@ const firebaseConfig = {
   authDomain: "murder-party-ba8d1.firebaseapp.com",
   databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.firebasestorage.app",
+  storageBucket: "murder-party-ba8d1.appspot.com",
   messagingSenderId: "20295055805",
   appId: "1:20295055805:web:0963719c3f23ab7752fad4",
   measurementId: "G-KSBMBB7KMJ"
@@ -109,7 +109,6 @@ function buildVars(etape) {
 
 // Génération des consignes harmonisées pour une mission
 function genererPhraseMission(type, mode, vars = {}) {
-  // Si tu as un catalogue, adapte !
   if (typeof QUEST_TEXTS === "undefined" || !QUEST_TEXTS[type]) return null;
   let textes = QUEST_TEXTS[type][mode] || QUEST_TEXTS[type]["arthurien"] || [];
   if (!Array.isArray(textes)) {
@@ -170,7 +169,8 @@ const MISSION_UPLOAD_LABELS = {
   fichier: (vars) => (vars.nb > 1 ? "Fichiers à envoyer" : "Fichier à envoyer"),
 };
 
-// Affichage harmonisé d'une étape
+// ======================== GESTION AFFICHAGE ETAPE ========================
+
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   resetAffichageEtape();
 
@@ -214,6 +214,88 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
 
   document.getElementById('mission-text').innerHTML = phraseMission + sousConsignesHtml;
 
+  // ==== GESTION DU JEU DU PENDU ====
+  if (etape.type === "pendu") {
+    document.getElementById('bloc-pendu').style.display = '';
+    // Variables pour le pendu
+    let motSecret = (etape.params && etape.params.mot_pendu) ? etape.params.mot_pendu.toUpperCase() : "";
+    let lettresTrouvees = Array(motSecret.length).fill("");
+    let essaisRestants = 8;
+    let lettresTestees = [];
+
+    // HTML du jeu du pendu
+    document.getElementById('bloc-pendu').innerHTML = `
+      <div class="pendu-word" id="pendu-word"></div>
+      <div class="pendu-drawing" id="pendu-drawing"></div>
+      <div class="pendu-alphabet" id="pendu-alphabet"></div>
+      <div class="pendu-message" id="pendu-message"></div>
+    `;
+
+    function afficherMot() {
+      document.getElementById("pendu-word").innerHTML = lettresTrouvees.map(l => l || "_").join(" ");
+    }
+
+    function afficherAlphabet() {
+      const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+      const container = document.getElementById("pendu-alphabet");
+      container.innerHTML = "";
+      alpha.forEach(l => {
+        const btn = document.createElement("button");
+        btn.textContent = l;
+        btn.disabled = lettresTestees.includes(l) || essaisRestants === 0;
+        btn.onclick = () => choisirLettre(l);
+        btn.className = "pendu-key";
+        container.appendChild(btn);
+      });
+    }
+
+    function choisirLettre(lettre) {
+      if (lettresTestees.includes(lettre) || essaisRestants === 0) return;
+      lettresTestees.push(lettre);
+      if (motSecret.includes(lettre)) {
+        motSecret.split("").forEach((l, i) => {
+          if (l === lettre) {
+            lettresTrouvees[i] = lettre;
+          }
+        });
+      } else {
+        essaisRestants--;
+      }
+      afficherMot();
+      afficherAlphabet();
+      afficherDessin();
+      verifierFin();
+    }
+
+    function afficherDessin() {
+      document.getElementById("pendu-drawing").textContent = `Erreurs : ${8 - essaisRestants}/8`;
+    }
+
+    function verifierFin() {
+      if (!lettresTrouvees.includes("")) {
+        document.getElementById("pendu-message").textContent = "Bravo, vous avez trouvé le mot !";
+        document.getElementById("pendu-alphabet").querySelectorAll("button").forEach(btn => btn.disabled = true);
+        document.getElementById('next-quest').style.display = '';
+        document.getElementById('next-quest').disabled = false;
+      } else if (essaisRestants === 0) {
+        document.getElementById("pendu-message").textContent = `Perdu ! Le mot était : ${motSecret}`;
+        document.getElementById("pendu-alphabet").querySelectorAll("button").forEach(btn => btn.disabled = true);
+        document.getElementById('next-quest').style.display = '';
+        document.getElementById('next-quest').disabled = false;
+      }
+    }
+
+    // Initialisation
+    afficherMot();
+    afficherAlphabet();
+    afficherDessin();
+    document.getElementById("pendu-message").textContent = "";
+    document.getElementById('next-quest').style.display = 'none';
+
+    return;
+  }
+  // ==== FIN GESTION DU PENDU ====
+
   // 4. Bloc upload harmonisé multi-upload pour tous les types
   const typesUpload = Object.keys(MISSION_UPLOAD_LABELS);
   if (typesUpload.includes(etape.type)) {
@@ -255,6 +337,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
   document.getElementById('next-quest').disabled = false;
   window.waitAndShowEpreuveContent && window.waitAndShowEpreuveContent();
 }
+
 
 function afficherBlocUpload(type, stepIndex, nb, onUploaded, testMode = false, labelUpload = null, consignes = null) {
   const bloc = document.getElementById('bloc-upload');
