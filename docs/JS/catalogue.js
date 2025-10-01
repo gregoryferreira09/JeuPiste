@@ -118,7 +118,7 @@ const QUESTS_CATALOGUE = [
     combinable: [],
     preview: "duel"
   },
-  // === PENDU, CORRIGÉ ET INTÉGRÉ ===
+  // === PENDU
   {
     id: "pendu",
     nom: "Le Jeu du Pendu",
@@ -267,7 +267,6 @@ const SUGGESTIONS = {
   ],
   pendu: [
     "Mot de 6 lettres à deviner (aléatoire)",
-    "Mot de 7 lettres à deviner (aléatoire)",
-    "Mot personnalisé (proposez votre propre mot mystère)"
+    "Mot de 7 lettres à deviner (aléatoire)"
   ]
 };
