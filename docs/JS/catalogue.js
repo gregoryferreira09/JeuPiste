@@ -1,7 +1,32 @@
 // quests-catalogue.js
 
+// ==== Mots pour le pendu ====
+const MOTS_6_LETTRES = [
+  "ACAJOU","AGNEAU","ALARME","ANANAS","ANGORA","ANIMAL","ARCADE","AVIRON","AZIMUT","BABINE",
+  "BALADE","BONZAÏ","BASSON","BILLET","BOUCHE","BOUCLE","BRONZE","CABANE","CAÏMAN","CLOCHE",
+  "CHÈQUE","CIRAGE","COCCYX","CRAYON","GARAGE","GOSPEL","GOULOT","GRAMME","GRELOT","GUENON",
+  "HOCHET","HORMIS","HUMOUR","HURLER","JARGON","LIMITE","LIONNE","MENTHE","OISEAU","PODIUM",
+  "POULPE","POUMON","PUZZLE","QUARTZ","RAPIDE","SÉISME","TÉTINE","TOMATE","WALABI","WHISKY",
+  "ZIPPER"
+];
+
+const MOTS_7_LETTRES = [
+  "ABRITER","BALLAST","BARYTON","BASSINE","BATAVIA","BILLARD","BRETZEL","CITHARE","CHARIOT","CLAIRON",
+  "CORBEAU","CORTEGE","CRAPAUD","CYMBALE","DENTIER","DJEMBÉ","DRAPEAU","EXEMPLE","FOURMIS","GRANDIR",
+  "ICEBERG","JAVELOT","JOCKEY","JOURNAL","JOURNÉE","JOUXTER","LOSANGE","MACADAM","MONDIAL","NOTABLE",
+  "OXYGÈNE","PANIQUE","PÉTROLE","POTERIE","POUVOIR","RENÉGAT","SCOOTER","SENTEUR","SIFFLET","SPIRALE",
+  "SUCETTE","STROPHE","TONNEAU","TROUSSE","TUNIQUE","UKULÉLÉ","VAUTOUR","ZOZOTER"
+];
+
+// Fonction utilitaire pour générer un mot aléatoire pour le pendu
+function genererMotPenduAleatoire() {
+  const tousMots = MOTS_6_LETTRES.concat(MOTS_7_LETTRES);
+  return tousMots[Math.floor(Math.random() * tousMots.length)];
+}
+
+// ==== Catalogue complet des épreuves ====
 const QUESTS_CATALOGUE = [
-  // === PHOTO SIMPLE ===
+  // PHOTO SIMPLE
   {
     id: "photo",
     nom: "Photo à prendre",
@@ -13,12 +38,11 @@ const QUESTS_CATALOGUE = [
     combinable: ["gps", "chrono", "mot_de_passe"],
     preview: "photo"
   },
-
-  // === PHOTO AVEC INCONNU/CRITÈRE ===
+  // PHOTO AVEC INCONNU
   {
     id: "photo_inconnus",
     nom: "Photo avec des inconnus",
-    description: "Prendre une ou plusieurs photos avec des personnes différentes ou répondant à un critère déterminé. (Qui porte des lunettes ; qui a plus de 50 ans ; qui pore une chemise blanche ...",
+    description: "Prendre une ou plusieurs photos avec des personnes différentes ou répondant à un critère déterminé.",
     parametres: [
       { key: "nbPersonnes", type: "number", label: "Nombre de personnes/photos", default: 1, min: 1, max: 10 },
       { key: "critere", type: "text", label: "Critère ou consigne", placeholder: "ex : Personne qui porte un chapeau" }
@@ -26,9 +50,7 @@ const QUESTS_CATALOGUE = [
     combinable: ["gps", "chrono"],
     preview: "photo"
   },
-
-
-  // === COLLECTE OBJET ===
+  // COLLECTE OBJET
   {
     id: "collecte_objet",
     nom: "Collecte d’objet",
@@ -40,21 +62,18 @@ const QUESTS_CATALOGUE = [
     combinable: ["chrono"],
     preview: "objet"
   },
-
-  // === AUDIO ===
-{
-  id: "audio",
-  nom: "Enregistrement audio",
-  description: "Capturer un ou plusieurs sons, messages, chansons, cris de guerre, imitations, etc.",
-  parametres: [
-    { key: "nbAudio", type: "number", label: "Nombre d'audios", default: 1, min: 1, max: 10 }
-    // plus de champ "consigne" ici, c'est géré dynamiquement comme photo/duel
-  ],
-  combinable: ["chrono"],
-  preview: "audio"
-},
-
-  // === GPS (1 ou plusieurs points) ===
+  // AUDIO
+  {
+    id: "audio",
+    nom: "Enregistrement audio",
+    description: "Capturer un ou plusieurs sons, messages, chansons, cris de guerre, imitations, etc.",
+    parametres: [
+      { key: "nbAudio", type: "number", label: "Nombre d'audios", default: 1, min: 1, max: 10 }
+    ],
+    combinable: ["chrono"],
+    preview: "audio"
+  },
+  // GPS
   {
     id: "gps",
     nom: "Déplacement GPS",
@@ -65,9 +84,7 @@ const QUESTS_CATALOGUE = [
     combinable: ["photo", "audio", "chrono", "mot_de_passe"],
     preview: "gps"
   },
-
-
-  // === ANAGRAMME/CRYPTAGE ===
+  // ANAGRAMME
   {
     id: "anagramme",
     nom: "Anagramme / Cryptogramme",
@@ -80,12 +97,7 @@ const QUESTS_CATALOGUE = [
     combinable: ["chrono", "gps"],
     preview: "enigme"
   },
-
-
-
-
-
-  // === CHRONOMETRE ===
+  // CHRONOMETRE
   {
     id: "chrono",
     nom: "Chronométré",
@@ -95,19 +107,18 @@ const QUESTS_CATALOGUE = [
     ],
     combinable: []
   },
-
-  // === DEFI EN DUEL ===
-{
-  id: "duel",
-  nom: "Défi en duel",
-  description: "Deux équipes s’affrontent sur un mini-jeu (score, rapidité, etc.). L'équipe perdante perd une minute à devoir attendre sur place.",
-  parametres: [
-    { key: "nombre", type: "number", label: "Nombre de duels", min: 1, max: 10 }
-  ],
-  combinable: [],
-  preview: "duel"
-},
-  
+  // DUEL
+  {
+    id: "duel",
+    nom: "Défi en duel",
+    description: "Deux équipes s’affrontent sur un mini-jeu (score, rapidité, etc.). L'équipe perdante perd une minute à devoir attendre sur place.",
+    parametres: [
+      { key: "nombre", type: "number", label: "Nombre de duels", min: 1, max: 10 }
+    ],
+    combinable: [],
+    preview: "duel"
+  },
+  // === PENDU, CORRIGÉ ET INTÉGRÉ ===
   {
     id: "pendu",
     nom: "Le Jeu du Pendu",
@@ -122,9 +133,7 @@ const QUESTS_CATALOGUE = [
   }
 ];
 
-
-
-// Suggestions pour les quêtes photos
+// ==== Suggestions pour chaque type de quête ====
 const SUGGESTIONS = {
   photo: [
     "Un arbre remarquable ou original",
@@ -157,8 +166,6 @@ const SUGGESTIONS = {
     "Une photo prise “à travers” quelque chose (trou, branches…)",
     "Un monument ou vestige caché du parc"
   ],
-
- 
   photo_inconnus: [
     "Avec une personne portant un chapeau",
     "Avec quelqu’un ayant une barbe remarquable",
@@ -180,8 +187,6 @@ const SUGGESTIONS = {
     "Avec toute une famille comme si vous en étiez un membre",
     "Avec la plus belle personne du parc"
   ],
-
-
   collecte_objet: [
     "Une feuille d’arbre d’une forme originale",
     "Le plus beau caillou que vous trouverez",
@@ -206,16 +211,12 @@ const SUGGESTIONS = {
     "Trois objets que tu mets en histoire durant deux minutes",
     "Un objet qui pourrait appartenir à un pirate/sorcier/héros…"
   ],
-
-  
-
   audio: [
     "Chanter le refrain de la musique qui apparait sous vos yeux",
     "Murmurer un secret à l’enregistreur",
     "Faire une imitation d’un personnage célèbre (dessin animé, cinéma…)",
     "Chanter une note qui tient le plus longtemps possible en un seul souffle"
   ],
-
   gps_chaud_froid: [
     "Trouve le banc caché au centre du parc",
     "Atteins la fontaine au nord sans la carte, en mode chaud/froid",
@@ -228,9 +229,6 @@ const SUGGESTIONS = {
     "Découvre la cachette sous le vieux pont",
     "Trouve la zone d’ombre la plus fraîche du parc"
   ],
-
-    
-
   enigme: [
     "Anagramme d’un mot en rapport avec le parc (ex : « RVABE » —> Réponse : “Arbre”)",
     "Décrypter un message codé avec un code César (décale chaque lettre de +3 par exemple)",
@@ -243,8 +241,6 @@ const SUGGESTIONS = {
     "Trouver le nombre exact d’objets d’une couleur dans la zone",
     "Trouver l’intrus dans une liste d’éléments naturels"
   ],
-
-  
   chrono: [
     "Ramasser et rapporter 3 objets différents en moins de 30 secondes et prendre la photo",
     "Prendre une photo d’un animal ou d’un insecte en moins de 40 secondes et prendre la photo",
@@ -258,8 +254,6 @@ const SUGGESTIONS = {
     "Faire la photo la plus sexy de vous en 10 secondes",
     "Faire la pire grimace de vous en 10 secondes"
   ],
-
-
   duel: [
     "Pierre-Feuille-Ciseaux (classique, un tour ou en 2 manches gagnantes)",
     "Duel de regard (le premier qui cligne des yeux a perdu)",
@@ -271,12 +265,9 @@ const SUGGESTIONS = {
     "Cri le plus long (qui tient un cri ou une note la plus longue)",
     "Pierre-feuille-ciseaux en relais (enchaîner 3 duels en équipe)"
   ],
-
-  
-    pendu: [
+  pendu: [
     "Mot de 6 lettres à deviner (aléatoire)",
     "Mot de 7 lettres à deviner (aléatoire)",
     "Mot personnalisé (proposez votre propre mot mystère)"
-    ]
-  }
-  
+  ]
+};
