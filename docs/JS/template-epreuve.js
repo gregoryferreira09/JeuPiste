@@ -169,10 +169,16 @@ const MISSION_UPLOAD_LABELS = {
   fichier: (vars) => (vars.nb > 1 ? "Fichiers à envoyer" : "Fichier à envoyer"),
 };
 
+// Fonction utilitaire pour générer un mot aléatoire pour le pendu (doit exister dans catalogue.js)
+function genererMotPenduAleatoire() {
+  const tousMots = MOTS_6_LETTRES.concat(MOTS_7_LETTRES);
+  return tousMots[Math.floor(Math.random() * tousMots.length)];
+}
+
 // ======================== JEU DU PENDU HARMONISÉ ========================
 
 // Fonction d'affichage du pendu harmonisé
-function afficherJeuPenduFirebaseEtape(motSecretParam) {
+function initJeuPendu(motSecretParam, onComplete) {
   let motSecret = motSecretParam && motSecretParam.length >= 6
     ? motSecretParam.toUpperCase()
     : (Math.random() < 0.5
@@ -252,6 +258,7 @@ function afficherJeuPenduFirebaseEtape(motSecretParam) {
       document.getElementById("pendu-alphabet").querySelectorAll("button").forEach(btn => btn.disabled = true);
       document.getElementById('next-quest').style.display = '';
       document.getElementById('next-quest').disabled = false;
+      if (typeof onComplete === "function") onComplete(true, motSecret);
     } else if (essaisRestants === 0) {
       document.getElementById("pendu-message").textContent = `Perdu ! Le mot était : ${motSecret}`;
       document.getElementById("pendu-alphabet").querySelectorAll("button").forEach(btn => btn.disabled = true);
