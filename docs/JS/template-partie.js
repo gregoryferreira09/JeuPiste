@@ -298,7 +298,19 @@ function tenterAccesJetonCourant() {
     ref.once('value').then(snap => {
       const epreuveEnCours = snap.val();
       if (epreuveEnCours === null || epreuveEnCours === i) {
-        // Soit aucune épreuve en cours, soit c'est bien celle-là : on la (ré)active et on y va
+        // Correction harmonisée : récupère l'épreuve à jouer
+        const etape = missions[jetonMissionsMapping[i]];
+        // Harmonise le mot du pendu si besoin
+        if (etape && etape.type === "pendu") {
+          if (!etape.params) etape.params = {};
+          if (!etape.params.mot_pendu || etape.params.mot_pendu.length < 6) {
+            // Cette fonction doit exister dans catalogue.js
+            etape.params.mot_pendu = genererMotPenduAleatoire();
+          }
+        }
+        // Synchronisation harmonisée dans le localStorage
+        localStorage.setItem("epreuveCourante", JSON.stringify(etape));
+        // Navigation vers la page d'épreuve
         ref.set(i).then(() => {
           window.location.href = `template-epreuve.html?idx=${jetonMissionsMapping[i]}`;
         });
