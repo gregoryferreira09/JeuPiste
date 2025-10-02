@@ -327,7 +327,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
       etape.params.mot_pendu = genererMotPenduAleatoire();
     }
     document.getElementById('bloc-pendu').style.display = '';
-    afficherJeuPenduFirebaseEtape(etape.params.mot_pendu);
+    initJeuPendu(etape.params.mot_pendu);
     return;
   }
   // ==== FIN GESTION DU PENDU ====
