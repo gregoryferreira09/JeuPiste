@@ -308,41 +308,22 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
 
     function renderGrilles() {
       const grillesDiv = document.getElementById("tc-grilles");
-      grillesDiv.innerHTML = `
-        <div>
-          <h4>Votre grille</h4>
-          <table id="tc-player-grid"><thead>
-            <tr><th></th>${letters.map(l=>`<th>${l}</th>`).join("")}</tr>
-          </thead><tbody>
-            ${numbers.map((num,r)=>
-              `<tr><th>${num}</th>`+
-              letters.map((_,c)=>{
-                let cl = "";
-                if (playerGrid[r][c]) cl="ship";
-                if (aiShots.find(s=>s.row===r&&s.col===c)) cl+=playerGrid[r][c]?" hit":" miss";
-                return `<td class="${cl}" style="cursor:${placingPhase&&currentShip?'pointer':'default'};" data-row="${r}" data-col="${c}"></td>`;
-              }).join("")+
-              `</tr>`
-            ).join("")}
-            </tbody></table>
-        </div>
-        <div>
-          <h4>Grille ennemie</h4>
-          <table id="tc-ai-grid"><thead>
-            <tr><th></th>${letters.map(l=>`<th>${l}</th>`).join("")}</tr>
-          </thead><tbody>
-            ${numbers.map((num,r)=>
-              `<tr><th>${num}</th>`+
-              letters.map((_,c)=>{
-                let shot = playerShots.find(s=>s.row===r&&s.col===c);
-                let cl = shot ? (aiGrid[r][c]?"hit":"miss") : "";
-                return `<td class="${cl}" style="cursor:${!placingPhase&&playerTurn&&!shot&&!gameOver?'pointer':'default'};" data-row="${r}" data-col="${c}"></td>`;
-              }).join("")+
-              `</tr>`
-            ).join("")}
-            </tbody></table>
-        </div>
-      `;
+grillesDiv.innerHTML = `
+  <div id="tc-legend">
+    <span class="tc-legend-item"><span class="tc-legend-box ship"></span> Bateau</span>
+    <span class="tc-legend-item"><span class="tc-legend-box hit"></span> Touché</span>
+    <span class="tc-legend-item"><span class="tc-legend-box miss"></span> Raté</span>
+    <span class="tc-legend-item"><span class="tc-legend-box empty"></span> Eau</span>
+  </div>
+  <div>
+    <h4>Votre grille</h4>
+    <table id="tc-player-grid"> ... </table>
+  </div>
+  <div>
+    <h4>Grille ennemie</h4>
+    <table id="tc-ai-grid"> ... </table>
+  </div>
+`;
       // Placement
       if (placingPhase) {
         document.querySelectorAll("#tc-player-grid td").forEach(td=>{
