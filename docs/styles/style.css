@@ -1412,3 +1412,9 @@ input[type="number"] {
   text-align: center;
   font-weight: bold;
 }
+
+
+#tc-player-grid td.ship { background:#4a90e2; }
+#tc-player-grid td.hit, #tc-ai-grid td.hit { background:#e22; }
+#tc-player-grid td.miss, #tc-ai-grid td.miss { background:#ccc; }
+#tc-ships-select button { margin:0 4px 4px 0; }
