@@ -128,7 +128,19 @@ const QUESTS_CATALOGUE = [
     preview: "pendu",
     genererMot: genererMotPenduAleatoire,
     instructions: "Devinez le mot de 6 ou 7 lettres en proposant des lettres une par une. Attention au temps limité !"
-  }
+  },
+
+// === TOUCHER-COULER
+{
+  id: "touchercouler",
+  nom: "Toucher-Couler",
+  description: "Affronte l’IA sur une bataille navale classique : place tes bateaux puis tente de couler ceux de l’ordinateur. À chaque victoire, tu passes à l’épreuve suivante.",
+  parametres: [
+    { key: "difficulte", type: "select", label: "Niveau de difficulté", options: ["Facile", "Normal", "Difficile"], default: "Normal" }
+  ],
+  preview: "touchercouler",
+  instructions: "Place tes bateaux puis attaque la grille ennemie. L’IA joue à chaque tour : sois le premier à couler tous ses bateaux !"
+}
 ];
 
 // ==== Suggestions pour chaque type de quête ====
