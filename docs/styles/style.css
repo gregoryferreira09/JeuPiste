@@ -1378,6 +1378,14 @@ input[type="number"] {
   cursor: pointer;
   transition: background .2s, color .2s;
 }
+.pendu-key:focus {
+  outline: 2px solid #e0c185;
+  background: #382313;
+}
+.pendu-key:hover:not(:disabled) {
+  background: #e0c185;
+  color: #231d1d;
+}
 .pendu-key:disabled {
   background: #aaa;
   color: #fff;
@@ -1388,6 +1396,9 @@ input[type="number"] {
   letter-spacing: 0.5em;
   margin-bottom: 18px;
   text-align: center;
+}
+@media (max-width: 550px) {
+  .pendu-word { font-size: 1.3em; letter-spacing: 0.2em; }
 }
 .pendu-drawing {
   margin: 14px 0;
