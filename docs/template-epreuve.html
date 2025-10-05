@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/style.css">
-  <!-- Ajout des fonts pendu si besoin -->
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
     html, body { height: 100%; }
     body { min-height: 100vh; background: #231d1d; }
@@ -29,7 +27,6 @@
       margin-bottom: 0;
       gap: 24px;
     }
-    /* Loader overlay */
     #epreuve-loader {
       position: fixed;
       z-index: 99999;
@@ -64,7 +61,6 @@
       0% { transform: rotate(0deg);}
       100% { transform: rotate(360deg);}
     }
-    /* Fade-in effect for main content */
     #main-content {
       opacity: 0;
       transition: opacity 1.1s;
@@ -73,7 +69,6 @@
       opacity: 1;
       transition: opacity 1.1s;
     }
-    /* Burn transition overlay */
     #burn-transition {
       display: none;
       position: fixed;
@@ -94,17 +89,49 @@
     @media (max-width: 650px) {
       .boutons-actions { margin-top: 18px; gap: 12px;}
     }
+    /* Styles pendu */
+    .pendu-key {
+      margin: 2px;
+      font-size: 1.1em;
+      min-width: 32px;
+      min-height: 32px;
+      border-radius: 6px;
+      background: #e0c185;
+      color: #2a1803;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .pendu-key:disabled {
+      background: #b8b0a7;
+      color: #6e6e6e;
+      cursor: not-allowed;
+    }
+    .pendu-word {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2.3em;
+      letter-spacing: 0.13em;
+      margin-bottom: 12px;
+    }
+    .pendu-drawing {
+      font-size: 1.1em;
+      margin-bottom: 12px;
+    }
+    .pendu-message {
+      font-size: 1.25em;
+      font-weight: bold;
+      margin-top: 12px;
+    }
   </style>
 </head>
 <body>
-  <!-- Loader overlay -->
   <div id="epreuve-loader">
     <div class="loader-content">
       Chargement de l'épreuve…
       <div class="loader-icon">⏳</div>
     </div>
   </div>
-  <!-- Burn effect overlay (hidden by default) -->
   <div id="burn-transition">
     <canvas id="burn-canvas" width="1920" height="1080" style="width:100vw;height:100vh;display:block;"></canvas>
   </div>
@@ -113,7 +140,6 @@
   </header>
   <div class="center-wrapper">
     <main class="main-accueil" id="main-content" role="main" style="display:flex;flex-direction:column;min-height:520px;">
-      <!-- TITRE ET METAPHORE UNIQUES -->
       <h2 class="titre-course" id="titre-quete"></h2>
       <div class="presentation-jeu" style="margin-top:24px;">
         <div class="texte-course" id="metaphore-quete" style="font-size:1.16em; color:#ffeecb; margin-bottom: 18px; line-height:1.7; font-style:italic;"></div>
@@ -126,21 +152,17 @@
         <div class="objectif-label" style="background:#cba55a; color:#231d1d;">Défi</div>
         <div class="objectif-text" id="defi-text"></div>
       </div>
-      <!-- Bloc Mission (consigne courante) -->
       <div id="bloc-mission" style="display:none;">
         <div class="objectif-course">
           <div class="objectif-label" id="mission-label">Mission</div>
           <div class="objectif-text" id="mission-text"></div>
         </div>
       </div>
-      <!-- Bloc Upload (photo, audio, etc) -->
       <div id="bloc-upload" style="display:none;">
         <div class="actions-row-horizontal" id="upload-row"></div>
         <div id="upload-feedback"></div>
       </div>
-      <!-- Bloc Réponse (input pour anagramme, réponse libre, etc) -->
       <div id="bloc-answer" style="display:none;"></div>
-      <!-- Bloc Indice (modale) -->
       <div id="bloc-indice" style="display:none;">
         <button id="show-indice" type="button">Voir l’indice</button>
         <div id="indice-modal" style="display:none;">
@@ -151,32 +173,18 @@
           </div>
         </div>
       </div>
-      <!-- Bloc Chrono (si besoin) -->
       <div id="bloc-chrono" style="display:none;">
         <span class="chrono-timer" id="timer"></span>
         <span class="chrono-message" id="chrono-message"></span>
       </div>
-      <!-- Bloc Pendu (mini-jeu) -->
+      <!-- Bloc Pendu harmonisé -->
       <div id="bloc-pendu" style="display:none;">
-        <!-- 
-          Bloc du pendu stylisé, incorporé depuis le code pendu.html
-          On conserve le container pour intégration JS.
-        -->
-        <h2 class="pendu-title" style="text-align:center; margin-bottom:1.3em;">Jeu du Pendu</h2>
-        <h3 class="pendu-soustitre">Devinez le mot mystère</h3>
-        <div id="pendu-container" class="pendu-section">
-          <div id="word-container" class="pendu-word"></div>
-          <div id="pendu-drawing" class="pendu-drawing"></div>
-          <div id="alphabet-container" class="pendu-alphabet"></div>
-          <div id="message" class="pendu-message"></div>
-        </div>
-        <div class="boutons-actions" style="margin-top:2em;">
-          <a href="index.html" class="main-btn">🏠 Retour à l'accueil</a>
-        </div>
+        <div id="pendu-word" class="pendu-word"></div>
+        <div id="pendu-drawing" class="pendu-drawing"></div>
+        <div id="pendu-alphabet" class="pendu-alphabet"></div>
+        <div id="pendu-message" class="pendu-message"></div>
       </div>
-      <!-- Bouton validation -->
       <button id="next-quest" class="main-btn" style="display:none;" disabled>Quête suivante</button>
-      <!-- BOUTON RETOUR EN BAS DU CADRE -->
       <div class="boutons-actions">
         <a class="main-btn" href="template-partie.html" id="retourJeuBtn" style="min-width:140px;text-align:center;">
           &#8592; Retour au jeu
@@ -194,17 +202,11 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-  <!-- Catalogue des phrases -->
   <script src="JS/catalogue-phrases.js"></script>
-  <!-- Catalogue des atmosphères -->
   <script src="JS/catalogue-atmospheres.js"></script>
-    <!-- Scripts pour le pendu -->
   <script src="JS/catalogue.js"></script>
-  <!-- Script principal de gestion de l'épreuve -->
   <script src="JS/template-epreuve.js"></script>
-  <!-- Animation de loader et fadein -->
   <script>
-    // Loader d'épreuve classique
     window.epreuveLoaderDisplayed = false;
     function showContentAfterLoader() {
       var main = document.getElementById('main-content');
@@ -224,25 +226,7 @@
       main.classList.remove('visible');
       window.epreuveLoaderDisplayed = false;
       setTimeout(function() { window.epreuveLoaderDisplayed = true; }, 300);
-
-      // === AJOUT PENDU ===
-      let epreuve;
-      try {
-        epreuve = JSON.parse(localStorage.getItem("epreuveCourante"));
-      } catch(e) {
-        epreuve = null;
-      }
-      if (epreuve && epreuve.type === "pendu" && epreuve.params && epreuve.params.mot_pendu) {
-    document.getElementById("bloc-pendu").style.display = "";
-    initJeuPendu(epreuve.params.mot_pendu, function(succes, mot) {
-        document.getElementById("next-quest").style.display = "";
-        document.getElementById("next-quest").disabled = false;
-    });
-}
-      // === FIN AJOUT PENDU ===
-      // Animation fadeIn pour le pendu
-      var penduMain = document.querySelector('.main-accueil');
-      if (penduMain) penduMain.classList.add('visible');
+      window.waitAndShowEpreuveContent && window.waitAndShowEpreuveContent();
     });
     window.showContentAfterLoader = showContentAfterLoader;
     window.waitAndShowEpreuveContent = function() {
@@ -253,7 +237,6 @@
       }
     };
   </script>
-  <!-- Animation page qui brûle -->
   <script>
     function startBurnTransitionAndRedirect(nextUrl) {
       const overlay = document.getElementById('burn-transition');
@@ -261,7 +244,6 @@
       overlay.style.display = 'block';
       overlay.classList.add('active');
       overlay.style.pointerEvents = 'all';
-      // Responsive sizing
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       let w = canvas.width, h = canvas.height;
@@ -269,11 +251,9 @@
       let radius = 80, maxR = Math.sqrt(w*w + h*h), step = 0;
       function draw() {
         ctx.clearRect(0,0,w,h);
-        // Fond noir
         ctx.globalAlpha = 1;
         ctx.fillStyle = "#000";
         ctx.fillRect(0,0,w,h);
-        // Cercle de brûlure
         let grad = ctx.createRadialGradient(w/2, h/2, radius*0.6, w/2, h/2, radius);
         grad.addColorStop(0, "rgba(255,180,0,0.7)");
         grad.addColorStop(0.2, "rgba(255,128,0,0.8)");
@@ -286,7 +266,7 @@
         ctx.fillStyle = grad;
         ctx.fill();
         ctx.globalCompositeOperation = "source-over";
-        radius += 55 + (radius/10); // vitesse
+        radius += 55 + (radius/10);
         step++;
         if (radius < maxR*1.3) {
           requestAnimationFrame(draw);
