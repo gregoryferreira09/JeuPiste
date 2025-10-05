@@ -309,7 +309,7 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
     document.getElementById('next-quest').style.display = 'none';
 
     return;
- 
+  }
   // ==== FIN GESTION DU PENDU ====
 
   // 4. Bloc upload harmonisé multi-upload pour tous les types
