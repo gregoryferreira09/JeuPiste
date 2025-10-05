@@ -4,7 +4,7 @@ const firebaseConfig = {
   authDomain: "murder-party-ba8d1.firebaseapp.com",
   databaseURL: "https://murder-party-ba8d1-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "murder-party-ba8d1",
-  storageBucket: "murder-party-ba8d1.appspot.com",
+  storageBucket: "murder-party-ba8d1.firebasestorage.app",
   messagingSenderId: "20295055805",
   appId: "1:20295055805:web:0963719c3f23ab7752fad4",
   measurementId: "G-KSBMBB7KMJ"
@@ -169,111 +169,6 @@ const MISSION_UPLOAD_LABELS = {
   fichier: (vars) => (vars.nb > 1 ? "Fichiers à envoyer" : "Fichier à envoyer"),
 };
 
-// Fonction utilitaire pour générer un mot aléatoire pour le pendu (doit exister dans catalogue.js)
-function genererMotPenduAleatoire() {
-  const tousMots = MOTS_6_LETTRES.concat(MOTS_7_LETTRES);
-  return tousMots[Math.floor(Math.random() * tousMots.length)];
-}
-
-// ======================== JEU DU PENDU HARMONISÉ ========================
-
-// Fonction d'affichage du pendu harmonisé
-function initJeuPendu(motSecretParam, onComplete) {
-  let motSecret = motSecretParam && motSecretParam.length >= 6
-    ? motSecretParam.toUpperCase()
-    : (Math.random() < 0.5
-        ? MOTS_6_LETTRES[Math.floor(Math.random() * MOTS_6_LETTRES.length)]
-        : MOTS_7_LETTRES[Math.floor(Math.random() * MOTS_7_LETTRES.length)]
-      ).toUpperCase();
-  let lettresTrouvees = Array(motSecret.length).fill("");
-  let essaisRestants = 9;
-  let lettresTestees = [];
-
-  document.getElementById('bloc-pendu').style.display = '';
-  document.getElementById('bloc-pendu').innerHTML = `
-    <div class="pendu-word" id="pendu-word"></div>
-    <div class="pendu-drawing" id="pendu-drawing"></div>
-    <div class="pendu-alphabet" id="pendu-alphabet"></div>
-    <div class="pendu-message" id="pendu-message"></div>
-  `;
-
-  function afficherMot() {
-    document.getElementById("pendu-word").innerHTML = lettresTrouvees.map(l => l || "_").join(" ");
-  }
-
-  function afficherAlphabet() {
-    const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-    const container = document.getElementById("pendu-alphabet");
-    container.innerHTML = "";
-    alpha.forEach(l => {
-      const btn = document.createElement("button");
-      btn.textContent = l;
-      btn.disabled = lettresTestees.includes(l) || essaisRestants === 0;
-      btn.onclick = () => choisirLettre(l);
-      btn.className = "pendu-key";
-      container.appendChild(btn);
-    });
-  }
-
-  function afficherDessin() {
-    const erreurs = 9 - essaisRestants;
-    const etapes = [
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/><line x1="40" y1="20" x2="90" y2="20" stroke="#fff" stroke-width="5"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/><line x1="40" y1="20" x2="90" y2="20" stroke="#fff" stroke-width="5"/><line x1="90" y1="20" x2="90" y2="40" stroke="#fff" stroke-width="5"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/><line x1="40" y1="20" x2="90" y2="20" stroke="#fff" stroke-width="5"/><line x1="90" y1="20" x2="90" y2="40" stroke="#fff" stroke-width="5"/><circle cx="90" cy="50" r="10" stroke="#fff" stroke-width="4" fill="none"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/><line x1="40" y1="20" x2="90" y2="20" stroke="#fff" stroke-width="5"/><line x1="90" y1="20" x2="90" y2="40" stroke="#fff" stroke-width="5"/><circle cx="90" cy="50" r="10" stroke="#fff" stroke-width="4" fill="none"/><line x1="90" y1="60" x2="90" y2="100" stroke="#fff" stroke-width="4"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/><line x1="40" y1="20" x2="90" y2="20" stroke="#fff" stroke-width="5"/><line x1="90" y1="20" x2="90" y2="40" stroke="#fff" stroke-width="5"/><circle cx="90" cy="50" r="10" stroke="#fff" stroke-width="4" fill="none"/><line x1="90" y1="60" x2="90" y2="100" stroke="#fff" stroke-width="4"/><line x1="90" y1="70" x2="75" y2="85" stroke="#fff" stroke-width="4"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/><line x1="40" y1="20" x2="90" y2="20" stroke="#fff" stroke-width="5"/><line x1="90" y1="20" x2="90" y2="40" stroke="#fff" stroke-width="5"/><circle cx="90" cy="50" r="10" stroke="#fff" stroke-width="4" fill="none"/><line x1="90" y1="60" x2="90" y2="100" stroke="#fff" stroke-width="4"/><line x1="90" y1="70" x2="75" y2="85" stroke="#fff" stroke-width="4"/><line x1="90" y1="70" x2="105" y2="85" stroke="#fff" stroke-width="4"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/><line x1="40" y1="20" x2="90" y2="20" stroke="#fff" stroke-width="5"/><line x1="90" y1="20" x2="90" y2="40" stroke="#fff" stroke-width="5"/><circle cx="90" cy="50" r="10" stroke="#fff" stroke-width="4" fill="none"/><line x1="90" y1="60" x2="90" y2="100" stroke="#fff" stroke-width="4"/><line x1="90" y1="70" x2="75" y2="85" stroke="#fff" stroke-width="4"/><line x1="90" y1="70" x2="105" y2="85" stroke="#fff" stroke-width="4"/><line x1="90" y1="100" x2="80" y2="120" stroke="#fff" stroke-width="4"/></svg>`,
-      `<svg viewBox="0 0 120 150"><line x1="10" y1="140" x2="110" y2="140" stroke="#fff" stroke-width="5"/><line x1="40" y1="140" x2="40" y2="20" stroke="#fff" stroke-width="5"/><line x1="40" y1="20" x2="90" y2="20" stroke="#fff" stroke-width="5"/><line x1="90" y1="20" x2="90" y2="40" stroke="#fff" stroke-width="5"/><circle cx="90" cy="50" r="10" stroke="#fff" stroke-width="4" fill="none"/><line x1="90" y1="60" x2="90" y2="100" stroke="#fff" stroke-width="4"/><line x1="90" y1="70" x2="75" y2="85" stroke="#fff" stroke-width="4"/><line x1="90" y1="70" x2="105" y2="85" stroke="#fff" stroke-width="4"/><line x1="90" y1="100" x2="80" y2="120" stroke="#fff" stroke-width="4"/><line x1="90" y1="100" x2="100" y2="120" stroke="#fff" stroke-width="4"/></svg>`
-    ];
-    document.getElementById("pendu-drawing").innerHTML =
-      etapes[Math.min(erreurs, etapes.length - 1)] +
-      `<div style="text-align:center;margin-top:8px;">Erreurs : ${erreurs}/9</div>`;
-  }
-
-  function choisirLettre(lettre) {
-    if (lettresTestees.includes(lettre) || essaisRestants === 0) return;
-    lettresTestees.push(lettre);
-    if (motSecret.includes(lettre)) {
-      motSecret.split("").forEach((l, i) => {
-        if (l === lettre) {
-          lettresTrouvees[i] = lettre;
-        }
-      });
-    } else {
-      essaisRestants--;
-    }
-    afficherMot();
-    afficherAlphabet();
-    afficherDessin();
-    verifierFin();
-  }
-
-  function verifierFin() {
-    if (!lettresTrouvees.includes("")) {
-      document.getElementById("pendu-message").textContent = "Bravo, vous avez trouvé le mot !";
-      document.getElementById("pendu-alphabet").querySelectorAll("button").forEach(btn => btn.disabled = true);
-      document.getElementById('next-quest').style.display = '';
-      document.getElementById('next-quest').disabled = false;
-      if (typeof onComplete === "function") onComplete(true, motSecret);
-    } else if (essaisRestants === 0) {
-      document.getElementById("pendu-message").textContent = `Perdu ! Le mot était : ${motSecret}`;
-      document.getElementById("pendu-alphabet").querySelectorAll("button").forEach(btn => btn.disabled = true);
-      document.getElementById('next-quest').style.display = '';
-      document.getElementById('next-quest').disabled = false;
-    }
-  }
-
-  afficherMot();
-  afficherAlphabet();
-  afficherDessin();
-  document.getElementById("pendu-message").textContent = "";
-  document.getElementById('next-quest').style.display = 'none';
-}
-
 // ======================== GESTION AFFICHAGE ETAPE ========================
 
 function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
@@ -321,13 +216,82 @@ function afficherEtapeHarmonisee(etape, stepIndex, mode, testMode = false) {
 
   // ==== GESTION DU JEU DU PENDU ====
   if (etape.type === "pendu") {
-    // Correction : génération du mot si absent ou trop court
-    if (!etape.params) etape.params = {};
-    if (!etape.params.mot_pendu || etape.params.mot_pendu.length < 6) {
-      etape.params.mot_pendu = genererMotPenduAleatoire();
-    }
     document.getElementById('bloc-pendu').style.display = '';
-    initJeuPendu(etape.params.mot_pendu);
+    // Variables pour le pendu
+    let motSecret = (etape.params && etape.params.mot_pendu) ? etape.params.mot_pendu.toUpperCase() : "";
+    let lettresTrouvees = Array(motSecret.length).fill("");
+    let essaisRestants = 9;
+    let lettresTestees = [];
+
+    // HTML du jeu du pendu
+    document.getElementById('bloc-pendu').innerHTML = `
+      <div class="pendu-word" id="pendu-word"></div>
+      <div class="pendu-drawing" id="pendu-drawing"></div>
+      <div class="pendu-alphabet" id="pendu-alphabet"></div>
+      <div class="pendu-message" id="pendu-message"></div>
+    `;
+
+    function afficherMot() {
+      document.getElementById("pendu-word").innerHTML = lettresTrouvees.map(l => l || "_").join(" ");
+    }
+
+    function afficherAlphabet() {
+      const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+      const container = document.getElementById("pendu-alphabet");
+      container.innerHTML = "";
+      alpha.forEach(l => {
+        const btn = document.createElement("button");
+        btn.textContent = l;
+        btn.disabled = lettresTestees.includes(l) || essaisRestants === 0;
+        btn.onclick = () => choisirLettre(l);
+        btn.className = "pendu-key";
+        container.appendChild(btn);
+      });
+    }
+
+    function choisirLettre(lettre) {
+      if (lettresTestees.includes(lettre) || essaisRestants === 0) return;
+      lettresTestees.push(lettre);
+      if (motSecret.includes(lettre)) {
+        motSecret.split("").forEach((l, i) => {
+          if (l === lettre) {
+            lettresTrouvees[i] = lettre;
+          }
+        });
+      } else {
+        essaisRestants--;
+      }
+      afficherMot();
+      afficherAlphabet();
+      afficherDessin();
+      verifierFin();
+    }
+
+    function afficherDessin() {
+      document.getElementById("pendu-drawing").textContent = `Erreurs : ${8 - essaisRestants}/9`;
+    }
+
+    function verifierFin() {
+      if (!lettresTrouvees.includes("")) {
+        document.getElementById("pendu-message").textContent = "Bravo, vous avez trouvé le mot !";
+        document.getElementById("pendu-alphabet").querySelectorAll("button").forEach(btn => btn.disabled = true);
+        document.getElementById('next-quest').style.display = '';
+        document.getElementById('next-quest').disabled = false;
+      } else if (essaisRestants === 0) {
+        document.getElementById("pendu-message").textContent = `Perdu ! Le mot était : ${motSecret}`;
+        document.getElementById("pendu-alphabet").querySelectorAll("button").forEach(btn => btn.disabled = true);
+        document.getElementById('next-quest').style.display = '';
+        document.getElementById('next-quest').disabled = false;
+      }
+    }
+
+    // Initialisation
+    afficherMot();
+    afficherAlphabet();
+    afficherDessin();
+    document.getElementById("pendu-message").textContent = "";
+    document.getElementById('next-quest').style.display = 'none';
+
     return;
   }
   // ==== FIN GESTION DU PENDU ====
@@ -512,6 +476,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
     });
 
     function chargerEtapeDynamique() {
+      // On récupère tout ce qu'il faut pour gérer le point final
       Promise.all([
         db.ref(`parties/${salonCode}/scenarioJeu/repartition`).once('value'),
         db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value'),
@@ -523,24 +488,27 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
         const finalGpsIndex = typeof snapFinal.val() === "number" ? snapFinal.val() : null;
         const validatedMissions = snapStatus.val() || {};
 
-        // Cas particulier : point final
+        // Cas particulier : on tente d'accéder au point final
         if (missionIdx !== null && finalGpsIndex !== null && missionIdx === finalGpsIndex) {
+          // On vérifie que toutes les missions sont validées (tous les jetonMissionsMapping[i]!=-1)
           let toutesValidees = true;
           for (let i = 0; i < jetonMissionsMapping.length; i++) {
             if (
-              jetonMissionsMapping[i] !== -1 &&
+              jetonMissionsMapping[i] !== -1 && // c'est une vraie mission
               (!validatedMissions[jetonMissionsMapping[i]] || !validatedMissions[jetonMissionsMapping[i]].validated)
             ) {
               toutesValidees = false; break;
             }
           }
           if (toutesValidees) {
+            // Affiche la fin du jeu
             document.getElementById('main-content').innerHTML = `
               <h2 style="color:#38b948;font-family:'Cinzel Decorative',serif;">🎉 Jeu terminé !</h2>
               <div style="font-size:1.25em;margin:18px 0 32px 0;">Félicitations, vous avez accompli toutes les quêtes et atteint le point final !</div>
               <a class="main-btn" href="accueil.html" style="min-width:160px;">Retour à l'accueil</a>
             `;
           } else {
+            // Pas encore accessible
             document.getElementById('main-content').innerHTML = `
               <h2>Point final non accessible</h2>
               <div style="margin:18px 0 32px 0;">Vous devez d'abord terminer toutes les missions avant de pouvoir accéder à ce point.</div>
@@ -551,7 +519,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
           return;
         }
 
-        // --- Mode carte libre (missionIdx dans URL) ---
+        // --- Support du mode carte libre (missionIdx dans URL) ---
         if (missionIdx !== null && !isNaN(missionIdx) && repartition[missionIdx]) {
           const etape = repartition[missionIdx];
           resetAffichageEtape();
@@ -591,6 +559,7 @@ if (typeof isTestMode !== 'undefined' && isTestMode) {
             const elapsed = Math.round((now - sTime) / 1000);
             db.ref(`parties/${salonCode}/equipes/${equipeNum}/stepsTime/${idx}`).set(elapsed);
           }
+          // --- Correction ici : valider bien l'index mission (idx), pas step ---
           sessionStorage.setItem('showValidationSuccess', '1');
           sessionStorage.setItem('nbEpreuvesRestantes', Math.max(0, repartLength - (idx+1)).toString());
           db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves/${idx}/validated`).set(true)
