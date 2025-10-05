@@ -278,5 +278,12 @@ const SUGGESTIONS = {
   pendu: [
     "Mot de 6 lettres à deviner (aléatoire)",
     "Mot de 7 lettres à deviner (aléatoire)"
-  ]
+  ],
+  touchercouler: [
+  "Coule tous les bateaux de l'adversaire pour gagner",
+  "Place tes bateaux stratégiquement pour éviter d’être coulé",
+  "Évite de regrouper tes navires pour compliquer la tâche de l'ennemi",
+  "Utilise la logique pour deviner l’orientation des bateaux ennemis",
+  "Attention, chaque tir raté rapproche l’adversaire de la victoire !",
+],
 };
