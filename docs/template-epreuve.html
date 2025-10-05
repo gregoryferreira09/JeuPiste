@@ -232,13 +232,13 @@
       } catch(e) {
         epreuve = null;
       }
-      if (epreuve && epreuve.type === "pendu" && epreuve.mot_pendu) {
-        document.getElementById("bloc-pendu").style.display = "";
-        initJeuPendu(epreuve.mot_pendu, function(succes, mot) {
-          document.getElementById("next-quest").style.display = "";
-          document.getElementById("next-quest").disabled = false;
-        });
-      }
+      if (epreuve && epreuve.type === "pendu" && epreuve.params && epreuve.params.mot_pendu) {
+    document.getElementById("bloc-pendu").style.display = "";
+    initJeuPendu(epreuve.params.mot_pendu, function(succes, mot) {
+        document.getElementById("next-quest").style.display = "";
+        document.getElementById("next-quest").disabled = false;
+    });
+}
       // === FIN AJOUT PENDU ===
       // Animation fadeIn pour le pendu
       var penduMain = document.querySelector('.main-accueil');
