@@ -17,6 +17,8 @@ let finalGpsIndex = null;
 let jetonsState = [];
 let currentJetonIndex = null;
 let userPosition = null;
+const PERIMETRE_AUTORISE = 75; // Périmètre autorisé en mètres
+let firebaseListeners = []; // Tableau pour tracker les listeners Firebase
 
 // ========== UTILS ==========
 function showValidationSuccess() {
@@ -47,6 +49,19 @@ function resetEpreuveEnCours() {
   }
 }
 
+// ========== FIREBASE LISTENERS CLEANUP ==========
+function cleanupFirebaseListeners() {
+  firebaseListeners.forEach(ref => {
+    ref.off();
+  });
+  firebaseListeners = [];
+}
+
+function addFirebaseListener(ref) {
+  firebaseListeners.push(ref);
+  return ref;
+}
+
 // ========== DOM + AUTH READY ==========
 function onDomAndAuthReady(callback) {
   let domReady = false, authReady = false;
@@ -71,10 +86,21 @@ function onDomAndAuthReady(callback) {
 function checkLocalStorageOrRedirect() {
   const salonCode = localStorage.getItem("salonCode");
   const equipeNum = localStorage.getItem("equipeNum");
-  if (!salonCode || !equipeNum) {
+  
+  // Validation plus robuste des données localStorage
+  if (!salonCode || !equipeNum || salonCode.trim() === "" || equipeNum.trim() === "") {
+    console.warn("Données localStorage manquantes ou invalides - redirection vers accueil");
     window.location.href = "accueil.html";
     return false;
   }
+  
+  // Vérification que equipeNum est un nombre valide
+  if (isNaN(parseInt(equipeNum, 10))) {
+    console.warn("Numéro d'équipe invalide - redirection vers accueil");
+    window.location.href = "accueil.html";
+    return false;
+  }
+  
   return true;
 }
 
@@ -184,54 +210,68 @@ function lancerAccueil() {
   db.ref('parties/' + salonCode + '/scenario/gpsPoints').once('value').then(snapPoints => {
     gpsPoints = snapPoints.val() || [];
     afficherCarteCentraleTousPoints(gpsPoints);
-    db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value').then(snapMission => {
-      missions = snapMission.val() || [];
-      db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value').then(snapMapping => {
-        jetonMissionsMapping = snapMapping.val() || [];
-        db.ref(`parties/${salonCode}/finalGpsIndex`).once('value').then(snapFinal => {
-          finalGpsIndex = typeof snapFinal.val() === "number" ? snapFinal.val() : null;
+    return db.ref('parties/' + salonCode + '/scenarioJeu/repartition').once('value');
+  }).then(snapMission => {
+    missions = snapMission.val() || [];
+    return db.ref(`parties/${salonCode}/jetonMissionsMapping`).once('value');
+  }).then(snapMapping => {
+    jetonMissionsMapping = snapMapping.val() || [];
+    return db.ref(`parties/${salonCode}/finalGpsIndex`).once('value');
+  }).then(snapFinal => {
+    finalGpsIndex = typeof snapFinal.val() === "number" ? snapFinal.val() : null;
 
-          function redraw() {
-            let totalMissions = missions.length;
-            let nbValidees = 0;
-            for (let i = 0; i < totalMissions; i++) {
-              if (validatedMissions && validatedMissions[i] && validatedMissions[i].validated) nbValidees++;
-            }
-            let toutesMissionsValidees = (nbValidees === totalMissions);
-            genererJetonsColonnes(
-              gpsPoints,
-              jetonMissionsMapping,
-              missions,
-              validatedMissions,
-              finalGpsIndex,
-              toutesMissionsValidees,
-              jetonsMalus,
-              epreuveEnCours
-            );
-            if (toutesMissionsValidees && finalGpsIndex !== null) {
-              afficherJetonFinal(gpsPoints, finalGpsIndex);
-            } else {
-              let finalWrapper = document.getElementById('final-jeton-wrapper');
-              if (finalWrapper) finalWrapper.style.display = "none";
-            }
-          }
+    function redraw() {
+      let totalMissions = missions.length;
+      let nbValidees = 0;
+      for (let i = 0; i < totalMissions; i++) {
+        if (validatedMissions && validatedMissions[i] && validatedMissions[i].validated) nbValidees++;
+      }
+      let toutesMissionsValidees = (nbValidees === totalMissions);
+      genererJetonsColonnes(
+        gpsPoints,
+        jetonMissionsMapping,
+        missions,
+        validatedMissions,
+        finalGpsIndex,
+        toutesMissionsValidees,
+        jetonsMalus,
+        epreuveEnCours
+      );
+      if (toutesMissionsValidees && finalGpsIndex !== null) {
+        afficherJetonFinal(gpsPoints, finalGpsIndex);
+      } else {
+        let finalWrapper = document.getElementById('final-jeton-wrapper');
+        if (finalWrapper) finalWrapper.style.display = "none";
+      }
+    }
 
-          db.ref(`parties/${salonCode}/equipes/${equipeNum}/jetonsMalus`).on('value', snapMalus => {
-            jetonsMalus = snapMalus.val() || [];
-            redraw();
-          });
-          db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).on('value', snapStatus => {
-            validatedMissions = snapStatus.val() || {};
-            redraw();
-          });
-          db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuveEnCours`).on('value', snapEpreuve => {
-            epreuveEnCours = snapEpreuve.val();
-            redraw();
-          });
-          redraw();
-        });
-      });
-    });
+    // Nettoyer les anciens listeners avant d'en créer de nouveaux
+    cleanupFirebaseListeners();
+
+    addFirebaseListener(
+      db.ref(`parties/${salonCode}/equipes/${equipeNum}/jetonsMalus`).on('value', snapMalus => {
+        jetonsMalus = snapMalus.val() || [];
+        redraw();
+      })
+    );
+    addFirebaseListener(
+      db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuves`).on('value', snapStatus => {
+        validatedMissions = snapStatus.val() || {};
+        redraw();
+      })
+    );
+    addFirebaseListener(
+      db.ref(`parties/${salonCode}/equipes/${equipeNum}/epreuveEnCours`).on('value', snapEpreuve => {
+        epreuveEnCours = snapEpreuve.val();
+        redraw();
+      })
+    );
+    redraw();
+  }).catch(error => {
+    console.error("Erreur lors du chargement des données Firebase:", error);
+    // En cas d'erreur critique, rediriger vers l'accueil
+    alert("Erreur de connexion. Redirection vers l'accueil...");
+    window.location.href = "accueil.html";
   });
 }
 
@@ -382,7 +422,11 @@ function genererJetonsColonnes(
   droite.innerHTML = '';
   const N = gpsPoints.length;
   let jetonDiameter = (N > 10) ? 34 : 48;
-  jetonsState = jetonsState.length === N ? jetonsState : Array(N).fill("white");
+  
+  // Initialisation plus robuste du state des jetons
+  if (jetonsState.length !== N) {
+    jetonsState = Array(N).fill("white");
+  }
   for(let i=0; i<N; i++) {
     if (i === finalGpsIndex && !toutesMissionsValidees) continue;
     if (i === finalGpsIndex && toutesMissionsValidees) continue;
@@ -469,20 +513,9 @@ let compassWatchId = null;
 let lastDistance = null;
 let isSearchingArrow = false;
 let searchingArrowInterval = null;
+let deviceOrientationListeners = [];
 
-function showCompass(targetGps, onArrivee) {
-  const container = document.getElementById('compass-arrow-container');
-  container.style.display = "flex";
-  const stepsInfo = document.getElementById('steps-info');
-  stepsInfo.textContent = "Recherche de la position...";
-  startSearchingArrow();
-  if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
-  lastDistance = null;
-
-  
-const PERIMETRE_AUTORISE = 75; // Mets ici la valeur que tu veux
-
-function updateArrow(position) {
+function updateArrow(position, targetGps, stepsInfo, onArrivee) {
   userPosition = { lat: position.coords.latitude, lng: position.coords.longitude };
   const userLat = position.coords.latitude;
   const userLng = position.coords.longitude;
@@ -521,29 +554,57 @@ function updateArrow(position) {
   stopSearchingArrow();
   document.getElementById('svg-arrow').style.transform = `rotate(${heading}deg)`;
 }
-  
+
+function showCompass(targetGps, onArrivee) {
+  const container = document.getElementById('compass-arrow-container');
+  container.style.display = "flex";
+  const stepsInfo = document.getElementById('steps-info');
+  stepsInfo.textContent = "Recherche de la position...";
+  startSearchingArrow();
+  if (compassWatchId) navigator.geolocation.clearWatch(compassWatchId);
+  lastDistance = null;
+
+  // Nettoyer les anciens event listeners
+  cleanupDeviceOrientationListeners();
+
   document.getElementById('svg-arrow').onclick = function() {
     tenterAccesJetonCourant();
   };
   if (navigator.geolocation) {
     compassWatchId = navigator.geolocation.watchPosition(
-      updateArrow,
+      (position) => updateArrow(position, targetGps, stepsInfo, onArrivee),
       (err) => { stepsInfo.textContent = "Impossible d'accéder à la position."; },
       { enableHighAccuracy: true }
     );
   } else {
     stepsInfo.textContent = "Géolocalisation non supportée.";
   }
-  window.addEventListener('deviceorientationabsolute', function(e) {
+  
+  // Ajouter les event listeners avec cleanup tracking
+  const absoluteListener = function(e) {
     if (e.absolute && e.alpha !== null) {
       window.lastDeviceOrientation = e.alpha;
     }
-  }, true);
-  window.addEventListener('deviceorientation', function(e) {
+  };
+  const orientationListener = function(e) {
     if (e.webkitCompassHeading !== undefined) {
       window.lastDeviceOrientation = e.webkitCompassHeading;
     }
-  }, true);
+  };
+  
+  window.addEventListener('deviceorientationabsolute', absoluteListener, true);
+  window.addEventListener('deviceorientation', orientationListener, true);
+  deviceOrientationListeners.push(
+    { type: 'deviceorientationabsolute', listener: absoluteListener },
+    { type: 'deviceorientation', listener: orientationListener }
+  );
+}
+
+function cleanupDeviceOrientationListeners() {
+  deviceOrientationListeners.forEach(({ type, listener }) => {
+    window.removeEventListener(type, listener, true);
+  });
+  deviceOrientationListeners = [];
 }
 
 function startSearchingArrow() {
@@ -574,6 +635,7 @@ function hideCompass() {
   }
   lastDistance = null;
   stopSearchingArrow();
+  cleanupDeviceOrientationListeners();
 }
 
 // ========== RESIZE (DÉBOUNCED) ==========
@@ -589,6 +651,15 @@ onDomAndAuthReady(() => {
   handleShowMap();      // Masque ou affiche la carte selon le paramètre
   initGlobalChrono();   // Ajoute le chrono global si durée définie
   lancerAccueil();      // Logique de jeu principale
+});
+
+// ========== CLEANUP À LA FERMETURE ==========
+window.addEventListener('beforeunload', function() {
+  cleanupFirebaseListeners();
+  cleanupDeviceOrientationListeners();
+  if (compassWatchId) {
+    navigator.geolocation.clearWatch(compassWatchId);
+  }
 });
 
 // ========= Pour la modale "Perdu !" =========
